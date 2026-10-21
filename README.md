@@ -4,12 +4,11 @@
 
 | Thư mục | Nội dung |
 |---|---|
-| `backend/` | Spring Boot 4 (Java 25), modular monolith — xem [ADR 0001](docs/adr/0001-modular-monolith-hexagonal.md) |
-| `apps/mobile/` | App người dùng, React Native + Expo |
-| `apps/admin-web/` | Admin web, React + Vite |
-| `apps/voting-web/` | Trang bình chọn cho bạn bè (không cần đăng nhập), React + Vite |
-| `contracts/openapi.yaml` | Hợp đồng API — sửa ở đây trước khi code |
-| `infra/` | Docker Compose cho máy dev (Postgres, MinIO) |
+| `be/` | **Backend** — Spring Boot 4 (Java 25), modular monolith — xem [ADR 0001](docs/adr/0001-modular-monolith-hexagonal.md). `be/docker-compose.yml`: Postgres + MinIO cho máy dev |
+| `fe/mobile/` | **Frontend** — app người dùng, React Native + Expo |
+| `fe/admin-web/` | **Frontend** — admin web, React + Vite |
+| `fe/voting-web/` | **Frontend** — trang bình chọn cho bạn bè (không cần đăng nhập), React + Vite |
+| `contracts/openapi.yaml` | Hợp đồng API giữa fe và be — sửa ở đây trước khi code |
 | `docs/adr/` | Các quyết định kiến trúc |
 
 ## Yêu cầu
@@ -19,10 +18,9 @@ JDK 25, Node 24, Docker Desktop.
 ## Chạy local
 
 ```bash
-docker compose -f infra/docker-compose.yml up -d   # Postgres + MinIO
-cd backend && ./gradlew bootRun                     # http://localhost:8080/actuator/health
-cd apps/voting-web && npm install && npm run dev    # tương tự cho admin-web
-cd apps/mobile && npm install --legacy-peer-deps && npx expo start
+cd be && docker compose up -d && ./gradlew bootRun # Postgres + MinIO, rồi http://localhost:8080/actuator/health
+cd fe/voting-web && npm install && npm run dev      # tương tự cho admin-web
+cd fe/mobile && npm install --legacy-peer-deps && npx expo start
 ```
 
 ## Quy trình làm việc

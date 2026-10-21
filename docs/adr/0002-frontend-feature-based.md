@@ -5,7 +5,7 @@
 
 ## Quyết định
 
-Cả 3 app (`apps/mobile`, `apps/admin-web`, `apps/voting-web`) dùng cùng khuôn:
+Cả 3 app (`fe/mobile`, `fe/admin-web`, `fe/voting-web`) dùng cùng khuôn:
 
 ```
 src/

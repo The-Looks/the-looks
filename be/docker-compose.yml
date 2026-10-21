@@ -1,4 +1,4 @@
-# Hạ tầng cho máy dev: docker compose -f infra/docker-compose.yml up -d
+# Hạ tầng cho máy dev (chạy trong thư mục be/): docker compose up -d
 services:
   postgres:
     image: postgres:17
