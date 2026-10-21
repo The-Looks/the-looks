@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "THE LOOKS",
+    "slug": "the-looks-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#FAF8FC",
+    "ios": { "supportsTablet": false, "bundleIdentifier": "vn.thelooks.app" },
+    "android": { "package": "vn.thelooks.app" },
+    "web": { "bundler": "metro" }
+  }
+}

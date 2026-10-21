@@ -1,0 +1,39 @@
+openapi: 3.1.0
+info:
+  title: The Looks API
+  version: 0.1.0
+  description: |
+    Hợp đồng API giữa backend và các app. Sửa file này trước, review qua PR, rồi mới code (contract-first).
+    Frontend sinh client/kiểu dữ liệu từ file này.
+
+    Nhóm đường dẫn:
+    - `/api/app/**`    — app mobile, cần JWT
+    - `/api/admin/**`  — admin web, cần JWT có roles: [ADMIN]
+    - `/api/public/**` — voting-web, không cần đăng nhập
+servers:
+  - url: http://localhost:8080
+    description: dev
+security:
+  - bearerAuth: []
+tags:
+  - name: identity
+  - name: wardrobe
+  - name: outfit
+  - name: voting
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Problem:
+      description: Lỗi chuẩn RFC 9457, mọi endpoint dùng chung
+      type: object
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
