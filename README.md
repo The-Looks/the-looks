@@ -13,12 +13,12 @@
 
 ## Yêu cầu
 
-JDK 25, Node 24, Docker Desktop.
+JDK 25, Node 24, PostgreSQL 18 (cài trực tiếp hoặc qua Docker). Không cần cài Maven: dùng `./mvnw` có sẵn trong `be/`.
 
 ## Chạy local
 
 ```bash
-cd be && docker compose up -d && ./gradlew bootRun # Postgres + MinIO, rồi http://localhost:8080/actuator/health
+cd be && ./mvnw spring-boot:run                  # cần Postgres (cài sẵn, hoặc docker compose up -d); http://localhost:8080/actuator/health
 cd fe/voting-web && npm install && npm run dev      # tương tự cho admin-web
 cd fe/mobile && npm install --legacy-peer-deps && npx expo start
 ```
