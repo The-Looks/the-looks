@@ -1,0 +1,122 @@
+openapi: 3.1.0
+info:
+  title: wardrobe-service
+  version: 0.1.0
+  description: |
+    Tủ đồ số: upload ảnh, AI nhận diện, người dùng xác nhận/sửa/xoá. Phụ trách: Member 1.
+    outfit-service gọi GET /api/app/wardrobe/items?status=CONFIRMED — giữ ổn định schema WardrobeItem.
+    Quy ước: `/api/app/**` cần JWT, `/api/admin/**` cần role ADMIN, `/api/public/**` không cần đăng nhập.
+    Sửa file này trước, review qua PR, rồi mới code (contract-first).
+servers:
+  - url: http://localhost:8082
+    description: local
+security:
+  - bearerAuth: []
+
+paths:
+  /api/app/wardrobe/items:
+    get:
+      summary: Danh sách món đồ của người dùng hiện tại
+      parameters:
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/ItemStatus' } }
+        - { name: category, in: query, schema: { $ref: '#/components/schemas/Category' } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+    post:
+      summary: Upload ảnh; trả ngay món đồ PROCESSING, AI nhận diện chạy nền rồi chuyển sang PENDING_REVIEW
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image: { type: string, format: binary }
+      responses:
+        '202':
+          description: Đã nhận ảnh
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobeItem' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/{itemId}:
+    parameters:
+      - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      summary: Chi tiết món đồ
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobeItem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+    put:
+      summary: Sửa thuộc tính món đã CONFIRMED
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClothingAttributes' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobeItem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+    delete:
+      summary: Xoá món đồ và ảnh
+      responses:
+        '204': { description: Đã xoá }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/{itemId}/confirm:
+    parameters:
+      - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
+    post:
+      summary: Xác nhận kết quả AI (kèm chỉnh sửa) — PENDING_REVIEW → CONFIRMED
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClothingAttributes' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobeItem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+
+components:
+  securitySchemes:
+    bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+  schemas:
+    ItemStatus: { type: string, enum: [PROCESSING, PENDING_REVIEW, CONFIRMED, RECOGNITION_FAILED] }
+    Category: { type: string, enum: [TOP, BOTTOM, DRESS, OUTERWEAR, SHOES, BAG, ACCESSORY] }
+    Season: { type: string, enum: [SPRING, SUMMER, AUTUMN, WINTER] }
+    ClothingAttributes:
+      type: object
+      properties:
+        category: { $ref: '#/components/schemas/Category' }
+        colors: { type: array, items: { type: string } }
+        material: { type: string }
+        seasons: { type: array, items: { $ref: '#/components/schemas/Season' }, description: rỗng = mặc được mọi mùa }
+        styleTags: { type: array, items: { type: string }, example: [casual, office] }
+    WardrobeItem:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ItemStatus' }
+        category: { $ref: '#/components/schemas/Category' }
+        colors: { type: array, items: { type: string } }
+        material: { type: string }
+        seasons: { type: array, items: { $ref: '#/components/schemas/Season' } }
+        styleTags: { type: array, items: { type: string } }
+        imageUrl: { type: string, format: uri }
+        createdAt: { type: string, format: date-time }

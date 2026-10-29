@@ -1,6 +1,6 @@
 # ADR 0001: Backend là modular monolith, mỗi module theo Hexagonal
 
-- Trạng thái: Đã chấp nhận
+- Trạng thái: **Đã thay thế** bởi [ADR 0003](0003-maven-microservices.md) (2026-10-29)
 - Ngày: 2026-10-21
 
 ## Bối cảnh

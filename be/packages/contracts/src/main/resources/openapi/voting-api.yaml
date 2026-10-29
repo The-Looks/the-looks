@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: voting-service
+  version: 0.1.0
+  description: |
+    Ask Friends: bình chọn A/B giữa 2 outfit, chia sẻ link qua Zalo; khách bình chọn ẩn danh. Phụ trách: Member 3 (Phát).
+    Lấy ảnh outfit từ outfit-service lúc tạo bình chọn. Giới hạn số lượt gửi để chống spam.
+    Quy ước: `/api/app/**` cần JWT, `/api/admin/**` cần role ADMIN, `/api/public/**` không cần đăng nhập.
+    Sửa file này trước, review qua PR, rồi mới code (contract-first).
+servers:
+  - url: http://localhost:8084
+    description: local
+security:
+  - bearerAuth: []
+
+paths:
+  /api/app/polls:
+    get:
+      summary: Bình chọn của tôi
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Poll' } }
+    post:
+      summary: Tạo bình chọn giữa 2 outfit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outfitAId, outfitBId]
+              properties:
+                outfitAId: { type: string, format: uuid }
+                outfitBId: { type: string, format: uuid }
+                question: { type: string, maxLength: 140, example: "Đi hẹn hò tối nay nên mặc bộ nào?" }
+                ttlHours: { type: integer, minimum: 1, maximum: 168, default: 24 }
+      responses:
+        '201':
+          description: Đã tạo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code: { type: string }
+                  shareUrl: { type: string, format: uri, description: link gửi qua Zalo, mở trên voting-web }
+                  expiresAt: { type: string, format: date-time }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/polls/{code}:
+    get:
+      summary: Trang bình chọn cho khách (không cần đăng nhập)
+      security: []
+      parameters:
+        - { name: code, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Poll' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '410': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/polls/{code}/votes:
+    post:
+      summary: Khách bình chọn ẩn danh; trả kết quả hiện tại
+      security: []
+      parameters:
+        - { name: code, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [choice]
+              properties:
+                choice: { type: string, enum: [A, B] }
+      responses:
+        '200':
+          description: Kết quả sau khi bình chọn
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PollResult' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+        '410': { $ref: 'common.yaml#/components/responses/Problem' }
+        '429': { $ref: 'common.yaml#/components/responses/Problem' }
+
+components:
+  securitySchemes:
+    bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+  schemas:
+    PollOption:
+      type: object
+      properties:
+        outfitId: { type: string, format: uuid }
+        imageUrls: { type: array, items: { type: string, format: uri } }
+    Poll:
+      type: object
+      properties:
+        code: { type: string }
+        question: { type: string }
+        optionA: { $ref: '#/components/schemas/PollOption' }
+        optionB: { $ref: '#/components/schemas/PollOption' }
+        expiresAt: { type: string, format: date-time }
+        result: { $ref: '#/components/schemas/PollResult' }
+    PollResult:
+      type: object
+      properties:
+        votesA: { type: integer }
+        votesB: { type: integer }
+        percentA: { type: integer }
+        percentB: { type: integer }

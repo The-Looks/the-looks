@@ -1,0 +1,12 @@
+# Giá trị cho máy dev (Postgres cài trên máy hoặc be/docker-compose.yml). Không dùng ở staging/prod.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/thelooks_outfit
+    username: thelooks
+    password: thelooks
+
+thelooks:
+  security:
+    jwt-secret: dev-only-secret-change-me-0123456789abcdef
+  services:
+    wardrobe-url: http://localhost:8082

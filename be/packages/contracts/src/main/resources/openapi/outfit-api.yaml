@@ -1,0 +1,125 @@
+openapi: 3.1.0
+info:
+  title: outfit-service
+  version: 0.1.0
+  description: |
+    Gợi ý phối đồ theo dịp + Quick Pick (ưu tiên đồ lâu chưa mặc). Phụ trách: Member 2 (Tuấn).
+    Đọc tủ đồ từ wardrobe-service; voting-service gọi GET /api/app/outfits/{outfitId}.
+    Quy ước: `/api/app/**` cần JWT, `/api/admin/**` cần role ADMIN, `/api/public/**` không cần đăng nhập.
+    Sửa file này trước, review qua PR, rồi mới code (contract-first).
+servers:
+  - url: http://localhost:8083
+    description: local
+security:
+  - bearerAuth: []
+
+paths:
+  /api/app/outfits/suggestions:
+    get:
+      summary: AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ
+      parameters:
+        - { name: occasion, in: query, required: true, schema: { $ref: '#/components/schemas/Occasion' } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 10, default: 3 } }
+      responses:
+        '200':
+          description: Danh sách gợi ý, điểm cao trước (rỗng nếu tủ đồ chưa đủ món)
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/OutfitSuggestion' } }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/quick-pick:
+    get:
+      summary: Quick Pick - 1 outfit, ưu tiên món lâu chưa mặc
+      responses:
+        '200':
+          description: Gợi ý
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OutfitSuggestion' }
+        '204': { description: Tủ đồ chưa đủ món để phối }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits:
+    get:
+      summary: Outfit đã lưu, mới nhất trước
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Outfit' } }
+    post:
+      summary: Lưu outfit (chỉ gồm món đã CONFIRMED trong tủ)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [itemIds]
+              properties:
+                itemIds: { type: array, minItems: 1, maxItems: 10, items: { type: string, format: uuid } }
+                occasion: { $ref: '#/components/schemas/Occasion' }
+      responses:
+        '201':
+          description: Đã lưu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Outfit' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/{outfitId}:
+    get:
+      summary: Outfit kèm ảnh các món (voting-service dùng khi tạo bình chọn)
+      parameters:
+        - { name: outfitId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OutfitDetail' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/{outfitId}/wear:
+    post:
+      summary: Nút "Mặc bộ này" - ghi lại lần mặc
+      parameters:
+        - { name: outfitId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '204': { description: Đã ghi }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+
+components:
+  securitySchemes:
+    bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+  schemas:
+    Occasion:
+      type: string
+      enum: [SCHOOL, WORK, HANGOUT, DATE]
+      description: đi học, đi làm, đi chơi, hẹn hò
+    OutfitItem:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        category: { type: string, example: TOP }
+        imageUrl: { type: string, format: uri }
+    OutfitSuggestion:
+      type: object
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/OutfitItem' } }
+        occasion: { $ref: '#/components/schemas/Occasion' }
+        score: { type: number, description: 0..1, cao hơn là hợp hơn }
+        reason: { type: string, example: "Hợp dịp đi làm · Có món 21 ngày chưa mặc" }
+    Outfit:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        itemIds: { type: array, items: { type: string, format: uuid } }
+        occasion: { $ref: '#/components/schemas/Occasion' }
+        createdAt: { type: string, format: date-time }
+    OutfitDetail:
+      allOf:
+        - { $ref: '#/components/schemas/Outfit' }
+        - type: object
+          properties:
+            itemImageUrls: { type: array, items: { type: string, format: uri } }

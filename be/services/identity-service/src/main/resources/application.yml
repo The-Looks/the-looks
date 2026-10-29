@@ -1,0 +1,36 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: identity-service
+  profiles:
+    default: local
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate # schema chỉ do Flyway quản lý
+  mvc:
+    problemdetails:
+      enabled: true # lỗi trả về chuẩn RFC 9457
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  pattern:
+    level: "%5p [%X{correlationId:-}]"
+
+thelooks:
+  security:
+    jwt-secret: ${JWT_SECRET}

@@ -22,7 +22,7 @@ Quy tắc phụ thuộc một chiều: `app → features → shared`.
 Công nghệ:
 - TypeScript strict.
 - Dữ liệu server: TanStack Query. Trạng thái chỉ ở client: Zustand (khi thật sự cần).
-- API client + kiểu dữ liệu sinh từ `contracts/openapi.yaml`, không viết tay.
+- API client + kiểu dữ liệu sinh từ `be/packages/contracts/src/main/resources/openapi/*-api.yaml`, không viết tay.
 
 ## Lý do
 

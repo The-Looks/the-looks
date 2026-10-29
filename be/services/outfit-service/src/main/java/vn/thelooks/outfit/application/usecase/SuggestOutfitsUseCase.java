@@ -1,0 +1,12 @@
+package vn.thelooks.outfit.application.usecase;
+
+import java.util.List;
+import java.util.UUID;
+import vn.thelooks.outfit.domain.model.Occasion;
+import vn.thelooks.outfit.domain.model.OutfitSuggestion;
+
+/** AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ. */
+public interface SuggestOutfitsUseCase {
+
+    List<OutfitSuggestion> suggest(UUID ownerId, Occasion occasion, int limit);
+}

@@ -1,0 +1,85 @@
+openapi: 3.1.0
+info:
+  title: identity-service
+  version: 0.1.0
+  description: |
+    Đăng ký, đăng nhập, phát JWT. Phụ trách: Member 3 (Phát).
+    Quy ước: `/api/app/**` cần JWT, `/api/admin/**` cần role ADMIN, `/api/public/**` không cần đăng nhập.
+    Sửa file này trước, review qua PR, rồi mới code (contract-first).
+servers:
+  - url: http://localhost:8081
+    description: local
+security:
+  - bearerAuth: []
+
+paths:
+  /api/public/auth/register:
+    post:
+      summary: Đăng ký (người dùng mới luôn có role USER)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, displayName]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                displayName: { type: string, maxLength: 60 }
+      responses:
+        '201':
+          description: Đã tạo tài khoản
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/auth/login:
+    post:
+      summary: Đăng nhập, nhận JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken: { type: string }
+                  expiresAt: { type: string, format: date-time }
+        '401': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/me:
+    get:
+      summary: Thông tin người dùng hiện tại
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+
+components:
+  securitySchemes:
+    bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        displayName: { type: string }
+        role: { type: string, enum: [USER, ADMIN] }
+        createdAt: { type: string, format: date-time }
