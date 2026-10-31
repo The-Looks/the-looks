@@ -99,12 +99,14 @@ components:
       description: đi học, đi làm, đi chơi, hẹn hò
     OutfitItem:
       type: object
+      required: [id, category]
       properties:
         id: { type: string, format: uuid }
         category: { type: string, example: TOP }
         imageUrl: { type: string, format: uri }
     OutfitSuggestion:
       type: object
+      required: [items, score, reason]
       properties:
         items: { type: array, items: { $ref: '#/components/schemas/OutfitItem' } }
         occasion: { $ref: '#/components/schemas/Occasion' }
@@ -112,6 +114,7 @@ components:
         reason: { type: string, example: "Hợp dịp đi làm · Có món 21 ngày chưa mặc" }
     Outfit:
       type: object
+      required: [id, itemIds, createdAt]
       properties:
         id: { type: string, format: uuid }
         itemIds: { type: array, items: { type: string, format: uuid } }
@@ -121,5 +124,6 @@ components:
       allOf:
         - { $ref: '#/components/schemas/Outfit' }
         - type: object
+          required: [itemImageUrls]
           properties:
             itemImageUrls: { type: array, items: { type: string, format: uri } }

@@ -1,3 +1,5 @@
+> **Tạm dừng** (31/10/2026): app chính chuyển sang [fe/web-app](../web-app) theo [ADR 0004](../../docs/adr/0004-web-app-first.md). Giữ thư mục này để tham khảo giao diện và làm tiếp sau.
+
 # THE LOOKS – User app (React Native + Expo)
 
 37 màn mobile theo Figma "V2 · App + Website · 39 màn" (dữ liệu mẫu, chưa nối backend).

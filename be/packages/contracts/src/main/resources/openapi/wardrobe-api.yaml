@@ -110,6 +110,7 @@ components:
         styleTags: { type: array, items: { type: string }, example: [casual, office] }
     WardrobeItem:
       type: object
+      required: [id, status, createdAt]
       properties:
         id: { type: string, format: uuid }
         status: { $ref: '#/components/schemas/ItemStatus' }

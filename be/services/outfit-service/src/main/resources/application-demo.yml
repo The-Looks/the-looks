@@ -1,0 +1,5 @@
+# Demo khi wardrobe-service chưa có: dùng tủ đồ mẫu trong FakeWardrobeReader.
+# Chạy: ./mvnw -pl services/outfit-service spring-boot:run -Dspring-boot.run.profiles=local,demo
+thelooks:
+  services:
+    wardrobe-fake: true
