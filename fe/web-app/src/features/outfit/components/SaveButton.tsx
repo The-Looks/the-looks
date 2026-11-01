@@ -17,7 +17,11 @@ export function SaveButton({ suggestion }: { suggestion: OutfitSuggestion }) {
       <Button small onClick={() => save.mutate(suggestion)} disabled={save.isPending}>
         {save.isPending ? 'Đang lưu…' : 'Lưu outfit'}
       </Button>
-      {save.isError && <span className="small" role="alert">{errorMessage(save.error)}</span>}
+      {save.isError && (
+        <span className="small" role="alert">
+          {errorMessage(save.error)}
+        </span>
+      )}
     </>
   );
 }

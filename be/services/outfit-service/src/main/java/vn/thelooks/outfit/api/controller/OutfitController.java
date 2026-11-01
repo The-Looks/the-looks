@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import vn.thelooks.outfit.api.dto.FeedbackRequest;
 import vn.thelooks.outfit.api.dto.OutfitDetailResponse;
 import vn.thelooks.outfit.api.dto.OutfitResponse;
 import vn.thelooks.outfit.api.dto.SaveOutfitRequest;
@@ -27,6 +28,7 @@ import vn.thelooks.outfit.application.port.out.WardrobeUnavailableException;
 import vn.thelooks.outfit.application.usecase.GetOutfitsQuery;
 import vn.thelooks.outfit.application.usecase.MarkOutfitWornUseCase;
 import vn.thelooks.outfit.application.usecase.QuickPickUseCase;
+import vn.thelooks.outfit.application.usecase.RateSuggestionUseCase;
 import vn.thelooks.outfit.application.usecase.SaveOutfitUseCase;
 import vn.thelooks.outfit.application.usecase.SuggestOutfitsUseCase;
 import vn.thelooks.outfit.domain.exception.InvalidOutfitException;
@@ -43,14 +45,16 @@ class OutfitController {
     private final SaveOutfitUseCase saveOutfit;
     private final MarkOutfitWornUseCase markOutfitWorn;
     private final GetOutfitsQuery getOutfits;
+    private final RateSuggestionUseCase rateSuggestion;
 
     OutfitController(SuggestOutfitsUseCase suggestOutfits, QuickPickUseCase quickPick, SaveOutfitUseCase saveOutfit,
-            MarkOutfitWornUseCase markOutfitWorn, GetOutfitsQuery getOutfits) {
+            MarkOutfitWornUseCase markOutfitWorn, GetOutfitsQuery getOutfits, RateSuggestionUseCase rateSuggestion) {
         this.suggestOutfits = suggestOutfits;
         this.quickPick = quickPick;
         this.saveOutfit = saveOutfit;
         this.markOutfitWorn = markOutfitWorn;
         this.getOutfits = getOutfits;
+        this.rateSuggestion = rateSuggestion;
     }
 
     /** AI gợi ý theo dịp. */
@@ -85,6 +89,13 @@ class OutfitController {
         return getOutfits.view(CurrentUser.id(jwt), outfitId)
                 .map(OutfitDetailResponse::from)
                 .orElseThrow(() -> new OutfitNotFoundException("Không tìm thấy outfit"));
+    }
+
+    /** Thích / không thích một gợi ý. Không thích → tổ hợp đó không được gợi ý lại. */
+    @PostMapping("/feedback")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void feedback(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody FeedbackRequest request) {
+        rateSuggestion.rate(CurrentUser.id(jwt), request.itemIds(), request.vote());
     }
 
     /** Nút "Mặc bộ này". */

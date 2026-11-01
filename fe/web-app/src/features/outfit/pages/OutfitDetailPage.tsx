@@ -35,9 +35,7 @@ export function OutfitDetailPage() {
             </ButtonLink>
           </div>
           {wear.isError && <Notice tone="error">{errorMessage(wear.error)}</Notice>}
-          <p className="small muted">
-            Bấm “Mặc bộ này” mỗi lần mặc để Quick Pick ưu tiên những món lâu chưa dùng.
-          </p>
+          <p className="small muted">Bấm “Mặc bộ này” mỗi lần mặc để Quick Pick ưu tiên những món lâu chưa dùng.</p>
         </Card>
       )}
     </div>

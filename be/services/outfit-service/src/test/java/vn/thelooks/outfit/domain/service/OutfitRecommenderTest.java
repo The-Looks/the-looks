@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import vn.thelooks.outfit.domain.model.ClosetItem;
+import vn.thelooks.outfit.domain.model.Feedback;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
 
@@ -122,6 +123,56 @@ class OutfitRecommenderTest {
     void returnsEmptyWhenNothingToCombine() {
         assertThat(recommender.recommend(List.of(item("SHOES", "black")), Map.of(), null, NOW, "AUTUMN", 3)).isEmpty();
         assertThat(recommender.recommend(List.of(item("DRESS", "black")), Map.of(), null, NOW, "AUTUMN", 0)).isEmpty();
+    }
+
+    @Test
+    void dislikedCombinationIsNeverSuggestedAgain() {
+        ClosetItem top = item("TOP", "white");
+        ClosetItem jeans = item("BOTTOM", "denim");
+        ClosetItem skirt = item("BOTTOM", "beige");
+        var disliked = Map.of(Feedback.comboKey(List.of(jeans.id(), top.id())), Feedback.DISLIKE);
+
+        List<OutfitSuggestion> result = recommender.recommend(
+                List.of(top, jeans, skirt), Map.of(), disliked, null, NOW, "AUTUMN", 5);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().items()).containsExactly(top, skirt);
+    }
+
+    @Test
+    void dislikedShoeCombinationFallsBackToAnotherShoe() {
+        ClosetItem dress = item("DRESS", "red");
+        ClosetItem sneakers = item("SHOES", "white");
+        ClosetItem heels = item("SHOES", "black");
+        var disliked = Map.of(Feedback.comboKey(List.of(dress.id(), sneakers.id())), Feedback.DISLIKE);
+
+        List<OutfitSuggestion> result = recommender.recommend(
+                List.of(dress, sneakers, heels), Map.of(), disliked, null, NOW, "AUTUMN", 5);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().items()).containsExactly(dress, heels);
+    }
+
+    @Test
+    void likedCombinationRanksHigherAndSaysSo() {
+        ClosetItem top = item("TOP", "white");
+        ClosetItem jeans = item("BOTTOM", "denim");
+        ClosetItem skirt = item("BOTTOM", "beige");
+        var liked = Map.of(Feedback.comboKey(List.of(top.id(), skirt.id())), Feedback.LIKE);
+        Map<UUID, Instant> lastWorn = Map.of(skirt.id(), daysAgo(1), jeans.id(), daysAgo(3), top.id(), daysAgo(1));
+
+        List<OutfitSuggestion> without = recommender.recommend(List.of(top, jeans, skirt), lastWorn, null, NOW, "AUTUMN", 1);
+        List<OutfitSuggestion> with = recommender.recommend(List.of(top, jeans, skirt), lastWorn, liked, null, NOW, "AUTUMN", 1);
+
+        assertThat(without.getFirst().items()).containsExactly(top, jeans);
+        assertThat(with.getFirst().items()).containsExactly(top, skirt);
+        assertThat(with.getFirst().reason()).contains("Bạn từng thích bộ này");
+    }
+
+    @Test
+    void comboKeyIgnoresOrder() {
+        UUID a = UUID.randomUUID(), b = UUID.randomUUID();
+        assertThat(Feedback.comboKey(List.of(a, b))).isEqualTo(Feedback.comboKey(List.of(b, a)));
     }
 
     @Test

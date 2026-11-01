@@ -68,6 +68,22 @@ paths:
               schema: { $ref: '#/components/schemas/Outfit' }
         '400': { $ref: 'common.yaml#/components/responses/Problem' }
         '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/feedback:
+    post:
+      summary: Thích / không thích một gợi ý (ghi đè lần trước). Tổ hợp bị không thích không được gợi ý lại.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [itemIds, vote]
+              properties:
+                itemIds: { type: array, minItems: 1, maxItems: 10, items: { type: string, format: uuid } }
+                vote: { type: string, enum: [LIKE, DISLIKE] }
+      responses:
+        '204': { description: Đã ghi }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/outfits/{outfitId}:
     get:
       summary: Outfit kèm ảnh các món (voting-service dùng khi tạo bình chọn)
