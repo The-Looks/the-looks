@@ -7,7 +7,7 @@ public record User(
         UUID id,
         String email,
         String passwordHash,
-        String displayName,
+        String username,
         Role role,
         Instant createdAt) {
 }

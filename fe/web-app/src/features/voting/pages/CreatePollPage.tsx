@@ -13,6 +13,7 @@ export function CreatePollPage() {
   const [b, setB] = useState('');
   const [question, setQuestion] = useState('');
   const [copied, setCopied] = useState(false);
+  const [shareError, setShareError] = useState(false);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -23,8 +24,20 @@ export function CreatePollPage() {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      setShareError(false);
     } catch {
       setCopied(false);
+      setShareError(true);
+    }
+  };
+
+  const share = async (url: string) => {
+    if (!navigator.share) return copy(url);
+    try {
+      await navigator.share({ title: 'Bình chọn outfit cùng mình', url });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      await copy(url);
     }
   };
 
@@ -44,8 +57,10 @@ export function CreatePollPage() {
           <p className="muted">Gửi link này vào nhóm Zalo, bạn bè bấm là chọn được ngay.</p>
           <input className="field" readOnly value={create.data.shareUrl} aria-label="Link bình chọn" onFocus={(e) => e.target.select()} style={{ padding: 12, borderRadius: 14, border: '1px solid var(--line)', font: 'inherit' }} />
           <div className="row">
+            <Button onClick={() => void share(create.data.shareUrl)}>Chia sẻ</Button>
             <Button onClick={() => copy(create.data.shareUrl)}>{copied ? 'Đã sao chép' : 'Sao chép link'}</Button>
           </div>
+          {shareError && <Notice tone="warn">Không thể sao chép tự động. Hãy chọn link ở ô phía trên để sao chép.</Notice>}
         </Card>
       ) : (
         <Card>

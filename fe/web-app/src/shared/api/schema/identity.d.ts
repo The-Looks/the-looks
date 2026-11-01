@@ -27,7 +27,7 @@ export interface paths {
                         /** Format: email */
                         email: string;
                         password: string;
-                        displayName: string;
+                        username: string;
                     };
                 };
             };
@@ -100,6 +100,158 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Đổi refresh token trong cookie httpOnly và cấp access token mới
+         * @description Refresh token có hạn 7 ngày và được xoay vòng mỗi lần sử dụng. Dùng lại token cũ sẽ thu hồi cả phiên.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Access token mới; Set-Cookie chứa refresh token mới */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AccessToken"];
+                    };
+                };
+                401: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Thu hồi phiên hiện tại và xoá refresh cookie */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Đã đăng xuất */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/auth/google/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bắt đầu Google OIDC Authorization Code + PKCE
+         * @description Server tạo state và nonce ngẫu nhiên, lưu tạm an toàn rồi chuyển hướng đến Google.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Chuyển hướng đến Google */
+                302: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/auth/google/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Xác thực Google callback rồi chuyển về web-app
+         * @description Server kiểm tra state và nonce; chỉ gộp tài khoản cùng email khi email_verified là true. Thành công đặt refresh cookie rồi chuyển về /auth/callback.
+         */
+        get: {
+            parameters: {
+                query: {
+                    code: string;
+                    state: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Chuyển về web-app */
+                302: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/me": {
         parameters: {
             query?: never;
@@ -145,11 +297,16 @@ export interface components {
             id: string;
             /** Format: email */
             email: string;
-            displayName: string;
+            username: string;
             /** @enum {string} */
             role: "USER" | "ADMIN";
             /** Format: date-time */
             createdAt: string;
+        };
+        AccessToken: {
+            accessToken: string;
+            /** Format: date-time */
+            expiresAt: string;
         };
         Problem: {
             /** Format: uri */

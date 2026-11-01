@@ -14,6 +14,15 @@ export function usePoll(code: string) {
   });
 }
 
+export function useCastVote(code: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (choice: 'A' | 'B') =>
+      unwrap(votingApi.POST('/api/public/polls/{code}/votes', { params: { path: { code } }, body: { choice } })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['polls', code] }),
+  });
+}
+
 /** Danh sách outfit đã lưu để chọn A/B (gọi thẳng outfit-service, không import feature outfit). */
 export function useOutfitChoices() {
   return useQuery({ queryKey: ['outfits'], queryFn: () => unwrap(outfitApi.GET('/api/app/outfits')) });

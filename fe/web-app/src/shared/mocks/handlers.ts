@@ -8,17 +8,32 @@ const problem = (status: number, detail: string) =>
   HttpResponse.json({ status, title: 'Error', detail }, { status, headers: { 'Content-Type': 'application/problem+json' } });
 
 // ---------------- identity ----------------
+let refreshActive = false;
 const identity: HttpHandler[] = [
   http.post('*/api/public/auth/register', async ({ request }) => {
-    const body = (await request.json()) as { email: string; displayName: string };
-    return HttpResponse.json({ ...DEMO_USER, email: body.email, displayName: body.displayName }, { status: 201 });
+    const body = (await request.json()) as { email: string; username: string };
+    return HttpResponse.json({ ...DEMO_USER, email: body.email, username: body.username }, { status: 201 });
   }),
   http.post('*/api/public/auth/login', async ({ request }) => {
     const body = (await request.json()) as { email?: string; password?: string };
     await delay(300);
     if (!body.email || !body.password) return problem(401, 'Sai email hoặc mật khẩu');
+    refreshActive = true;
     const { token, expiresAt } = await signDevJwt(DEMO_USER.id, ['USER']);
     return HttpResponse.json({ accessToken: token, expiresAt });
+  }),
+  http.post('*/api/public/auth/refresh', async () => {
+    if (!refreshActive) return problem(401, 'Chưa có phiên đăng nhập');
+    const { token, expiresAt } = await signDevJwt(DEMO_USER.id, ['USER']);
+    return HttpResponse.json({ accessToken: token, expiresAt });
+  }),
+  http.post('*/api/public/auth/logout', () => {
+    refreshActive = false;
+    return new HttpResponse(null, { status: 204 });
+  }),
+  http.get('*/api/public/auth/google/start', ({ request }) => {
+    refreshActive = true;
+    return HttpResponse.redirect(new URL('/auth/callback', request.url).toString(), 302);
   }),
   http.get('*/api/app/me', () => HttpResponse.json(DEMO_USER)),
 ];
@@ -129,6 +144,7 @@ let polls: Poll[] = [
     result: { votesA: 12, votesB: 6, percentA: 67, percentB: 33 },
   },
 ];
+const votedPolls = new Set<string>();
 
 const voting: HttpHandler[] = [
   http.get('*/api/app/polls', () => HttpResponse.json(polls)),
@@ -145,6 +161,21 @@ const voting: HttpHandler[] = [
   http.get('*/api/public/polls/:code', ({ params }) => {
     const p = polls.find((x) => x.code === params.code);
     return p ? HttpResponse.json(p) : problem(404, 'Không có bình chọn với mã này');
+  }),
+  http.post('*/api/public/polls/:code/votes', async ({ params, request }) => {
+    const code = String(params.code);
+    const poll = polls.find((x) => x.code === code);
+    if (!poll) return problem(404, 'Không có bình chọn với mã này');
+    if (Date.parse(poll.expiresAt) <= Date.now()) return problem(410, 'Link đã hết hạn');
+    if (votedPolls.has(code)) return problem(409, 'Bạn đã bình chọn');
+    const body = (await request.json()) as { choice?: string };
+    if (body.choice !== 'A' && body.choice !== 'B') return problem(400, 'Lựa chọn không hợp lệ');
+    votedPolls.add(code);
+    const votesA = (poll.result?.votesA ?? 0) + Number(body.choice === 'A');
+    const votesB = (poll.result?.votesB ?? 0) + Number(body.choice === 'B');
+    const total = votesA + votesB;
+    poll.result = { votesA, votesB, percentA: Math.round(votesA / total * 100), percentB: Math.round(votesB / total * 100) };
+    return HttpResponse.json(poll.result);
   }),
 ];
 

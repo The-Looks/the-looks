@@ -44,6 +44,9 @@ export function LoginPage() {
             {login.isPending ? 'Đang đăng nhập…' : 'Đăng nhập'}
           </Button>
         </form>
+        <Button kind="outline" block onClick={() => window.location.assign('/api/public/auth/google/start')}>
+          Đăng nhập bằng Google
+        </Button>
         <p className="small muted">
           Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
         </p>

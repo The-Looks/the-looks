@@ -23,11 +23,11 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, password, displayName]
+              required: [email, password, username]
               properties:
                 email: { type: string, format: email }
                 password: { type: string, minLength: 8 }
-                displayName: { type: string, maxLength: 60 }
+                username: { type: string, maxLength: 60 }
       responses:
         '201':
           description: Đã tạo tài khoản
@@ -62,6 +62,42 @@ paths:
                   accessToken: { type: string }
                   expiresAt: { type: string, format: date-time }
         '401': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/auth/refresh:
+    post:
+      summary: Đổi refresh token trong cookie httpOnly và cấp access token mới
+      description: Refresh token có hạn 7 ngày và được xoay vòng mỗi lần sử dụng. Dùng lại token cũ sẽ thu hồi cả phiên.
+      security: []
+      responses:
+        '200':
+          description: Access token mới; Set-Cookie chứa refresh token mới
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccessToken' }
+        '401': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/auth/logout:
+    post:
+      summary: Thu hồi phiên hiện tại và xoá refresh cookie
+      security: []
+      responses:
+        '204': { description: Đã đăng xuất }
+  /api/public/auth/google/start:
+    get:
+      summary: Bắt đầu Google OIDC Authorization Code + PKCE
+      description: Server tạo state và nonce ngẫu nhiên, lưu tạm an toàn rồi chuyển hướng đến Google.
+      security: []
+      responses:
+        '302': { description: Chuyển hướng đến Google }
+  /api/public/auth/google/callback:
+    get:
+      summary: Xác thực Google callback rồi chuyển về web-app
+      description: Server kiểm tra state và nonce; chỉ gộp tài khoản cùng email khi email_verified là true. Thành công đặt refresh cookie rồi chuyển về /auth/callback.
+      security: []
+      parameters:
+        - { name: code, in: query, required: true, schema: { type: string } }
+        - { name: state, in: query, required: true, schema: { type: string } }
+      responses:
+        '302': { description: Chuyển về web-app }
+        '401': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/me:
     get:
       summary: Thông tin người dùng hiện tại
@@ -78,10 +114,16 @@ components:
   schemas:
     User:
       type: object
-      required: [id, email, displayName, role, createdAt]
+      required: [id, email, username, role, createdAt]
       properties:
         id: { type: string, format: uuid }
         email: { type: string, format: email }
-        displayName: { type: string }
+        username: { type: string }
         role: { type: string, enum: [USER, ADMIN] }
         createdAt: { type: string, format: date-time }
+    AccessToken:
+      type: object
+      required: [accessToken, expiresAt]
+      properties:
+        accessToken: { type: string }
+        expiresAt: { type: string, format: date-time }
