@@ -7,7 +7,8 @@ spring:
 
 thelooks:
   security:
-    jwt-secret: dev-only-secret-change-me-0123456789abcdef
+    issuer: http://localhost:8081
+    jwk-set-uri: http://localhost:8081/.well-known/jwks.json
   services:
     outfit-url: http://localhost:8083
   voting:

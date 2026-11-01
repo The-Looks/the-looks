@@ -34,7 +34,8 @@ logging:
 
 thelooks:
   security:
-    jwt-secret: ${JWT_SECRET}
+    issuer: ${JWT_ISSUER}
+    jwk-set-uri: ${JWT_JWK_SET_URI}
   services:
     outfit-url: ${OUTFIT_SERVICE_URL}
   voting:

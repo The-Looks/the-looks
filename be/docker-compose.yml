@@ -22,9 +22,9 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_identity
       DB_USER: thelooks
       DB_PASSWORD: thelooks
-      JWT_SECRET: ${JWT_SECRET}
       PASSWORD_PEPPER: ${PASSWORD_PEPPER}
       JWT_ISSUER: ${JWT_ISSUER}
+      JWT_JWK_SET_URI: http://identity-service:8081/.well-known/jwks.json
       JWT_PRIVATE_KEY_PATH: /run/secrets/jwt-private.pem
       WEB_ORIGIN: ${WEB_ORIGIN}
     volumes:
@@ -41,7 +41,8 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_wardrobe
       DB_USER: thelooks
       DB_PASSWORD: thelooks
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_JWK_SET_URI: http://identity-service:8081/.well-known/jwks.json
     ports: ["8082:8082"]
     depends_on:
       postgres:
@@ -54,7 +55,8 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_outfit
       DB_USER: thelooks
       DB_PASSWORD: thelooks
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_JWK_SET_URI: http://identity-service:8081/.well-known/jwks.json
       WARDROBE_SERVICE_URL: http://wardrobe-service:8082
     ports: ["8083:8083"]
     depends_on:
@@ -68,7 +70,8 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_voting
       DB_USER: thelooks
       DB_PASSWORD: thelooks
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_JWK_SET_URI: http://identity-service:8081/.well-known/jwks.json
       OUTFIT_SERVICE_URL: http://outfit-service:8083
       SHARE_BASE_URL: ${SHARE_BASE_URL}
       VOTER_KEY_SECRET: ${VOTER_KEY_SECRET}

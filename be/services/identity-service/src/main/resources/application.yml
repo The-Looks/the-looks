@@ -34,8 +34,8 @@ logging:
 
 thelooks:
   security:
-    jwt-secret: ${JWT_SECRET}
     password-pepper: ${PASSWORD_PEPPER}
     issuer: ${JWT_ISSUER}
+    jwk-set-uri: ${JWT_JWK_SET_URI}
     private-key-path: ${JWT_PRIVATE_KEY_PATH}
     web-origin: ${WEB_ORIGIN}
