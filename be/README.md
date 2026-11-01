@@ -6,6 +6,7 @@
 | `services/wardrobe-service` | Tủ đồ số: upload, AI nhận diện, xác nhận/sửa/xoá | 8082 | Member 1 |
 | `services/outfit-service` | AI gợi ý theo dịp + Quick Pick | 8083 | Member 2 (Tuấn) |
 | `services/voting-service` | Ask Friends: bình chọn A/B qua link | 8084 | Member 3 (Phát) |
+| `services/billing-service` | Gói Free / Plus / Pro, thanh toán PayOS | 8085 | Member 2 (Tuấn) |
 | `packages/contracts` | OpenAPI của từng service — **sửa ở đây trước khi code** | | |
 | `packages/security` | Xác thực JWT dùng chung + chuyển tiếp token khi gọi service khác | | |
 | `packages/observability` | Correlation ID (header `X-Correlation-Id`, có trong log) | | |
@@ -66,6 +67,20 @@ psql -U postgres -f infrastructure/docker/postgres/init.sql
 ```
 Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
 
+## outfit-service: AI và thời tiết
+
+| Biến môi trường | Mặc định | Ý nghĩa |
+|---|---|---|
+| `AI_PROVIDER` | `none` | `claude` để bật AI chọn/xếp hạng gợi ý (cần `ANTHROPIC_API_KEY`); `none` = xếp theo điểm thuật toán |
+| `AI_MODEL` | `claude-haiku-5-5` | Model Claude. `claude-opus-5-5` chọn tinh tế hơn nhưng đắt hơn ~40 lần |
+| `BILLING_SERVICE_URL` | | Số lượt AI/ngày lấy theo gói từ billing-service (Free 3, Plus 20, Pro 100); billing lỗi → dùng mức Free. Hết lượt vẫn có gợi ý theo điểm |
+| `AI_MONTHLY_BUDGET_USD` | `25` | Tổng chi phí AI mỗi tháng; chạm ngưỡng thì tự ngừng gọi AI |
+| `WEATHER_LAT`, `WEATHER_LON` | TP.HCM | Vị trí lấy thời tiết (Open-Meteo, miễn phí, không cần key) |
+
+Admin xem chi phí: `GET /api/admin/outfits/ai-usage` (cần JWT role ADMIN).
+
+**Cá nhân hoá:** `StyleProfile` học gu từng người từ 👍/👎, outfit đã lưu và số lần mặc mỗi món (cần ≥ 3 hành vi). Gu được cộng vào điểm thuật toán và gửi kèm cho Claude dưới dạng tóm tắt. Không huấn luyện lại model, không gửi dữ liệu người dùng khác.
+
 ## Xác thực JWT
 
 Auth service phát access token ký RS256 và công bố public keys tại
@@ -89,3 +104,36 @@ Trong Google Cloud Console, đăng ký chính xác redirect URI, ví dụ
 đăng nhập Google với email đã xác minh và Google quản lý email đó (Gmail/Workspace),
 và hệ thống chưa có admin. Để trống biến này nếu chưa cần tạo admin. Sau khi đã có
 admin, biến môi trường không cấp thêm quyền cho tài khoản khác.
+
+## billing-service: gói thuê bao
+
+| Gói | Giá | Tủ đồ | AI gợi ý/ngày | Riêng Pro |
+|---|---|---|---|---|
+| Free | 0đ | 50 món | 3 | |
+| Plus | 39.000đ/tháng · 390.000đ/năm | 300 món | 20 | |
+| Pro | 79.000đ/tháng · 790.000đ/năm | không giới hạn | 100 | thống kê tủ đồ, chi phí mỗi lần mặc, lịch mặc, thử đồ 3D |
+
+Giá và quyền lợi nằm trong `billing-service/.../domain/model/Plan.java`.
+
+- Service khác lấy giới hạn của người dùng: `GET /api/app/billing/me` (chuyển tiếp JWT). wardrobe-service dùng `limits.wardrobeItems`,
+  outfit-service dùng `limits.aiSuggestionsPerDay`, tính năng Pro kiểm tra `features`.
+- Thanh toán: `PAYMENT_GATEWAY=fake` (mặc định, bấm là thành công, chỉ dùng khi dev) hoặc `payos`
+  (cần `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` từ https://my.payos.vn).
+  Khai báo webhook `https://<domain>/api/public/billing/payos/webhook` trong trang PayOS.
+- Gói kích hoạt khi webhook tới **hoặc** khi người dùng quay lại trang kết quả (hỏi trạng thái từ PayOS), chỉ một lần.
+- Đổi gói khi còn hạn: thời gian còn lại quy ra tiền rồi đổi sang thời gian của gói mới, không mất tiền.
+
+## wardrobe-service: tủ đồ, quét ảnh nhiều món
+
+- `POST /api/app/wardrobe/scans` (1–10 ảnh JPEG/PNG) → chạy nền: chuẩn hoá ảnh (xoay theo EXIF, cạnh dài ≤ 1568px)
+  → AI tìm từng món kèm khung → `GarmentSelection` lọc → cắt ảnh từng món → lưu → món `PENDING_REVIEW`. Ảnh gốc không lưu.
+- Giới hạn số món theo gói: hỏi billing-service `GET /api/app/billing/me` (lỗi → mức Free 50).
+
+| Biến môi trường | Mặc định | Ý nghĩa |
+|---|---|---|
+| `AI_PROVIDER` | `none` | `claude` để dùng Claude vision (cần `ANTHROPIC_API_KEY`); `none` = nhận diện giả: mỗi ảnh tách đôi áo (trên) / quần (dưới) |
+| `AI_MODEL` | `claude-haiku-5-5` | Model Claude |
+| `IMAGE_STORAGE` | `local` | `cloudinary` khi deploy (cần `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`) |
+| `IMAGE_DIR` | `./data/wardrobe-images` | Thư mục ảnh khi lưu local |
+| `PUBLIC_BASE_URL` | `http://localhost:5173` | Địa chỉ web-app, dùng tạo link ảnh lưu local |
+| `BILLING_SERVICE_URL` | | billing-service, để biết giới hạn số món theo gói |

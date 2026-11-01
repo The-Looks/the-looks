@@ -26,21 +26,37 @@ export function useItem(id: string) {
   });
 }
 
-export function useUpload() {
-  const qc = useQueryClient();
+/** Gửi 1..10 ảnh trong một lần quét; mỗi ảnh có thể ra nhiều món. */
+export function useStartScan() {
   return useMutation({
-    mutationFn: (file: File) =>
+    mutationFn: (files: File[]) =>
       unwrap(
-        wardrobeApi.POST('/api/app/wardrobe/items', {
-          body: { image: '' },
+        wardrobeApi.POST('/api/app/wardrobe/scans', {
+          body: { images: [] },
           bodySerializer: () => {
             const form = new FormData();
-            form.append('image', file);
+            files.forEach((f) => form.append('images', f));
             return form;
           },
         }),
       ),
-    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+  });
+}
+
+/** Theo dõi lần quét: hỏi lại mỗi 2 giây khi còn PROCESSING, xong thì làm mới tủ đồ. */
+export function useScan(scanId: string | null) {
+  const qc = useQueryClient();
+  return useQuery({
+    queryKey: ['wardrobe', 'scan', scanId],
+    enabled: scanId !== null,
+    queryFn: async () => {
+      const scan = await unwrap(
+        wardrobeApi.GET('/api/app/wardrobe/scans/{scanId}', { params: { path: { scanId: scanId! } } }),
+      );
+      if (scan.status !== 'PROCESSING') qc.invalidateQueries({ queryKey: wardrobeKeys.all });
+      return scan;
+    },
+    refetchInterval: (q) => (q.state.data?.status === 'PROCESSING' ? 2000 : false),
   });
 }
 
@@ -48,7 +64,9 @@ export function useConfirm(id: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (attrs: ClothingAttributes) =>
-      unwrap(wardrobeApi.POST('/api/app/wardrobe/items/{itemId}/confirm', { params: { path: { itemId: id } }, body: attrs })),
+      unwrap(
+        wardrobeApi.POST('/api/app/wardrobe/items/{itemId}/confirm', { params: { path: { itemId: id } }, body: attrs }),
+      ),
     onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
   });
 }

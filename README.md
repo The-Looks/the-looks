@@ -10,6 +10,8 @@
 | `fe/admin-web/` | **Frontend** — admin web, React + Vite |
 | `fe/voting-web/` | **Frontend** — trang bình chọn cho bạn bè (không cần đăng nhập), React + Vite |
 | `docs/adr/` | Các quyết định kiến trúc |
+| `docs/phan-cong.md` | **Phân công**: ai làm phần nào, hạn chót |
+| `docs/viec-thu-cong.md` | **Việc cần làm bằng tay** (tài khoản, khoá bí mật, deploy, việc của nhóm) |
 
 ## Yêu cầu
 

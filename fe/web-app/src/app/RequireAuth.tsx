@@ -5,5 +5,9 @@ import { useSession } from '../shared/lib/session';
 export function RequireAuth() {
   const { isAuthenticated } = useSession();
   const location = useLocation();
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />
+  );
 }

@@ -22,4 +22,11 @@ public record ClosetItem(
         seasons = seasons == null ? Set.of() : Set.copyOf(seasons);
         styleTags = styleTags == null ? Set.of() : Set.copyOf(styleTags);
     }
+
+    /** Mô tả ngắn cho AI, ví dụ "TOP (trắng; casual, office)". */
+    public String describe() {
+        String tags = styleTags.isEmpty() ? "" : "; " + String.join(", ", styleTags);
+        String color = colors.isEmpty() ? "?" : String.join("/", colors);
+        return category + " (" + color + tags + ")";
+    }
 }

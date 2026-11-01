@@ -36,7 +36,23 @@ export interface paths {
             };
         };
         put?: never;
-        /** Upload ảnh; trả ngay món đồ PROCESSING, AI nhận diện chạy nền rồi chuyển sang PENDING_REVIEW */
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/app/wardrobe/scans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Thêm đồ bằng ảnh: 1..10 ảnh, mỗi ảnh có thể có nhiều món (outfit đang mặc, đồ trải trên giường). Trả ngay Scan PROCESSING; AI tìm từng món, cắt ảnh từng món, tạo các món PENDING_REVIEW chạy nền. Ảnh gốc không được lưu. Tủ đồ đã đủ số món của gói (limits.wardrobeItems từ billing-service) → 403; tìm được nhiều món hơn chỗ còn trống → tạo đủ chỗ, số còn lại ghi ở skippedForLimit. */
         post: {
             parameters: {
                 query?: never;
@@ -47,24 +63,110 @@ export interface paths {
             requestBody: {
                 content: {
                     "multipart/form-data": {
-                        /** Format: binary */
-                        image: string;
+                        /** @description JPEG hoặc PNG, tối đa 10 MB mỗi ảnh (ảnh iPhone được trình duyệt đổi sang JPEG khi tải lên) */
+                        images: string[];
                     };
                 };
             };
             responses: {
-                /** @description Đã nhận ảnh */
+                /** @description Đã nhận ảnh, đang xử lý */
                 202: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["WardrobeItem"];
+                        "application/json": components["schemas"]["Scan"];
                     };
                 };
                 400: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/app/wardrobe/scans/{scanId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tiến độ một lần quét; web hỏi lại mỗi ~2 giây tới khi hết PROCESSING */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    scanId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Scan"];
+                    };
+                };
+                404: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/wardrobe/images/{ownerId}/{file}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ảnh món đồ khi lưu local (dev). Production dùng link Cloudinary trong imageUrl. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    ownerId: string;
+                    file: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Ảnh JPEG */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/jpeg": string;
+                    };
+                };
+                /** @description Không có ảnh */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -238,8 +340,32 @@ export interface components {
             material?: string;
             seasons?: components["schemas"]["Season"][];
             styleTags?: string[];
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description Ảnh đã cắt của riêng món này
+             */
             imageUrl?: string;
+            /**
+             * Format: uuid
+             * @description Lần quét tạo ra món này
+             */
+            scanId?: string | null;
+            /** @description Độ tin cậy của AI 0..1; thấp thì nhắc người dùng kiểm tra kỹ */
+            confidence?: number | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        /** @enum {string} */
+        ScanStatus: "PROCESSING" | "DONE" | "FAILED";
+        Scan: {
+            /** Format: uuid */
+            id: string;
+            status: components["schemas"]["ScanStatus"];
+            imageCount: number;
+            /** @description Các món đã tạo (PENDING_REVIEW), rỗng khi còn PROCESSING hoặc không tìm thấy món nào */
+            items: components["schemas"]["WardrobeItem"][];
+            /** @description Số món tìm thấy nhưng không thêm vì tủ đồ đã đủ số món của gói */
+            skippedForLimit: number;
             /** Format: date-time */
             createdAt: string;
         };

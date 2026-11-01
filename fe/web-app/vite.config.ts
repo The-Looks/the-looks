@@ -9,6 +9,7 @@ const services = {
   wardrobe: 'http://localhost:8082',
   outfit: 'http://localhost:8083',
   voting: 'http://localhost:8084',
+  billing: 'http://localhost:8085',
 };
 
 export default defineConfig({
@@ -46,9 +47,12 @@ export default defineConfig({
       '/api/public/auth': services.auth,
       '/api/app/me': services.auth,
       '/api/app/wardrobe': services.wardrobe,
+      '/api/public/wardrobe': services.wardrobe,
       '/api/app/outfits': services.outfit,
       '/api/app/polls': services.voting,
       '/api/public/polls': services.voting,
+      '/api/app/billing': services.billing,
+      '/api/public/billing': services.billing,
     },
   },
   test: {

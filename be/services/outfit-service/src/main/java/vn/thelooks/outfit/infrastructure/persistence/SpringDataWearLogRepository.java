@@ -11,4 +11,8 @@ public interface SpringDataWearLogRepository extends JpaRepository<WearLogJpaEnt
     /** Mỗi dòng: [itemId (UUID), lần mặc gần nhất (Instant)]. */
     @Query("select i, max(w.wornAt) from WearLogJpaEntity w join w.itemIds i where w.ownerId = :ownerId group by i")
     List<Object[]> lastWornAtByItem(@Param("ownerId") UUID ownerId);
+
+    /** Mỗi dòng: [itemId (UUID), số lần mặc (Long)]. */
+    @Query("select i, count(w) from WearLogJpaEntity w join w.itemIds i where w.ownerId = :ownerId group by i")
+    List<Object[]> wearCountByItem(@Param("ownerId") UUID ownerId);
 }

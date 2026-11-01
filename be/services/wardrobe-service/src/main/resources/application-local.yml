@@ -9,3 +9,5 @@ thelooks:
   security:
     issuer: http://localhost:8081
     jwk-set-uri: http://localhost:8081/.well-known/jwks.json
+  services:
+    billing-url: http://localhost:8085

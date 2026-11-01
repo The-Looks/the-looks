@@ -30,7 +30,11 @@ export function SavedOutfitsPage() {
         {outfits.data?.map((o) => (
           <Link key={o.id} to={`/outfits/${o.id}`} className="card">
             <div className="spread">
-              {occasionLabel(o.occasion) ? <Badge>{occasionLabel(o.occasion)}</Badge> : <Badge tone="pink">Tự phối</Badge>}
+              {occasionLabel(o.occasion) ? (
+                <Badge>{occasionLabel(o.occasion)}</Badge>
+              ) : (
+                <Badge tone="pink">Tự phối</Badge>
+              )}
               <span className="small muted">{formatDate(o.createdAt)}</span>
             </div>
             <h3>{o.itemIds.length} món</h3>

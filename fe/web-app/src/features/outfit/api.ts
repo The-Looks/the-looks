@@ -14,9 +14,7 @@ export function useSuggestions(occasion: Occasion | null, limit = 3) {
   return useQuery({
     queryKey: outfitKeys.suggestions(occasion ?? 'SCHOOL', limit),
     queryFn: () =>
-      unwrap(
-        outfitApi.GET('/api/app/outfits/suggestions', { params: { query: { occasion: occasion!, limit } } }),
-      ),
+      unwrap(outfitApi.GET('/api/app/outfits/suggestions', { params: { query: { occasion: occasion!, limit } } })),
     enabled: occasion !== null,
   });
 }
@@ -49,6 +47,22 @@ export function useSaveOutfit() {
     mutationFn: (s: OutfitSuggestion) =>
       unwrap(outfitApi.POST('/api/app/outfits', { body: { itemIds: s.items.map((i) => i.id), occasion: s.occasion } })),
     onSuccess: () => qc.invalidateQueries({ queryKey: outfitKeys.saved }),
+  });
+}
+
+export type Vote = 'LIKE' | 'DISLIKE';
+
+/** Thích / không thích một gợi ý. Không thích → backend loại tổ hợp đó, nên tải lại danh sách gợi ý. */
+export function useRateSuggestion() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ suggestion, vote }: { suggestion: OutfitSuggestion; vote: Vote }) =>
+      unwrap(
+        outfitApi.POST('/api/app/outfits/feedback', { body: { itemIds: suggestion.items.map((i) => i.id), vote } }),
+      ),
+    onSuccess: (_, { vote }) => {
+      if (vote === 'DISLIKE') qc.invalidateQueries({ queryKey: ['outfits', 'suggestions'] });
+    },
   });
 }
 

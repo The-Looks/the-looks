@@ -1,0 +1,124 @@
+openapi: 3.1.0
+info:
+  title: billing-service
+  version: 0.1.0
+  description: |
+    Gói thuê bao Free / Plus / Pro (Plus, Pro trả theo tháng hoặc năm), thanh toán qua PayOS (VietQR, MoMo, ngân hàng).
+    Service khác lấy giới hạn của người dùng qua GET /api/app/billing/me (chuyển tiếp JWT).
+    Quy ước: `/api/app/**` cần JWT, `/api/public/**` không cần đăng nhập.
+servers:
+  - url: http://localhost:8085
+    description: local
+security:
+  - bearerAuth: []
+paths:
+  /api/public/billing/plans:
+    get:
+      summary: Bảng giá và quyền lợi 3 gói
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/PlanInfo' } }
+  /api/app/billing/me:
+    get:
+      summary: Gói và giới hạn hiện tại của người dùng (FREE nếu chưa mua hoặc đã hết hạn)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Entitlements' }
+  /api/app/billing/checkout:
+    post:
+      summary: Tạo đơn mua / gia hạn gói và link thanh toán. Đổi gói khi còn hạn thì thời gian còn lại được quy đổi, không mất tiền.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plan, period]
+              properties:
+                plan: { type: string, enum: [PLUS, PRO] }
+                period: { $ref: '#/components/schemas/BillingPeriod' }
+      responses:
+        '201':
+          description: Đã tạo đơn; chuyển người dùng tới checkoutUrl
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/billing/orders/{orderCode}/confirm:
+    post:
+      summary: Gọi khi người dùng quay lại từ trang thanh toán; nếu đã trả tiền thì kích hoạt gói
+      parameters:
+        - { name: orderCode, in: path, required: true, schema: { type: integer, format: int64 } }
+      responses:
+        '200':
+          description: Trạng thái đơn sau khi kiểm tra
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/billing/payos/webhook:
+    post:
+      summary: Webhook của PayOS (xác thực bằng chữ ký HMAC-SHA256 checksum key)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200': { description: Đã nhận }
+        '400': { description: Sai chữ ký }
+components:
+  securitySchemes:
+    bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+  schemas:
+    Plan: { type: string, enum: [FREE, PLUS, PRO] }
+    BillingPeriod: { type: string, enum: [MONTHLY, YEARLY] }
+    Feature:
+      type: string
+      enum: [WARDROBE_STATS, COST_PER_WEAR, WEAR_CALENDAR, TRY_ON_3D]
+      description: Tính năng chỉ gói Pro có
+    Limits:
+      type: object
+      required: [aiSuggestionsPerDay]
+      properties:
+        wardrobeItems: { type: [integer, 'null'], description: null = không giới hạn }
+        aiSuggestionsPerDay: { type: integer }
+    PlanInfo:
+      type: object
+      required: [plan, name, monthlyPriceVnd, yearlyPriceVnd, limits, features]
+      properties:
+        plan: { $ref: '#/components/schemas/Plan' }
+        name: { type: string }
+        monthlyPriceVnd: { type: integer, format: int64 }
+        yearlyPriceVnd: { type: integer, format: int64 }
+        limits: { $ref: '#/components/schemas/Limits' }
+        features: { type: array, items: { $ref: '#/components/schemas/Feature' } }
+    Entitlements:
+      type: object
+      required: [plan, limits, features]
+      properties:
+        plan: { $ref: '#/components/schemas/Plan' }
+        expiresAt: { type: [string, 'null'], format: date-time }
+        limits: { $ref: '#/components/schemas/Limits' }
+        features: { type: array, items: { $ref: '#/components/schemas/Feature' } }
+    Order:
+      type: object
+      required: [orderCode, plan, period, amountVnd, status, createdAt]
+      properties:
+        orderCode: { type: integer, format: int64 }
+        plan: { $ref: '#/components/schemas/Plan' }
+        period: { $ref: '#/components/schemas/BillingPeriod' }
+        amountVnd: { type: integer, format: int64 }
+        status: { type: string, enum: [PENDING, PAID, CANCELLED] }
+        checkoutUrl: { type: string, format: uri }
+        createdAt: { type: string, format: date-time }
+        paidAt: { type: [string, 'null'], format: date-time }

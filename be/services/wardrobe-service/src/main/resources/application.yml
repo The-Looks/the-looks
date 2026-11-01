@@ -2,6 +2,10 @@ server:
   port: 8082
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 101MB
   application:
     name: wardrobe-service
   profiles:
@@ -36,3 +40,19 @@ thelooks:
     issuer: ${JWT_ISSUER}
     jwk-set-uri: ${JWT_JWK_SET_URI}
     session-validation-uri: ${SESSION_VALIDATION_URI:http://localhost:8081/api/public/auth/session/active}
+  services:
+    billing-url: ${BILLING_SERVICE_URL}
+  ai:
+    # none = nhận diện giả (mỗi ảnh tách đôi trên/dưới, chỉ để dev); claude = Claude vision, cần ANTHROPIC_API_KEY
+    provider: ${AI_PROVIDER:none}
+    model: ${AI_MODEL:claude-haiku-5-5}
+  storage:
+    # local = lưu file trên máy chủ (dev); cloudinary = Cloudinary (cần CLOUDINARY_*)
+    provider: ${IMAGE_STORAGE:local}
+    local-dir: ${IMAGE_DIR:./data/wardrobe-images}
+    # Địa chỉ web-app (cùng origin với API qua Vite proxy / Vercel rewrites) để tạo link ảnh lưu local
+    public-base-url: ${PUBLIC_BASE_URL:http://localhost:5173}
+    cloudinary:
+      cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+      api-key: ${CLOUDINARY_API_KEY:}
+      api-secret: ${CLOUDINARY_API_SECRET:}
