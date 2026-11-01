@@ -20,10 +20,13 @@ Cập nhật lần cuối: 01/11/2026 (sau review toàn bộ PR)
 - [ ] **Mời Member 1 vào tổ chức `The-Looks`** và gửi username GitHub cho cả nhóm · Tuấn
   Cần để thêm file `CODEOWNERS` (tự gán người review theo service).
 - [ ] **Xoá nhánh đã merge `feature/web-app`** · Tuấn · bấm **Delete branch** trong PR #1
-- [ ] **Review và merge PR theo thứ tự** · cả nhóm
-  - Phát: #2 (JWKS) → #3 (đăng nhập, bình chọn)
-  - Tuấn: #4 (thích/không thích) → #5 (thời tiết, AI, học gu) → #6 (gói thuê bao) → #8 (quét nhiều món/ảnh)
-  - Merge #2 và #3 **trước** #5, #6: #3 đổi `identity-service` → `auth-service` nên #5, #6 cần cập nhật lại (nhờ Claude) trước khi merge.
+- [ ] **Review và merge PR theo thứ tự** · cả nhóm (Claude không tự merge được: cần người review)
+  - [x] #2, #3 của Phát đã lên `main` (01/11)
+  - #4 (thích/không thích) → #5 (thời tiết, AI, học gu) → #9 (lượt AI theo gói, base là #5)
+  - #6 (gói thuê bao) → #8 (quét nhiều món/ảnh, đã chứa #6) → #10 (wardrobe-service chạy thật, base là #8)
+  - #11 (chống spam bình chọn + test, Phát review) · #7 (tài liệu này)
+  - PR nối tiếp (#9, #10): sau khi PR nền merge, bấm **Edit** cạnh tiêu đề PR để đổi base sang `main`.
+  - Muốn Claude tự merge: thêm quyền trong `.claude/settings.json` hoặc bấm duyệt khi được hỏi.
 
 ## 2. Tài khoản dịch vụ và khoá bí mật
 
@@ -38,6 +41,11 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   2. Lấy `Client ID`, `API Key`, `Checksum Key` → biến `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, và `PAYMENT_GATEWAY=payos`.
   3. Khai báo webhook: `https://<tên-miền>/api/public/billing/payos/webhook`.
   4. Mua thử 1 gói Plus tháng bằng tiền thật để kiểm tra trọn luồng.
+- [ ] **Cloudinary (lưu ảnh tủ đồ)** · Tuấn hoặc Member 1 · trước khi deploy
+  Đăng ký https://cloudinary.com (gói Free) → Dashboard lấy Cloud name, API Key, API Secret.
+  Biến môi trường wardrobe-service: `IMAGE_STORAGE=cloudinary`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+- [ ] **Bật AI nhận diện quần áo** · khi có key Anthropic
+  wardrobe-service: `AI_PROVIDER=claude` + `ANTHROPIC_API_KEY` (dùng chung key với outfit-service). Chạy thử với 20–30 ảnh thật, xem AI cắt đúng món chưa.
 - [ ] **Google Login** · Phát · khi merge PR #3
   Google Cloud Console → tạo OAuth Client ID (Web) → `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`.
 - [ ] **Khoá và bí mật của identity / voting** · Phát · khi deploy
