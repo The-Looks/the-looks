@@ -1,4 +1,4 @@
-package vn.thelooks.voting.application.port.out;
+package vn.thelooks.voting.domain.exception;
 
 public class OutfitUnavailableException extends RuntimeException {
 

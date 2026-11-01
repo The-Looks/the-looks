@@ -1,4 +1,4 @@
-package vn.thelooks.voting.infrastructure.persistence;
+package vn.thelooks.voting.infrastructure.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,12 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
-import vn.thelooks.voting.domain.model.Ballot;
-import vn.thelooks.voting.domain.model.Choice;
+import vn.thelooks.voting.domain.enums.Choice;
 
 @Entity
 @Table(name = "ballots")
-class BallotJpaEntity extends BaseEntity {
+public class BallotJpaEntity extends BaseEntity {
 
     @Id
     private UUID id;
@@ -34,13 +33,11 @@ class BallotJpaEntity extends BaseEntity {
     protected BallotJpaEntity() {
     }
 
-    static BallotJpaEntity from(Ballot ballot) {
-        var entity = new BallotJpaEntity();
-        entity.id = ballot.id();
-        entity.pollId = ballot.pollId();
-        entity.voterKey = ballot.voterKey();
-        entity.choice = ballot.choice();
-        entity.castAt = ballot.castAt();
-        return entity;
+    public BallotJpaEntity(UUID id, UUID pollId, String voterKey, Choice choice, Instant castAt) {
+        this.id = id;
+        this.pollId = pollId;
+        this.voterKey = voterKey;
+        this.choice = choice;
+        this.castAt = castAt;
     }
 }

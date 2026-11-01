@@ -1,4 +1,4 @@
-package vn.thelooks.voting.infrastructure.persistence;
+package vn.thelooks.voting.infrastructure.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

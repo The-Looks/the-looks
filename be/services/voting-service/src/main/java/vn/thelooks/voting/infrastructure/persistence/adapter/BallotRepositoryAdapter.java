@@ -1,4 +1,4 @@
-package vn.thelooks.voting.infrastructure.persistence;
+package vn.thelooks.voting.infrastructure.persistence.adapter;
 
 import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -6,8 +6,10 @@ import org.springframework.stereotype.Repository;
 import vn.thelooks.voting.application.port.out.BallotRepository;
 import vn.thelooks.voting.domain.exception.AlreadyVotedException;
 import vn.thelooks.voting.domain.model.Ballot;
-import vn.thelooks.voting.domain.model.Choice;
+import vn.thelooks.voting.domain.enums.Choice;
 import vn.thelooks.voting.domain.model.PollResult;
+import vn.thelooks.voting.infrastructure.persistence.mapper.BallotPersistenceMapper;
+import vn.thelooks.voting.infrastructure.persistence.repository.SpringDataBallotRepository;
 
 @Repository
 class BallotRepositoryAdapter implements BallotRepository {
@@ -21,7 +23,7 @@ class BallotRepositoryAdapter implements BallotRepository {
     @Override
     public Ballot save(Ballot ballot) {
         try {
-            repository.saveAndFlush(BallotJpaEntity.from(ballot));
+            repository.saveAndFlush(BallotPersistenceMapper.toEntity(ballot));
             return ballot;
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyVotedException("Bạn đã bình chọn cho link này");

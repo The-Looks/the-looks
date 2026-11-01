@@ -1,4 +1,4 @@
-package vn.thelooks.voting.infrastructure.security;
+package vn.thelooks.voting.infrastructure.crypto;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;

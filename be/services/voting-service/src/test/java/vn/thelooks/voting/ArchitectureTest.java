@@ -7,7 +7,7 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
-/** Ranh giới các layer (domain → application → api/infrastructure), kiểm tra trên CI. */
+/** Ranh giới các layer (domain → application → presentation/infrastructure), kiểm tra trên CI. */
 @AnalyzeClasses(packages = "vn.thelooks.voting", importOptions = ImportOption.DoNotIncludeTests.class)
 class ArchitectureTest {
 
@@ -16,18 +16,18 @@ class ArchitectureTest {
             .that().resideInAPackage("vn.thelooks.voting.domain..")
             .should().dependOnClassesThat().resideInAnyPackage(
                     "org.springframework..", "jakarta.persistence..",
-                    "vn.thelooks.voting.application..", "vn.thelooks.voting.api..", "vn.thelooks.voting.infrastructure..")
+                    "vn.thelooks.voting.application..", "vn.thelooks.voting.presentation..", "vn.thelooks.voting.infrastructure..")
             .allowEmptyShould(true);
 
     @ArchTest
     static final ArchRule applicationDoesNotDependOnAdapters = noClasses()
             .that().resideInAPackage("vn.thelooks.voting.application..")
-            .should().dependOnClassesThat().resideInAnyPackage("vn.thelooks.voting.api..", "vn.thelooks.voting.infrastructure..")
+            .should().dependOnClassesThat().resideInAnyPackage("vn.thelooks.voting.presentation..", "vn.thelooks.voting.infrastructure..")
             .allowEmptyShould(true);
 
     @ArchTest
-    static final ArchRule apiDoesNotUseInfrastructure = noClasses()
-            .that().resideInAPackage("vn.thelooks.voting.api..")
+    static final ArchRule presentationDoesNotUseInfrastructure = noClasses()
+            .that().resideInAPackage("vn.thelooks.voting.presentation..")
             .should().dependOnClassesThat().resideInAPackage("vn.thelooks.voting.infrastructure..")
             .allowEmptyShould(true);
 }

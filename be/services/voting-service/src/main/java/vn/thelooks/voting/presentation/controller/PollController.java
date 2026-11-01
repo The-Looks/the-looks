@@ -1,27 +1,18 @@
-package vn.thelooks.voting.api.controller;
+package vn.thelooks.voting.presentation.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import java.net.URI;
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,17 +20,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.thelooks.security.CurrentUser;
-import vn.thelooks.voting.api.dto.PollResponse;
-import vn.thelooks.voting.application.port.out.OutfitUnavailableException;
 import vn.thelooks.voting.application.port.out.VoterKeyGenerator;
-import vn.thelooks.voting.application.usecase.CastVoteUseCase;
-import vn.thelooks.voting.application.usecase.CreatePollUseCase;
-import vn.thelooks.voting.application.usecase.GetPollQuery;
-import vn.thelooks.voting.domain.exception.AlreadyVotedException;
-import vn.thelooks.voting.domain.exception.InvalidPollException;
-import vn.thelooks.voting.domain.exception.PollExpiredException;
+import vn.thelooks.voting.application.port.in.CastVoteUseCase;
+import vn.thelooks.voting.application.port.in.CreatePollUseCase;
+import vn.thelooks.voting.application.port.in.GetPollQuery;
 import vn.thelooks.voting.domain.exception.PollNotFoundException;
-import vn.thelooks.voting.domain.model.Choice;
+import vn.thelooks.voting.presentation.mapper.PollResponseMapper;
+import vn.thelooks.voting.presentation.request.CreatePollRequest;
+import vn.thelooks.voting.presentation.request.VoteRequest;
+import vn.thelooks.voting.presentation.response.CreatedPollResponse;
+import vn.thelooks.voting.presentation.response.PollResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -63,7 +53,7 @@ class PollController {
     @GetMapping("/app/polls")
     List<PollResponse> mine(@AuthenticationPrincipal Jwt jwt) {
         return getPoll.mine(CurrentUser.id(jwt)).stream()
-                .map(poll -> PollResponse.from(poll, getPoll.result(poll.code())))
+                .map(poll -> PollResponseMapper.toResponse(poll, getPoll.result(poll.code())))
                 .toList();
     }
 
@@ -79,7 +69,7 @@ class PollController {
     @GetMapping("/public/polls/{code}")
     PollResponse publicPoll(@PathVariable String code) {
         var poll = getPoll.byCode(code).orElseThrow(() -> new PollNotFoundException("Không tìm thấy bình chọn"));
-        return PollResponse.from(poll, getPoll.result(code));
+        return PollResponseMapper.toResponse(poll, getPoll.result(code));
     }
 
     @PostMapping("/public/polls/{code}/votes")
@@ -90,7 +80,8 @@ class PollController {
         var cookie = ResponseCookie.from("vote_id", id)
                 .httpOnly(true).secure(request.isSecure()).sameSite("Lax")
                 .path("/api/public/polls").maxAge(Duration.ofDays(365)).build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(PollResponse.Result.from(result));
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(PollResponseMapper.toResult(result));
     }
 
     private static String newVoterId() {
@@ -99,38 +90,4 @@ class PollController {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    record CreatePollRequest(@NotNull UUID outfitAId, @NotNull UUID outfitBId,
-            @Size(max = 140) String question, @Min(1) @Max(168) Integer ttlHours) {
-    }
-
-    record CreatedPollResponse(String code, URI shareUrl, Instant expiresAt) {
-    }
-
-    record VoteRequest(@NotNull Choice choice) {
-    }
-
-    @ExceptionHandler(PollNotFoundException.class)
-    ProblemDetail notFound(PollNotFoundException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
-    }
-
-    @ExceptionHandler(PollExpiredException.class)
-    ProblemDetail expired(PollExpiredException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.GONE, e.getMessage());
-    }
-
-    @ExceptionHandler(AlreadyVotedException.class)
-    ProblemDetail duplicate(AlreadyVotedException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
-    }
-
-    @ExceptionHandler(InvalidPollException.class)
-    ProblemDetail invalid(InvalidPollException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
-
-    @ExceptionHandler(OutfitUnavailableException.class)
-    ProblemDetail unavailable(OutfitUnavailableException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
-    }
 }

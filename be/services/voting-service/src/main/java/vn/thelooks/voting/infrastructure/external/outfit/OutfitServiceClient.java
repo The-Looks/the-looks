@@ -1,4 +1,4 @@
-package vn.thelooks.voting.infrastructure.client;
+package vn.thelooks.voting.infrastructure.external.outfit;
 
 import java.net.URI;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import vn.thelooks.voting.application.port.out.OutfitReader;
-import vn.thelooks.voting.application.port.out.OutfitUnavailableException;
+import vn.thelooks.voting.domain.exception.OutfitUnavailableException;
 import vn.thelooks.voting.domain.model.PollOption;
 
 @Component

@@ -1,4 +1,4 @@
-package vn.thelooks.voting.application.usecase;
+package vn.thelooks.voting.application.port.in;
 
 import java.util.List;
 import java.util.Optional;

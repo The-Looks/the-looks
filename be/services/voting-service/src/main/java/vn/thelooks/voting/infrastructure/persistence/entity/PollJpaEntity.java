@@ -1,21 +1,18 @@
-package vn.thelooks.voting.infrastructure.persistence;
+package vn.thelooks.voting.infrastructure.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import vn.thelooks.voting.domain.model.Poll;
-import vn.thelooks.voting.domain.model.PollOption;
 
 @Entity
 @Table(name = "polls")
-class PollJpaEntity extends BaseEntity {
+public class PollJpaEntity extends BaseEntity {
 
     @Id
     private UUID id;
@@ -49,24 +46,26 @@ class PollJpaEntity extends BaseEntity {
     protected PollJpaEntity() {
     }
 
-    static PollJpaEntity from(Poll poll) {
-        var entity = new PollJpaEntity();
-        entity.id = poll.id();
-        entity.code = poll.code();
-        entity.ownerId = poll.ownerId();
-        entity.question = poll.question();
-        entity.outfitAId = poll.optionA().outfitId();
-        entity.outfitBId = poll.optionB().outfitId();
-        entity.optionAImages = poll.optionA().imageUrls().stream().map(URI::toString).toList();
-        entity.optionBImages = poll.optionB().imageUrls().stream().map(URI::toString).toList();
-        entity.expiresAt = poll.expiresAt();
-        return entity;
+    public PollJpaEntity(UUID id, String code, UUID ownerId, String question, UUID outfitAId, UUID outfitBId,
+            List<String> optionAImages, List<String> optionBImages, Instant expiresAt) {
+        this.id = id;
+        this.code = code;
+        this.ownerId = ownerId;
+        this.question = question;
+        this.outfitAId = outfitAId;
+        this.outfitBId = outfitBId;
+        this.optionAImages = optionAImages;
+        this.optionBImages = optionBImages;
+        this.expiresAt = expiresAt;
     }
 
-    Poll toDomain() {
-        return new Poll(id, ownerId, code, question,
-                new PollOption(outfitAId, optionAImages.stream().map(URI::create).toList()),
-                new PollOption(outfitBId, optionBImages.stream().map(URI::create).toList()),
-                expiresAt, getCreatedAt());
-    }
+    public UUID getId() { return id; }
+    public String getCode() { return code; }
+    public UUID getOwnerId() { return ownerId; }
+    public String getQuestion() { return question; }
+    public UUID getOutfitAId() { return outfitAId; }
+    public UUID getOutfitBId() { return outfitBId; }
+    public List<String> getOptionAImages() { return optionAImages; }
+    public List<String> getOptionBImages() { return optionBImages; }
+    public Instant getExpiresAt() { return expiresAt; }
 }
