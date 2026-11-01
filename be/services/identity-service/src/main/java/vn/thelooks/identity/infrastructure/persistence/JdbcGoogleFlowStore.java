@@ -5,15 +5,21 @@ import java.time.Instant;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 import vn.thelooks.identity.application.port.out.GoogleFlowStore;
 
 @Repository
 class JdbcGoogleFlowStore implements GoogleFlowStore {
 
     private final JdbcTemplate jdbc;
+    private final TransactionTemplate consumeTransaction;
 
-    JdbcGoogleFlowStore(JdbcTemplate jdbc) {
+    JdbcGoogleFlowStore(JdbcTemplate jdbc, PlatformTransactionManager transactions) {
         this.jdbc = jdbc;
+        consumeTransaction = new TransactionTemplate(transactions);
+        consumeTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
     @Override
@@ -24,8 +30,9 @@ class JdbcGoogleFlowStore implements GoogleFlowStore {
 
     @Override
     public Optional<Flow> consume(String stateHash) {
-        return jdbc.query("DELETE FROM google_oauth_flows WHERE state_hash = ? RETURNING nonce, code_verifier, expires_at",
+        return consumeTransaction.execute(status -> jdbc.query(
+                "DELETE FROM google_oauth_flows WHERE state_hash = ? RETURNING nonce, code_verifier, expires_at",
                 (rs, row) -> new Flow(rs.getString("nonce"), rs.getString("code_verifier"),
-                        rs.getTimestamp("expires_at").toInstant()), stateHash).stream().findFirst();
+                        rs.getTimestamp("expires_at").toInstant()), stateHash).stream().findFirst());
     }
 }
