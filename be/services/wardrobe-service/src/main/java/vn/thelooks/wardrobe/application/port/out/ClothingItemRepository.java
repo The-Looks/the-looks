@@ -15,4 +15,7 @@ public interface ClothingItemRepository {
     List<ClothingItem> findByOwner(UUID ownerId, ItemStatus status);
 
     void deleteById(UUID id);
+
+    /** Số món đang có (mọi trạng thái trừ RECOGNITION_FAILED), để so với giới hạn của gói. */
+    long countByOwner(UUID ownerId);
 }

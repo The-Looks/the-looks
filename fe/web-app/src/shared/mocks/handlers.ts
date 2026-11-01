@@ -1,5 +1,5 @@
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
-import type { Category, OutfitSuggestion, Poll, SavedOutfit, WardrobeItem } from '../api/types';
+import type { Category, OutfitSuggestion, Poll, SavedOutfit, Scan, WardrobeItem } from '../api/types';
 import { DEMO_USER, sampleCloset } from './data';
 import { makeMockJwt } from './devJwt';
 
@@ -43,6 +43,7 @@ const auth: HttpHandler[] = [
 
 // ---------------- wardrobe ----------------
 let closet: WardrobeItem[] = structuredClone(sampleCloset);
+const scans = new Map<string, Scan>();
 const guessCategories: Category[] = ['TOP', 'BOTTOM', 'DRESS', 'SHOES'];
 
 const wardrobe: HttpHandler[] = [
@@ -54,33 +55,44 @@ const wardrobe: HttpHandler[] = [
       closet.filter((i) => (!status || i.status === status) && (!category || i.category === category)),
     );
   }),
-  http.post('*/api/app/wardrobe/items', async ({ request }) => {
+  // Giả lập quét ảnh: mỗi ảnh ra 1–3 món sau ~2 giây (ảnh mock không cắt được nên dùng lại ảnh gốc)
+  http.post('*/api/app/wardrobe/scans', async ({ request }) => {
     const form = await request.formData();
-    const file = form.get('image');
-    if (!(file instanceof File)) return problem(400, 'Thiếu ảnh');
-    const item: WardrobeItem = {
+    const images = form.getAll('images').filter((f): f is File => f instanceof File);
+    if (images.length === 0) return problem(400, 'Thiếu ảnh');
+    if (images.length > 10) return problem(400, 'Tối đa 10 ảnh mỗi lần');
+    const scan: Scan = {
       id: crypto.randomUUID(),
       status: 'PROCESSING',
-      imageUrl: URL.createObjectURL(file),
+      imageCount: images.length,
+      items: [],
+      skippedForLimit: 0,
       createdAt: new Date().toISOString(),
     };
-    closet = [item, ...closet];
-    // Giả lập AI nhận diện chạy nền ~2 giây
+    scans.set(scan.id, scan);
     setTimeout(() => {
-      closet = closet.map((i) =>
-        i.id === item.id
-          ? {
-              ...i,
-              status: 'PENDING_REVIEW',
-              category: guessCategories[closet.length % 4],
-              colors: ['white'],
-              seasons: [],
-              styleTags: ['casual'],
-            }
-          : i,
+      const created: WardrobeItem[] = images.flatMap((file, i) =>
+        Array.from({ length: 1 + ((i + file.size) % 3) }, (_, k) => ({
+          id: crypto.randomUUID(),
+          status: 'PENDING_REVIEW' as const,
+          category: guessCategories[(i + k) % guessCategories.length],
+          colors: ['white'],
+          seasons: [],
+          styleTags: ['casual'],
+          imageUrl: URL.createObjectURL(file),
+          scanId: scan.id,
+          confidence: 0.8,
+          createdAt: new Date().toISOString(),
+        })),
       );
+      closet = [...created, ...closet];
+      scans.set(scan.id, { ...scan, status: 'DONE', items: created });
     }, 2000);
-    return HttpResponse.json(item, { status: 202 });
+    return HttpResponse.json(scan, { status: 202 });
+  }),
+  http.get('*/api/app/wardrobe/scans/:id', ({ params }) => {
+    const scan = scans.get(String(params.id));
+    return scan ? HttpResponse.json(scan) : problem(404, 'Không tìm thấy lần quét');
   }),
   http.get('*/api/app/wardrobe/items/:id', ({ params }) => {
     const item = closet.find((i) => i.id === params.id);
