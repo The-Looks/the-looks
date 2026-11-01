@@ -1,5 +1,5 @@
 import { ApiError, errorMessage } from '../../../shared/api/client';
-import { Button, ButtonLink, Card, Notice } from '../../../shared/ui';
+import { Button, ButtonLink, Card, Garment, Notice } from '../../../shared/ui';
 import { useQuickPick } from '../api';
 import { OutfitCard } from './OutfitCard';
 import { SaveButton } from './SaveButton';
@@ -10,18 +10,18 @@ export function QuickPickCard() {
 
   return (
     <div className="stack">
-      <Card hero>
+      <Card hero><div className="quick-copy">
         <span className="eyebrow" style={{ color: 'inherit', opacity: 0.85 }}>
           Quick Pick
         </span>
         <h2>Hôm nay mặc gì?</h2>
-        <p className="muted">Một chạm, AI chọn bộ đồ ưu tiên những món bạn lâu chưa mặc.</p>
+        <p className="muted">Khơi gợi cảm hứng từ tủ đồ của bạn. Ưu tiên những món đã lâu chưa được diện.</p>
         <div className="row">
           <Button kind="ghost" onClick={() => pick.mutate()} disabled={pick.isPending}>
             {pick.isPending ? 'Đang chọn…' : pick.data ? 'Chọn bộ khác' : 'Gợi ý cho tôi'}
           </Button>
         </div>
-      </Card>
+      </div><div className="outfit-preview" aria-hidden="true"><div className="preview-top"><Garment category="TOP" /></div><div className="preview-bottom"><Garment category="BOTTOM" /></div><div className="preview-shoe"><Garment category="SHOES" /></div><span>Phối mới từ đồ đang có</span></div></Card>
 
       {pick.isError && (
         <Notice tone={pick.error instanceof ApiError && pick.error.status === 503 ? 'warn' : 'error'}>
