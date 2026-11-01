@@ -2,7 +2,7 @@
 
 | Thư mục | Nội dung | Cổng | Phụ trách |
 |---|---|---|---|
-| `services/identity-service` | Đăng ký, đăng nhập, phát JWT, phân quyền | 8081 | Member 3 (Phát) |
+| `services/auth-service` | Đăng ký, đăng nhập, phát JWT, phân quyền | 8081 | Member 3 (Phát) |
 | `services/wardrobe-service` | Tủ đồ số: upload, AI nhận diện, xác nhận/sửa/xoá | 8082 | Member 1 |
 | `services/outfit-service` | AI gợi ý theo dịp + Quick Pick | 8083 | Member 2 (Tuấn) |
 | `services/voting-service` | Ask Friends: bình chọn A/B qua link | 8084 | Member 3 (Phát) |
@@ -11,15 +11,32 @@
 | `packages/observability` | Correlation ID (header `X-Correlation-Id`, có trong log) | | |
 | `infrastructure/docker` | Script tạo database cho từng service | | |
 
-## Layer trong mỗi service
+## Cấu trúc auth-service
 
 ```
-domain/          model, exception, service — Java thuần, không Spring/JPA
-application/     usecase (interface), port/out (interface ra ngoài), service (cài đặt use case)
-api/             controller, dto — REST + validation
-infrastructure/  persistence (JPA), client (gọi service khác), ai, config
+services/auth-service/src/main/java/vn/thelooks/auth/
+  application/port/in/          use case interfaces
+  application/port/out/         interfaces tới hạ tầng
+  application/service/          xử lý nghiệp vụ
+  domain/enums/                 Role, UserStatus
+  domain/exception/             lỗi nghiệp vụ
+  domain/model/                 User
+  infrastructure/config/       Clock
+  infrastructure/crypto/       Argon2 và phát JWT
+  infrastructure/external/google/  Google OIDC
+  infrastructure/persistence/adapter/     JDBC/JPA adapters
+  infrastructure/persistence/entity/      JPA entities, BaseEntity
+  infrastructure/persistence/mapper/      ánh xạ entity ↔ domain
+  infrastructure/persistence/repository/  Spring Data repository
+  infrastructure/security/config/         cấu hình khóa JWT
+  presentation/advice/         ánh xạ lỗi HTTP
+  presentation/controller/     REST endpoints
+  presentation/mapper/         ánh xạ response
+  presentation/request/        request DTOs
+  presentation/response/       response DTOs
 ```
-`ArchitectureTest` trong mỗi service kiểm tra các ranh giới này trên CI.
+Các nhánh như Kafka, Keycloak, event hoặc filter sẽ được thêm khi có code dùng đến.
+`ArchitectureTest` kiểm tra ranh giới các lớp trên CI.
 
 Quy tắc: service không đọc database của service khác, không dùng chung entity/domain model.
 Cần dữ liệu service khác → gọi REST API của nó (JWT được chuyển tiếp tự động).
@@ -41,15 +58,15 @@ Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
 
 ## Xác thực JWT
 
-Identity service phát access token ký RS256 và công bố public keys tại
+Auth service phát access token ký RS256 và công bố public keys tại
 `/.well-known/jwks.json`. Mỗi service kiểm tra chữ ký từ JWKS và kiểm tra claim
-`iss` bằng `JWT_ISSUER`; private key chỉ nằm ở identity service. Với Docker Compose,
-`JWT_JWK_SET_URI` trỏ tới `http://identity-service:8081/.well-known/jwks.json`.
+`iss` bằng `JWT_ISSUER`; private key chỉ nằm ở auth service. Với Docker Compose,
+`JWT_JWK_SET_URI` trỏ tới `http://auth-service:8081/.well-known/jwks.json`.
 Chạy local ngoài Docker thì dùng URI `http://localhost:8081/.well-known/jwks.json`.
-Các service kiểm tra `sid` với identity qua `SESSION_VALIDATION_URI` trên mỗi request
+Các service kiểm tra `sid` với auth service qua `SESSION_VALIDATION_URI` trên mỗi request
 có Bearer token; phiên đã thu hồi bị từ chối ngay, kể cả access token chưa hết 30 phút.
 Tạo khóa một lần bằng `powershell -File scripts/generate-jwt-key.ps1` trước khi
-chạy identity service hoặc Docker Compose. File `.keys/jwt-private.pem` đã được
+chạy auth service hoặc Docker Compose. File `.keys/jwt-private.pem` đã được
 gitignore; không đưa private key vào repository. JDK 21 dùng được khi build với
 `mvnw.cmd verify -Djava.version=21`.
 

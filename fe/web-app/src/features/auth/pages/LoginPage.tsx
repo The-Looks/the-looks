@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { errorMessage, identityApi, unwrap } from '../../../shared/api/client';
+import { authApi, errorMessage, unwrap } from '../../../shared/api/client';
 import { session, useSession } from '../../../shared/lib/session';
 import { Brand, Button, Card, Field, Notice } from '../../../shared/ui';
 
-// identity-service — Phát. Contract: identity-api.yaml
+// auth-service — Phát. Contract: auth-api.yaml
 export function LoginPage() {
   const { isAuthenticated } = useSession();
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
 
   const login = useMutation({
-    mutationFn: () => unwrap(identityApi.POST('/api/public/auth/login', { body: { email, password } })),
+    mutationFn: () => unwrap(authApi.POST('/api/public/auth/login', { body: { email, password } })),
     onSuccess: (res) => {
       session.setToken(res.accessToken);
       navigate(from, { replace: true });

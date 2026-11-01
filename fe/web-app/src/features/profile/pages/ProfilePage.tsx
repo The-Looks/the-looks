@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { errorMessage, identityApi, unwrap } from '../../../shared/api/client';
+import { authApi, errorMessage, unwrap } from '../../../shared/api/client';
 import { formatDate } from '../../../shared/lib/format';
 import { session } from '../../../shared/lib/session';
 import { Button, Card, Notice, PageHeader, Spinner } from '../../../shared/ui';
 
 export function ProfilePage() {
-  const me = useQuery({ queryKey: ['me'], queryFn: () => unwrap(identityApi.GET('/api/app/me')) });
+  const me = useQuery({ queryKey: ['me'], queryFn: () => unwrap(authApi.GET('/api/app/me')) });
 
   return (
     <div className="stack-lg">

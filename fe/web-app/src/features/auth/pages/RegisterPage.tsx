@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { errorMessage, identityApi, unwrap } from '../../../shared/api/client';
+import { authApi, errorMessage, unwrap } from '../../../shared/api/client';
 import { session } from '../../../shared/lib/session';
 import { Brand, Button, Card, Field, Notice } from '../../../shared/ui';
 
@@ -12,8 +12,8 @@ export function RegisterPage() {
 
   const register = useMutation({
     mutationFn: async () => {
-      await unwrap(identityApi.POST('/api/public/auth/register', { body: form }));
-      return unwrap(identityApi.POST('/api/public/auth/login', { body: { email: form.email, password: form.password } }));
+      await unwrap(authApi.POST('/api/public/auth/register', { body: form }));
+      return unwrap(authApi.POST('/api/public/auth/login', { body: { email: form.email, password: form.password } }));
     },
     onSuccess: (res) => {
       session.setToken(res.accessToken);

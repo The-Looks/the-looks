@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-/** Kiểm tra trạng thái phiên ở identity service để token đã thu hồi bị từ chối ngay. */
+/** Kiểm tra trạng thái phiên ở auth service để token đã thu hồi bị từ chối ngay. */
 final class SessionStatusValidator implements OAuth2TokenValidator<Jwt> {
 
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();

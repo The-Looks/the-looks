@@ -11,7 +11,7 @@ mỗi thành viên sở hữu trọn một hoặc hai service:
 
 | Service | Phụ trách | Cổng |
 |---|---|---|
-| identity-service | Member 3 (Phát) | 8081 |
+| auth-service | Member 3 (Phát) | 8081 |
 | wardrobe-service | Member 1 | 8082 |
 | outfit-service | Member 2 (Tuấn) | 8083 |
 | voting-service | Member 3 (Phát) | 8084 |
@@ -21,7 +21,7 @@ mỗi thành viên sở hữu trọn một hoặc hai service:
 - `be/pom.xml` là parent (packaging `pom`); mỗi service là một ứng dụng Spring Boot riêng trong `be/services/`.
 - Package dùng chung trong `be/packages/`:
   - `contracts` — OpenAPI của từng service (contract-first).
-  - `security` — mọi service là OAuth2 resource server, xác thực JWT do identity-service phát;
+  - `security` — mọi service là OAuth2 resource server, xác thực JWT do auth-service phát;
     tự chuyển tiếp JWT người dùng khi gọi service khác.
   - `observability` — correlation ID (`X-Correlation-Id`) xuyên suốt các service, có trong log.
 - Layer trong mỗi service: `domain` (model, exception, service) → `application` (usecase, port/out, service)
@@ -38,4 +38,4 @@ mỗi thành viên sở hữu trọn một hoặc hai service:
   1 máy chủ 1 CPU/2 GB — vừa sát, cần theo dõi; có thể gộp chạy chung máy, tách database theo schema nếu thiếu.
 - Frontend gọi 4 cổng khác nhau → cần **API gateway / reverse proxy** (một địa chỉ duy nhất) trước khi ra mắt.
 - Chưa dùng Kafka/message broker, Kubernetes, Terraform: thêm khi có nhu cầu thật (event bất đồng bộ, nhiều máy chủ).
-- JWT ký HMAC dùng chung secret giữa các service; chuyển sang RSA + JWKS của identity-service khi deploy nhiều nơi.
+- JWT ký HMAC dùng chung secret giữa các service; chuyển sang RSA + JWKS của auth-service khi deploy nhiều nơi.

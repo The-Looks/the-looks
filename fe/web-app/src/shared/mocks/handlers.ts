@@ -7,9 +7,9 @@ import { makeMockJwt } from './devJwt';
 const problem = (status: number, detail: string) =>
   HttpResponse.json({ status, title: 'Error', detail }, { status, headers: { 'Content-Type': 'application/problem+json' } });
 
-// ---------------- identity ----------------
+// ---------------- auth ----------------
 let refreshActive = false;
-const identity: HttpHandler[] = [
+const auth: HttpHandler[] = [
   http.post('*/api/public/auth/register', async ({ request }) => {
     const body = (await request.json()) as { email: string; username: string };
     return HttpResponse.json({ ...DEMO_USER, email: body.email, username: body.username }, { status: 201 });
@@ -179,4 +179,4 @@ const voting: HttpHandler[] = [
   }),
 ];
 
-export const handlersByService: Record<string, HttpHandler[]> = { identity, wardrobe, outfit, voting };
+export const handlersByService: Record<string, HttpHandler[]> = { auth, wardrobe, outfit, voting };

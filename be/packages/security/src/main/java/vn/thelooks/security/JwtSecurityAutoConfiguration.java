@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Mọi service đều là OAuth2 resource server, xác thực JWT do identity-service phát.
+ * Mọi service đều là OAuth2 resource server, xác thực JWT do auth-service phát.
  * Chạy trước cấu hình bảo mật mặc định của Spring Boot để thay thế nó.
  *
  * <p>Quy ước đường dẫn: /api/public/** không cần đăng nhập, /api/admin/** cần role ADMIN, còn lại cần JWT.

@@ -1,6 +1,6 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import { session } from '../lib/session';
-import type { paths as IdentityPaths } from './schema/identity';
+import type { paths as AuthPaths } from './schema/auth';
 import type { paths as OutfitPaths } from './schema/outfit';
 import type { paths as VotingPaths } from './schema/voting';
 import type { paths as WardrobePaths } from './schema/wardrobe';
@@ -27,7 +27,7 @@ function client<Paths extends object>() {
   return c;
 }
 
-export const identityApi = client<IdentityPaths>();
+export const authApi = client<AuthPaths>();
 export const wardrobeApi = client<WardrobePaths>();
 export const outfitApi = client<OutfitPaths>();
 export const votingApi = client<VotingPaths>();
