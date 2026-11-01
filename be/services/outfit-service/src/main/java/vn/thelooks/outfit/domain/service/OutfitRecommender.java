@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import vn.thelooks.outfit.domain.model.ClosetItem;
+import vn.thelooks.outfit.domain.model.Feedback;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
 
@@ -21,11 +22,15 @@ import vn.thelooks.outfit.domain.model.OutfitSuggestion;
  *
  * <p>Điểm = độ hợp dịp + độ hài hoà màu + độ "lâu chưa mặc". Quick Pick (occasion = null) bỏ phần hợp dịp,
  * dồn trọng số cho độ lâu chưa mặc.
+ *
+ * <p>Phản hồi của người dùng: tổ hợp bị "không thích" không bao giờ được gợi ý lại; tổ hợp "thích" được cộng điểm.
  */
 public class OutfitRecommender {
 
     /** Quá số ngày này coi như "lâu chưa mặc" tối đa. */
     static final int FRESHNESS_CAP_DAYS = 30;
+    /** Điểm cộng cho tổ hợp người dùng đã thích. */
+    static final double LIKE_BONUS = 0.1;
 
     // ponytail: bảng tag/màu cố định theo nhãn AI trả về; chuyển vào DB/config khi nhãn AI ổn định
     private static final Map<Occasion, Set<String>> OCCASION_TAGS = Map.of(
@@ -41,6 +46,18 @@ public class OutfitRecommender {
     public List<OutfitSuggestion> recommend(
             List<ClosetItem> closet,
             Map<UUID, Instant> lastWornAt,
+            Occasion occasion,
+            Instant now,
+            String season,
+            int limit) {
+        return recommend(closet, lastWornAt, Map.of(), occasion, now, season, limit);
+    }
+
+    /** @param feedback comboKey (xem {@link Feedback#comboKey}) → phản hồi của người dùng */
+    public List<OutfitSuggestion> recommend(
+            List<ClosetItem> closet,
+            Map<UUID, Instant> lastWornAt,
+            Map<String, Feedback> feedback,
             Occasion occasion,
             Instant now,
             String season,
@@ -75,17 +92,22 @@ public class OutfitRecommender {
 
         List<OutfitSuggestion> candidates = new ArrayList<>();
         for (List<ClosetItem> base : bases) {
-            // Có giày thì luôn phối kèm đôi hợp nhất; không có giày thì gợi ý phần thân.
+            // Có giày thì phối kèm đôi hợp nhất (bỏ qua tổ hợp bị không thích); không có giày thì gợi ý phần thân.
             OutfitSuggestion best = null;
             for (ClosetItem shoe : shoes) {
                 List<ClosetItem> withShoe = new ArrayList<>(base);
                 withShoe.add(shoe);
-                OutfitSuggestion scored = score(withShoe, lastWornAt, occasion, now);
-                if (best == null || scored.score() > best.score()) {
+                OutfitSuggestion scored = score(withShoe, lastWornAt, feedback, occasion, now);
+                if (scored != null && (best == null || scored.score() > best.score())) {
                     best = scored;
                 }
             }
-            candidates.add(best != null ? best : score(base, lastWornAt, occasion, now));
+            if (best == null && shoes.isEmpty()) {
+                best = score(base, lastWornAt, feedback, occasion, now);
+            }
+            if (best != null) {
+                candidates.add(best);
+            }
         }
         candidates.sort(Comparator.comparingDouble(OutfitSuggestion::score).reversed());
         return pickDiverse(candidates, limit);
@@ -119,7 +141,13 @@ public class OutfitRecommender {
         return picked;
     }
 
-    private static OutfitSuggestion score(List<ClosetItem> items, Map<UUID, Instant> lastWornAt, Occasion occasion, Instant now) {
+    /** @return null nếu người dùng đã không thích tổ hợp này */
+    private static OutfitSuggestion score(List<ClosetItem> items, Map<UUID, Instant> lastWornAt,
+            Map<String, Feedback> feedback, Occasion occasion, Instant now) {
+        Feedback vote = feedback.get(Feedback.comboKey(items.stream().map(ClosetItem::id).toList()));
+        if (vote == Feedback.DISLIKE) {
+            return null;
+        }
         double harmony = colorHarmony(items);
         double freshness = 0;
         long stalestDays = -1; // Long.MAX_VALUE = chưa mặc lần nào
@@ -133,6 +161,9 @@ public class OutfitRecommender {
 
         double score;
         List<String> reasons = new ArrayList<>();
+        if (vote == Feedback.LIKE) {
+            reasons.add("Bạn từng thích bộ này");
+        }
         if (occasion == null) {
             score = 0.6 * freshness + 0.4 * harmony;
         } else {
@@ -149,6 +180,9 @@ public class OutfitRecommender {
         }
         if (harmony == 1.0) {
             reasons.add("Màu sắc hài hoà");
+        }
+        if (vote == Feedback.LIKE) {
+            score = Math.min(1.0, score + LIKE_BONUS);
         }
         String reason = reasons.isEmpty() ? "Phối từ đồ bạn đang có" : String.join(" · ", reasons);
         return new OutfitSuggestion(List.copyOf(items), occasion, score, reason);

@@ -5,7 +5,10 @@ import { signDevJwt } from './devJwt';
 
 // Giả lập API theo đúng contract trong be/packages/contracts. Dữ liệu chỉ nằm trong bộ nhớ trình duyệt.
 const problem = (status: number, detail: string) =>
-  HttpResponse.json({ status, title: 'Error', detail }, { status, headers: { 'Content-Type': 'application/problem+json' } });
+  HttpResponse.json(
+    { status, title: 'Error', detail },
+    { status, headers: { 'Content-Type': 'application/problem+json' } },
+  );
 
 // ---------------- identity ----------------
 const identity: HttpHandler[] = [
@@ -51,7 +54,14 @@ const wardrobe: HttpHandler[] = [
     setTimeout(() => {
       closet = closet.map((i) =>
         i.id === item.id
-          ? { ...i, status: 'PENDING_REVIEW', category: guessCategories[closet.length % 4], colors: ['white'], seasons: [], styleTags: ['casual'] }
+          ? {
+              ...i,
+              status: 'PENDING_REVIEW',
+              category: guessCategories[closet.length % 4],
+              colors: ['white'],
+              seasons: [],
+              styleTags: ['casual'],
+            }
           : i,
       );
     }, 2000);
@@ -79,6 +89,8 @@ const wardrobe: HttpHandler[] = [
 
 // ---------------- outfit (chỉ khi không chạy outfit-service thật) ----------------
 let savedOutfits: SavedOutfit[] = [];
+const disliked = new Set<string>();
+const comboKey = (ids: string[]) => [...ids].sort().join(',');
 const confirmed = () => closet.filter((i) => i.status === 'CONFIRMED');
 const toItem = (i: WardrobeItem) => ({ id: i.id, category: i.category ?? 'TOP', imageUrl: i.imageUrl });
 
@@ -86,12 +98,16 @@ function mockSuggestions(occasion?: string): OutfitSuggestion[] {
   const by = (c: string) => confirmed().filter((i) => i.category === c);
   const shoes = by('SHOES')[0];
   const combos = by('TOP').flatMap((t) => by('BOTTOM').map((b) => [t, b]));
-  return combos.slice(0, 3).map((c, k) => ({
-    items: [...c, ...(shoes ? [shoes] : [])].map(toItem),
-    occasion: occasion as OutfitSuggestion['occasion'],
-    score: 0.9 - k * 0.08,
-    reason: 'Dữ liệu giả lập · Có món bạn chưa mặc lần nào',
-  }));
+  return combos
+    .map((c) => [...c, ...(shoes ? [shoes] : [])])
+    .filter((c) => !disliked.has(comboKey(c.map((i) => i.id))))
+    .slice(0, 3)
+    .map((c, k) => ({
+      items: c.map(toItem),
+      occasion: occasion as OutfitSuggestion['occasion'],
+      score: 0.9 - k * 0.08,
+      reason: 'Dữ liệu giả lập · Có món bạn chưa mặc lần nào',
+    }));
 }
 
 const outfit: HttpHandler[] = [
@@ -105,7 +121,12 @@ const outfit: HttpHandler[] = [
   http.get('*/api/app/outfits', () => HttpResponse.json(savedOutfits)),
   http.post('*/api/app/outfits', async ({ request }) => {
     const body = (await request.json()) as { itemIds: string[]; occasion?: SavedOutfit['occasion'] };
-    const o: SavedOutfit = { id: crypto.randomUUID(), itemIds: body.itemIds, occasion: body.occasion, createdAt: new Date().toISOString() };
+    const o: SavedOutfit = {
+      id: crypto.randomUUID(),
+      itemIds: body.itemIds,
+      occasion: body.occasion,
+      createdAt: new Date().toISOString(),
+    };
     savedOutfits = [o, ...savedOutfits];
     return HttpResponse.json(o, { status: 201 });
   }),
@@ -113,6 +134,11 @@ const outfit: HttpHandler[] = [
     const o = savedOutfits.find((x) => x.id === params.id);
     if (!o) return problem(404, 'Không tìm thấy outfit');
     return HttpResponse.json({ ...o, itemImageUrls: [] });
+  }),
+  http.post('*/api/app/outfits/feedback', async ({ request }) => {
+    const body = (await request.json()) as { itemIds: string[]; vote: 'LIKE' | 'DISLIKE' };
+    if (body.vote === 'DISLIKE') disliked.add(comboKey(body.itemIds));
+    return new HttpResponse(null, { status: 204 });
   }),
   http.post('*/api/app/outfits/:id/wear', () => new HttpResponse(null, { status: 204 })),
 ];
@@ -133,11 +159,23 @@ let polls: Poll[] = [
 const voting: HttpHandler[] = [
   http.get('*/api/app/polls', () => HttpResponse.json(polls)),
   http.post('*/api/app/polls', async ({ request }) => {
-    const body = (await request.json()) as { outfitAId: string; outfitBId: string; question?: string; ttlHours?: number };
+    const body = (await request.json()) as {
+      outfitAId: string;
+      outfitBId: string;
+      question?: string;
+      ttlHours?: number;
+    };
     const code = Math.random().toString(36).slice(2, 8);
     const expiresAt = new Date(Date.now() + (body.ttlHours ?? 24) * 3600_000).toISOString();
     polls = [
-      { code, question: body.question, optionA: option(body.outfitAId), optionB: option(body.outfitBId), expiresAt, result: { votesA: 0, votesB: 0, percentA: 0, percentB: 0 } },
+      {
+        code,
+        question: body.question,
+        optionA: option(body.outfitAId),
+        optionB: option(body.outfitBId),
+        expiresAt,
+        result: { votesA: 0, votesB: 0, percentA: 0, percentB: 0 },
+      },
       ...polls,
     ];
     return HttpResponse.json({ code, shareUrl: `${location.origin}/v/${code}`, expiresAt }, { status: 201 });

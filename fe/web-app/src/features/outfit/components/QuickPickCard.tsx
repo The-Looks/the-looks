@@ -1,6 +1,7 @@
 import { ApiError, errorMessage } from '../../../shared/api/client';
 import { Button, ButtonLink, Card, Notice } from '../../../shared/ui';
 import { useQuickPick } from '../api';
+import { FeedbackButtons } from './FeedbackButtons';
 import { OutfitCard } from './OutfitCard';
 import { SaveButton } from './SaveButton';
 
@@ -36,7 +37,18 @@ export function QuickPickCard() {
           </ButtonLink>
         </Notice>
       )}
-      {pick.data && <OutfitCard suggestion={pick.data} actions={<SaveButton suggestion={pick.data} />} />}
+      {pick.data && (
+        <OutfitCard
+          key={pick.data.items.map((i) => i.id).join('-')}
+          suggestion={pick.data}
+          actions={
+            <>
+              <SaveButton suggestion={pick.data} />
+              <FeedbackButtons suggestion={pick.data} onDisliked={() => pick.mutate()} />
+            </>
+          }
+        />
+      )}
     </div>
   );
 }

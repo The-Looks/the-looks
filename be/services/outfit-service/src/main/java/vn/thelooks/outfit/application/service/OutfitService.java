@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.thelooks.outfit.application.port.out.FeedbackRepository;
 import vn.thelooks.outfit.application.port.out.OutfitAiAdvisor;
 import vn.thelooks.outfit.application.port.out.OutfitRepository;
 import vn.thelooks.outfit.application.port.out.WardrobeReader;
@@ -22,11 +23,13 @@ import vn.thelooks.outfit.application.port.out.WearLogRepository;
 import vn.thelooks.outfit.application.usecase.GetOutfitsQuery;
 import vn.thelooks.outfit.application.usecase.MarkOutfitWornUseCase;
 import vn.thelooks.outfit.application.usecase.QuickPickUseCase;
+import vn.thelooks.outfit.application.usecase.RateSuggestionUseCase;
 import vn.thelooks.outfit.application.usecase.SaveOutfitUseCase;
 import vn.thelooks.outfit.application.usecase.SuggestOutfitsUseCase;
 import vn.thelooks.outfit.domain.exception.InvalidOutfitException;
 import vn.thelooks.outfit.domain.exception.OutfitNotFoundException;
 import vn.thelooks.outfit.domain.model.ClosetItem;
+import vn.thelooks.outfit.domain.model.Feedback;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.Outfit;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
@@ -37,7 +40,7 @@ import vn.thelooks.outfit.domain.service.OutfitRecommender;
 @Service
 @Transactional(readOnly = true)
 class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutfitUseCase,
-        MarkOutfitWornUseCase, GetOutfitsQuery {
+        MarkOutfitWornUseCase, GetOutfitsQuery, RateSuggestionUseCase {
 
     static final ZoneId VIETNAM = ZoneId.of("Asia/Ho_Chi_Minh");
     /** Số ứng viên tốt nhất gửi cho AI chọn lại. */
@@ -48,15 +51,17 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
     private final OutfitRepository outfits;
     private final WearLogRepository wearLogs;
     private final OutfitAiAdvisor aiAdvisor;
+    private final FeedbackRepository feedback;
     private final Clock clock;
     private final OutfitRecommender recommender = new OutfitRecommender();
 
     OutfitService(WardrobeReader wardrobe, OutfitRepository outfits, WearLogRepository wearLogs,
-            OutfitAiAdvisor aiAdvisor, Clock clock) {
+            OutfitAiAdvisor aiAdvisor, FeedbackRepository feedback, Clock clock) {
         this.wardrobe = wardrobe;
         this.outfits = outfits;
         this.wearLogs = wearLogs;
         this.aiAdvisor = aiAdvisor;
+        this.feedback = feedback;
         this.clock = clock;
     }
 
@@ -77,18 +82,23 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         Instant now = clock.instant();
         String season = OutfitRecommender.seasonOf(LocalDate.ofInstant(now, VIETNAM).getMonth());
         return recommender.recommend(wardrobe.confirmedItems(ownerId), wearLogs.lastWornAtByItem(ownerId),
-                occasion, now, season, AI_CANDIDATES);
+                feedback.byOwner(ownerId), occasion, now, season, AI_CANDIDATES);
+    }
+
+    @Override
+    @Transactional
+    public void rate(UUID ownerId, List<UUID> itemIds, Feedback vote) {
+        validateItems(itemIds);
+        if (vote == null) {
+            throw new InvalidOutfitException("Cần chọn thích hoặc không thích");
+        }
+        feedback.save(ownerId, Feedback.comboKey(itemIds), vote, clock.instant());
     }
 
     @Override
     @Transactional
     public Outfit save(UUID ownerId, List<UUID> itemIds, Occasion occasion) {
-        if (itemIds == null || itemIds.isEmpty() || itemIds.size() > MAX_ITEMS_PER_OUTFIT) {
-            throw new InvalidOutfitException("Outfit cần từ 1 đến " + MAX_ITEMS_PER_OUTFIT + " món");
-        }
-        if (new HashSet<>(itemIds).size() != itemIds.size()) {
-            throw new InvalidOutfitException("Outfit có món bị trùng");
-        }
+        validateItems(itemIds);
         Set<UUID> owned = wardrobe.confirmedItems(ownerId).stream().map(ClosetItem::id).collect(Collectors.toSet());
         if (!owned.containsAll(itemIds)) {
             throw new InvalidOutfitException("Có món không nằm trong tủ đồ của bạn");
@@ -121,6 +131,15 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
                     .toList();
             return new OutfitView(outfit, images);
         });
+    }
+
+    private static void validateItems(List<UUID> itemIds) {
+        if (itemIds == null || itemIds.isEmpty() || itemIds.size() > MAX_ITEMS_PER_OUTFIT) {
+            throw new InvalidOutfitException("Outfit cần từ 1 đến " + MAX_ITEMS_PER_OUTFIT + " món");
+        }
+        if (new HashSet<>(itemIds).size() != itemIds.size()) {
+            throw new InvalidOutfitException("Outfit có món bị trùng");
+        }
     }
 
     private Optional<Outfit> owned(UUID ownerId, UUID outfitId) {

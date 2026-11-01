@@ -3,6 +3,7 @@ import { ApiError, errorMessage } from '../../../shared/api/client';
 import type { Occasion } from '../../../shared/api/types';
 import { ButtonLink, EmptyState, Notice, PageHeader, Spinner } from '../../../shared/ui';
 import { useSuggestions } from '../api';
+import { FeedbackButtons } from '../components/FeedbackButtons';
 import { OutfitCard } from '../components/OutfitCard';
 import { SaveButton } from '../components/SaveButton';
 import { OCCASIONS, occasionLabel } from '../occasions';
@@ -55,9 +56,7 @@ export function SuggestPage() {
           <h2>Gợi ý cho {occasionLabel(occasion)?.toLowerCase()}</h2>
           {suggestions.isPending && <Spinner label="AI đang phối đồ…" />}
           {suggestions.isError && (
-            <Notice
-              tone={suggestions.error instanceof ApiError && suggestions.error.status === 503 ? 'warn' : 'error'}
-            >
+            <Notice tone={suggestions.error instanceof ApiError && suggestions.error.status === 503 ? 'warn' : 'error'}>
               {errorMessage(suggestions.error)}
             </Notice>
           )}
@@ -71,7 +70,16 @@ export function SuggestPage() {
           )}
           <div className="grid-cards">
             {suggestions.data?.map((s) => (
-              <OutfitCard key={s.items.map((i) => i.id).join('-')} suggestion={s} actions={<SaveButton suggestion={s} />} />
+              <OutfitCard
+                key={s.items.map((i) => i.id).join('-')}
+                suggestion={s}
+                actions={
+                  <>
+                    <SaveButton suggestion={s} />
+                    <FeedbackButtons suggestion={s} />
+                  </>
+                }
+              />
             ))}
           </div>
         </section>

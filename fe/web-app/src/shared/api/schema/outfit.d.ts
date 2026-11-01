@@ -154,6 +154,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/outfits/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Thích / không thích một gợi ý (ghi đè lần trước). Tổ hợp bị không thích không được gợi ý lại. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        itemIds: string[];
+                        /** @enum {string} */
+                        vote: "LIKE" | "DISLIKE";
+                    };
+                };
+            };
+            responses: {
+                /** @description Đã ghi */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/outfits/{outfitId}": {
         parameters: {
             query?: never;
