@@ -18,4 +18,6 @@ public interface ClothingItemRepository {
 
     /** Số món đang có (mọi trạng thái trừ RECOGNITION_FAILED), để so với giới hạn của gói. */
     long countByOwner(UUID ownerId);
+
+    List<ClothingItem> findByScan(UUID scanId);
 }

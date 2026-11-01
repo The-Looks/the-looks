@@ -45,7 +45,7 @@ paths:
                   type: array
                   minItems: 1
                   maxItems: 10
-                  description: JPEG, PNG hoặc WebP, tối đa 10 MB mỗi ảnh
+                  description: JPEG hoặc PNG, tối đa 10 MB mỗi ảnh (ảnh iPhone được trình duyệt đổi sang JPEG khi tải lên)
                   items: { type: string, format: binary }
       responses:
         '202':
@@ -67,6 +67,20 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Scan' }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/wardrobe/images/{ownerId}/{file}:
+    get:
+      summary: Ảnh món đồ khi lưu local (dev). Production dùng link Cloudinary trong imageUrl.
+      security: []
+      parameters:
+        - { name: ownerId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: file, in: path, required: true, schema: { type: string, example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479.jpg' } }
+      responses:
+        '200':
+          description: Ảnh JPEG
+          content:
+            image/jpeg:
+              schema: { type: string, format: binary }
+        '404': { description: Không có ảnh }
   /api/app/wardrobe/items/{itemId}:
     parameters:
       - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
