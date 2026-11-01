@@ -15,6 +15,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      // Bản demo dùng service worker của MSW; hai service worker cùng scope sẽ đè nhau.
+      disable: !!process.env.VITE_MOCK_SERVICES,
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {

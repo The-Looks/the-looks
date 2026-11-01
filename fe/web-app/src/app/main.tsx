@@ -6,13 +6,16 @@ import { queryClient } from '../shared/api/queryClient';
 import '../shared/theme/styles.css';
 import { router } from './router';
 
-/** Dev: bật MSW cho các service trong VITE_MOCK_SERVICES (xem .env.development). */
+/**
+ * Bật MSW cho các service trong VITE_MOCK_SERVICES.
+ * Dev: đặt trong .env.development. Bản demo trên Vercel: đặt biến môi trường lúc build (để trống ở production thật).
+ */
 async function enableMocks() {
   const services = (import.meta.env.VITE_MOCK_SERVICES ?? '')
     .split(',')
     .map((s: string) => s.trim())
     .filter(Boolean);
-  if (!import.meta.env.DEV || services.length === 0) return;
+  if (services.length === 0) return;
   const { startMocks } = await import('../shared/mocks/browser');
   await startMocks(services);
 }
