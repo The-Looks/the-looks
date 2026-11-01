@@ -18,8 +18,8 @@ CREATE INDEX polls_owner_created_idx ON polls (owner_id, created_at DESC);
 CREATE TABLE ballots (
     id UUID PRIMARY KEY,
     poll_id UUID NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
-    voter_key CHAR(64) NOT NULL,
-    choice CHAR(1) NOT NULL,
+    voter_key VARCHAR(64) NOT NULL,
+    choice VARCHAR(8) NOT NULL,
     cast_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),

@@ -8,6 +8,9 @@ public record User(
         String email,
         String passwordHash,
         String username,
+        boolean emailVerified,
         Role role,
-        Instant createdAt) {
+        UserStatus status,
+        Instant createdAt,
+        Instant updatedAt) {
 }

@@ -1,5 +1,6 @@
 server:
   port: 8081
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -34,3 +35,7 @@ logging:
 thelooks:
   security:
     jwt-secret: ${JWT_SECRET}
+    password-pepper: ${PASSWORD_PEPPER}
+    issuer: ${JWT_ISSUER}
+    private-key-path: ${JWT_PRIVATE_KEY_PATH}
+    web-origin: ${WEB_ORIGIN}

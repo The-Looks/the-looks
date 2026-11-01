@@ -1,12 +1,13 @@
 package vn.thelooks.identity.application.port.out;
 
 import java.time.Instant;
+import java.util.UUID;
 import vn.thelooks.identity.domain.model.User;
 
-/** Phát JWT ký bằng thelooks.security.jwt-secret (claim sub = userId, roles = [role]). */
+/** Phát access JWT ký RS256; claim sub = userId, sid = refresh session, roles = [role]. */
 public interface TokenIssuer {
 
-    IssuedToken issue(User user);
+    IssuedToken issue(User user, UUID sessionId);
 
     record IssuedToken(String token, Instant expiresAt) {
     }

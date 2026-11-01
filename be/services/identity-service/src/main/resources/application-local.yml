@@ -8,3 +8,7 @@ spring:
 thelooks:
   security:
     jwt-secret: dev-only-secret-change-me-0123456789abcdef
+    password-pepper: dev-only-password-pepper-change-me-123456789
+    issuer: http://localhost:8081
+    private-key-path: ./.keys/jwt-private.pem
+    web-origin: http://localhost:5173

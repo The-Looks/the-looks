@@ -23,6 +23,12 @@ services:
       DB_USER: thelooks
       DB_PASSWORD: thelooks
       JWT_SECRET: ${JWT_SECRET}
+      PASSWORD_PEPPER: ${PASSWORD_PEPPER}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_PRIVATE_KEY_PATH: /run/secrets/jwt-private.pem
+      WEB_ORIGIN: ${WEB_ORIGIN}
+    volumes:
+      - ./.keys/jwt-private.pem:/run/secrets/jwt-private.pem:ro
     ports: ["8081:8081"]
     depends_on:
       postgres:
@@ -63,6 +69,9 @@ services:
       DB_USER: thelooks
       DB_PASSWORD: thelooks
       JWT_SECRET: ${JWT_SECRET}
+      OUTFIT_SERVICE_URL: http://outfit-service:8083
+      SHARE_BASE_URL: ${SHARE_BASE_URL}
+      VOTER_KEY_SECRET: ${VOTER_KEY_SECRET}
     ports: ["8084:8084"]
     depends_on:
       postgres:
