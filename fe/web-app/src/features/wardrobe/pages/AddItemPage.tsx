@@ -41,7 +41,7 @@ export function AddItemPage() {
         <input
           id="add-photos"
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/png"
           capture="environment"
           multiple
           hidden

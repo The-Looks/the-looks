@@ -63,7 +63,7 @@ export interface paths {
             requestBody: {
                 content: {
                     "multipart/form-data": {
-                        /** @description JPEG, PNG hoặc WebP, tối đa 10 MB mỗi ảnh */
+                        /** @description JPEG hoặc PNG, tối đa 10 MB mỗi ảnh (ảnh iPhone được trình duyệt đổi sang JPEG khi tải lên) */
                         images: string[];
                     };
                 };
@@ -117,6 +117,52 @@ export interface paths {
                     };
                 };
                 404: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/wardrobe/images/{ownerId}/{file}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ảnh món đồ khi lưu local (dev). Production dùng link Cloudinary trong imageUrl. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    ownerId: string;
+                    file: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Ảnh JPEG */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "image/jpeg": string;
+                    };
+                };
+                /** @description Không có ảnh */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
             };
         };
         put?: never;

@@ -108,3 +108,18 @@ Giá và quyền lợi nằm trong `billing-service/.../domain/model/Plan.java`.
   Khai báo webhook `https://<domain>/api/public/billing/payos/webhook` trong trang PayOS.
 - Gói kích hoạt khi webhook tới **hoặc** khi người dùng quay lại trang kết quả (hỏi trạng thái từ PayOS), chỉ một lần.
 - Đổi gói khi còn hạn: thời gian còn lại quy ra tiền rồi đổi sang thời gian của gói mới, không mất tiền.
+
+## wardrobe-service: tủ đồ, quét ảnh nhiều món
+
+- `POST /api/app/wardrobe/scans` (1–10 ảnh JPEG/PNG) → chạy nền: chuẩn hoá ảnh (xoay theo EXIF, cạnh dài ≤ 1568px)
+  → AI tìm từng món kèm khung → `GarmentSelection` lọc → cắt ảnh từng món → lưu → món `PENDING_REVIEW`. Ảnh gốc không lưu.
+- Giới hạn số món theo gói: hỏi billing-service `GET /api/app/billing/me` (lỗi → mức Free 50).
+
+| Biến môi trường | Mặc định | Ý nghĩa |
+|---|---|---|
+| `AI_PROVIDER` | `none` | `claude` để dùng Claude vision (cần `ANTHROPIC_API_KEY`); `none` = nhận diện giả: mỗi ảnh tách đôi áo (trên) / quần (dưới) |
+| `AI_MODEL` | `claude-haiku-5-5` | Model Claude |
+| `IMAGE_STORAGE` | `local` | `cloudinary` khi deploy (cần `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`) |
+| `IMAGE_DIR` | `./data/wardrobe-images` | Thư mục ảnh khi lưu local |
+| `PUBLIC_BASE_URL` | `http://localhost:5173` | Địa chỉ web-app, dùng tạo link ảnh lưu local |
+| `BILLING_SERVICE_URL` | | billing-service, để biết giới hạn số món theo gói |

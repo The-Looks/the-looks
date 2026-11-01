@@ -47,6 +47,7 @@ export default defineConfig({
       '/api/public/auth': services.auth,
       '/api/app/me': services.auth,
       '/api/app/wardrobe': services.wardrobe,
+      '/api/public/wardrobe': services.wardrobe,
       '/api/app/outfits': services.outfit,
       '/api/app/polls': services.voting,
       '/api/public/polls': services.voting,

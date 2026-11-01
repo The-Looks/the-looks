@@ -43,6 +43,14 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_wardrobe
+      BILLING_SERVICE_URL: http://billing-service:8085
+      AI_PROVIDER: ${WARDROBE_AI_PROVIDER:-none}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      IMAGE_STORAGE: ${IMAGE_STORAGE:-local}
+      PUBLIC_BASE_URL: ${WEB_APP_URL:-http://localhost:5173}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
       DB_USER: thelooks
       DB_PASSWORD: thelooks
       JWT_ISSUER: ${JWT_ISSUER}
