@@ -1,3 +1,4 @@
+import { MyPlanCard } from '../features/billing';
 import { QuickPickCard } from '../features/outfit';
 import { WardrobeSummary } from '../features/wardrobe';
 import { ButtonLink, Card } from '../shared/ui';
@@ -31,6 +32,7 @@ export function HomePage() {
             </ButtonLink>
           </div>
         </Card>
+        <MyPlanCard />
       </div>
     </div>
   );

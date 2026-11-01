@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { LoginPage, OnboardingPage, RegisterPage } from '../features/auth';
+import { BillingResultPage, PlansPage } from '../features/billing';
 import { OutfitDetailPage, SavedOutfitsPage, SuggestPage } from '../features/outfit';
 import { ProfilePage } from '../features/profile';
 import { CreatePollPage, MyPollsPage, PollDetailPage } from '../features/voting';
@@ -40,6 +41,8 @@ export const router = createBrowserRouter([
           { path: 'polls/new', element: <CreatePollPage /> },
           { path: 'polls/:code', element: <PollDetailPage /> },
           { path: 'profile', element: <ProfilePage /> },
+          { path: 'plans', element: <PlansPage /> },
+          { path: 'billing/result', element: <BillingResultPage /> },
           { path: '*', element: <NotFound /> },
         ],
       },

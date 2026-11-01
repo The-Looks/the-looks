@@ -5,7 +5,10 @@ import { signDevJwt } from './devJwt';
 
 // Giả lập API theo đúng contract trong be/packages/contracts. Dữ liệu chỉ nằm trong bộ nhớ trình duyệt.
 const problem = (status: number, detail: string) =>
-  HttpResponse.json({ status, title: 'Error', detail }, { status, headers: { 'Content-Type': 'application/problem+json' } });
+  HttpResponse.json(
+    { status, title: 'Error', detail },
+    { status, headers: { 'Content-Type': 'application/problem+json' } },
+  );
 
 // ---------------- identity ----------------
 const identity: HttpHandler[] = [
@@ -51,7 +54,14 @@ const wardrobe: HttpHandler[] = [
     setTimeout(() => {
       closet = closet.map((i) =>
         i.id === item.id
-          ? { ...i, status: 'PENDING_REVIEW', category: guessCategories[closet.length % 4], colors: ['white'], seasons: [], styleTags: ['casual'] }
+          ? {
+              ...i,
+              status: 'PENDING_REVIEW',
+              category: guessCategories[closet.length % 4],
+              colors: ['white'],
+              seasons: [],
+              styleTags: ['casual'],
+            }
           : i,
       );
     }, 2000);
@@ -105,7 +115,12 @@ const outfit: HttpHandler[] = [
   http.get('*/api/app/outfits', () => HttpResponse.json(savedOutfits)),
   http.post('*/api/app/outfits', async ({ request }) => {
     const body = (await request.json()) as { itemIds: string[]; occasion?: SavedOutfit['occasion'] };
-    const o: SavedOutfit = { id: crypto.randomUUID(), itemIds: body.itemIds, occasion: body.occasion, createdAt: new Date().toISOString() };
+    const o: SavedOutfit = {
+      id: crypto.randomUUID(),
+      itemIds: body.itemIds,
+      occasion: body.occasion,
+      createdAt: new Date().toISOString(),
+    };
     savedOutfits = [o, ...savedOutfits];
     return HttpResponse.json(o, { status: 201 });
   }),
@@ -133,11 +148,23 @@ let polls: Poll[] = [
 const voting: HttpHandler[] = [
   http.get('*/api/app/polls', () => HttpResponse.json(polls)),
   http.post('*/api/app/polls', async ({ request }) => {
-    const body = (await request.json()) as { outfitAId: string; outfitBId: string; question?: string; ttlHours?: number };
+    const body = (await request.json()) as {
+      outfitAId: string;
+      outfitBId: string;
+      question?: string;
+      ttlHours?: number;
+    };
     const code = Math.random().toString(36).slice(2, 8);
     const expiresAt = new Date(Date.now() + (body.ttlHours ?? 24) * 3600_000).toISOString();
     polls = [
-      { code, question: body.question, optionA: option(body.outfitAId), optionB: option(body.outfitBId), expiresAt, result: { votesA: 0, votesB: 0, percentA: 0, percentB: 0 } },
+      {
+        code,
+        question: body.question,
+        optionA: option(body.outfitAId),
+        optionB: option(body.outfitBId),
+        expiresAt,
+        result: { votesA: 0, votesB: 0, percentA: 0, percentB: 0 },
+      },
       ...polls,
     ];
     return HttpResponse.json({ code, shareUrl: `${location.origin}/v/${code}`, expiresAt }, { status: 201 });
@@ -148,4 +175,75 @@ const voting: HttpHandler[] = [
   }),
 ];
 
-export const handlersByService: Record<string, HttpHandler[]> = { identity, wardrobe, outfit, voting };
+// ---------------- billing ----------------
+const PLANS = [
+  {
+    plan: 'FREE',
+    name: 'Free',
+    monthlyPriceVnd: 0,
+    yearlyPriceVnd: 0,
+    limits: { wardrobeItems: 50, aiSuggestionsPerDay: 3 },
+    features: [],
+  },
+  {
+    plan: 'PLUS',
+    name: 'Plus',
+    monthlyPriceVnd: 39000,
+    yearlyPriceVnd: 390000,
+    limits: { wardrobeItems: 300, aiSuggestionsPerDay: 20 },
+    features: [],
+  },
+  {
+    plan: 'PRO',
+    name: 'Pro',
+    monthlyPriceVnd: 79000,
+    yearlyPriceVnd: 790000,
+    limits: { wardrobeItems: null, aiSuggestionsPerDay: 100 },
+    features: ['WARDROBE_STATS', 'COST_PER_WEAR', 'WEAR_CALENDAR', 'TRY_ON_3D'],
+  },
+] as const;
+let myPlan: { plan: 'FREE' | 'PLUS' | 'PRO'; expiresAt: string | null } = { plan: 'FREE', expiresAt: null };
+const orders = new Map<
+  number,
+  { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY'; amountVnd: number; status: string; createdAt: string }
+>();
+let nextOrder = 100001;
+const entitlements = () => {
+  const p = PLANS.find((x) => x.plan === myPlan.plan)!;
+  return { ...myPlan, limits: p.limits, features: p.features };
+};
+
+const billing: HttpHandler[] = [
+  http.get('*/api/public/billing/plans', () => HttpResponse.json(PLANS)),
+  http.get('*/api/app/billing/me', () => HttpResponse.json(entitlements())),
+  http.post('*/api/app/billing/checkout', async ({ request }) => {
+    const body = (await request.json()) as { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY' };
+    const p = PLANS.find((x) => x.plan === body.plan)!;
+    const orderCode = nextOrder++;
+    const order = {
+      plan: body.plan,
+      period: body.period,
+      amountVnd: body.period === 'MONTHLY' ? p.monthlyPriceVnd : p.yearlyPriceVnd,
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+    };
+    orders.set(orderCode, order);
+    const checkoutUrl = `${location.origin}/billing/result?orderCode=${orderCode}&status=PAID&fake=1`;
+    return HttpResponse.json({ orderCode, ...order, checkoutUrl }, { status: 201 });
+  }),
+  http.post('*/api/app/billing/orders/:code/confirm', ({ params }) => {
+    const code = Number(params.code);
+    const order = orders.get(code);
+    if (!order) return problem(404, `Không tìm thấy đơn ${code}`);
+    if (order.status === 'PENDING') {
+      order.status = 'PAID';
+      const months = order.period === 'MONTHLY' ? 1 : 12;
+      const expires = new Date();
+      expires.setMonth(expires.getMonth() + months);
+      myPlan = { plan: order.plan, expiresAt: expires.toISOString() };
+    }
+    return HttpResponse.json({ orderCode: code, ...order });
+  }),
+];
+
+export const handlersByService: Record<string, HttpHandler[]> = { identity, wardrobe, outfit, voting, billing };

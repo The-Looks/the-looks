@@ -1,0 +1,15 @@
+# Giá trị cho máy dev (Postgres cài trên máy hoặc be/docker-compose.yml). Không dùng ở staging/prod.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/thelooks_billing
+    username: thelooks
+    password: thelooks
+
+thelooks:
+  security:
+    jwt-secret: dev-only-secret-change-me-0123456789abcdef
+    issuer: http://localhost:8081
+    jwk-set-uri: http://localhost:8081/.well-known/jwks.json
+  billing:
+    return-url: http://localhost:5173/billing/result
+    cancel-url: http://localhost:5173/plans

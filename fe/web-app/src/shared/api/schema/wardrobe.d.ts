@@ -36,7 +36,7 @@ export interface paths {
             };
         };
         put?: never;
-        /** Upload ảnh; trả ngay món đồ PROCESSING, AI nhận diện chạy nền rồi chuyển sang PENDING_REVIEW */
+        /** Upload ảnh; trả ngay món đồ PROCESSING, AI nhận diện chạy nền rồi chuyển sang PENDING_REVIEW. Trả 403 khi tủ đồ đã đủ số món của gói (limits.wardrobeItems từ GET /api/app/billing/me của billing-service). */
         post: {
             parameters: {
                 query?: never;

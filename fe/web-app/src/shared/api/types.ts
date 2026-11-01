@@ -1,4 +1,5 @@
 // Tên ngắn cho các kiểu sinh từ contract, dùng chung giữa các feature.
+import type { components as Billing } from './schema/billing';
 import type { components as Identity } from './schema/identity';
 import type { components as Outfit } from './schema/outfit';
 import type { components as Voting } from './schema/voting';
@@ -19,3 +20,9 @@ export type OutfitDetail = Outfit['schemas']['OutfitDetail'];
 
 export type Poll = Voting['schemas']['Poll'];
 export type PollResult = Voting['schemas']['PollResult'];
+
+export type Plan = Billing['schemas']['Plan'];
+export type BillingPeriod = Billing['schemas']['BillingPeriod'];
+export type PlanInfo = Billing['schemas']['PlanInfo'];
+export type Entitlements = Billing['schemas']['Entitlements'];
+export type BillingOrder = Billing['schemas']['Order'];
