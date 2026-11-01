@@ -5,7 +5,7 @@ Làm xong thì đánh dấu `[x]` và ghi ngày. Có việc mới thì thêm và
 
 > **Không ghi khoá bí mật, mật khẩu, token vào file này** (repo dùng chung). Chỉ ghi tên biến môi trường.
 
-Cập nhật lần cuối: 01/11/2026
+Cập nhật lần cuối: 01/11/2026 (sau review toàn bộ PR)
 
 ---
 
@@ -22,7 +22,8 @@ Cập nhật lần cuối: 01/11/2026
 - [ ] **Xoá nhánh đã merge `feature/web-app`** · Tuấn · bấm **Delete branch** trong PR #1
 - [ ] **Review và merge PR theo thứ tự** · cả nhóm
   - Phát: #2 (JWKS) → #3 (đăng nhập, bình chọn)
-  - Tuấn: #4 (thích/không thích) → #5 (thời tiết, AI, học gu) → #6 (gói thuê bao)
+  - Tuấn: #4 (thích/không thích) → #5 (thời tiết, AI, học gu) → #6 (gói thuê bao) → #8 (quét nhiều món/ảnh)
+  - Merge #2 và #3 **trước** #5, #6: #3 đổi `identity-service` → `auth-service` nên #5, #6 cần cập nhật lại (nhờ Claude) trước khi merge.
 
 ## 2. Tài khoản dịch vụ và khoá bí mật
 
@@ -67,6 +68,10 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   - outfit-service gọi `GET /api/app/wardrobe/items?status=CONFIRMED`; giữ đúng schema trong `wardrobe-api.yaml`.
   - Upload ảnh phải trả **403** khi tủ đồ đã đủ `limits.wardrobeItems` (lấy từ `GET /api/app/billing/me`).
   - Khi xong, báo Tuấn để bỏ `FakeWardrobeReader` (profile `demo`) trong outfit-service.
+  - **Hợp đồng mới (PR #8):** thêm đồ bằng `POST /api/app/wardrobe/scans` (1–10 ảnh, mỗi ảnh nhiều món), bỏ `POST /items`.
+    Cài đặt `GarmentDetector` (đề xuất Claude Haiku 5.5 vision), `ImageCropper`, lưu Cloudinary; không lưu ảnh gốc.
+- [ ] **Báo Phát các điểm review PR #2, #3** · Tuấn
+  Chống spam bình chọn (thêm IP vào voter key + giới hạn tần suất), cache kiểm tra phiên ~30 giây, thêm test đăng nhập/refresh/bình chọn.
 - [ ] **Chốt giá gói** · nhóm · trước khi bật PayOS
   Đang đề xuất: Plus 39.000đ/tháng · 390.000đ/năm, Pro 79.000đ/tháng · 790.000đ/năm (sửa trong `Plan.java`).
 - [ ] **Chọn hướng cho affiliate và phí giao dịch** (luồng doanh thu 2 và 3) · nhóm
