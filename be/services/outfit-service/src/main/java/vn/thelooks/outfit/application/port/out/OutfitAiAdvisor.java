@@ -4,6 +4,7 @@ import java.util.List;
 import vn.thelooks.outfit.domain.model.AiUsage;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
+import vn.thelooks.outfit.domain.model.StyleProfile;
 
 /**
  * AI chọn/xếp hạng outfit. Code lọc ứng viên hợp lệ trước (đúng dịp, đúng mùa, có trong tủ),
@@ -11,8 +12,11 @@ import vn.thelooks.outfit.domain.model.OutfitSuggestion;
  */
 public interface OutfitAiAdvisor {
 
-    /** @param occasion null với Quick Pick */
-    Advice choose(Occasion occasion, List<OutfitSuggestion> candidates, int limit);
+    /**
+     * @param occasion null với Quick Pick
+     * @param taste    gu học từ hành vi người dùng, để AI chọn sát sở thích
+     */
+    Advice choose(Occasion occasion, List<OutfitSuggestion> candidates, StyleProfile taste, int limit);
 
     /** @param usage null khi không gọi AI (bản pass-through, hoặc AI lỗi và đã quay về thứ tự điểm) */
     record Advice(List<OutfitSuggestion> suggestions, AiUsage usage) {

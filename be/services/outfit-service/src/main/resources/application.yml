@@ -39,7 +39,7 @@ thelooks:
   ai:
     # none = không gọi AI (xếp theo điểm); claude = gọi Claude, cần ANTHROPIC_API_KEY
     provider: ${AI_PROVIDER:none}
-    model: ${AI_MODEL:claude-opus-5-5}
+    model: ${AI_MODEL:claude-haiku-5-5}
     daily-limit-per-user: ${AI_DAILY_LIMIT:10}
     monthly-budget-usd: ${AI_MONTHLY_BUDGET_USD:25}
   weather:

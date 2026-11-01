@@ -25,6 +25,7 @@ import vn.thelooks.outfit.domain.model.AiUsage;
 import vn.thelooks.outfit.domain.model.ClosetItem;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
+import vn.thelooks.outfit.domain.model.StyleProfile;
 
 /**
  * Claude chọn và xếp hạng trong các ứng viên đã lọc, viết lý do ngắn bằng tiếng Việt.
@@ -47,7 +48,7 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
             Bạn nhận danh sách outfit ứng viên, đều ghép từ quần áo người dùng đang có. Mỗi ứng viên có số thứ tự, các món \
             (loại, màu, phong cách), điểm hệ thống và ghi chú (hợp dịp, món lâu chưa mặc, thời tiết).
             Hãy chọn tối đa số lượng được yêu cầu, xếp tốt nhất trước. Ưu tiên: hợp dịp, phối màu đẹp, hợp thời tiết, \
-            và dùng lại những món lâu chưa mặc. Chỉ dùng số thứ tự có trong danh sách.
+            dùng lại những món lâu chưa mặc, và sát gu người dùng nếu có phần "Gu của người dùng". Chỉ dùng số thứ tự có trong danh sách.
             Với mỗi lựa chọn, viết lý do bằng tiếng Việt, tự nhiên, tối đa 20 từ, nói với người dùng ("bạn").
             """;
 
@@ -72,7 +73,7 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
     }
 
     @Override
-    public Advice choose(Occasion occasion, List<OutfitSuggestion> candidates, int limit) {
+    public Advice choose(Occasion occasion, List<OutfitSuggestion> candidates, StyleProfile taste, int limit) {
         if (candidates.isEmpty() || limit <= 0) {
             return Advice.withoutAi(candidates, limit);
         }
@@ -81,7 +82,7 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
                 .maxTokens(4000L)
                 .system(SYSTEM)
                 .outputConfig(Picks.class)
-                .addUserMessage(prompt(occasion, candidates, limit))
+                .addUserMessage(prompt(occasion, candidates, taste, limit))
                 .build();
         try {
             StructuredMessage<Picks> response = client.messages().create(params);
@@ -98,9 +99,11 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
         }
     }
 
-    static String prompt(Occasion occasion, List<OutfitSuggestion> candidates, int limit) {
+    static String prompt(Occasion occasion, List<OutfitSuggestion> candidates, StyleProfile taste, int limit) {
         String header = (occasion == null ? "Quick Pick: chọn bộ hợp để mặc hôm nay." : "Dịp: " + occasion.label() + ".")
-                + " Chọn tối đa " + limit + " outfit.\n\nỨng viên:\n";
+                + " Chọn tối đa " + limit + " outfit.\n"
+                + (taste.summary().isEmpty() ? "" : "Gu của người dùng (học từ lượt thích, outfit đã lưu, đồ hay mặc): " + taste.summary() + "\n")
+                + "\nỨng viên:\n";
         return header + IntStream.range(0, candidates.size())
                 .mapToObj(i -> "#" + i + ": " + describe(candidates.get(i)))
                 .collect(Collectors.joining("\n"));

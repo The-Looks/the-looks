@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import vn.thelooks.outfit.domain.model.ClosetItem;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
+import vn.thelooks.outfit.domain.model.StyleProfile;
 import vn.thelooks.outfit.infrastructure.ai.ClaudeOutfitAdvisor.Pick;
 import vn.thelooks.outfit.infrastructure.ai.ClaudeOutfitAdvisor.Picks;
 
@@ -45,7 +46,14 @@ class ClaudeOutfitAdvisorTest {
 
     @Test
     void promptListsEveryCandidateWithIndex() {
-        String prompt = ClaudeOutfitAdvisor.prompt(Occasion.WORK, candidates, 2);
-        assertThat(prompt).contains("Dịp: đi làm", "#0: DRESS (white; casual)", "#2:", "Chọn tối đa 2");
+        String prompt = ClaudeOutfitAdvisor.prompt(Occasion.WORK, candidates, StyleProfile.NONE, 2);
+        assertThat(prompt).contains("Dịp: đi làm", "#0: DRESS (white; casual)", "#2:", "Chọn tối đa 2").doesNotContain("Gu của");
+    }
+
+    @Test
+    void promptIncludesUserTasteWhenKnown() {
+        var taste = new StyleProfile(java.util.Map.of("minimal", 1.0), java.util.Map.of("red", -1.0), 5);
+        assertThat(ClaudeOutfitAdvisor.prompt(null, candidates, taste, 1))
+                .contains("Gu của người dùng", "phong cách minimal", "Ít hợp: màu red");
     }
 }

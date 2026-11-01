@@ -15,6 +15,7 @@ import vn.thelooks.outfit.domain.model.ClosetItem;
 import vn.thelooks.outfit.domain.model.Feedback;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
+import vn.thelooks.outfit.domain.model.StyleProfile;
 
 /**
  * Lõi "Wear More": phối đồ từ những món đang có, chấm điểm và ưu tiên món lâu chưa mặc.
@@ -31,6 +32,8 @@ public class OutfitRecommender {
     static final int FRESHNESS_CAP_DAYS = 30;
     /** Điểm cộng cho tổ hợp người dùng đã thích. */
     static final double LIKE_BONUS = 0.1;
+    /** Trọng số của gu cá nhân (StyleProfile.affinity, -1..1). */
+    static final double TASTE_WEIGHT = 0.15;
 
     // ponytail: bảng tag/màu cố định theo nhãn AI trả về; chuyển vào DB/config khi nhãn AI ổn định
     private static final Map<Occasion, Set<String>> OCCASION_TAGS = Map.of(
@@ -62,6 +65,19 @@ public class OutfitRecommender {
             List<ClosetItem> closet,
             Map<UUID, Instant> lastWornAt,
             Map<String, Feedback> feedback,
+            Occasion occasion,
+            Instant now,
+            Set<String> seasons,
+            int limit) {
+        return recommend(closet, lastWornAt, feedback, StyleProfile.NONE, occasion, now, seasons, limit);
+    }
+
+    /** @param taste gu của người dùng: bộ hợp gu được cộng điểm, bộ chạm vào thứ họ hay né bị trừ điểm */
+    public List<OutfitSuggestion> recommend(
+            List<ClosetItem> closet,
+            Map<UUID, Instant> lastWornAt,
+            Map<String, Feedback> feedback,
+            StyleProfile taste,
             Occasion occasion,
             Instant now,
             Set<String> seasons,
@@ -101,13 +117,13 @@ public class OutfitRecommender {
             for (ClosetItem shoe : shoes) {
                 List<ClosetItem> withShoe = new ArrayList<>(base);
                 withShoe.add(shoe);
-                OutfitSuggestion scored = score(withShoe, lastWornAt, feedback, occasion, now);
+                OutfitSuggestion scored = score(withShoe, lastWornAt, feedback, taste, occasion, now);
                 if (scored != null && (best == null || scored.score() > best.score())) {
                     best = scored;
                 }
             }
             if (best == null && shoes.isEmpty()) {
-                best = score(base, lastWornAt, feedback, occasion, now);
+                best = score(base, lastWornAt, feedback, taste, occasion, now);
             }
             if (best != null) {
                 candidates.add(best);
@@ -147,7 +163,7 @@ public class OutfitRecommender {
 
     /** @return null nếu người dùng đã không thích tổ hợp này */
     private static OutfitSuggestion score(List<ClosetItem> items, Map<UUID, Instant> lastWornAt,
-            Map<String, Feedback> feedback, Occasion occasion, Instant now) {
+            Map<String, Feedback> feedback, StyleProfile taste, Occasion occasion, Instant now) {
         Feedback vote = feedback.get(Feedback.comboKey(items.stream().map(ClosetItem::id).toList()));
         if (vote == Feedback.DISLIKE) {
             return null;
@@ -186,8 +202,13 @@ public class OutfitRecommender {
             reasons.add("Màu sắc hài hoà");
         }
         if (vote == Feedback.LIKE) {
-            score = Math.min(1.0, score + LIKE_BONUS);
+            score += LIKE_BONUS;
         }
+        double affinity = taste.affinity(items);
+        if (affinity >= 0.5) {
+            reasons.add("Đúng gu của bạn");
+        }
+        score = Math.max(0, Math.min(1.0, score + TASTE_WEIGHT * affinity));
         String reason = reasons.isEmpty() ? "Phối từ đồ bạn đang có" : String.join(" · ", reasons);
         return new OutfitSuggestion(List.copyOf(items), occasion, score, reason);
     }

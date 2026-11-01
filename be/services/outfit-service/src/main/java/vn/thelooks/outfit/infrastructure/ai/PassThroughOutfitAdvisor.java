@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import vn.thelooks.outfit.application.port.out.OutfitAiAdvisor;
 import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
+import vn.thelooks.outfit.domain.model.StyleProfile;
 
 /** Khi chưa bật AI (thelooks.ai.provider=none): giữ nguyên thứ tự điểm của OutfitRecommender. */
 @Component
@@ -13,7 +14,7 @@ import vn.thelooks.outfit.domain.model.OutfitSuggestion;
 class PassThroughOutfitAdvisor implements OutfitAiAdvisor {
 
     @Override
-    public Advice choose(Occasion occasion, List<OutfitSuggestion> candidates, int limit) {
+    public Advice choose(Occasion occasion, List<OutfitSuggestion> candidates, StyleProfile taste, int limit) {
         return Advice.withoutAi(candidates, limit);
     }
 }

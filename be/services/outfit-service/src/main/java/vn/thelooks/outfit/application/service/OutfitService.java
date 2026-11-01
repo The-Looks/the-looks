@@ -39,6 +39,7 @@ import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.Outfit;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
 import vn.thelooks.outfit.domain.model.OutfitView;
+import vn.thelooks.outfit.domain.model.StyleProfile;
 import vn.thelooks.outfit.domain.model.Weather;
 import vn.thelooks.outfit.domain.model.WearLog;
 import vn.thelooks.outfit.domain.service.OutfitRecommender;
@@ -88,20 +89,21 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         if (occasion == null) {
             throw new InvalidOutfitException("Cần chọn dịp");
         }
-        return advise(ownerId, occasion, candidates(ownerId, occasion), limit);
+        return advise(ownerId, occasion, prepare(ownerId, occasion), limit);
     }
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED) // gọi AI vài giây, không giữ kết nối DB
     public Optional<OutfitSuggestion> quickPick(UUID ownerId) {
-        return advise(ownerId, null, candidates(ownerId, null), 1).stream().findFirst();
+        return advise(ownerId, null, prepare(ownerId, null), 1).stream().findFirst();
     }
 
     /**
      * Gọi AI trong giới hạn: mỗi người tối đa N lượt/ngày và tổng chi phí tháng chưa vượt ngân sách.
      * Hết lượt → vẫn có gợi ý theo điểm của OutfitRecommender, chỉ không qua AI.
      */
-    private List<OutfitSuggestion> advise(UUID ownerId, Occasion occasion, List<OutfitSuggestion> candidates, int limit) {
+    private List<OutfitSuggestion> advise(UUID ownerId, Occasion occasion, Prepared prepared, int limit) {
+        List<OutfitSuggestion> candidates = prepared.candidates();
         if (candidates.isEmpty()) {
             return List.of();
         }
@@ -111,7 +113,7 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         if (!withinLimits) {
             return OutfitAiAdvisor.Advice.withoutAi(candidates, limit).suggestions();
         }
-        OutfitAiAdvisor.Advice advice = aiAdvisor.choose(occasion, candidates, limit);
+        OutfitAiAdvisor.Advice advice = aiAdvisor.choose(occasion, candidates, prepared.taste(), limit);
         if (advice.usage() != null) {
             aiUsage.record(ownerId, advice.usage(), now);
         }
@@ -133,15 +135,22 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         return LocalDate.ofInstant(now, VIETNAM).withDayOfMonth(1).atStartOfDay(VIETNAM).toInstant();
     }
 
-    private List<OutfitSuggestion> candidates(UUID ownerId, Occasion occasion) {
+    /** Ứng viên đã lọc + chấm điểm, kèm gu của người dùng để gửi cho AI. */
+    record Prepared(List<OutfitSuggestion> candidates, StyleProfile taste) {
+    }
+
+    private Prepared prepare(UUID ownerId, Occasion occasion) {
         Instant now = clock.instant();
         Optional<Weather> today = weather.current();
         Set<String> seasons = today
                 .map(w -> OutfitRecommender.seasonsFor(w.temperatureC()))
                 .orElseGet(() -> Set.of(OutfitRecommender.seasonOf(LocalDate.ofInstant(now, VIETNAM).getMonth())));
-        List<OutfitSuggestion> suggestions = recommender.recommend(wardrobe.confirmedItems(ownerId),
-                wearLogs.lastWornAtByItem(ownerId), feedback.byOwner(ownerId), occasion, now, seasons, AI_CANDIDATES);
-        return today.map(w -> withWeatherNote(suggestions, w)).orElse(suggestions);
+        List<ClosetItem> closet = wardrobe.confirmedItems(ownerId);
+        Map<String, Feedback> votes = feedback.byOwner(ownerId);
+        StyleProfile taste = StyleProfile.learn(closet, votes, outfits.findByOwner(ownerId), wearLogs.wearCountByItem(ownerId));
+        List<OutfitSuggestion> suggestions = recommender.recommend(closet, wearLogs.lastWornAtByItem(ownerId), votes, taste,
+                occasion, now, seasons, AI_CANDIDATES);
+        return new Prepared(today.map(w -> withWeatherNote(suggestions, w)).orElse(suggestions), taste);
     }
 
     /** Ghi thời tiết vào lý do gợi ý, ví dụ "… · Trời 33°C, có mưa". */

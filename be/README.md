@@ -44,9 +44,11 @@ Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
 | Biến môi trường | Mặc định | Ý nghĩa |
 |---|---|---|
 | `AI_PROVIDER` | `none` | `claude` để bật AI chọn/xếp hạng gợi ý (cần `ANTHROPIC_API_KEY`); `none` = xếp theo điểm thuật toán |
-| `AI_MODEL` | `claude-opus-5-5` | Đổi sang `claude-haiku-5-5` để rẻ hơn ~40 lần |
+| `AI_MODEL` | `claude-haiku-5-5` | Model Claude. `claude-opus-5-5` chọn tinh tế hơn nhưng đắt hơn ~40 lần |
 | `AI_DAILY_LIMIT` | `10` | Số lượt gọi AI mỗi người mỗi ngày; hết lượt vẫn có gợi ý theo điểm |
 | `AI_MONTHLY_BUDGET_USD` | `25` | Tổng chi phí AI mỗi tháng; chạm ngưỡng thì tự ngừng gọi AI |
 | `WEATHER_LAT`, `WEATHER_LON` | TP.HCM | Vị trí lấy thời tiết (Open-Meteo, miễn phí, không cần key) |
 
 Admin xem chi phí: `GET /api/admin/outfits/ai-usage` (cần JWT role ADMIN).
+
+**Cá nhân hoá:** `StyleProfile` học gu từng người từ 👍/👎, outfit đã lưu và số lần mặc mỗi món (cần ≥ 3 hành vi). Gu được cộng vào điểm thuật toán và gửi kèm cho Claude dưới dạng tóm tắt. Không huấn luyện lại model, không gửi dữ liệu người dùng khác.

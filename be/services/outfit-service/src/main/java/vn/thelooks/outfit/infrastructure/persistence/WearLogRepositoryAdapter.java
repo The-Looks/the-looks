@@ -30,4 +30,13 @@ class WearLogRepositoryAdapter implements WearLogRepository {
         }
         return result;
     }
+
+    @Override
+    public Map<UUID, Long> wearCountByItem(UUID ownerId) {
+        Map<UUID, Long> result = new HashMap<>();
+        for (Object[] row : wearLogs.wearCountByItem(ownerId)) {
+            result.put((UUID) row[0], (Long) row[1]);
+        }
+        return result;
+    }
 }
