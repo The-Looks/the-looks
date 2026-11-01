@@ -1,17 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/api/public/auth/:path*", "destination": "https://BACKEND_HOST:8081/api/public/auth/:path*" },
-    { "source": "/api/app/me", "destination": "https://BACKEND_HOST:8081/api/app/me" },
-    { "source": "/api/app/wardrobe/:path*", "destination": "https://BACKEND_HOST:8082/api/app/wardrobe/:path*" },
-    { "source": "/api/public/wardrobe/:path*", "destination": "https://BACKEND_HOST:8082/api/public/wardrobe/:path*" },
-    { "source": "/api/app/outfits/:path*", "destination": "https://BACKEND_HOST:8083/api/app/outfits/:path*" },
-    { "source": "/api/app/outfits", "destination": "https://BACKEND_HOST:8083/api/app/outfits" },
-    { "source": "/api/app/polls/:path*", "destination": "https://BACKEND_HOST:8084/api/app/polls/:path*" },
-    { "source": "/api/app/polls", "destination": "https://BACKEND_HOST:8084/api/app/polls" },
-    { "source": "/api/public/polls/:path*", "destination": "https://BACKEND_HOST:8084/api/public/polls/:path*" },
-    { "source": "/api/app/billing/:path*", "destination": "https://BACKEND_HOST:8085/api/app/billing/:path*" },
-    { "source": "/api/public/billing/:path*", "destination": "https://BACKEND_HOST:8085/api/public/billing/:path*" },
+    { "source": "/api/public/auth/:path*", "destination": "https://thelooks-auth.onrender.com/api/public/auth/:path*" },
+    { "source": "/api/app/me", "destination": "https://thelooks-auth.onrender.com/api/app/me" },
+    { "source": "/api/app/wardrobe/:path*", "destination": "https://thelooks-wardrobe.onrender.com/api/app/wardrobe/:path*" },
+    { "source": "/api/public/wardrobe/:path*", "destination": "https://thelooks-wardrobe.onrender.com/api/public/wardrobe/:path*" },
+    { "source": "/api/app/outfits/:path*", "destination": "https://thelooks-outfit.onrender.com/api/app/outfits/:path*" },
+    { "source": "/api/app/outfits", "destination": "https://thelooks-outfit.onrender.com/api/app/outfits" },
+    { "source": "/api/app/polls/:path*", "destination": "https://thelooks-voting.onrender.com/api/app/polls/:path*" },
+    { "source": "/api/app/polls", "destination": "https://thelooks-voting.onrender.com/api/app/polls" },
+    { "source": "/api/public/polls/:path*", "destination": "https://thelooks-voting.onrender.com/api/public/polls/:path*" },
+    { "source": "/api/app/billing/:path*", "destination": "https://thelooks-billing.onrender.com/api/app/billing/:path*" },
+    { "source": "/api/public/billing/:path*", "destination": "https://thelooks-billing.onrender.com/api/public/billing/:path*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

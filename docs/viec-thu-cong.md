@@ -58,11 +58,30 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
 
 - [ ] **Web demo trên Vercel** · Tuấn
   1. https://vercel.com → Add New → Project → chọn repo `the-looks`, **Root Directory** `fe/web-app`.
-  2. Environment Variables: `VITE_MOCK_SERVICES=identity,wardrobe,outfit,voting,billing` (bản demo dùng dữ liệu mẫu).
+  2. Environment Variables: `VITE_MOCK_SERVICES=auth,wardrobe,outfit,voting,billing` (bản demo dùng dữ liệu mẫu).
   3. Muốn gửi link cho người ngoài nhóm: Settings → Deployment Protection → tắt Vercel Authentication.
-- [ ] **Backend miễn phí (Render + Neon)** · Tuấn · khi identity và wardrobe chạy được (dự kiến giữa T11)
-  Tạo Postgres trên Neon, 5 service trên Render từ Dockerfile; thay `BACKEND_HOST` trong `fe/web-app/vercel.json`;
-  bỏ dần tên service đã chạy thật khỏi `VITE_MOCK_SERVICES`.
+- [ ] **Database trên Neon (free)** · Tuấn
+  1. https://neon.tech → tạo project, vùng **Singapore**.
+  2. SQL Editor: `CREATE DATABASE thelooks_identity;` và tương tự `thelooks_wardrobe`, `thelooks_outfit`, `thelooks_voting`, `thelooks_billing`.
+     Không cần tạo bảng: Flyway tự tạo khi service chạy.
+  3. Connect → ghi lại **host** (dạng `ep-...ap-southeast-1.aws.neon.tech`) và **mật khẩu** của user `neondb_owner`.
+- [ ] **Backend trên Render (free)** · Tuấn · sau khi có Neon
+  1. Tạo khoá ký JWT (Git Bash): `openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:3072 -out jwt-private.pem`.
+     Giữ file này ở ngoài repo, mất khoá thì mọi người phải đăng nhập lại.
+  2. https://render.com → New → **Blueprint** → repo `the-looks`, nhánh `main`, **Blueprint Path để trống** (file `render.yaml` ở gốc).
+  3. Điền các ô Render hỏi:
+     - `DB_URL`: `jdbc:postgresql://<host Neon>/<database của service>?sslmode=require`
+       (auth → `thelooks_identity`, wardrobe → `thelooks_wardrobe`, outfit → `thelooks_outfit`, voting → `thelooks_voting`)
+     - `DB_PASSWORD`: mật khẩu Neon (cả 4 service giống nhau)
+     - `WEB_ORIGIN`, `PUBLIC_BASE_URL`, `SHARE_BASE_URL`: link Vercel, vd `https://the-looks.vercel.app`
+     - `ANTHROPIC_API_KEY`: key Claude (wardrobe và outfit)
+  4. Service `thelooks-auth` → Environment → **Secret Files** → thêm file tên `jwt-private.pem`, dán nội dung khoá ở bước 1.
+  5. Kiểm tra tên 4 service trên Render đúng là `thelooks-auth`, `-wardrobe`, `-outfit`, `-voting`.
+     Nếu Render thêm đuôi khác vào link thì sửa URL trong `render.yaml` và `fe/web-app/vercel.json`.
+  6. Mở `https://thelooks-auth.onrender.com/actuator/health` thấy `UP` là chạy.
+  7. Vercel: đổi `VITE_MOCK_SERVICES=billing` (chỉ billing còn giả) → Redeploy.
+  Gói free: service ngủ sau 15 phút không dùng, lần mở đầu chờ khoảng 1 phút. Ảnh tủ đồ mất khi service khởi động lại
+  cho tới khi bật Cloudinary. billing-service deploy sau khi có PayOS.
 - [ ] **Mua tên miền** · nhóm · trước khi ra mắt T1/2027 (ngân sách 500.000đ)
 
 ## 4. Máy dev của Tuấn

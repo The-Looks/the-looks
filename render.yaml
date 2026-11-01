@@ -1,0 +1,115 @@
+# Render Blueprint: backend bản demo trên gói free. Các bước làm: docs/viec-thu-cong.md, mục Deploy.
+# - Biến `sync: false` là bí mật: Render hỏi khi tạo Blueprint, không ghi vào file này.
+# - Gói free không nhận được traffic mạng nội bộ, nên các service gọi nhau qua URL public.
+#   Nếu Render đổi tên service (tên đã có người dùng), sửa các URL *.onrender.com bên dưới.
+# - billing-service chưa deploy (chưa có PayOS): BILLING_SERVICE_URL trỏ chỗ không có gì,
+#   outfit và wardrobe tự dùng hạn mức gói Free.
+
+envVarGroups:
+  - name: thelooks-shared
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_USER
+        value: neondb_owner
+      - key: JWT_ISSUER
+        value: https://thelooks-auth.onrender.com
+      - key: JWT_JWK_SET_URI
+        value: https://thelooks-auth.onrender.com/.well-known/jwks.json
+      - key: SESSION_VALIDATION_URI
+        value: https://thelooks-auth.onrender.com/api/public/auth/session/active
+      - key: BILLING_SERVICE_URL
+        value: http://localhost:8085
+
+services:
+  - type: web
+    name: thelooks-auth
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./be
+    dockerfilePath: ./be/services/auth-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: thelooks-shared
+      - key: PORT
+        value: 8081
+      - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_identity?sslmode=require
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: WEB_ORIGIN # link Vercel, vd https://the-looks.vercel.app
+        sync: false
+      - key: PASSWORD_PEPPER # không được đổi sau khi có người dùng
+        generateValue: true
+      - key: JWT_PRIVATE_KEY_PATH # thêm Secret File tên jwt-private.pem trong dashboard
+        value: /etc/secrets/jwt-private.pem
+
+  - type: web
+    name: thelooks-wardrobe
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./be
+    dockerfilePath: ./be/services/wardrobe-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: thelooks-shared
+      - key: PORT
+        value: 8082
+      - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_wardrobe?sslmode=require
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: PUBLIC_BASE_URL # link Vercel (ảnh tủ đồ đi qua web)
+        sync: false
+      - key: AI_PROVIDER
+        value: claude
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+  - type: web
+    name: thelooks-outfit
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./be
+    dockerfilePath: ./be/services/outfit-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: thelooks-shared
+      - key: PORT
+        value: 8083
+      - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_outfit?sslmode=require
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: WARDROBE_SERVICE_URL
+        value: https://thelooks-wardrobe.onrender.com
+      - key: AI_PROVIDER
+        value: claude
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+  - type: web
+    name: thelooks-voting
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./be
+    dockerfilePath: ./be/services/voting-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: thelooks-shared
+      - key: PORT
+        value: 8084
+      - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_voting?sslmode=require
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: SHARE_BASE_URL # link Vercel
+        sync: false
+      - key: OUTFIT_SERVICE_URL
+        value: https://thelooks-outfit.onrender.com
+      - key: VOTER_KEY_SECRET
+        generateValue: true

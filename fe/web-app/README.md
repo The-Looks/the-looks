@@ -50,4 +50,4 @@ src/
 ## Deploy
 
 Vercel: thư mục gốc `fe/web-app`, build `npm run build`, output `dist`.
-Sửa `BACKEND_HOST` trong `vercel.json` thành địa chỉ máy chủ backend.
+`vercel.json` chuyển `/api/...` tới các service trên Render (`thelooks-<service>.onrender.com`, xem `render.yaml` ở gốc repo).
