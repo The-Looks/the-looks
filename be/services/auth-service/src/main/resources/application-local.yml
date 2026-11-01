@@ -1,0 +1,14 @@
+# Giá trị cho máy dev (Postgres cài trên máy hoặc be/docker-compose.yml). Không dùng ở staging/prod.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/thelooks_identity}
+    username: ${DB_USER:thelooks}
+    password: ${DB_PASSWORD:thelooks}
+
+thelooks:
+  security:
+    password-pepper: ${PASSWORD_PEPPER:dev-only-password-pepper-change-me-123456789}
+    issuer: ${JWT_ISSUER:http://localhost:8081}
+    jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/.well-known/jwks.json}
+    private-key-path: ${JWT_PRIVATE_KEY_PATH:./.keys/jwt-private.pem}
+    web-origin: ${WEB_ORIGIN:http://localhost:5173}

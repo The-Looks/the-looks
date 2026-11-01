@@ -3,7 +3,7 @@ import { ButtonLink, Card, Chip, PageHeader } from '../../../shared/ui';
 
 const STYLES = ['Nữ tính', 'Năng động', 'Tối giản', 'Streetwear', 'Vintage', 'Công sở'];
 
-// TODO(Phát): lưu sở thích khi identity-service có API hồ sơ (gợi ý outfit sẽ dùng).
+// TODO(Phát): lưu sở thích khi auth-service có API hồ sơ (gợi ý outfit sẽ dùng).
 export function OnboardingPage() {
   const [picked, setPicked] = useState<string[]>([]);
   const toggle = (s: string) => setPicked((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));

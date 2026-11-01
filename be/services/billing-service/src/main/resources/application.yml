@@ -33,11 +33,9 @@ logging:
 
 thelooks:
   security:
-    # HMAC (bản hiện tại) và JWKS (sau PR #2): khai báo cả hai để chạy được với cả hai cách xác thực
-    jwt-secret: ${JWT_SECRET:}
-    issuer: ${JWT_ISSUER:}
-    jwk-set-uri: ${JWT_JWK_SET_URI:}
-    session-validation-uri: ${SESSION_VALIDATION_URI:}
+    issuer: ${JWT_ISSUER}
+    jwk-set-uri: ${JWT_JWK_SET_URI}
+    session-validation-uri: ${SESSION_VALIDATION_URI:http://localhost:8081/api/public/auth/session/active}
   billing:
     # payos = cổng PayOS thật; fake = thanh toán giả (bấm là thành công, CHỈ dùng khi dev).
     # Không có giá trị mặc định: quên khai báo thì service không khởi động, thay vì cho mọi người lên Pro miễn phí.

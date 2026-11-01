@@ -1,9 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { LoginPage, OnboardingPage, RegisterPage } from '../features/auth';
+import { GoogleCallbackPage, LoginPage, OnboardingPage, RegisterPage } from '../features/auth';
 import { BillingResultPage, PlansPage } from '../features/billing';
 import { OutfitDetailPage, SavedOutfitsPage, SuggestPage } from '../features/outfit';
 import { ProfilePage } from '../features/profile';
-import { CreatePollPage, MyPollsPage, PollDetailPage } from '../features/voting';
+import { CreatePollPage, MyPollsPage, PollDetailPage, PublicPollPage } from '../features/voting';
 import { AddItemPage, ItemDetailPage, WardrobePage } from '../features/wardrobe';
 import { ButtonLink, EmptyState } from '../shared/ui';
 import { AppShell } from './AppShell';
@@ -23,6 +23,8 @@ function NotFound() {
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
+  { path: '/auth/callback', element: <GoogleCallbackPage /> },
+  { path: '/v/:code', element: <PublicPollPage /> },
   {
     element: <RequireAuth />,
     children: [

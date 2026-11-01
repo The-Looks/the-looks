@@ -47,7 +47,7 @@ paths:
                 required: [code, shareUrl, expiresAt]
                 properties:
                   code: { type: string }
-                  shareUrl: { type: string, format: uri, description: link gửi qua Zalo, mở trên voting-web }
+                  shareUrl: { type: string, format: uri, description: 'link gửi qua Zalo, mở trên web-app tại /v/{code}' }
                   expiresAt: { type: string, format: date-time }
         '400': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/public/polls/{code}:
