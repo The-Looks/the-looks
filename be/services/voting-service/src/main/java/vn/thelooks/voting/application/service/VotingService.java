@@ -11,6 +11,9 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import vn.thelooks.voting.domain.exception.TooManyVotesException;
+import vn.thelooks.voting.application.port.out.VoterKeyGenerator;
+import vn.thelooks.voting.application.port.out.VoteThrottle;
 import org.springframework.transaction.annotation.Transactional;
 import vn.thelooks.voting.application.port.out.BallotRepository;
 import vn.thelooks.voting.application.port.out.OutfitReader;
@@ -31,19 +34,26 @@ import vn.thelooks.voting.domain.model.PollResult;
 class VotingService implements CreatePollUseCase, CastVoteUseCase, GetPollQuery {
 
     private static final SecureRandom RANDOM = new SecureRandom();
+    /** Nhiều bạn dùng chung Wi-Fi ký túc xá vẫn bình chọn được; xoá cookie để bình chọn hàng loạt thì bị chặn. */
+    static final int MAX_VOTES_PER_IP_PER_POLL = 20;
 
     private final PollRepository polls;
     private final BallotRepository ballots;
     private final OutfitReader outfits;
     private final Clock clock;
+    private final VoterKeyGenerator voterKeys;
+    private final VoteThrottle throttle;
     private final String shareBaseUrl;
 
     VotingService(PollRepository polls, BallotRepository ballots, OutfitReader outfits, Clock clock,
+            VoterKeyGenerator voterKeys, VoteThrottle throttle,
             @Value("${thelooks.voting.share-base-url}") String shareBaseUrl) {
         this.polls = polls;
         this.ballots = ballots;
         this.outfits = outfits;
         this.clock = clock;
+        this.voterKeys = voterKeys;
+        this.throttle = throttle;
         this.shareBaseUrl = shareBaseUrl.replaceAll("/+$", "");
     }
 
@@ -71,7 +81,10 @@ class VotingService implements CreatePollUseCase, CastVoteUseCase, GetPollQuery 
 
     @Override
     @Transactional
-    public PollResult vote(String code, Choice choice, String voterKey) {
+    public PollResult vote(String code, Choice choice, String voterKey, String ip) {
+        if (!throttle.tryAcquire(ip)) {
+            throw new TooManyVotesException("Bạn gửi bình chọn quá nhanh, thử lại sau ít phút");
+        }
         var poll = polls.findByCode(code).orElseThrow(() -> new PollNotFoundException("Không tìm thấy bình chọn"));
         if (poll.isExpired(Instant.now(clock))) {
             throw new PollExpiredException("Link bình chọn đã hết hạn");
@@ -79,7 +92,11 @@ class VotingService implements CreatePollUseCase, CastVoteUseCase, GetPollQuery 
         if (ballots.exists(poll.id(), voterKey)) {
             throw new AlreadyVotedException("Bạn đã bình chọn cho link này");
         }
-        ballots.save(new Ballot(UUID.randomUUID(), poll.id(), choice, voterKey, Instant.now(clock)));
+        var ipKey = voterKeys.forIp(code, ip);
+        if (ballots.countByIp(poll.id(), ipKey) >= MAX_VOTES_PER_IP_PER_POLL) {
+            throw new TooManyVotesException("Mạng này đã gửi quá nhiều phiếu cho bình chọn này");
+        }
+        ballots.save(new Ballot(UUID.randomUUID(), poll.id(), choice, voterKey, ipKey, Instant.now(clock)));
         return ballots.tally(poll.id());
     }
 

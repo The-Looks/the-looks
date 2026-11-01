@@ -8,7 +8,8 @@ public interface CastVoteUseCase {
 
     /**
      * @param voterKey do web adapter tính từ cookie và mã poll
+     * @param ip       địa chỉ IP người gửi (đã qua proxy tin cậy), dùng để chống spam
      * @return kết quả sau khi bình chọn, để hiện ngay cho khách
      */
-    PollResult vote(String code, Choice choice, String voterKey);
+    PollResult vote(String code, Choice choice, String voterKey, String ip);
 }

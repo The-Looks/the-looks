@@ -36,6 +36,11 @@ class BallotRepositoryAdapter implements BallotRepository {
     }
 
     @Override
+    public long countByIp(UUID pollId, String ipKey) {
+        return repository.countByPollIdAndIpKey(pollId, ipKey);
+    }
+
+    @Override
     public PollResult tally(UUID pollId) {
         return new PollResult(repository.countByPollIdAndChoice(pollId, Choice.A),
                 repository.countByPollIdAndChoice(pollId, Choice.B));

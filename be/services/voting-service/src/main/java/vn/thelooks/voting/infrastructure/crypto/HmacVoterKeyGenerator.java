@@ -20,6 +20,11 @@ class HmacVoterKeyGenerator implements VoterKeyGenerator {
     }
 
     @Override
+    public String forIp(String code, String ip) {
+        return forPoll(code, "ip:" + ip);
+    }
+
+    @Override
     public String forPoll(String code, String voterId) {
         try {
             var mac = Mac.getInstance("HmacSHA256");

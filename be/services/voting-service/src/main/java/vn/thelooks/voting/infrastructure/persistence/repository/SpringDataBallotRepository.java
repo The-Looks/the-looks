@@ -9,5 +9,7 @@ public interface SpringDataBallotRepository extends JpaRepository<BallotJpaEntit
 
     boolean existsByPollIdAndVoterKey(UUID pollId, String voterKey);
 
+    long countByPollIdAndIpKey(UUID pollId, String ipKey);
+
     long countByPollIdAndChoice(UUID pollId, Choice choice);
 }

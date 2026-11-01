@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vn.thelooks.voting.domain.exception.AlreadyVotedException;
 import vn.thelooks.voting.domain.exception.InvalidPollException;
+import vn.thelooks.voting.domain.exception.TooManyVotesException;
 import vn.thelooks.voting.domain.exception.OutfitUnavailableException;
 import vn.thelooks.voting.domain.exception.PollExpiredException;
 import vn.thelooks.voting.domain.exception.PollNotFoundException;
@@ -26,6 +27,11 @@ class VotingExceptionHandler {
     @ExceptionHandler(AlreadyVotedException.class)
     ProblemDetail duplicate(AlreadyVotedException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(TooManyVotesException.class)
+    ProblemDetail tooMany(TooManyVotesException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, e.getMessage());
     }
 
     @ExceptionHandler(InvalidPollException.class)
