@@ -13,13 +13,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import vn.thelooks.outfit.application.port.out.AiUsageRepository;
 import vn.thelooks.outfit.application.port.out.FeedbackRepository;
 import vn.thelooks.outfit.application.port.out.OutfitAiAdvisor;
 import vn.thelooks.outfit.application.port.out.OutfitRepository;
 import vn.thelooks.outfit.application.port.out.WardrobeReader;
+import vn.thelooks.outfit.application.port.out.WeatherReader;
 import vn.thelooks.outfit.application.port.out.WearLogRepository;
+import vn.thelooks.outfit.application.usecase.GetAiUsageQuery;
 import vn.thelooks.outfit.application.usecase.GetOutfitsQuery;
 import vn.thelooks.outfit.application.usecase.MarkOutfitWornUseCase;
 import vn.thelooks.outfit.application.usecase.QuickPickUseCase;
@@ -34,13 +39,14 @@ import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.Outfit;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
 import vn.thelooks.outfit.domain.model.OutfitView;
+import vn.thelooks.outfit.domain.model.Weather;
 import vn.thelooks.outfit.domain.model.WearLog;
 import vn.thelooks.outfit.domain.service.OutfitRecommender;
 
 @Service
 @Transactional(readOnly = true)
 class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutfitUseCase,
-        MarkOutfitWornUseCase, GetOutfitsQuery, RateSuggestionUseCase {
+        MarkOutfitWornUseCase, GetOutfitsQuery, RateSuggestionUseCase, GetAiUsageQuery {
 
     static final ZoneId VIETNAM = ZoneId.of("Asia/Ho_Chi_Minh");
     /** Số ứng viên tốt nhất gửi cho AI chọn lại. */
@@ -52,37 +58,98 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
     private final WearLogRepository wearLogs;
     private final OutfitAiAdvisor aiAdvisor;
     private final FeedbackRepository feedback;
+    private final WeatherReader weather;
+    private final AiUsageRepository aiUsage;
+    private final int aiDailyLimitPerUser;
+    private final double aiMonthlyBudgetUsd;
     private final Clock clock;
     private final OutfitRecommender recommender = new OutfitRecommender();
 
     OutfitService(WardrobeReader wardrobe, OutfitRepository outfits, WearLogRepository wearLogs,
-            OutfitAiAdvisor aiAdvisor, FeedbackRepository feedback, Clock clock) {
+            OutfitAiAdvisor aiAdvisor, FeedbackRepository feedback, WeatherReader weather, AiUsageRepository aiUsage,
+            @Value("${thelooks.ai.daily-limit-per-user}") int aiDailyLimitPerUser,
+            @Value("${thelooks.ai.monthly-budget-usd}") double aiMonthlyBudgetUsd,
+            Clock clock) {
         this.wardrobe = wardrobe;
         this.outfits = outfits;
         this.wearLogs = wearLogs;
         this.aiAdvisor = aiAdvisor;
         this.feedback = feedback;
+        this.weather = weather;
+        this.aiUsage = aiUsage;
+        this.aiDailyLimitPerUser = aiDailyLimitPerUser;
+        this.aiMonthlyBudgetUsd = aiMonthlyBudgetUsd;
         this.clock = clock;
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED) // gọi AI vài giây, không giữ kết nối DB
     public List<OutfitSuggestion> suggest(UUID ownerId, Occasion occasion, int limit) {
         if (occasion == null) {
             throw new InvalidOutfitException("Cần chọn dịp");
         }
-        return aiAdvisor.choose(occasion, candidates(ownerId, occasion), limit);
+        return advise(ownerId, occasion, candidates(ownerId, occasion), limit);
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED) // gọi AI vài giây, không giữ kết nối DB
     public Optional<OutfitSuggestion> quickPick(UUID ownerId) {
-        return aiAdvisor.choose(null, candidates(ownerId, null), 1).stream().findFirst();
+        return advise(ownerId, null, candidates(ownerId, null), 1).stream().findFirst();
+    }
+
+    /**
+     * Gọi AI trong giới hạn: mỗi người tối đa N lượt/ngày và tổng chi phí tháng chưa vượt ngân sách.
+     * Hết lượt → vẫn có gợi ý theo điểm của OutfitRecommender, chỉ không qua AI.
+     */
+    private List<OutfitSuggestion> advise(UUID ownerId, Occasion occasion, List<OutfitSuggestion> candidates, int limit) {
+        if (candidates.isEmpty()) {
+            return List.of();
+        }
+        Instant now = clock.instant();
+        boolean withinLimits = aiUsage.callsSince(ownerId, startOfDay(now)) < aiDailyLimitPerUser
+                && aiUsage.costSince(startOfMonth(now)) < aiMonthlyBudgetUsd;
+        if (!withinLimits) {
+            return OutfitAiAdvisor.Advice.withoutAi(candidates, limit).suggestions();
+        }
+        OutfitAiAdvisor.Advice advice = aiAdvisor.choose(occasion, candidates, limit);
+        if (advice.usage() != null) {
+            aiUsage.record(ownerId, advice.usage(), now);
+        }
+        return advice.suggestions();
+    }
+
+    @Override
+    public Report thisMonth() {
+        Instant since = startOfMonth(clock.instant());
+        return new Report(LocalDate.ofInstant(since, VIETNAM).toString().substring(0, 7),
+                aiUsage.costSince(since), aiMonthlyBudgetUsd, aiUsage.topUsersSince(since, 10));
+    }
+
+    static Instant startOfDay(Instant now) {
+        return LocalDate.ofInstant(now, VIETNAM).atStartOfDay(VIETNAM).toInstant();
+    }
+
+    static Instant startOfMonth(Instant now) {
+        return LocalDate.ofInstant(now, VIETNAM).withDayOfMonth(1).atStartOfDay(VIETNAM).toInstant();
     }
 
     private List<OutfitSuggestion> candidates(UUID ownerId, Occasion occasion) {
         Instant now = clock.instant();
-        String season = OutfitRecommender.seasonOf(LocalDate.ofInstant(now, VIETNAM).getMonth());
-        return recommender.recommend(wardrobe.confirmedItems(ownerId), wearLogs.lastWornAtByItem(ownerId),
-                feedback.byOwner(ownerId), occasion, now, season, AI_CANDIDATES);
+        Optional<Weather> today = weather.current();
+        Set<String> seasons = today
+                .map(w -> OutfitRecommender.seasonsFor(w.temperatureC()))
+                .orElseGet(() -> Set.of(OutfitRecommender.seasonOf(LocalDate.ofInstant(now, VIETNAM).getMonth())));
+        List<OutfitSuggestion> suggestions = recommender.recommend(wardrobe.confirmedItems(ownerId),
+                wearLogs.lastWornAtByItem(ownerId), feedback.byOwner(ownerId), occasion, now, seasons, AI_CANDIDATES);
+        return today.map(w -> withWeatherNote(suggestions, w)).orElse(suggestions);
+    }
+
+    /** Ghi thời tiết vào lý do gợi ý, ví dụ "… · Trời 33°C, có mưa". */
+    static List<OutfitSuggestion> withWeatherNote(List<OutfitSuggestion> suggestions, Weather w) {
+        String note = "Trời " + Math.round(w.temperatureC()) + "°C" + (w.rainy() ? ", có mưa" : "");
+        return suggestions.stream()
+                .map(s -> new OutfitSuggestion(s.items(), s.occasion(), s.score(), s.reason() + " · " + note))
+                .toList();
     }
 
     @Override

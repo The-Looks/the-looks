@@ -35,7 +35,7 @@ class OutfitRecommenderTest {
         ClosetItem trousers = item("BOTTOM", "black", "office");
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(tee, shirt, trousers), Map.of(), Occasion.WORK, NOW, "AUTUMN", 1);
+                List.of(tee, shirt, trousers), Map.of(), Occasion.WORK, NOW, Set.of("AUTUMN"), 1);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().items()).containsExactly(shirt, trousers);
@@ -53,7 +53,7 @@ class OutfitRecommenderTest {
                 jeans.id(), daysAgo(21));
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(wornYesterday, wornLongAgo, jeans), lastWorn, null, NOW, "AUTUMN", 1);
+                List.of(wornYesterday, wornLongAgo, jeans), lastWorn, null, NOW, Set.of("AUTUMN"), 1);
 
         assertThat(result.getFirst().items()).containsExactly(wornLongAgo, jeans);
         assertThat(result.getFirst().reason()).contains("21 ngày chưa mặc");
@@ -62,7 +62,7 @@ class OutfitRecommenderTest {
     @Test
     void neverWornItemsAreMentioned() {
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(item("DRESS", "red")), Map.of(), null, NOW, "AUTUMN", 1);
+                List.of(item("DRESS", "red")), Map.of(), null, NOW, Set.of("AUTUMN"), 1);
 
         assertThat(result.getFirst().reason()).contains("chưa mặc lần nào");
     }
@@ -74,7 +74,7 @@ class OutfitRecommenderTest {
         ClosetItem shorts = item("BOTTOM", "beige");
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(coatTop, summerTop, shorts), Map.of(), null, NOW, "SUMMER", 5);
+                List.of(coatTop, summerTop, shorts), Map.of(), null, NOW, Set.of("SUMMER"), 5);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().items()).containsExactly(summerTop, shorts);
@@ -88,7 +88,7 @@ class OutfitRecommenderTest {
         ClosetItem loafers = item("SHOES", "brown", "formal");
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(top, bottom, sneakers, loafers), Map.of(), Occasion.WORK, NOW, "AUTUMN", 1);
+                List.of(top, bottom, sneakers, loafers), Map.of(), Occasion.WORK, NOW, Set.of("AUTUMN"), 1);
 
         assertThat(result.getFirst().items()).containsExactly(top, bottom, loafers);
     }
@@ -101,7 +101,7 @@ class OutfitRecommenderTest {
         ClosetItem bottom2 = item("BOTTOM", "beige");
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(top1, top2, bottom1, bottom2), Map.of(), Occasion.HANGOUT, NOW, "AUTUMN", 2);
+                List.of(top1, top2, bottom1, bottom2), Map.of(), Occasion.HANGOUT, NOW, Set.of("AUTUMN"), 2);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).items()).doesNotContainAnyElementsOf(result.get(1).items());
@@ -114,15 +114,15 @@ class OutfitRecommenderTest {
         ClosetItem redSkirt = item("BOTTOM", "red");
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(loudTop, neutralTop, redSkirt), Map.of(), null, NOW, "AUTUMN", 2);
+                List.of(loudTop, neutralTop, redSkirt), Map.of(), null, NOW, Set.of("AUTUMN"), 2);
 
         assertThat(result.getFirst().items()).containsExactly(neutralTop, redSkirt);
     }
 
     @Test
     void returnsEmptyWhenNothingToCombine() {
-        assertThat(recommender.recommend(List.of(item("SHOES", "black")), Map.of(), null, NOW, "AUTUMN", 3)).isEmpty();
-        assertThat(recommender.recommend(List.of(item("DRESS", "black")), Map.of(), null, NOW, "AUTUMN", 0)).isEmpty();
+        assertThat(recommender.recommend(List.of(item("SHOES", "black")), Map.of(), null, NOW, Set.of("AUTUMN"), 3)).isEmpty();
+        assertThat(recommender.recommend(List.of(item("DRESS", "black")), Map.of(), null, NOW, Set.of("AUTUMN"), 0)).isEmpty();
     }
 
     @Test
@@ -133,7 +133,7 @@ class OutfitRecommenderTest {
         var disliked = Map.of(Feedback.comboKey(List.of(jeans.id(), top.id())), Feedback.DISLIKE);
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(top, jeans, skirt), Map.of(), disliked, null, NOW, "AUTUMN", 5);
+                List.of(top, jeans, skirt), Map.of(), disliked, null, NOW, Set.of("AUTUMN"), 5);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().items()).containsExactly(top, skirt);
@@ -147,7 +147,7 @@ class OutfitRecommenderTest {
         var disliked = Map.of(Feedback.comboKey(List.of(dress.id(), sneakers.id())), Feedback.DISLIKE);
 
         List<OutfitSuggestion> result = recommender.recommend(
-                List.of(dress, sneakers, heels), Map.of(), disliked, null, NOW, "AUTUMN", 5);
+                List.of(dress, sneakers, heels), Map.of(), disliked, null, NOW, Set.of("AUTUMN"), 5);
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().items()).containsExactly(dress, heels);
@@ -161,8 +161,8 @@ class OutfitRecommenderTest {
         var liked = Map.of(Feedback.comboKey(List.of(top.id(), skirt.id())), Feedback.LIKE);
         Map<UUID, Instant> lastWorn = Map.of(skirt.id(), daysAgo(1), jeans.id(), daysAgo(3), top.id(), daysAgo(1));
 
-        List<OutfitSuggestion> without = recommender.recommend(List.of(top, jeans, skirt), lastWorn, null, NOW, "AUTUMN", 1);
-        List<OutfitSuggestion> with = recommender.recommend(List.of(top, jeans, skirt), lastWorn, liked, null, NOW, "AUTUMN", 1);
+        List<OutfitSuggestion> without = recommender.recommend(List.of(top, jeans, skirt), lastWorn, null, NOW, Set.of("AUTUMN"), 1);
+        List<OutfitSuggestion> with = recommender.recommend(List.of(top, jeans, skirt), lastWorn, liked, null, NOW, Set.of("AUTUMN"), 1);
 
         assertThat(without.getFirst().items()).containsExactly(top, jeans);
         assertThat(with.getFirst().items()).containsExactly(top, skirt);
@@ -173,6 +173,26 @@ class OutfitRecommenderTest {
     void comboKeyIgnoresOrder() {
         UUID a = UUID.randomUUID(), b = UUID.randomUUID();
         assertThat(Feedback.comboKey(List.of(a, b))).isEqualTo(Feedback.comboKey(List.of(b, a)));
+    }
+
+    @Test
+    void hotWeatherSkipsWinterItems() {
+        ClosetItem coat = new ClosetItem(UUID.randomUUID(), "TOP", List.of("gray"), Set.of("WINTER"), Set.of(), null);
+        ClosetItem tee = new ClosetItem(UUID.randomUUID(), "TOP", List.of("white"), Set.of("SUMMER"), Set.of(), null);
+        ClosetItem anySeason = item("BOTTOM", "beige");
+
+        List<OutfitSuggestion> result = recommender.recommend(
+                List.of(coat, tee, anySeason), Map.of(), null, NOW, OutfitRecommender.seasonsFor(33), 5);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().items()).containsExactly(tee, anySeason);
+    }
+
+    @Test
+    void seasonsByTemperature() {
+        assertThat(OutfitRecommender.seasonsFor(33)).containsExactlyInAnyOrder("SUMMER", "SPRING");
+        assertThat(OutfitRecommender.seasonsFor(24)).containsExactlyInAnyOrder("SPRING", "SUMMER", "AUTUMN");
+        assertThat(OutfitRecommender.seasonsFor(15)).containsExactlyInAnyOrder("AUTUMN", "WINTER");
     }
 
     @Test

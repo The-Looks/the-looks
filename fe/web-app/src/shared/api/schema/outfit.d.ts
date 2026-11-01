@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ */
+        /** AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ, lọc theo thời tiết hiện tại */
         get: {
             parameters: {
                 query: {
@@ -191,6 +191,54 @@ export interface paths {
                 400: components["responses"]["Problem"];
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/outfits/ai-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Chi phí gọi AI tháng này so với ngân sách, 10 người dùng tốn nhiều nhất */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example 2026-11 */
+                            month: string;
+                            costUsd: number;
+                            budgetUsd: number;
+                            topUsers: {
+                                /** Format: uuid */
+                                ownerId: string;
+                                calls: number;
+                                costUsd: number;
+                            }[];
+                        };
+                    };
+                };
+                403: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;

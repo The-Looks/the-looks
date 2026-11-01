@@ -48,19 +48,23 @@ public class OutfitRecommender {
             Map<UUID, Instant> lastWornAt,
             Occasion occasion,
             Instant now,
-            String season,
+            Set<String> seasons,
             int limit) {
-        return recommend(closet, lastWornAt, Map.of(), occasion, now, season, limit);
+        return recommend(closet, lastWornAt, Map.of(), occasion, now, seasons, limit);
     }
 
-    /** @param feedback comboKey (xem {@link Feedback#comboKey}) → phản hồi của người dùng */
+    /**
+     * @param feedback comboKey (xem {@link Feedback#comboKey}) → phản hồi của người dùng
+     * @param seasons  mùa phù hợp lúc này ({@link #seasonsFor} theo nhiệt độ, hoặc mùa của tháng);
+     *                 món có ghi mùa mà không thuộc tập này thì bỏ qua, món không ghi mùa thì luôn dùng được
+     */
     public List<OutfitSuggestion> recommend(
             List<ClosetItem> closet,
             Map<UUID, Instant> lastWornAt,
             Map<String, Feedback> feedback,
             Occasion occasion,
             Instant now,
-            String season,
+            Set<String> seasons,
             int limit) {
         if (limit <= 0) {
             return List.of();
@@ -70,7 +74,7 @@ public class OutfitRecommender {
         List<ClosetItem> dresses = new ArrayList<>();
         List<ClosetItem> shoes = new ArrayList<>();
         for (ClosetItem item : closet) {
-            if (!item.seasons().isEmpty() && !item.seasons().contains(season)) {
+            if (!item.seasons().isEmpty() && item.seasons().stream().noneMatch(seasons::contains)) {
                 continue;
             }
             switch (item.category().toUpperCase(Locale.ROOT)) {
@@ -211,6 +215,20 @@ public class OutfitRecommender {
                 .distinct()
                 .count();
         return accents <= 1 ? 1.0 : accents == 2 ? 0.7 : 0.3;
+    }
+
+    /**
+     * Mùa nào mặc hợp với nhiệt độ hiện tại. Dùng khi có thời tiết thật, chính xác hơn mùa theo tháng
+     * (TP.HCM gần như quanh năm là "hè").
+     */
+    public static Set<String> seasonsFor(double temperatureC) {
+        if (temperatureC >= 28) {
+            return Set.of("SUMMER", "SPRING");
+        }
+        if (temperatureC >= 20) {
+            return Set.of("SPRING", "SUMMER", "AUTUMN");
+        }
+        return Set.of("AUTUMN", "WINTER");
     }
 
     // ponytail: mùa theo tháng kiểu miền Bắc; miền Nam gần như không có mùa đông, thêm vùng khi có dữ liệu vị trí

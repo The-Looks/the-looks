@@ -38,3 +38,15 @@ psql -U postgres -f infrastructure/docker/postgres/init.sql
 ./mvnw -pl services/outfit-service -am package           # build riêng 1 service
 ```
 Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
+
+## outfit-service: AI và thời tiết
+
+| Biến môi trường | Mặc định | Ý nghĩa |
+|---|---|---|
+| `AI_PROVIDER` | `none` | `claude` để bật AI chọn/xếp hạng gợi ý (cần `ANTHROPIC_API_KEY`); `none` = xếp theo điểm thuật toán |
+| `AI_MODEL` | `claude-opus-5-5` | Đổi sang `claude-haiku-5-5` để rẻ hơn ~40 lần |
+| `AI_DAILY_LIMIT` | `10` | Số lượt gọi AI mỗi người mỗi ngày; hết lượt vẫn có gợi ý theo điểm |
+| `AI_MONTHLY_BUDGET_USD` | `25` | Tổng chi phí AI mỗi tháng; chạm ngưỡng thì tự ngừng gọi AI |
+| `WEATHER_LAT`, `WEATHER_LON` | TP.HCM | Vị trí lấy thời tiết (Open-Meteo, miễn phí, không cần key) |
+
+Admin xem chi phí: `GET /api/admin/outfits/ai-usage` (cần JWT role ADMIN).
