@@ -3,7 +3,7 @@ package vn.thelooks.auth.application.port.out;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface RefreshSessionStore {
+public interface RefreshTokenSessionStore {
 
     Session create(UUID userId, Instant now, Instant expiresAt);
 

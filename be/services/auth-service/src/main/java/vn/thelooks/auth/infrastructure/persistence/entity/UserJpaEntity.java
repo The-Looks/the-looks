@@ -7,7 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.UUID;
-import vn.thelooks.auth.domain.enums.Role;
 import vn.thelooks.auth.domain.enums.UserStatus;
 
 @Entity
@@ -31,10 +30,6 @@ public class UserJpaEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
-    private Role role;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 16)
     private UserStatus status;
 
     protected UserJpaEntity() {
@@ -47,12 +42,11 @@ public class UserJpaEntity extends BaseEntity {
     }
 
     public void setDetails(String email, String username, String passwordHash,
-            boolean emailVerified, Role role, UserStatus status) {
+            boolean emailVerified, UserStatus status) {
         this.email = email;
         this.username = username;
         this.passwordHash = passwordHash;
         this.emailVerified = emailVerified;
-        this.role = role;
         this.status = status;
     }
 
@@ -74,10 +68,6 @@ public class UserJpaEntity extends BaseEntity {
 
     public boolean isEmailVerified() {
         return emailVerified;
-    }
-
-    public Role getRole() {
-        return role;
     }
 
     public UserStatus getStatus() {

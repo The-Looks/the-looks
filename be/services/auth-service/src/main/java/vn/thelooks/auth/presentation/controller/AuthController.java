@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import vn.thelooks.auth.application.port.out.UserRepository;
+import vn.thelooks.auth.application.port.out.UserPersistencePort;
 import vn.thelooks.auth.application.port.in.LoginUseCase;
 import vn.thelooks.auth.application.port.in.RegisterUseCase;
 import vn.thelooks.auth.application.port.in.SessionUseCase;
@@ -37,10 +37,10 @@ class AuthController {
     private final RegisterUseCase register;
     private final LoginUseCase login;
     private final SessionUseCase sessions;
-    private final UserRepository users;
+    private final UserPersistencePort users;
     private final String allowedOrigin;
 
-    AuthController(RegisterUseCase register, LoginUseCase login, SessionUseCase sessions, UserRepository users,
+    AuthController(RegisterUseCase register, LoginUseCase login, SessionUseCase sessions, UserPersistencePort users,
             @Value("${thelooks.security.web-origin}") String allowedOrigin) {
         this.register = register;
         this.login = login;

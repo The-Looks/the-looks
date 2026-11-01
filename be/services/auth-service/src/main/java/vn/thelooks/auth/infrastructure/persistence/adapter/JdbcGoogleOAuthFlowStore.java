@@ -8,15 +8,16 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
-import vn.thelooks.auth.application.port.out.GoogleFlowStore;
+import vn.thelooks.auth.application.port.out.GoogleOAuthFlowStore;
 
+/** Lưu state, nonce và PKCE verifier; callback tiêu thụ state đúng một lần. */
 @Repository
-class JdbcGoogleFlowStore implements GoogleFlowStore {
+class JdbcGoogleOAuthFlowStore implements GoogleOAuthFlowStore {
 
     private final JdbcTemplate jdbc;
     private final TransactionTemplate consumeTransaction;
 
-    JdbcGoogleFlowStore(JdbcTemplate jdbc, PlatformTransactionManager transactions) {
+    JdbcGoogleOAuthFlowStore(JdbcTemplate jdbc, PlatformTransactionManager transactions) {
         this.jdbc = jdbc;
         consumeTransaction = new TransactionTemplate(transactions);
         consumeTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);

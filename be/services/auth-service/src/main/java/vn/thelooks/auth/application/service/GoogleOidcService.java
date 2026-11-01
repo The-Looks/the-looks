@@ -10,43 +10,44 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
-import vn.thelooks.auth.application.port.out.AdminBootstrapStore;
-import vn.thelooks.auth.application.port.out.GoogleFlowStore;
-import vn.thelooks.auth.application.port.out.GoogleIdentityStore;
+import vn.thelooks.auth.application.port.out.FirstAdminRoleAssigner;
+import vn.thelooks.auth.application.port.out.GoogleOAuthFlowStore;
+import vn.thelooks.auth.application.port.out.GoogleAccountLinkStore;
 import vn.thelooks.auth.application.port.out.GoogleTokenVerifier;
-import vn.thelooks.auth.application.port.out.RefreshSessionStore;
+import vn.thelooks.auth.application.port.out.RefreshTokenSessionStore;
 import vn.thelooks.auth.application.port.out.TokenIssuer;
-import vn.thelooks.auth.application.port.out.UserRepository;
+import vn.thelooks.auth.application.port.out.UserPersistencePort;
 import vn.thelooks.auth.application.port.in.GoogleLoginUseCase;
 import vn.thelooks.auth.application.port.in.LoginUseCase;
 import vn.thelooks.auth.domain.exception.InvalidCredentialsException;
-import vn.thelooks.auth.domain.enums.Role;
 import vn.thelooks.auth.domain.model.User;
+import vn.thelooks.auth.domain.model.RoleCodes;
 import vn.thelooks.auth.domain.enums.UserStatus;
 
 @Service
 class GoogleOidcService implements GoogleLoginUseCase {
 
     private static final SecureRandom RANDOM = new SecureRandom();
-    private final GoogleFlowStore flows;
-    private final GoogleIdentityStore identities;
+    private final GoogleOAuthFlowStore flows;
+    private final GoogleAccountLinkStore identities;
     private final GoogleTokenVerifier google;
-    private final UserRepository users;
-    private final AdminBootstrapStore admins;
-    private final RefreshSessionStore sessions;
+    private final UserPersistencePort users;
+    private final FirstAdminRoleAssigner admins;
+    private final RefreshTokenSessionStore sessions;
     private final TokenIssuer tokens;
     private final Clock clock;
     private final String clientId;
     private final String redirectUri;
     private final String adminEmail;
 
-    GoogleOidcService(GoogleFlowStore flows, GoogleIdentityStore identities, GoogleTokenVerifier google,
-            UserRepository users, AdminBootstrapStore admins, RefreshSessionStore sessions, TokenIssuer tokens,
+    GoogleOidcService(GoogleOAuthFlowStore flows, GoogleAccountLinkStore identities, GoogleTokenVerifier google,
+            UserPersistencePort users, FirstAdminRoleAssigner admins, RefreshTokenSessionStore sessions, TokenIssuer tokens,
             Clock clock, @Value("${thelooks.google.client-id:}") String clientId,
             @Value("${thelooks.google.redirect-uri:}") String redirectUri,
             @Value("${thelooks.admin.bootstrap-email:}") String adminEmail) {
@@ -101,14 +102,14 @@ class GoogleOidcService implements GoogleLoginUseCase {
                 user = existing.get();
                 if (!user.emailVerified()) {
                     user = users.save(new User(user.id(), user.email(), user.passwordHash(), user.username(), true,
-                            user.role(), user.status(), user.createdAt(), Instant.now(clock)));
+                            user.roles(), user.permissions(), user.status(), user.createdAt(), Instant.now(clock)));
                 }
             } else {
                 var now = Instant.now(clock);
                 var name = profile.name() == null || profile.name().isBlank() ? email.split("@")[0] : profile.name();
                 if (name.length() > 60) name = name.substring(0, 60);
                 user = users.save(new User(UUID.randomUUID(), email, null, name, true,
-                        Role.USER, UserStatus.ACTIVE, now, now));
+                        Set.of(RoleCodes.USER), Set.of(), UserStatus.ACTIVE, now, now));
             }
             identities.link(profile.subject(), user.id());
         }
@@ -116,8 +117,7 @@ class GoogleOidcService implements GoogleLoginUseCase {
         if (!adminEmail.isBlank() && profile.googleAuthoritativeForEmail() && user.emailVerified()
                 && user.email().equalsIgnoreCase(adminEmail.trim())) {
             if (admins.promoteFirstVerifiedAdmin(user.id(), user.email())) {
-                user = new User(user.id(), user.email(), user.passwordHash(), user.username(), true,
-                        Role.ADMIN, user.status(), user.createdAt(), Instant.now(clock));
+                user = users.findById(user.id()).orElseThrow(GoogleOidcService::invalid);
             }
         }
         var now = Instant.now(clock);

@@ -3,7 +3,6 @@ package vn.thelooks.auth.infrastructure.crypto;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
@@ -40,7 +39,8 @@ class RsaTokenIssuer implements TokenIssuer {
                 .subject(user.id().toString())
                 .issuedAt(now)
                 .expiresAt(expiresAt)
-                .claim("roles", List.of(user.role().name()))
+                .claim("roles", user.roles().stream().sorted().toList())
+                .claim("permissions", user.permissions().stream().sorted().toList())
                 .claim("sid", sessionId.toString())
                 .build();
         var header = JwsHeader.with(SignatureAlgorithm.RS256).keyId(kid).build();

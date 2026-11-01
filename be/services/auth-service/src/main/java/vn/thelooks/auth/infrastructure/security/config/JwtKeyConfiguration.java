@@ -29,7 +29,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
-import vn.thelooks.auth.application.port.out.RefreshSessionStore;
+import vn.thelooks.auth.application.port.out.RefreshTokenSessionStore;
 
 @Configuration
 class JwtKeyConfiguration {
@@ -66,7 +66,7 @@ class JwtKeyConfiguration {
     /** Identity kiểm tra JWT bằng public key tại chỗ, không gọi HTTP tới chính nó. */
     @Bean
     JwtDecoder jwtDecoder(RSAKey key, @Value("${thelooks.security.issuer}") String issuer,
-            RefreshSessionStore sessions, Clock clock) throws Exception {
+            RefreshTokenSessionStore sessions, Clock clock) throws Exception {
         var decoder = NimbusJwtDecoder.withPublicKey(key.toRSAPublicKey()).build();
         decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(issuer),
                 jwt -> {

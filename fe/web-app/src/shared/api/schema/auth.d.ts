@@ -336,8 +336,7 @@ export interface components {
             /** Format: email */
             email: string;
             username: string;
-            /** @enum {string} */
-            role: "USER" | "ADMIN";
+            roles: string[];
             /** Format: date-time */
             createdAt: string;
         };

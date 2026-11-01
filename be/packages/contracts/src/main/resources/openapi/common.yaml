@@ -10,7 +10,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT do auth-service phát (claim sub = userId, roles = [USER|ADMIN])
+      description: JWT do auth-service phát (claim sub = userId, roles và permissions là danh sách mã từ RBAC)
   responses:
     Problem:
       description: Lỗi chuẩn RFC 9457

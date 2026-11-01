@@ -3,7 +3,7 @@ package vn.thelooks.auth.application.port.out;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface GoogleIdentityStore {
+public interface GoogleAccountLinkStore {
 
     Optional<UUID> findUserId(String subject);
 

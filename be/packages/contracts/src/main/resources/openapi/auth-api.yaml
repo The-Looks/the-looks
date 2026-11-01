@@ -123,12 +123,14 @@ components:
   schemas:
     User:
       type: object
-      required: [id, email, username, role, createdAt]
+      required: [id, email, username, roles, createdAt]
       properties:
         id: { type: string, format: uuid }
         email: { type: string, format: email }
         username: { type: string }
-        role: { type: string, enum: [USER, ADMIN] }
+        roles:
+          type: array
+          items: { type: string }
         createdAt: { type: string, format: date-time }
     AccessToken:
       type: object

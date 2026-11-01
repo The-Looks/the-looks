@@ -10,17 +10,18 @@ import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
-import vn.thelooks.auth.application.port.out.RefreshSessionStore;
+import vn.thelooks.auth.application.port.out.RefreshTokenSessionStore;
 
+/** Tạo, xoay vòng và thu hồi refresh token; dùng lại token cũ sẽ khóa cả phiên. */
 @Repository
-class JdbcRefreshSessionStore implements RefreshSessionStore {
+class JdbcRefreshTokenSessionStore implements RefreshTokenSessionStore {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final JdbcTemplate jdbc;
     private final TransactionTemplate transactions;
 
-    JdbcRefreshSessionStore(JdbcTemplate jdbc, TransactionTemplate transactions) {
+    JdbcRefreshTokenSessionStore(JdbcTemplate jdbc, TransactionTemplate transactions) {
         this.jdbc = jdbc;
         this.transactions = transactions;
     }

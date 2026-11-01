@@ -22,6 +22,6 @@ export const DEMO_USER = {
   id: '11111111-1111-4111-8111-111111111111',
   email: 'demo@thelooks.vn',
   username: 'Thảo Nguyên',
-  role: 'USER' as const,
+  roles: ['USER'],
   createdAt: '2026-10-01T08:00:00Z',
 };

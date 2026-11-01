@@ -9,6 +9,7 @@ public final class UserResponseMapper {
     }
 
     public static UserResponse from(User user) {
-        return new UserResponse(user.id(), user.email(), user.username(), user.role(), user.createdAt());
+        return new UserResponse(user.id(), user.email(), user.username(),
+                user.roles().stream().sorted().toList(), user.createdAt());
     }
 }

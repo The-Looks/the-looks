@@ -4,14 +4,15 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import vn.thelooks.auth.application.port.out.GoogleIdentityStore;
+import vn.thelooks.auth.application.port.out.GoogleAccountLinkStore;
 
+/** Liên kết Google subject ổn định với tài khoản nội bộ. */
 @Repository
-class JdbcGoogleIdentityStore implements GoogleIdentityStore {
+class JdbcGoogleAccountLinkStore implements GoogleAccountLinkStore {
 
     private final JdbcTemplate jdbc;
 
-    JdbcGoogleIdentityStore(JdbcTemplate jdbc) {
+    JdbcGoogleAccountLinkStore(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 

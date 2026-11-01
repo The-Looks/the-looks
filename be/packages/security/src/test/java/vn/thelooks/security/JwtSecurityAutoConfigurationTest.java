@@ -2,6 +2,7 @@ package vn.thelooks.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -16,10 +17,25 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyPairGenerator;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 class JwtSecurityAutoConfigurationTest {
+
+    @Test
+    void mapsDatabaseBackedPermissionsAndRolesToAuthorities() {
+        var jwt = Jwt.withTokenValue("token").header("alg", "RS256")
+                .claim("roles", List.of("USER", "ADMIN"))
+                .claim("permissions", List.of("ACCOUNT_READ_SELF", "ADMIN_ACCESS"))
+                .build();
+        var authentication = new JwtSecurityAutoConfiguration().jwtAuthenticationConverter().convert(jwt);
+
+        assertTrue(authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+        assertTrue(authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("PERMISSION_ADMIN_ACCESS")));
+    }
 
     @Test
     void verifiesRs256SignatureAndIssuerFromJwks() throws Exception {

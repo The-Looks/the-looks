@@ -18,7 +18,7 @@ services/auth-service/src/main/java/vn/thelooks/auth/
   application/port/in/          use case interfaces
   application/port/out/         interfaces tới hạ tầng
   application/service/          xử lý nghiệp vụ
-  domain/enums/                 Role, UserStatus
+  domain/enums/                 UserStatus
   domain/exception/             lỗi nghiệp vụ
   domain/model/                 User
   infrastructure/config/       Clock
@@ -37,6 +37,16 @@ services/auth-service/src/main/java/vn/thelooks/auth/
 ```
 Các nhánh như Kafka, Keycloak, event hoặc filter sẽ được thêm khi có code dùng đến.
 `ArchitectureTest` kiểm tra ranh giới các lớp trên CI.
+
+## Role và permission
+
+`users` là bảng tài khoản có sẵn. Flyway V3 thêm bốn bảng phân quyền:
+`roles` (mã role), `permissions` (mã quyền), `user_roles` (gán nhiều role cho
+một user), và `role_permissions` (gán nhiều permission cho một role). V3 chuyển
+role cũ sang `user_roles`, sau đó bỏ cột `users.role`; V1/V2 không bị sửa.
+Hiện có role `USER`, `ADMIN` và quyền `ACCOUNT_READ_SELF`, `ADMIN_ACCESS`.
+Access JWT mang cả `roles` và `permissions`; các route quản trị kiểm tra quyền
+`ADMIN_ACCESS`.
 
 Quy tắc: service không đọc database của service khác, không dùng chung entity/domain model.
 Cần dữ liệu service khác → gọi REST API của nó (JWT được chuyển tiếp tự động).

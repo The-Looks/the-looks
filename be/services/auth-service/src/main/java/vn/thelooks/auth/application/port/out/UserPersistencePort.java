@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import vn.thelooks.auth.domain.model.User;
 
-public interface UserRepository {
+public interface UserPersistencePort {
 
     User save(User user);
 
