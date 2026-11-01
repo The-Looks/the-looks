@@ -1,0 +1,49 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: billing-service
+  profiles:
+    default: local
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate # schema chỉ do Flyway quản lý
+  mvc:
+    problemdetails:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  pattern:
+    level: "%5p [%X{correlationId:-}]"
+
+thelooks:
+  security:
+    issuer: ${JWT_ISSUER}
+    jwk-set-uri: ${JWT_JWK_SET_URI}
+    session-validation-uri: ${SESSION_VALIDATION_URI:http://localhost:8081/api/public/auth/session/active}
+  billing:
+    # payos = cổng PayOS thật; fake = thanh toán giả (bấm là thành công, CHỈ dùng khi dev).
+    # Không có giá trị mặc định: quên khai báo thì service không khởi động, thay vì cho mọi người lên Pro miễn phí.
+    gateway: ${PAYMENT_GATEWAY}
+    # Trang web-app nhận người dùng sau khi thanh toán xong / huỷ
+    return-url: ${BILLING_RETURN_URL}
+    cancel-url: ${BILLING_CANCEL_URL}
+    payos:
+      client-id: ${PAYOS_CLIENT_ID:}
+      api-key: ${PAYOS_API_KEY:}
+      checksum-key: ${PAYOS_CHECKSUM_KEY:}

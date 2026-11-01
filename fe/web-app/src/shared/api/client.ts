@@ -1,6 +1,7 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import { session } from '../lib/session';
 import type { paths as AuthPaths } from './schema/auth';
+import type { paths as BillingPaths } from './schema/billing';
 import type { paths as OutfitPaths } from './schema/outfit';
 import type { paths as VotingPaths } from './schema/voting';
 import type { paths as WardrobePaths } from './schema/wardrobe';
@@ -31,6 +32,7 @@ export const authApi = client<AuthPaths>();
 export const wardrobeApi = client<WardrobePaths>();
 export const outfitApi = client<OutfitPaths>();
 export const votingApi = client<VotingPaths>();
+export const billingApi = client<BillingPaths>();
 
 const DEFAULT_MESSAGE: Record<number, string> = {
   400: 'Dữ liệu chưa hợp lệ.',

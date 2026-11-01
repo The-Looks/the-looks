@@ -5,3 +5,4 @@ CREATE DATABASE thelooks_identity OWNER thelooks;
 CREATE DATABASE thelooks_wardrobe OWNER thelooks;
 CREATE DATABASE thelooks_outfit   OWNER thelooks;
 CREATE DATABASE thelooks_voting   OWNER thelooks;
+CREATE DATABASE thelooks_billing  OWNER thelooks;
