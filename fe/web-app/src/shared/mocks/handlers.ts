@@ -1,7 +1,7 @@
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 import type { Category, OutfitSuggestion, Poll, SavedOutfit, WardrobeItem } from '../api/types';
 import { DEMO_USER, sampleCloset } from './data';
-import { signDevJwt } from './devJwt';
+import { makeMockJwt } from './devJwt';
 
 // Giả lập API theo đúng contract trong be/packages/contracts. Dữ liệu chỉ nằm trong bộ nhớ trình duyệt.
 const problem = (status: number, detail: string) =>
@@ -19,12 +19,12 @@ const identity: HttpHandler[] = [
     await delay(300);
     if (!body.email || !body.password) return problem(401, 'Sai email hoặc mật khẩu');
     refreshActive = true;
-    const { token, expiresAt } = await signDevJwt(DEMO_USER.id, ['USER']);
+    const { token, expiresAt } = makeMockJwt(DEMO_USER.id, ['USER']);
     return HttpResponse.json({ accessToken: token, expiresAt });
   }),
   http.post('*/api/public/auth/refresh', async () => {
     if (!refreshActive) return problem(401, 'Chưa có phiên đăng nhập');
-    const { token, expiresAt } = await signDevJwt(DEMO_USER.id, ['USER']);
+    const { token, expiresAt } = makeMockJwt(DEMO_USER.id, ['USER']);
     return HttpResponse.json({ accessToken: token, expiresAt });
   }),
   http.post('*/api/public/auth/logout', () => {

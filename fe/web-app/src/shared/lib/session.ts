@@ -39,7 +39,7 @@ export const session = {
   },
   async refresh(): Promise<string | null> {
     if (refreshing) return refreshing;
-    refreshing = (async () => {
+    const request = async (): Promise<string | null> => {
       try {
         const response = await fetch('/api/public/auth/refresh', { method: 'POST', credentials: 'same-origin' });
         if (!response.ok) {
@@ -56,6 +56,14 @@ export const session = {
       } catch {
         session.clear();
         return null;
+      }
+    };
+    // Các tab dùng chung refresh cookie. Khoá liên tab tránh gửi đồng thời token cũ.
+    refreshing = (async () => {
+      try {
+        return navigator.locks
+          ? await navigator.locks.request('thelooks-refresh-token', request)
+          : await request();
       } finally {
         refreshing = null;
       }

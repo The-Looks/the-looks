@@ -9,16 +9,18 @@ npm install
 npm run dev            # http://localhost:5173
 ```
 
-Mặc định `identity`, `wardrobe`, `voting` chạy giả lập (MSW) theo contract — đăng nhập bằng email/mật khẩu bất kỳ.
-`outfit` gọi outfit-service thật qua Vite proxy:
+Mặc định cả bốn service chạy giả lập (MSW) theo contract — đăng nhập bằng email/mật khẩu bất kỳ.
+Token của chế độ này chỉ dùng cho mock; không chứa secret và service thật sẽ từ chối.
+Khi identity-service thật đã chạy, bỏ `identity` khỏi `VITE_MOCK_SERVICES` rồi mới kết nối
+các service thật cần JWT. Ví dụ, để gọi outfit-service thật:
 
 ```bash
 # trong be/ — profile demo dùng tủ đồ mẫu vì wardrobe-service chưa xong
 ./mvnw -pl services/outfit-service spring-boot:run -Dspring-boot.run.profiles=local,demo
 ```
 
-Không chạy Java? Thêm `outfit` vào `VITE_MOCK_SERVICES` trong `.env.development` (hoặc tạo `.env.development.local`).
-Service nào xong backend thật thì bỏ tên nó khỏi danh sách.
+Trong `.env.development.local`, đặt `VITE_MOCK_SERVICES=wardrobe,voting` khi identity-service
+và outfit-service thật đã sẵn sàng. Service nào xong backend thật thì bỏ tên nó khỏi danh sách.
 
 ## Lệnh
 
