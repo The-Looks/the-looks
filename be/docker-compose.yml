@@ -1,4 +1,4 @@
-# Chạy cả hệ thống bằng Docker (cần build jar trước: ./mvnw package -DskipTests).
+# Chạy cả hệ thống bằng Docker (Dockerfile tự build jar).
 #   cp .env.example .env && docker compose up -d --build
 # Chỉ cần database: docker compose up -d postgres
 services:
@@ -16,7 +16,7 @@ services:
       interval: 5s
 
   auth-service:
-    build: services/auth-service
+    build: { context: ., dockerfile: services/auth-service/Dockerfile }
     environment:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_identity
@@ -39,7 +39,7 @@ services:
         condition: service_healthy
 
   wardrobe-service:
-    build: services/wardrobe-service
+    build: { context: ., dockerfile: services/wardrobe-service/Dockerfile }
     environment:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_wardrobe
@@ -62,7 +62,7 @@ services:
         condition: service_healthy
 
   outfit-service:
-    build: services/outfit-service
+    build: { context: ., dockerfile: services/outfit-service/Dockerfile }
     environment:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_outfit
@@ -79,7 +79,7 @@ services:
         condition: service_healthy
 
   voting-service:
-    build: services/voting-service
+    build: { context: ., dockerfile: services/voting-service/Dockerfile }
     environment:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_voting
@@ -97,7 +97,7 @@ services:
         condition: service_healthy
 
   billing-service:
-    build: services/billing-service
+    build: { context: ., dockerfile: services/billing-service/Dockerfile }
     environment:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_billing
