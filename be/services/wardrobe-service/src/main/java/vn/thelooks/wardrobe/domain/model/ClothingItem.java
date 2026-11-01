@@ -8,6 +8,7 @@ import java.util.UUID;
  *
  * @param imageKey   khoá ảnh trong ImageStorage (không phải URL)
  * @param attributes null khi đang PROCESSING
+ * @param scanId     lần quét tạo ra món này; null nếu thêm tay
  */
 public record ClothingItem(
         UUID id,
@@ -15,5 +16,6 @@ public record ClothingItem(
         String imageKey,
         ItemStatus status,
         ClothingAttributes attributes,
+        UUID scanId,
         Instant createdAt) {
 }

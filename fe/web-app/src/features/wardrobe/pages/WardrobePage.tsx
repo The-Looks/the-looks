@@ -21,7 +21,11 @@ export function WardrobePage() {
       <PageHeader
         title="Tủ đồ của tôi"
         sub={items.data ? `${items.data.length} món` : undefined}
-        action={<ButtonLink to="/wardrobe/add" small>+ Thêm món</ButtonLink>}
+        action={
+          <ButtonLink to="/wardrobe/add" small>
+            + Thêm món
+          </ButtonLink>
+        }
       />
       <div className="row" role="group" aria-label="Lọc theo loại">
         <Chip active={!category} onClick={() => setCategory(undefined)}>
@@ -44,7 +48,12 @@ export function WardrobePage() {
         {items.data?.map((item) => {
           const badge = item.status !== 'CONFIRMED' ? STATUS_BADGE[item.status] : null;
           return (
-            <Link key={item.id} to={`/wardrobe/${item.id}`} style={{ textDecoration: 'none', color: 'inherit' }} className="stack">
+            <Link
+              key={item.id}
+              to={`/wardrobe/${item.id}`}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+              className="stack"
+            >
               <ItemTile category={item.category} imageUrl={item.imageUrl} />
               {badge && <Badge tone={badge.tone}>{badge.label}</Badge>}
             </Link>

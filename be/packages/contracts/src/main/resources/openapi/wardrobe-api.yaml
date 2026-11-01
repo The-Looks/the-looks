@@ -26,24 +26,47 @@ paths:
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+  /api/app/wardrobe/scans:
     post:
-      summary: Upload ảnh; trả ngay món đồ PROCESSING, AI nhận diện chạy nền rồi chuyển sang PENDING_REVIEW
+      summary: >-
+        Thêm đồ bằng ảnh: 1..10 ảnh, mỗi ảnh có thể có nhiều món (outfit đang mặc, đồ trải trên giường).
+        Trả ngay Scan PROCESSING; AI tìm từng món, cắt ảnh từng món, tạo các món PENDING_REVIEW chạy nền.
+        Ảnh gốc không được lưu. Tủ đồ đã đủ số món của gói (limits.wardrobeItems từ billing-service) → 403;
+        tìm được nhiều món hơn chỗ còn trống → tạo đủ chỗ, số còn lại ghi ở skippedForLimit.
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
               type: object
-              required: [image]
+              required: [images]
               properties:
-                image: { type: string, format: binary }
+                images:
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  description: JPEG, PNG hoặc WebP, tối đa 10 MB mỗi ảnh
+                  items: { type: string, format: binary }
       responses:
         '202':
-          description: Đã nhận ảnh
+          description: Đã nhận ảnh, đang xử lý
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/WardrobeItem' }
+              schema: { $ref: '#/components/schemas/Scan' }
         '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/scans/{scanId}:
+    get:
+      summary: Tiến độ một lần quét; web hỏi lại mỗi ~2 giây tới khi hết PROCESSING
+      parameters:
+        - { name: scanId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Scan' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/wardrobe/items/{itemId}:
     parameters:
       - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
@@ -119,5 +142,23 @@ components:
         material: { type: string }
         seasons: { type: array, items: { $ref: '#/components/schemas/Season' } }
         styleTags: { type: array, items: { type: string } }
-        imageUrl: { type: string, format: uri }
+        imageUrl: { type: string, format: uri, description: Ảnh đã cắt của riêng món này }
+        scanId: { type: [string, 'null'], format: uuid, description: Lần quét tạo ra món này }
+        confidence: { type: [number, 'null'], description: Độ tin cậy của AI 0..1; thấp thì nhắc người dùng kiểm tra kỹ }
+        createdAt: { type: string, format: date-time }
+    ScanStatus:
+      type: string
+      enum: [PROCESSING, DONE, FAILED]
+    Scan:
+      type: object
+      required: [id, status, imageCount, items, skippedForLimit, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        status: { $ref: '#/components/schemas/ScanStatus' }
+        imageCount: { type: integer }
+        items:
+          type: array
+          description: Các món đã tạo (PENDING_REVIEW), rỗng khi còn PROCESSING hoặc không tìm thấy món nào
+          items: { $ref: '#/components/schemas/WardrobeItem' }
+        skippedForLimit: { type: integer, description: Số món tìm thấy nhưng không thêm vì tủ đồ đã đủ số món của gói }
         createdAt: { type: string, format: date-time }

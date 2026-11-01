@@ -44,17 +44,30 @@ export function ItemDetailPage() {
               </p>
             </>
           )}
-          {(confirm.isError || remove.isError) && <Notice tone="error">{errorMessage(confirm.error ?? remove.error)}</Notice>}
+          {(confirm.isError || remove.isError) && (
+            <Notice tone="error">{errorMessage(confirm.error ?? remove.error)}</Notice>
+          )}
           <div className="row">
             {item.data.status === 'PENDING_REVIEW' && (
               <Button
-                onClick={() => confirm.mutate({ category, colors: item.data.colors, seasons: item.data.seasons, styleTags: item.data.styleTags })}
+                onClick={() =>
+                  confirm.mutate({
+                    category,
+                    colors: item.data.colors,
+                    seasons: item.data.seasons,
+                    styleTags: item.data.styleTags,
+                  })
+                }
                 disabled={confirm.isPending || !category}
               >
                 Xác nhận
               </Button>
             )}
-            <Button kind="outline" onClick={() => remove.mutate(id, { onSuccess: () => navigate('/wardrobe') })} disabled={remove.isPending}>
+            <Button
+              kind="outline"
+              onClick={() => remove.mutate(id, { onSuccess: () => navigate('/wardrobe') })}
+              disabled={remove.isPending}
+            >
               Xoá món này
             </Button>
           </div>
