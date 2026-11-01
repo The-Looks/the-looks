@@ -3,8 +3,13 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { queryClient } from '../shared/api/queryClient';
+import { session } from '../shared/lib/session';
 import '../shared/theme/styles.css';
 import { router } from './router';
+
+session.subscribe(() => {
+  if (!session.getToken()) queryClient.clear();
+});
 
 /**
  * Bật MSW cho các service trong VITE_MOCK_SERVICES.
@@ -20,7 +25,7 @@ async function enableMocks() {
   await startMocks(services);
 }
 
-enableMocks().finally(() => {
+enableMocks().then(() => session.refresh()).finally(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>

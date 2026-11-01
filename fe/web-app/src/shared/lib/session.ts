@@ -1,25 +1,13 @@
 import { useSyncExternalStore } from 'react';
 
-// ponytail: access token trong localStorage — script lạ (XSS) đọc được. Chuyển sang refresh token
-// trong cookie httpOnly khi identity-service hỗ trợ.
-const KEY = 'thelooks.accessToken';
 const listeners = new Set<() => void>();
-
-function read(): string | null {
-  try {
-    return localStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
-}
-
-let token = read();
+let token: string | null = null;
+let refreshing: Promise<string | null> | null = null;
 
 function emit() {
   listeners.forEach((l) => l());
 }
 
-/** Giây hết hạn (claim exp) của JWT; null nếu không đọc được. */
 function expiry(jwt: string): number | null {
   try {
     const payload = JSON.parse(atob(jwt.split('.')[1]!.replace(/-/g, '+').replace(/_/g, '/')));
@@ -29,24 +17,15 @@ function expiry(jwt: string): number | null {
   }
 }
 
+/** Access token chỉ tồn tại trong bộ nhớ; refresh token ở cookie httpOnly. */
 export const session = {
   getToken: () => token,
   setToken(next: string) {
     token = next;
-    try {
-      localStorage.setItem(KEY, next);
-    } catch {
-      /* chế độ riêng tư: chỉ giữ trong bộ nhớ */
-    }
     emit();
   },
   clear() {
     token = null;
-    try {
-      localStorage.removeItem(KEY);
-    } catch {
-      /* bỏ qua */
-    }
     emit();
   },
   subscribe(listener: () => void) {
@@ -56,7 +35,52 @@ export const session = {
   isValid(t: string | null = token) {
     if (!t) return false;
     const exp = expiry(t);
-    return exp === null || exp * 1000 > Date.now();
+    return exp !== null && exp * 1000 > Date.now() + 15_000;
+  },
+  async refresh(): Promise<string | null> {
+    if (refreshing) return refreshing;
+    const request = async (): Promise<string | null> => {
+      try {
+        const response = await fetch('/api/public/auth/refresh', { method: 'POST', credentials: 'same-origin' });
+        if (!response.ok) {
+          session.clear();
+          return null;
+        }
+        const body = (await response.json()) as { accessToken?: string };
+        if (!body.accessToken) {
+          session.clear();
+          return null;
+        }
+        session.setToken(body.accessToken);
+        return body.accessToken;
+      } catch {
+        session.clear();
+        return null;
+      }
+    };
+    // Các tab dùng chung refresh cookie. Khoá liên tab tránh gửi đồng thời token cũ.
+    refreshing = (async () => {
+      try {
+        return navigator.locks
+          ? await navigator.locks.request('thelooks-refresh-token', request)
+          : await request();
+      } finally {
+        refreshing = null;
+      }
+    })();
+    return refreshing;
+  },
+  async validToken() {
+    return session.isValid() ? token : session.refresh();
+  },
+  async logout() {
+    try {
+      await fetch('/api/public/auth/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch {
+      // Mất kết nối vẫn xoá access token khỏi bộ nhớ.
+    } finally {
+      session.clear();
+    }
   },
 };
 

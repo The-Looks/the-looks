@@ -9,16 +9,18 @@ npm install
 npm run dev            # http://localhost:5173
 ```
 
-Mặc định `identity`, `wardrobe`, `voting` chạy giả lập (MSW) theo contract — đăng nhập bằng email/mật khẩu bất kỳ.
-`outfit` gọi outfit-service thật qua Vite proxy:
+Mặc định cả bốn service chạy giả lập (MSW) theo contract — đăng nhập bằng email/mật khẩu bất kỳ.
+Token của chế độ này chỉ dùng cho mock; không chứa secret và service thật sẽ từ chối.
+Khi auth-service thật đã chạy, bỏ `auth` khỏi `VITE_MOCK_SERVICES` rồi mới kết nối
+các service thật cần JWT. Ví dụ, để gọi outfit-service thật:
 
 ```bash
 # trong be/ — profile demo dùng tủ đồ mẫu vì wardrobe-service chưa xong
 ./mvnw -pl services/outfit-service spring-boot:run -Dspring-boot.run.profiles=local,demo
 ```
 
-Không chạy Java? Thêm `outfit` vào `VITE_MOCK_SERVICES` trong `.env.development` (hoặc tạo `.env.development.local`).
-Service nào xong backend thật thì bỏ tên nó khỏi danh sách.
+Trong `.env.development.local`, đặt `VITE_MOCK_SERVICES=wardrobe,voting` khi auth-service
+và outfit-service thật đã sẵn sàng. Service nào xong backend thật thì bỏ tên nó khỏi danh sách.
 
 ## Lệnh
 
@@ -34,7 +36,7 @@ Service nào xong backend thật thì bỏ tên nó khỏi danh sách.
 src/
   app/        router, AppShell (thanh dưới trên điện thoại, sidebar ≥1024px), RequireAuth, HomePage
   features/
-    auth/       đăng nhập, đăng ký, onboarding        — Phát (identity-service)
+    auth/       đăng nhập, đăng ký, onboarding        — Phát (auth-service)
     wardrobe/   tủ đồ, thêm món (camera), chi tiết    — Member 1 (wardrobe-service)
     outfit/     gợi ý theo dịp, Quick Pick, đã lưu    — Tuấn (outfit-service)
     voting/     bình chọn của tôi, tạo, kết quả       — Phát (voting-service)
