@@ -13,7 +13,7 @@ import vn.thelooks.billing.domain.model.Order;
  * KHÔNG bật ở production (PAYMENT_GATEWAY=payos).
  */
 @Component
-@ConditionalOnProperty(name = "thelooks.billing.gateway", havingValue = "fake", matchIfMissing = true)
+@ConditionalOnProperty(name = "thelooks.billing.gateway", havingValue = "fake")
 class FakePaymentGateway implements PaymentGateway {
 
     private final String returnUrl;
