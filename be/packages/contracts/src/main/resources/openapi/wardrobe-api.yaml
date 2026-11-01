@@ -27,7 +27,9 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
     post:
-      summary: Upload ảnh; trả ngay món đồ PROCESSING, AI nhận diện chạy nền rồi chuyển sang PENDING_REVIEW
+      summary: >-
+        Upload ảnh; trả ngay món đồ PROCESSING, AI nhận diện chạy nền rồi chuyển sang PENDING_REVIEW.
+        Trả 403 khi tủ đồ đã đủ số món của gói (limits.wardrobeItems từ GET /api/app/billing/me của billing-service).
       requestBody:
         required: true
         content:

@@ -212,9 +212,85 @@ const voting: HttpHandler[] = [
     const votesA = (poll.result?.votesA ?? 0) + Number(body.choice === 'A');
     const votesB = (poll.result?.votesB ?? 0) + Number(body.choice === 'B');
     const total = votesA + votesB;
-    poll.result = { votesA, votesB, percentA: Math.round(votesA / total * 100), percentB: Math.round(votesB / total * 100) };
+    poll.result = {
+      votesA,
+      votesB,
+      percentA: Math.round((votesA / total) * 100),
+      percentB: Math.round((votesB / total) * 100),
+    };
     return HttpResponse.json(poll.result);
   }),
 ];
 
-export const handlersByService: Record<string, HttpHandler[]> = { auth, wardrobe, outfit, voting };
+// ---------------- billing ----------------
+const PLANS = [
+  {
+    plan: 'FREE',
+    name: 'Free',
+    monthlyPriceVnd: 0,
+    yearlyPriceVnd: 0,
+    limits: { wardrobeItems: 50, aiSuggestionsPerDay: 3 },
+    features: [],
+  },
+  {
+    plan: 'PLUS',
+    name: 'Plus',
+    monthlyPriceVnd: 39000,
+    yearlyPriceVnd: 390000,
+    limits: { wardrobeItems: 300, aiSuggestionsPerDay: 20 },
+    features: [],
+  },
+  {
+    plan: 'PRO',
+    name: 'Pro',
+    monthlyPriceVnd: 79000,
+    yearlyPriceVnd: 790000,
+    limits: { wardrobeItems: null, aiSuggestionsPerDay: 100 },
+    features: ['WARDROBE_STATS', 'COST_PER_WEAR', 'WEAR_CALENDAR', 'TRY_ON_3D'],
+  },
+] as const;
+let myPlan: { plan: 'FREE' | 'PLUS' | 'PRO'; expiresAt: string | null } = { plan: 'FREE', expiresAt: null };
+const orders = new Map<
+  number,
+  { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY'; amountVnd: number; status: string; createdAt: string }
+>();
+let nextOrder = 100001;
+const entitlements = () => {
+  const p = PLANS.find((x) => x.plan === myPlan.plan)!;
+  return { ...myPlan, limits: p.limits, features: p.features };
+};
+
+const billing: HttpHandler[] = [
+  http.get('*/api/public/billing/plans', () => HttpResponse.json(PLANS)),
+  http.get('*/api/app/billing/me', () => HttpResponse.json(entitlements())),
+  http.post('*/api/app/billing/checkout', async ({ request }) => {
+    const body = (await request.json()) as { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY' };
+    const p = PLANS.find((x) => x.plan === body.plan)!;
+    const orderCode = nextOrder++;
+    const order = {
+      plan: body.plan,
+      period: body.period,
+      amountVnd: body.period === 'MONTHLY' ? p.monthlyPriceVnd : p.yearlyPriceVnd,
+      status: 'PENDING',
+      createdAt: new Date().toISOString(),
+    };
+    orders.set(orderCode, order);
+    const checkoutUrl = `${location.origin}/billing/result?orderCode=${orderCode}&status=PAID&fake=1`;
+    return HttpResponse.json({ orderCode, ...order, checkoutUrl }, { status: 201 });
+  }),
+  http.post('*/api/app/billing/orders/:code/confirm', ({ params }) => {
+    const code = Number(params.code);
+    const order = orders.get(code);
+    if (!order) return problem(404, `Không tìm thấy đơn ${code}`);
+    if (order.status === 'PENDING') {
+      order.status = 'PAID';
+      const months = order.period === 'MONTHLY' ? 1 : 12;
+      const expires = new Date();
+      expires.setMonth(expires.getMonth() + months);
+      myPlan = { plan: order.plan, expiresAt: expires.toISOString() };
+    }
+    return HttpResponse.json({ orderCode: code, ...order });
+  }),
+];
+
+export const handlersByService: Record<string, HttpHandler[]> = { auth, wardrobe, outfit, voting, billing };

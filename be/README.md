@@ -6,6 +6,7 @@
 | `services/wardrobe-service` | Tủ đồ số: upload, AI nhận diện, xác nhận/sửa/xoá | 8082 | Member 1 |
 | `services/outfit-service` | AI gợi ý theo dịp + Quick Pick | 8083 | Member 2 (Tuấn) |
 | `services/voting-service` | Ask Friends: bình chọn A/B qua link | 8084 | Member 3 (Phát) |
+| `services/billing-service` | Gói Free / Plus / Pro, thanh toán PayOS | 8085 | Member 2 (Tuấn) |
 | `packages/contracts` | OpenAPI của từng service — **sửa ở đây trước khi code** | | |
 | `packages/security` | Xác thực JWT dùng chung + chuyển tiếp token khi gọi service khác | | |
 | `packages/observability` | Correlation ID (header `X-Correlation-Id`, có trong log) | | |
@@ -103,3 +104,21 @@ Trong Google Cloud Console, đăng ký chính xác redirect URI, ví dụ
 đăng nhập Google với email đã xác minh và Google quản lý email đó (Gmail/Workspace),
 và hệ thống chưa có admin. Để trống biến này nếu chưa cần tạo admin. Sau khi đã có
 admin, biến môi trường không cấp thêm quyền cho tài khoản khác.
+
+## billing-service: gói thuê bao
+
+| Gói | Giá | Tủ đồ | AI gợi ý/ngày | Riêng Pro |
+|---|---|---|---|---|
+| Free | 0đ | 50 món | 3 | |
+| Plus | 39.000đ/tháng · 390.000đ/năm | 300 món | 20 | |
+| Pro | 79.000đ/tháng · 790.000đ/năm | không giới hạn | 100 | thống kê tủ đồ, chi phí mỗi lần mặc, lịch mặc, thử đồ 3D |
+
+Giá và quyền lợi nằm trong `billing-service/.../domain/model/Plan.java`.
+
+- Service khác lấy giới hạn của người dùng: `GET /api/app/billing/me` (chuyển tiếp JWT). wardrobe-service dùng `limits.wardrobeItems`,
+  outfit-service dùng `limits.aiSuggestionsPerDay`, tính năng Pro kiểm tra `features`.
+- Thanh toán: `PAYMENT_GATEWAY=fake` (mặc định, bấm là thành công, chỉ dùng khi dev) hoặc `payos`
+  (cần `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` từ https://my.payos.vn).
+  Khai báo webhook `https://<domain>/api/public/billing/payos/webhook` trong trang PayOS.
+- Gói kích hoạt khi webhook tới **hoặc** khi người dùng quay lại trang kết quả (hỏi trạng thái từ PayOS), chỉ một lần.
+- Đổi gói khi còn hạn: thời gian còn lại quy ra tiền rồi đổi sang thời gian của gói mới, không mất tiền.

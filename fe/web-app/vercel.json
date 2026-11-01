@@ -9,6 +9,8 @@
     { "source": "/api/app/polls/:path*", "destination": "https://BACKEND_HOST:8084/api/app/polls/:path*" },
     { "source": "/api/app/polls", "destination": "https://BACKEND_HOST:8084/api/app/polls" },
     { "source": "/api/public/polls/:path*", "destination": "https://BACKEND_HOST:8084/api/public/polls/:path*" },
+    { "source": "/api/app/billing/:path*", "destination": "https://BACKEND_HOST:8085/api/app/billing/:path*" },
+    { "source": "/api/public/billing/:path*", "destination": "https://BACKEND_HOST:8085/api/public/billing/:path*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

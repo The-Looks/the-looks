@@ -88,5 +88,26 @@ services:
       postgres:
         condition: service_healthy
 
+  billing-service:
+    build: services/billing-service
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      DB_URL: jdbc:postgresql://postgres:5432/thelooks_billing
+      DB_USER: thelooks
+      DB_PASSWORD: thelooks
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_JWK_SET_URI: http://auth-service:8081/.well-known/jwks.json
+      SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active
+      PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-fake}
+      BILLING_RETURN_URL: ${WEB_APP_URL:-http://localhost:5173}/billing/result
+      BILLING_CANCEL_URL: ${WEB_APP_URL:-http://localhost:5173}/plans
+      PAYOS_CLIENT_ID: ${PAYOS_CLIENT_ID:-}
+      PAYOS_API_KEY: ${PAYOS_API_KEY:-}
+      PAYOS_CHECKSUM_KEY: ${PAYOS_CHECKSUM_KEY:-}
+    ports: ["8085:8085"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   pgdata:

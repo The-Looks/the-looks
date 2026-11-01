@@ -24,6 +24,7 @@
 		<module>services/wardrobe-service</module>
 		<module>services/outfit-service</module>
 		<module>services/voting-service</module>
+		<module>services/billing-service</module>
 	</modules>
 
 	<properties>
