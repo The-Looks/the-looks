@@ -44,6 +44,7 @@ paths:
             application/json:
               schema:
                 type: object
+                required: [code, shareUrl, expiresAt]
                 properties:
                   code: { type: string }
                   shareUrl: { type: string, format: uri, description: link gửi qua Zalo, mở trên voting-web }
@@ -95,11 +96,13 @@ components:
   schemas:
     PollOption:
       type: object
+      required: [outfitId, imageUrls]
       properties:
         outfitId: { type: string, format: uuid }
         imageUrls: { type: array, items: { type: string, format: uri } }
     Poll:
       type: object
+      required: [code, optionA, optionB, expiresAt]
       properties:
         code: { type: string }
         question: { type: string }
@@ -109,6 +112,7 @@ components:
         result: { $ref: '#/components/schemas/PollResult' }
     PollResult:
       type: object
+      required: [votesA, votesB, percentA, percentB]
       properties:
         votesA: { type: integer }
         votesB: { type: integer }

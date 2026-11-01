@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -14,6 +15,7 @@ import vn.thelooks.outfit.domain.model.ClosetItem;
 
 /** Gọi wardrobe-service với JWT của người dùng (RestClient đã gắn BearerTokenForwardingInterceptor). */
 @Component
+@ConditionalOnProperty(name = "thelooks.services.wardrobe-fake", havingValue = "false", matchIfMissing = true)
 class WardrobeServiceClient implements WardrobeReader {
 
     private static final Logger log = LoggerFactory.getLogger(WardrobeServiceClient.class);

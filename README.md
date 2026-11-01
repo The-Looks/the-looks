@@ -5,7 +5,8 @@
 | Thư mục | Nội dung |
 |---|---|
 | `be/` | **Backend** — Maven microservices, Spring Boot 4 (Java 25): identity, wardrobe, outfit, voting — xem [be/README.md](be/README.md) và [ADR 0003](docs/adr/0003-maven-microservices.md) |
-| `fe/mobile/` | **Frontend** — app người dùng, React Native + Expo |
+| `fe/web-app/` | **Frontend** — app người dùng chính, React + Vite + TypeScript, PWA — xem [ADR 0004](docs/adr/0004-web-app-first.md) |
+| `fe/mobile/` | App mobile React Native + Expo — **tạm dừng**, làm sau khi có người dùng thật |
 | `fe/admin-web/` | **Frontend** — admin web, React + Vite |
 | `fe/voting-web/` | **Frontend** — trang bình chọn cho bạn bè (không cần đăng nhập), React + Vite |
 | `docs/adr/` | Các quyết định kiến trúc |
@@ -19,8 +20,8 @@ JDK 25, Node 24, PostgreSQL 18 (cài trực tiếp hoặc qua Docker). Không c�
 ```bash
 cd be && ./mvnw install -DskipTests              # lần đầu; xem be/README.md để tạo database
 cd be && ./mvnw -pl services/outfit-service spring-boot:run   # chạy 1 service (cổng 8081–8084)
+cd fe/web-app && npm install && npm run dev        # app chính, http://localhost:5173 (xem fe/web-app/README.md)
 cd fe/voting-web && npm install && npm run dev      # tương tự cho admin-web
-cd fe/mobile && npm install --legacy-peer-deps && npx expo start
 ```
 
 ## Quy trình làm việc
