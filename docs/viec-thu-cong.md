@@ -17,8 +17,9 @@ Cập nhật lần cuối: 01/11/2026 (sau review toàn bộ PR)
   - Hoặc trên web: repo → **Add file → Create new file** → tên `.github/workflows/ci.yml` → dán nội dung file → **Commit**.
 - [ ] **Bật bảo vệ nhánh `main`** · Tuấn (admin) · sau khi CI chạy được
   Settings → Branches → Add rule cho `main`: bắt buộc Pull Request, ít nhất 1 người duyệt, CI phải xanh.
-- [ ] **Mời Member 1 vào tổ chức `The-Looks`** và gửi username GitHub cho cả nhóm · Tuấn
-  Cần để thêm file `CODEOWNERS` (tự gán người review theo service).
+- [x] **Mời Thạch (`thachhn404`) vào tổ chức `The-Looks` và cấp quyền Write cho repo** · 01/11
+  Thành viên mới mặc định chỉ có quyền đọc: người mới vào nhóm cần được nâng lên Write mới push được.
+- [ ] **Thêm file `CODEOWNERS`** · Tuấn (tự gán người review theo service: wardrobe → `thachhn404`, outfit + billing → `tennyhoang`, auth + voting → `DoTruongPhat`)
 - [ ] **Xoá nhánh đã merge `feature/web-app`** · Tuấn · bấm **Delete branch** trong PR #1
 - [ ] **Review và merge PR theo thứ tự** · cả nhóm (Claude không tự merge được: cần người review)
   - [x] #2, #3 của Phát đã lên `main` (01/11)
@@ -41,7 +42,7 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   2. Lấy `Client ID`, `API Key`, `Checksum Key` → biến `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, và `PAYMENT_GATEWAY=payos`.
   3. Khai báo webhook: `https://<tên-miền>/api/public/billing/payos/webhook`.
   4. Mua thử 1 gói Plus tháng bằng tiền thật để kiểm tra trọn luồng.
-- [ ] **Cloudinary (lưu ảnh tủ đồ)** · Tuấn hoặc Member 1 · trước khi deploy
+- [ ] **Cloudinary (lưu ảnh tủ đồ)** · Tuấn hoặc Thạch · trước khi deploy
   Đăng ký https://cloudinary.com (gói Free) → Dashboard lấy Cloud name, API Key, API Secret.
   Biến môi trường wardrobe-service: `IMAGE_STORAGE=cloudinary`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
 - [ ] **Bật AI nhận diện quần áo** · khi có key Anthropic
@@ -72,7 +73,7 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
 
 ## 5. Phối hợp trong nhóm
 
-- [ ] **Báo Member 1** · Tuấn
+- [ ] **Báo Thạch** · Tuấn
   - outfit-service gọi `GET /api/app/wardrobe/items?status=CONFIRMED`; giữ đúng schema trong `wardrobe-api.yaml`.
   - Upload ảnh phải trả **403** khi tủ đồ đã đủ `limits.wardrobeItems` (lấy từ `GET /api/app/billing/me`).
   - Khi xong, báo Tuấn để bỏ `FakeWardrobeReader` (profile `demo`) trong outfit-service.

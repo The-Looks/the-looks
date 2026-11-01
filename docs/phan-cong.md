@@ -9,13 +9,13 @@ Mỗi người sở hữu trọn phần của mình: backend, màn hình web và
 
 | Người | Phụ trách chính | Service / thư mục |
 |---|---|---|
-| **Member 1** | Tủ đồ số, onboarding, affiliate | `wardrobe-service`, `fe/web-app/src/features/wardrobe` |
-| **Tuấn** (Member 2) | Gợi ý outfit, Quick Pick, gói thuê bao, tính năng Pro, deploy | `outfit-service`, `billing-service`, `fe/web-app/src/features/{outfit,billing}` |
-| **Phát** (Member 3) | Đăng nhập, phân quyền, Ask Friends, admin, quyền riêng tư | `auth-service`, `voting-service`, `fe/web-app/src/features/{auth,voting,profile}`, `fe/admin-web`, `fe/voting-web` |
+| **Thạch** (Member 1, `thachhn404`) | Tủ đồ số, onboarding, affiliate | `wardrobe-service`, `fe/web-app/src/features/wardrobe` |
+| **Tuấn** (Member 2, `tennyhoang`) | Gợi ý outfit, Quick Pick, gói thuê bao, tính năng Pro, deploy | `outfit-service`, `billing-service`, `fe/web-app/src/features/{outfit,billing}` |
+| **Phát** (Member 3, `DoTruongPhat`) | Đăng nhập, phân quyền, Ask Friends, admin, quyền riêng tư | `auth-service`, `voting-service`, `fe/web-app/src/features/{auth,voting,profile}`, `fe/admin-web`, `fe/voting-web` |
 
 ---
 
-## Member 1 · Tủ đồ số
+## Thạch (Member 1) · Tủ đồ số
 
 | # | Việc | Hạn | Ghi chú |
 |---|---|---|---|
@@ -49,7 +49,7 @@ Mỗi người sở hữu trọn phần của mình: backend, màn hình web và
 | 3.4 | Cấu hình **Google Login** thật (Google Cloud Console) | 15/11 | |
 | 3.5 | **Admin web nối API thật**: danh sách người dùng, khoá/mở tài khoản, xem doanh thu gói và chi phí AI | 06/12 | Có sẵn quyền `ADMIN`; outfit có `/api/admin/outfits/ai-usage` |
 | 3.6 | **Báo cáo và phản hồi**: nút báo cáo bình chọn vi phạm, gửi góp ý trong app; admin xử lý | 13/12 | Theo quy trình hỗ trợ khách hàng |
-| 3.7 | **Quyền riêng tư**: màn xin đồng ý, xoá tài khoản kèm dữ liệu ở mọi service | 20/12 | Phát làm ở auth + điều phối; mỗi service thêm API xoá dữ liệu của người dùng (Member 1: wardrobe, Tuấn: outfit + billing) |
+| 3.7 | **Quyền riêng tư**: màn xin đồng ý, xoá tài khoản kèm dữ liệu ở mọi service | 20/12 | Phát làm ở auth + điều phối; mỗi service thêm API xoá dữ liệu của người dùng (Thạch: wardrobe, Tuấn: outfit + billing) |
 | 3.8 | **Hồ sơ cá nhân**: tên, ảnh đại diện, thành phố (để lấy thời tiết đúng nơi) | 20/12 | Báo Tuấn khi có thành phố để outfit dùng |
 
 ## Cả nhóm
