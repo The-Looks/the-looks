@@ -174,6 +174,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/auth/session/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kiểm tra access token và trạng thái phiên cho các service nội bộ
+         * @description Yêu cầu Bearer JWT; từ chối khi sid đã bị thu hồi hoặc hết hạn.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Phiên còn hoạt động */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                401: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/auth/google/start": {
         parameters: {
             query?: never;

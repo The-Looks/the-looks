@@ -80,6 +80,15 @@ paths:
       security: []
       responses:
         '204': { description: Đã đăng xuất }
+  /api/public/auth/session/active:
+    get:
+      summary: Kiểm tra access token và trạng thái phiên cho các service nội bộ
+      description: Yêu cầu Bearer JWT; từ chối khi sid đã bị thu hồi hoặc hết hạn.
+      security:
+        - bearerAuth: []
+      responses:
+        '204': { description: Phiên còn hoạt động }
+        '401': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/public/auth/google/start:
     get:
       summary: Bắt đầu Google OIDC Authorization Code + PKCE

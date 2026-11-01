@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -49,11 +50,14 @@ public class JwtSecurityAutoConfiguration {
     @ConditionalOnMissingBean
     JwtDecoder jwtDecoder(
             @Value("${thelooks.security.jwk-set-uri}") String jwkSetUri,
-            @Value("${thelooks.security.issuer}") String issuer) {
+            @Value("${thelooks.security.issuer}") String issuer,
+            @Value("${thelooks.security.session-validation-uri:}") String sessionValidationUri) {
         var decoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
                 .jwsAlgorithm(SignatureAlgorithm.RS256)
                 .build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));
+        decoder.setJwtValidator(sessionValidationUri.isBlank() ? JwtValidators.createDefaultWithIssuer(issuer)
+                : new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(issuer),
+                        new SessionStatusValidator(sessionValidationUri)));
         return decoder;
     }
 

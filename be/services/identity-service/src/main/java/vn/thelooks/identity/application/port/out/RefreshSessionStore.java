@@ -11,6 +11,8 @@ public interface RefreshSessionStore {
 
     void revoke(String rawToken, Instant now);
 
+    boolean isActive(UUID sessionId, UUID userId, Instant now);
+
     record Session(UUID id, String refreshToken, Instant expiresAt) {
     }
 

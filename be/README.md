@@ -46,6 +46,8 @@ Identity service phát access token ký RS256 và công bố public keys tại
 `iss` bằng `JWT_ISSUER`; private key chỉ nằm ở identity service. Với Docker Compose,
 `JWT_JWK_SET_URI` trỏ tới `http://identity-service:8081/.well-known/jwks.json`.
 Chạy local ngoài Docker thì dùng URI `http://localhost:8081/.well-known/jwks.json`.
+Các service kiểm tra `sid` với identity qua `SESSION_VALIDATION_URI` trên mỗi request
+có Bearer token; phiên đã thu hồi bị từ chối ngay, kể cả access token chưa hết 30 phút.
 Tạo khóa một lần bằng `powershell -File scripts/generate-jwt-key.ps1` trước khi
 chạy identity service hoặc Docker Compose. File `.keys/jwt-private.pem` đã được
 gitignore; không đưa private key vào repository. JDK 21 dùng được khi build với

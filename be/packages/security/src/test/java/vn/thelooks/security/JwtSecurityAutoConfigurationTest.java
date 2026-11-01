@@ -42,7 +42,7 @@ class JwtSecurityAutoConfigurationTest {
         try {
             var issuer = "http://localhost:8081";
             var jwkSetUri = "http://127.0.0.1:" + server.getAddress().getPort() + "/.well-known/jwks.json";
-            var decoder = new JwtSecurityAutoConfiguration().jwtDecoder(jwkSetUri, issuer);
+            var decoder = new JwtSecurityAutoConfiguration().jwtDecoder(jwkSetUri, issuer, "");
             assertEquals("user-1", decoder.decode(token(keyPair.getPrivate(), issuer)).getSubject());
             assertThrows(JwtException.class, () -> decoder.decode(token(keyPair.getPrivate(), "wrong-issuer")));
 

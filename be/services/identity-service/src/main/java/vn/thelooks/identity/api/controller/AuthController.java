@@ -88,6 +88,12 @@ class AuthController {
                 .orElseThrow(() -> new InvalidCredentialsException("Tài khoản không tồn tại"));
     }
 
+    @GetMapping("/public/auth/session/active")
+    ResponseEntity<Void> activeSession(@AuthenticationPrincipal Jwt jwt) {
+        if (jwt == null) throw new InvalidCredentialsException("Phiên đăng nhập không hợp lệ");
+        return ResponseEntity.noContent().header(HttpHeaders.CACHE_CONTROL, "no-store").build();
+    }
+
     private ResponseEntity<AccessTokenResponse> tokenResponse(LoginUseCase.AuthTokens tokens, HttpServletRequest request) {
         var maxAge = Duration.between(Instant.now(), tokens.refreshExpiresAt());
         var cookie = ResponseCookie.from("refresh_token", tokens.refreshToken())

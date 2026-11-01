@@ -47,6 +47,7 @@ services:
       DB_PASSWORD: thelooks
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_JWK_SET_URI: http://identity-service:8081/.well-known/jwks.json
+      SESSION_VALIDATION_URI: http://identity-service:8081/api/public/auth/session/active
     ports: ["8082:8082"]
     depends_on:
       postgres:
@@ -62,6 +63,7 @@ services:
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_JWK_SET_URI: http://identity-service:8081/.well-known/jwks.json
       WARDROBE_SERVICE_URL: http://wardrobe-service:8082
+      SESSION_VALIDATION_URI: http://identity-service:8081/api/public/auth/session/active
     ports: ["8083:8083"]
     depends_on:
       postgres:
@@ -77,6 +79,7 @@ services:
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_JWK_SET_URI: http://identity-service:8081/.well-known/jwks.json
       OUTFIT_SERVICE_URL: http://outfit-service:8083
+      SESSION_VALIDATION_URI: http://identity-service:8081/api/public/auth/session/active
       SHARE_BASE_URL: ${SHARE_BASE_URL}
       VOTER_KEY_SECRET: ${VOTER_KEY_SECRET}
     ports: ["8084:8084"]

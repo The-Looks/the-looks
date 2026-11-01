@@ -85,6 +85,14 @@ class JdbcRefreshSessionStore implements RefreshSessionStore {
         });
     }
 
+    @Override
+    public boolean isActive(UUID sessionId, UUID userId, Instant now) {
+        return Boolean.TRUE.equals(jdbc.queryForObject("""
+                SELECT EXISTS (SELECT 1 FROM refresh_sessions
+                    WHERE id = ? AND user_id = ? AND revoked_at IS NULL AND expires_at > ?)
+                """, Boolean.class, sessionId, userId, java.sql.Timestamp.from(now)));
+    }
+
     private static String randomToken() {
         var bytes = new byte[32];
         RANDOM.nextBytes(bytes);

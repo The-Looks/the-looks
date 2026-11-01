@@ -14,7 +14,10 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +26,10 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import vn.thelooks.identity.application.port.out.RefreshSessionStore;
 
 @Configuration
 class JwtKeyConfiguration {
@@ -58,9 +65,21 @@ class JwtKeyConfiguration {
 
     /** Identity kiểm tra JWT bằng public key tại chỗ, không gọi HTTP tới chính nó. */
     @Bean
-    JwtDecoder jwtDecoder(RSAKey key, @Value("${thelooks.security.issuer}") String issuer) throws Exception {
+    JwtDecoder jwtDecoder(RSAKey key, @Value("${thelooks.security.issuer}") String issuer,
+            RefreshSessionStore sessions, Clock clock) throws Exception {
         var decoder = NimbusJwtDecoder.withPublicKey(key.toRSAPublicKey()).build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(issuer),
+                jwt -> {
+                    try {
+                        var sid = UUID.fromString(jwt.getClaimAsString("sid"));
+                        var uid = UUID.fromString(jwt.getSubject());
+                        return sessions.isActive(sid, uid, Instant.now(clock))
+                                ? OAuth2TokenValidatorResult.success()
+                                : OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Phiên đã thu hồi", null));
+                    } catch (IllegalArgumentException | NullPointerException e) {
+                        return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token", "Thiếu phiên đăng nhập", null));
+                    }
+                }));
         return decoder;
     }
 }
