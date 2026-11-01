@@ -33,6 +33,7 @@ logging:
 
 thelooks:
   security:
-    jwt-secret: ${JWT_SECRET}
+    issuer: ${JWT_ISSUER}
+    jwk-set-uri: ${JWT_JWK_SET_URI}
   services:
     wardrobe-url: ${WARDROBE_SERVICE_URL}

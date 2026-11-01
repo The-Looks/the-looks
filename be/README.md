@@ -38,3 +38,13 @@ psql -U postgres -f infrastructure/docker/postgres/init.sql
 ./mvnw -pl services/outfit-service -am package           # build riêng 1 service
 ```
 Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
+
+## Xác thực JWT
+
+Identity service phát access token ký RS256 và công bố public keys tại
+`/.well-known/jwks.json`. Mỗi service kiểm tra chữ ký từ JWKS và kiểm tra claim
+`iss` bằng `JWT_ISSUER`; private key chỉ nằm ở identity service. Với Docker Compose,
+`JWT_JWK_SET_URI` trỏ tới `http://identity-service:8081/.well-known/jwks.json`.
+Chạy local ngoài Docker thì dùng URI `http://localhost:8081/.well-known/jwks.json`.
+Endpoint JWKS và bộ phát token RS256 cần được triển khai trong identity service trước
+khi có thể xác thực access token.
