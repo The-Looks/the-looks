@@ -11,4 +11,7 @@ public interface WearLogRepository {
 
     /** itemId → lần mặc gần nhất. Món chưa mặc lần nào không có trong map. */
     Map<UUID, Instant> lastWornAtByItem(UUID ownerId);
+
+    /** itemId → số lần đã mặc. */
+    Map<UUID, Long> wearCountByItem(UUID ownerId);
 }

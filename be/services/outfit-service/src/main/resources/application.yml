@@ -38,3 +38,13 @@ thelooks:
     session-validation-uri: ${SESSION_VALIDATION_URI:http://localhost:8081/api/public/auth/session/active}
   services:
     wardrobe-url: ${WARDROBE_SERVICE_URL}
+  ai:
+    # none = không gọi AI (xếp theo điểm); claude = gọi Claude, cần ANTHROPIC_API_KEY
+    provider: ${AI_PROVIDER:none}
+    model: ${AI_MODEL:claude-haiku-5-5}
+    daily-limit-per-user: ${AI_DAILY_LIMIT:10}
+    monthly-budget-usd: ${AI_MONTHLY_BUDGET_USD:25}
+  weather:
+    # Mặc định TP.HCM (đổi bằng WEATHER_LAT / WEATHER_LON khi chạy cho cơ sở khác)
+    latitude: ${WEATHER_LAT:10.8231}
+    longitude: ${WEATHER_LON:106.6297}

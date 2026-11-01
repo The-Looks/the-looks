@@ -16,7 +16,7 @@ security:
 paths:
   /api/app/outfits/suggestions:
     get:
-      summary: AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ
+      summary: AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ, lọc theo thời tiết hiện tại
       parameters:
         - { name: occasion, in: query, required: true, schema: { $ref: '#/components/schemas/Occasion' } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 10, default: 3 } }
@@ -84,6 +84,31 @@ paths:
       responses:
         '204': { description: Đã ghi }
         '400': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/admin/outfits/ai-usage:
+    get:
+      summary: (ADMIN) Chi phí gọi AI tháng này so với ngân sách, 10 người dùng tốn nhiều nhất
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [month, costUsd, budgetUsd, topUsers]
+                properties:
+                  month: { type: string, example: '2026-11' }
+                  costUsd: { type: number }
+                  budgetUsd: { type: number }
+                  topUsers:
+                    type: array
+                    items:
+                      type: object
+                      required: [ownerId, calls, costUsd]
+                      properties:
+                        ownerId: { type: string, format: uuid }
+                        calls: { type: integer }
+                        costUsd: { type: number }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/outfits/{outfitId}:
     get:
       summary: Outfit kèm ảnh các món (voting-service dùng khi tạo bình chọn)
