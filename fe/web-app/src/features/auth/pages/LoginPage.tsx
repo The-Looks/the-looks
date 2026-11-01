@@ -31,7 +31,7 @@ export function LoginPage() {
 
   return (
     <main className="auth-page">
-      <Card className="auth-card">
+      <aside className="auth-story"><Brand /><div><h2>Tủ đồ quen. <br />Cảm hứng mới.</h2><p>Mỗi món đồ đều có thêm một cách mặc.<br />Khám phá diện mạo tiếp theo cùng The Looks.</p></div><p>Wear More. Buy Smarter.</p></aside><Card className="auth-card">
         <Brand />
         <div className="stack">
           <h1>Chào mừng trở lại</h1>

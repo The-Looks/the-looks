@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ApiError, errorMessage } from '../../../shared/api/client';
 import type { Occasion } from '../../../shared/api/types';
-import { ButtonLink, EmptyState, Notice, PageHeader, Spinner } from '../../../shared/ui';
+import { ButtonLink, EmptyState, Icon, Notice, PageHeader, Spinner } from '../../../shared/ui';
 import { useSuggestions } from '../api';
 import { FeedbackButtons } from '../components/FeedbackButtons';
 import { OutfitCard } from '../components/OutfitCard';
@@ -9,7 +9,10 @@ import { SaveButton } from '../components/SaveButton';
 import { OCCASIONS, occasionLabel } from '../occasions';
 
 export function SuggestPage() {
-  const [occasion, setOccasion] = useState<Occasion | null>(null);
+  const [params, setParams] = useSearchParams();
+  const selected = params.get('occasion');
+  const occasion: Occasion | null = OCCASIONS.find(o => o.value === selected)?.value ?? null;
+  const setOccasion = (value: Occasion) => setParams({ occasion: value });
   const suggestions = useSuggestions(occasion);
 
   return (
@@ -43,7 +46,7 @@ export function SuggestPage() {
             }}
           >
             <span style={{ fontSize: 24 }} aria-hidden="true">
-              {o.icon}
+              <Icon name="spark" />
             </span>
             <h3>{o.label}</h3>
             <span className="small muted">{o.hint}</span>

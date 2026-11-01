@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { CATEGORY_EMOJI, categoryLabel } from '../lib/labels';
+import { categoryLabel } from '../lib/labels';
 
 type ButtonKind = 'primary' | 'ghost' | 'outline' | 'pink';
 
@@ -70,7 +70,7 @@ export function ItemTile({ category, imageUrl, label }: { category?: string; ima
       ) : (
         <>
           <span className="tile-emoji" aria-hidden="true">
-            {CATEGORY_EMOJI[category?.toUpperCase() ?? ''] ?? '👚'}
+            <Garment category={category} />
           </span>
           <span className="tile-label">{name}</span>
         </>
@@ -118,11 +118,11 @@ export function PageHeader({
   );
 }
 
-export function EmptyState({ icon, title, children }: { icon: string; title: string; children?: ReactNode }) {
+export function EmptyState({ title, children }: { icon: string; title: string; children?: ReactNode }) {
   return (
     <div className="empty">
       <span className="empty-ico" aria-hidden="true">
-        {icon}
+        <Icon name="spark" />
       </span>
       <h3>{title}</h3>
       {children}
@@ -156,10 +156,26 @@ export function ProgressBar({ percent }: { percent: number }) {
 }
 
 export function Brand() {
-  return (
-    <span className="brand">
-      <span className="brand-mark" aria-hidden="true" />
-      THE LOOKS
-    </span>
-  );
+  return <span className="brand"><img src="/the-looks-logo.png" alt="The Looks" /></span>;
+}
+
+export function Icon({ name }: { name: string }) {
+  const paths: Record<string, string> = {
+    home: 'm3 10 9-7 9 7v10H3z M9 20v-7h6v7',
+    wardrobe: 'M9 5a3 3 0 0 1 6 0c0 2-3 2-3 4v2 M12 11 2 18v2h20v-2z',
+    spark: 'm12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z',
+    vote: 'm5 9 7-6 7 6-7 6z M5 13H3v8h18v-8h-2',
+    user: 'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M4 21v-2a8 8 0 0 1 16 0v2',
+    heart: 'M20 5c-3-3-6-1-8 1-2-2-5-4-8-1-4 4 1 9 8 15 7-6 12-11 8-15',
+    plus: 'M12 4v16 M4 12h16',
+    arrow: 'M4 12h16 m-6-6 6 6-6 6',
+  };
+  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name] ?? paths.spark} /></svg>;
+}
+
+export function Garment({ category }: { category?: string }) {
+  const type = category?.toUpperCase();
+  return <svg className="garment" viewBox="0 0 120 120" fill="currentColor" stroke="var(--ink)" strokeOpacity=".18" strokeWidth="1.5" aria-hidden="true">
+    {type === 'BOTTOM' ? <path d="M35 18h50l5 84H65l-5-55-5 55H30z M35 28h50" /> : type === 'DRESS' ? <path d="M45 16h10q5 12 10 0h10l-3 30 25 58H23l25-58z" /> : type === 'SHOES' ? <path d="M24 42h25l12 24 36 12q10 3 10 17H17V72z M17 87h87" /> : <path d="m38 22 12-5q10 12 20 0l12 5 25 22-16 21-12-9v48H41V56l-12 9-16-21z" />}
+  </svg>;
 }

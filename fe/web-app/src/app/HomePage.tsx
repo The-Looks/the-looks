@@ -1,39 +1,51 @@
+import { Link } from 'react-router-dom';
 import { MyPlanCard } from '../features/billing';
-import { QuickPickCard } from '../features/outfit';
+import { OCCASIONS, QuickPickCard } from '../features/outfit';
 import { WardrobeSummary } from '../features/wardrobe';
-import { ButtonLink, Card } from '../shared/ui';
-
-/** Trang chủ ghép từ nhiều feature (ADR 0002: việc ghép làm ở app/, feature không import nhau). */
+import { ButtonLink, Card, Icon } from '../shared/ui';
 export function HomePage() {
   return (
-    <div className="stack-lg">
-      <header className="page-header">
-        <span className="eyebrow">Wear More. Buy Smarter.</span>
-        <h1>Chào bạn 👋</h1>
+    <div className="stack-lg home-page">
+      <header className="page-header home-heading">
+        <div>
+          <h1>Một ngày, một diện mạo.</h1>
+          <p className="muted">Khám phá cách mặc mới từ những món đồ quen thuộc.</p>
+        </div>
+        <ButtonLink to="/wardrobe/add" small>
+          + Thêm món đồ
+        </ButtonLink>
       </header>
       <QuickPickCard />
-      <div className="grid-cards">
+      <div className="home-grid">
         <WardrobeSummary />
-        <Card>
-          <h2>Phối đồ theo dịp</h2>
-          <p className="muted">Đi học, đi làm, đi chơi hay hẹn hò, AI chọn từ đồ bạn đang có.</p>
-          <div>
-            <ButtonLink to="/outfits/suggest" kind="ghost" small>
-              Chọn dịp
-            </ButtonLink>
-          </div>
-        </Card>
-        <Card>
-          <h2>Hỏi bạn bè</h2>
-          <p className="muted">Phân vân giữa 2 bộ? Gửi link Zalo để bạn bè bình chọn ẩn danh.</p>
-          <div>
-            <ButtonLink to="/polls/new" kind="ghost" small>
-              Tạo bình chọn
-            </ButtonLink>
-          </div>
-        </Card>
-        <MyPlanCard />
+        <div className="home-side">
+          <Card className="occasion-card">
+            <h2>Hôm nay bạn đi đâu?</h2>
+            <p className="muted">Tìm một bộ đồ hợp với kế hoạch của bạn.</p>
+            <div className="occasion-links">
+              {OCCASIONS.map(({ label, value }) => (
+                <Link key={value} to={`/outfits/suggest?occasion=${value}`}>
+                  {label}
+                  <Icon name="arrow" />
+                </Link>
+              ))}
+            </div>
+          </Card>
+          <Card className="friends-card">
+            <h2>Hai bộ đồ. Một lựa chọn.</h2>
+            <p className="muted">Để hội bạn thân giúp bạn chọn diện mạo yêu thích.</p>
+            <Link className="text-action" to="/polls/new">
+              Hỏi ý kiến bạn bè <Icon name="arrow" />
+            </Link>
+          </Card>
+        </div>
       </div>
+      <MyPlanCard />
+      <Link className="saved-link" to="/outfits">
+        <Icon name="heart" />
+        <span>Những bộ đồ bạn muốn mặc lại</span>
+        <Icon name="arrow" />
+      </Link>
     </div>
   );
 }

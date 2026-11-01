@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ButtonLink, Card, ItemTile, Spinner } from '../../../shared/ui';
+import { ButtonLink, Card, ItemTile, Notice, Spinner } from '../../../shared/ui';
 import { useWardrobe } from '../api';
 
 /** Tóm tắt tủ đồ trên trang chủ. */
@@ -15,7 +15,7 @@ export function WardrobeSummary() {
           Xem tất cả
         </Link>
       </div>
-      {items.isPending ? (
+      {items.isError ? <Notice tone="error">Chưa tải được tủ đồ. <button className="chip" onClick={() => void items.refetch()}>Thử lại</button></Notice> : items.isPending ? (
         <Spinner />
       ) : (
         <>
@@ -24,7 +24,7 @@ export function WardrobeSummary() {
           </p>
           <div className="grid-tiles">
             {items.data?.slice(0, 6).map((i) => (
-              <ItemTile key={i.id} category={i.category} imageUrl={i.imageUrl} />
+              <Link key={i.id} to={`/wardrobe/${i.id}`}><ItemTile category={i.category} imageUrl={i.imageUrl} /></Link>
             ))}
           </div>
           <div>

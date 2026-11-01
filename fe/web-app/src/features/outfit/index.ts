@@ -3,3 +3,5 @@ export { QuickPickCard } from './components/QuickPickCard';
 export { OutfitDetailPage } from './pages/OutfitDetailPage';
 export { SavedOutfitsPage } from './pages/SavedOutfitsPage';
 export { SuggestPage } from './pages/SuggestPage';
+
+export { OCCASIONS } from './occasions';
