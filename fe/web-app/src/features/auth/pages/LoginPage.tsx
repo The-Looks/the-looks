@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { errorMessage, identityApi, unwrap } from '../../../shared/api/client';
 import { session, useSession } from '../../../shared/lib/session';
 import { Brand, Button, Card, Field, Notice } from '../../../shared/ui';
@@ -9,6 +9,7 @@ import { Brand, Button, Card, Field, Notice } from '../../../shared/ui';
 export function LoginPage() {
   const { isAuthenticated } = useSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const from = (useLocation().state as { from?: string } | null)?.from ?? '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,6 +40,7 @@ export function LoginPage() {
         <form className="stack" onSubmit={submit}>
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           <Field id="login-password" label="Mật khẩu" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          {searchParams.get('google') === 'failed' && <Notice tone="error">Không hoàn tất đăng nhập Google. Vui lòng thử lại.</Notice>}
           {login.isError && <Notice tone="error">{errorMessage(login.error)}</Notice>}
           <Button type="submit" block disabled={login.isPending}>
             {login.isPending ? 'Đang đăng nhập…' : 'Đăng nhập'}

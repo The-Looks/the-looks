@@ -39,3 +39,9 @@ thelooks:
     jwk-set-uri: ${JWT_JWK_SET_URI}
     private-key-path: ${JWT_PRIVATE_KEY_PATH}
     web-origin: ${WEB_ORIGIN}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    redirect-uri: ${GOOGLE_REDIRECT_URI:}
+  admin:
+    bootstrap-email: ${ADMIN_BOOTSTRAP_EMAIL:}

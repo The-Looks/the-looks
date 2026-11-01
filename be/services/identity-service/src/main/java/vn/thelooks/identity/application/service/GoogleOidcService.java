@@ -1,0 +1,148 @@
+package vn.thelooks.identity.application.service;
+
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Locale;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
+import vn.thelooks.identity.application.port.out.AdminBootstrapStore;
+import vn.thelooks.identity.application.port.out.GoogleFlowStore;
+import vn.thelooks.identity.application.port.out.GoogleIdentityStore;
+import vn.thelooks.identity.application.port.out.GoogleTokenVerifier;
+import vn.thelooks.identity.application.port.out.RefreshSessionStore;
+import vn.thelooks.identity.application.port.out.TokenIssuer;
+import vn.thelooks.identity.application.port.out.UserRepository;
+import vn.thelooks.identity.application.usecase.GoogleLoginUseCase;
+import vn.thelooks.identity.application.usecase.LoginUseCase;
+import vn.thelooks.identity.domain.exception.InvalidCredentialsException;
+import vn.thelooks.identity.domain.model.Role;
+import vn.thelooks.identity.domain.model.User;
+import vn.thelooks.identity.domain.model.UserStatus;
+
+@Service
+class GoogleOidcService implements GoogleLoginUseCase {
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private final GoogleFlowStore flows;
+    private final GoogleIdentityStore identities;
+    private final GoogleTokenVerifier google;
+    private final UserRepository users;
+    private final AdminBootstrapStore admins;
+    private final RefreshSessionStore sessions;
+    private final TokenIssuer tokens;
+    private final Clock clock;
+    private final String clientId;
+    private final String redirectUri;
+    private final String adminEmail;
+
+    GoogleOidcService(GoogleFlowStore flows, GoogleIdentityStore identities, GoogleTokenVerifier google,
+            UserRepository users, AdminBootstrapStore admins, RefreshSessionStore sessions, TokenIssuer tokens,
+            Clock clock, @Value("${thelooks.google.client-id:}") String clientId,
+            @Value("${thelooks.google.redirect-uri:}") String redirectUri,
+            @Value("${thelooks.admin.bootstrap-email:}") String adminEmail) {
+        this.flows = flows;
+        this.identities = identities;
+        this.google = google;
+        this.users = users;
+        this.admins = admins;
+        this.sessions = sessions;
+        this.tokens = tokens;
+        this.clock = clock;
+        this.clientId = clientId;
+        this.redirectUri = redirectUri;
+        this.adminEmail = adminEmail;
+    }
+
+    @Override
+    public Start start() {
+        if (clientId.isBlank() || redirectUri.isBlank()) throw new IllegalStateException("Google OAuth chưa cấu hình");
+        var state = random();
+        var nonce = random();
+        var verifier = random();
+        flows.save(sha256(state), nonce, verifier, Instant.now(clock).plus(Duration.ofMinutes(10)));
+        URI uri = UriComponentsBuilder.fromUriString("https://accounts.google.com/o/oauth2/v2/auth")
+                .queryParam("client_id", clientId).queryParam("redirect_uri", redirectUri)
+                .queryParam("response_type", "code").queryParam("scope", "openid email profile")
+                .queryParam("state", state).queryParam("nonce", nonce)
+                .queryParam("code_challenge", sha256(verifier)).queryParam("code_challenge_method", "S256")
+                .build().encode().toUri();
+        return new Start(state, uri);
+    }
+
+    @Override
+    @Transactional
+    public LoginUseCase.AuthTokens complete(String code, String state, String stateCookie) {
+        if (code == null || code.isBlank() || state == null || stateCookie == null
+                || !MessageDigest.isEqual(state.getBytes(StandardCharsets.UTF_8),
+                        stateCookie.getBytes(StandardCharsets.UTF_8))) throw invalid();
+        var flow = flows.consume(sha256(state)).orElseThrow(GoogleOidcService::invalid);
+        if (!flow.expiresAt().isAfter(Instant.now(clock))) throw invalid();
+        var profile = google.exchangeAndVerify(code, flow.codeVerifier(), flow.nonce());
+        if (!profile.emailVerified()) throw invalid();
+        var userId = identities.findUserId(profile.subject()).orElse(null);
+        User user;
+        if (userId != null) {
+            user = users.findById(userId).orElseThrow(GoogleOidcService::invalid);
+        } else {
+            var email = profile.email().trim().toLowerCase(Locale.ROOT);
+            var existing = users.findByEmail(email);
+            if (existing.isPresent()) {
+                if (!profile.googleAuthoritativeForEmail()) throw invalid();
+                user = existing.get();
+                if (!user.emailVerified()) {
+                    user = users.save(new User(user.id(), user.email(), user.passwordHash(), user.username(), true,
+                            user.role(), user.status(), user.createdAt(), Instant.now(clock)));
+                }
+            } else {
+                var now = Instant.now(clock);
+                var name = profile.name() == null || profile.name().isBlank() ? email.split("@")[0] : profile.name();
+                if (name.length() > 60) name = name.substring(0, 60);
+                user = users.save(new User(UUID.randomUUID(), email, null, name, true,
+                        Role.USER, UserStatus.ACTIVE, now, now));
+            }
+            identities.link(profile.subject(), user.id());
+        }
+        if (user.status() != UserStatus.ACTIVE) throw invalid();
+        if (!adminEmail.isBlank() && profile.googleAuthoritativeForEmail() && user.emailVerified()
+                && user.email().equalsIgnoreCase(adminEmail.trim())) {
+            if (admins.promoteFirstVerifiedAdmin(user.id(), user.email())) {
+                user = new User(user.id(), user.email(), user.passwordHash(), user.username(), true,
+                        Role.ADMIN, user.status(), user.createdAt(), Instant.now(clock));
+            }
+        }
+        var now = Instant.now(clock);
+        var session = sessions.create(user.id(), now, now.plus(Duration.ofDays(7)));
+        var access = tokens.issue(user, session.id());
+        return new LoginUseCase.AuthTokens(access.token(), access.expiresAt(),
+                session.refreshToken(), session.expiresAt());
+    }
+
+    private static String random() {
+        var bytes = new byte[32];
+        RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private static String sha256(String value) {
+        try {
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(
+                    MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static InvalidCredentialsException invalid() {
+        return new InvalidCredentialsException("Google đăng nhập không hợp lệ");
+    }
+}

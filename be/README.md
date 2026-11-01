@@ -46,5 +46,17 @@ Identity service phát access token ký RS256 và công bố public keys tại
 `iss` bằng `JWT_ISSUER`; private key chỉ nằm ở identity service. Với Docker Compose,
 `JWT_JWK_SET_URI` trỏ tới `http://identity-service:8081/.well-known/jwks.json`.
 Chạy local ngoài Docker thì dùng URI `http://localhost:8081/.well-known/jwks.json`.
-Endpoint JWKS và bộ phát token RS256 cần được triển khai trong identity service trước
-khi có thể xác thực access token.
+Tạo khóa một lần bằng `powershell -File scripts/generate-jwt-key.ps1` trước khi
+chạy identity service hoặc Docker Compose. File `.keys/jwt-private.pem` đã được
+gitignore; không đưa private key vào repository. JDK 21 dùng được khi build với
+`mvnw.cmd verify -Djava.version=21`.
+
+## Google đăng nhập và admin đầu tiên
+
+Điền `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` trong `.env`.
+Trong Google Cloud Console, đăng ký chính xác redirect URI, ví dụ
+`http://localhost:5173/api/public/auth/google/callback` khi chạy web-app qua Vite.
+`ADMIN_BOOTSTRAP_EMAIL` là email admin đầu tiên: tài khoản chỉ được nâng quyền khi
+đăng nhập Google với email đã xác minh và Google quản lý email đó (Gmail/Workspace),
+và hệ thống chưa có admin. Để trống biến này nếu chưa cần tạo admin. Sau khi đã có
+admin, biến môi trường không cấp thêm quyền cho tài khoản khác.
