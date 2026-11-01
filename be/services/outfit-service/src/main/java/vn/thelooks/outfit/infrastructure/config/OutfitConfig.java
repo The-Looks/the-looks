@@ -32,4 +32,18 @@ class OutfitConfig {
                 .requestInterceptor(correlationId)
                 .build();
     }
+
+    @Bean
+    RestClient billingRestClient(@Value("${thelooks.services.billing-url}") String billingUrl,
+            BearerTokenForwardingInterceptor bearerToken, CorrelationIdForwardingInterceptor correlationId) {
+        var requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofSeconds(2));
+        requestFactory.setReadTimeout(Duration.ofSeconds(3));
+        return RestClient.builder()
+                .baseUrl(billingUrl)
+                .requestFactory(requestFactory)
+                .requestInterceptor(bearerToken)
+                .requestInterceptor(correlationId)
+                .build();
+    }
 }

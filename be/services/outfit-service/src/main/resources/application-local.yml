@@ -11,3 +11,4 @@ thelooks:
     jwk-set-uri: http://localhost:8081/.well-known/jwks.json
   services:
     wardrobe-url: http://localhost:8082
+    billing-url: http://localhost:8085

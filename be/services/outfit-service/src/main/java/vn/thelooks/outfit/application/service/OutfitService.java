@@ -21,6 +21,7 @@ import vn.thelooks.outfit.application.port.out.AiUsageRepository;
 import vn.thelooks.outfit.application.port.out.FeedbackRepository;
 import vn.thelooks.outfit.application.port.out.OutfitAiAdvisor;
 import vn.thelooks.outfit.application.port.out.OutfitRepository;
+import vn.thelooks.outfit.application.port.out.PlanLimitReader;
 import vn.thelooks.outfit.application.port.out.WardrobeReader;
 import vn.thelooks.outfit.application.port.out.WeatherReader;
 import vn.thelooks.outfit.application.port.out.WearLogRepository;
@@ -61,14 +62,14 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
     private final FeedbackRepository feedback;
     private final WeatherReader weather;
     private final AiUsageRepository aiUsage;
-    private final int aiDailyLimitPerUser;
+    private final PlanLimitReader plans;
     private final double aiMonthlyBudgetUsd;
     private final Clock clock;
     private final OutfitRecommender recommender = new OutfitRecommender();
 
     OutfitService(WardrobeReader wardrobe, OutfitRepository outfits, WearLogRepository wearLogs,
             OutfitAiAdvisor aiAdvisor, FeedbackRepository feedback, WeatherReader weather, AiUsageRepository aiUsage,
-            @Value("${thelooks.ai.daily-limit-per-user}") int aiDailyLimitPerUser,
+            PlanLimitReader plans,
             @Value("${thelooks.ai.monthly-budget-usd}") double aiMonthlyBudgetUsd,
             Clock clock) {
         this.wardrobe = wardrobe;
@@ -78,7 +79,7 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         this.feedback = feedback;
         this.weather = weather;
         this.aiUsage = aiUsage;
-        this.aiDailyLimitPerUser = aiDailyLimitPerUser;
+        this.plans = plans;
         this.aiMonthlyBudgetUsd = aiMonthlyBudgetUsd;
         this.clock = clock;
     }
@@ -99,7 +100,8 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
     }
 
     /**
-     * Gọi AI trong giới hạn: mỗi người tối đa N lượt/ngày và tổng chi phí tháng chưa vượt ngân sách.
+     * Gọi AI trong giới hạn: số lượt/ngày theo gói của người dùng (Free 3, Plus 20, Pro 100)
+     * và tổng chi phí tháng chưa vượt ngân sách.
      * Hết lượt → vẫn có gợi ý theo điểm của OutfitRecommender, chỉ không qua AI.
      */
     private List<OutfitSuggestion> advise(UUID ownerId, Occasion occasion, Prepared prepared, int limit) {
@@ -108,7 +110,7 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
             return List.of();
         }
         Instant now = clock.instant();
-        boolean withinLimits = aiUsage.callsSince(ownerId, startOfDay(now)) < aiDailyLimitPerUser
+        boolean withinLimits = aiUsage.callsSince(ownerId, startOfDay(now)) < plans.aiSuggestionsPerDay()
                 && aiUsage.costSince(startOfMonth(now)) < aiMonthlyBudgetUsd;
         if (!withinLimits) {
             return OutfitAiAdvisor.Advice.withoutAi(candidates, limit).suggestions();
