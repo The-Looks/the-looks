@@ -89,6 +89,34 @@ class AccessTradeTikTokCatalogTest {
         assertThat(lastLinkBody).contains("\"product_id\":\"1\"").contains("\"sub1\":\"ab12\"");
     }
 
+    static AccessTradeTikTokCatalog.Product product(String title, String leaf) {
+        return new AccessTradeTikTokCatalog.Product("1", title, null, "https://x", true, 1L, null, null, null,
+                java.util.List.of(new AccessTradeTikTokCatalog.CategoryNode(leaf)));
+    }
+
+    @Test
+    void filtersByGenderFromTitleAndCategory() {
+        var male = vn.thelooks.outfit.domain.model.StylePreferences.Gender.MALE;
+        var female = vn.thelooks.outfit.domain.model.StylePreferences.Gender.FEMALE;
+        assertThat(AccessTradeTikTokCatalog.fitsGender(product("Áo polo nam cổ bẻ", "Polo Shirts"), male)).isTrue();
+        assertThat(AccessTradeTikTokCatalog.fitsGender(product("Áo polo nam cổ bẻ", "Polo Shirts"), female)).isFalse();
+        assertThat(AccessTradeTikTokCatalog.fitsGender(product("Áo thun nữ ôm body", "Women's T-shirts"), male)).isFalse();
+        assertThat(AccessTradeTikTokCatalog.fitsGender(product("Giày sneaker nam nữ", "Casual Trainers"), female)).isTrue();
+        assertThat(AccessTradeTikTokCatalog.fitsGender(product("Quần jean hàng Việt Nam", "Jeans"), female)).isTrue();
+        assertThat(AccessTradeTikTokCatalog.fitsGender(product("Quần baggy", "Men's Pants"), female)).isFalse();
+    }
+
+    @Test
+    void prefersProductsWithinBudgetButNeverReturnsNothing() throws Exception {
+        var catalog = start("secret");
+        var cheap = new WardrobeGap("SHOES", "sneaker", "giày", null,
+                vn.thelooks.outfit.domain.model.StylePreferences.Budget.LOW);
+        assertThat(catalog.search(cheap, 3)).extracting(o -> o.id()).containsExactly("1"); // 300k > 200k nhưng là món duy nhất
+        var mid = new WardrobeGap("SHOES", "sneaker", "giày", null,
+                vn.thelooks.outfit.domain.model.StylePreferences.Budget.MID);
+        assertThat(catalog.search(mid, 3)).extracting(o -> o.id()).containsExactly("1");
+    }
+
     @Test
     void withoutApiKeyTheFeatureIsOff() throws Exception {
         var catalog = start("");

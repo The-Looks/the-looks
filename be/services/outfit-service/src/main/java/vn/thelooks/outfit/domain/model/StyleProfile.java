@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,6 +24,8 @@ public record StyleProfile(Map<String, Double> styles, Map<String, Double> color
     static final double LIKE = 2, DISLIKE = -2, SAVED = 1, WORN = 1;
     /** Một món mặc rất nhiều lần không được lấn át mọi tín hiệu khác. */
     static final int MAX_WEAR_COUNT = 5;
+    /** Điểm cho phong cách người dùng tự chọn (học từ hành vi tối đa là 1). */
+    static final double STATED = 0.6;
 
     public static StyleProfile learn(Collection<ClosetItem> closet, Map<String, Feedback> feedback,
             Collection<Outfit> saved, Map<UUID, Long> wearCount) {
@@ -67,6 +70,19 @@ public record StyleProfile(Map<String, Double> styles, Map<String, Double> color
 
     private static String key(String s) {
         return s.toLowerCase(Locale.ROOT).trim();
+    }
+
+    /**
+     * Thêm phong cách người dùng tự khai: là gu ban đầu khi chưa đủ hành vi để đoán. Hành vi thật vẫn được ưu tiên:
+     * phong cách đã học được điểm cao hơn thì giữ, người dùng hay né (điểm âm) thì không bị ghi đè.
+     */
+    public StyleProfile withStated(Set<String> stated) {
+        if (stated.isEmpty()) {
+            return this;
+        }
+        Map<String, Double> merged = new HashMap<>(known() ? styles : Map.of());
+        stated.forEach(s -> merged.merge(key(s), STATED, (learned, given) -> learned < 0 ? learned : Math.max(learned, given)));
+        return new StyleProfile(merged, known() ? colors : Map.of(), Math.max(signals, MIN_SIGNALS));
     }
 
     public boolean known() {

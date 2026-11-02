@@ -7,6 +7,9 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import vn.thelooks.outfit.domain.model.ClosetItem;
 import vn.thelooks.outfit.domain.model.Occasion;
+import vn.thelooks.outfit.domain.model.StylePreferences;
+import vn.thelooks.outfit.domain.model.StylePreferences.Budget;
+import vn.thelooks.outfit.domain.model.StylePreferences.Gender;
 import vn.thelooks.outfit.domain.model.WardrobeGap;
 
 class WardrobeGapsTest {
@@ -40,5 +43,16 @@ class WardrobeGapsTest {
         assertThat(work.keyword()).isEqualTo("loafer");
         assertThat(school.keyword()).isEqualTo("sneaker");
         assertThat(school.label()).isEqualTo("giày");
+    }
+
+    @Test
+    void genderAndBudgetComeFromThePreferences() {
+        var female = new StylePreferences(Gender.FEMALE, java.util.Set.of(), Budget.LOW);
+        var gap = WardrobeGaps.find(List.of(), Occasion.HANGOUT, female).orElseThrow();
+        assertThat(gap.keyword()).isEqualTo("croptop");
+        assertThat(gap.gender()).isEqualTo(Gender.FEMALE);
+        assertThat(gap.budget()).isEqualTo(Budget.LOW);
+        assertThat(WardrobeGaps.find(List.of(item("TOP")), Occasion.WORK,
+                new StylePreferences(Gender.MALE, null, null)).orElseThrow().keyword()).isEqualTo("baggy");
     }
 }

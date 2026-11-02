@@ -22,6 +22,7 @@ import vn.thelooks.outfit.application.port.out.FeedbackRepository;
 import vn.thelooks.outfit.application.port.out.OutfitAiAdvisor;
 import vn.thelooks.outfit.application.port.out.OutfitRepository;
 import vn.thelooks.outfit.application.port.out.PlanLimitReader;
+import vn.thelooks.outfit.application.port.out.PreferencesRepository;
 import vn.thelooks.outfit.application.port.out.WardrobeReader;
 import vn.thelooks.outfit.application.port.out.WeatherReader;
 import vn.thelooks.outfit.application.port.out.WearLogRepository;
@@ -63,13 +64,14 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
     private final WeatherReader weather;
     private final AiUsageRepository aiUsage;
     private final PlanLimitReader plans;
+    private final PreferencesRepository preferences;
     private final double aiMonthlyBudgetUsd;
     private final Clock clock;
     private final OutfitRecommender recommender = new OutfitRecommender();
 
     OutfitService(WardrobeReader wardrobe, OutfitRepository outfits, WearLogRepository wearLogs,
             OutfitAiAdvisor aiAdvisor, FeedbackRepository feedback, WeatherReader weather, AiUsageRepository aiUsage,
-            PlanLimitReader plans,
+            PlanLimitReader plans, PreferencesRepository preferences,
             @Value("${thelooks.ai.monthly-budget-usd}") double aiMonthlyBudgetUsd,
             Clock clock) {
         this.wardrobe = wardrobe;
@@ -80,6 +82,7 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         this.weather = weather;
         this.aiUsage = aiUsage;
         this.plans = plans;
+        this.preferences = preferences;
         this.aiMonthlyBudgetUsd = aiMonthlyBudgetUsd;
         this.clock = clock;
     }
@@ -149,7 +152,8 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
                 .orElseGet(() -> Set.of(OutfitRecommender.seasonOf(LocalDate.ofInstant(now, VIETNAM).getMonth())));
         List<ClosetItem> closet = wardrobe.confirmedItems(ownerId);
         Map<String, Feedback> votes = feedback.byOwner(ownerId);
-        StyleProfile taste = StyleProfile.learn(closet, votes, outfits.findByOwner(ownerId), wearLogs.wearCountByItem(ownerId));
+        StyleProfile taste = StyleProfile.learn(closet, votes, outfits.findByOwner(ownerId), wearLogs.wearCountByItem(ownerId))
+                .withStated(preferences.find(ownerId).styles());
         List<OutfitSuggestion> suggestions = recommender.recommend(closet, wearLogs.lastWornAtByItem(ownerId), votes, taste,
                 occasion, now, seasons, AI_CANDIDATES);
         return new Prepared(today.map(w -> withWeatherNote(suggestions, w)).orElse(suggestions), taste);

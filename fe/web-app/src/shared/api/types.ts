@@ -16,6 +16,7 @@ export type Scan = Wardrobe['schemas']['Scan'];
 export type Occasion = Outfit['schemas']['Occasion'];
 export type OutfitItem = Outfit['schemas']['OutfitItem'];
 export type OutfitSuggestion = Outfit['schemas']['OutfitSuggestion'];
+export type StylePreferences = Outfit['schemas']['StylePreferences'];
 export type SavedOutfit = Outfit['schemas']['Outfit'];
 export type OutfitDetail = Outfit['schemas']['OutfitDetail'];
 

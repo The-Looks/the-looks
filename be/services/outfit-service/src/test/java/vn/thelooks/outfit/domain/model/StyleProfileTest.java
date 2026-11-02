@@ -41,6 +41,21 @@ class StyleProfileTest {
     }
 
     @Test
+    void statedStylesPersonaliseANewUser() {
+        StyleProfile taste = StyleProfile.NONE.withStated(java.util.Set.of("streetwear"));
+        assertThat(taste.known()).isTrue();
+        assertThat(taste.affinity(List.of(loudTop))).isGreaterThan(taste.affinity(List.of(minimalTee)));
+        assertThat(taste.summary()).contains("streetwear");
+    }
+
+    @Test
+    void learnedBehaviourWinsOverStatedStyles() {
+        StyleProfile taste = likesMinimalHatesRed().withStated(java.util.Set.of("minimal", "streetwear"));
+        assertThat(taste.styles().get("minimal")).isEqualTo(1.0); // học được 1.0, không bị hạ xuống
+        assertThat(taste.styles().get("streetwear")).isNegative(); // hay né thì không ghi đè
+    }
+
+    @Test
     void notEnoughSignalsMeansNoPersonalisation() {
         StyleProfile taste = StyleProfile.learn(closet, Map.of(), List.of(), Map.of(minimalTee.id(), 1L));
         assertThat(taste.known()).isFalse();

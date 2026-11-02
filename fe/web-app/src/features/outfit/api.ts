@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { outfitApi, unwrap } from '../../shared/api/client';
-import type { Occasion, OutfitSuggestion } from '../../shared/api/types';
+import type { Occasion, OutfitSuggestion, StylePreferences } from '../../shared/api/types';
 
 // outfit-service (be/services/outfit-service), contract: outfit-api.yaml
 
@@ -24,6 +24,25 @@ export function useQuickPick() {
   return useMutation({
     mutationFn: async (): Promise<OutfitSuggestion | null> =>
       (await unwrap(outfitApi.GET('/api/app/outfits/quick-pick'))) ?? null,
+  });
+}
+
+export function usePreferences() {
+  return useQuery({
+    queryKey: ['outfits', 'preferences'],
+    queryFn: () => unwrap(outfitApi.GET('/api/app/outfits/preferences')),
+  });
+}
+
+/** Lưu xong thì gợi ý outfit và gợi ý mua thêm tính lại theo hồ sơ mới. */
+export function useSavePreferences() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: StylePreferences) => unwrap(outfitApi.PUT('/api/app/outfits/preferences', { body })),
+    onSuccess: (saved) => {
+      qc.invalidateQueries({ queryKey: ['outfits'] });
+      qc.setQueryData(['outfits', 'preferences'], saved);
+    },
   });
 }
 
