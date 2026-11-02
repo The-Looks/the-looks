@@ -21,10 +21,23 @@ const auth: Middleware = {
   },
 };
 
+/**
+ * Mỗi request ghi một Idempotency-Key riêng: nếu mạng/proxy gửi lại cùng request, backend trả lại kết quả
+ * lần đầu thay vì làm lại (IdempotencyFilter trong be/packages/observability).
+ */
+const idempotency: Middleware = {
+  onRequest({ request }) {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      request.headers.set('Idempotency-Key', crypto.randomUUID());
+    }
+    return request;
+  },
+};
+
 // Cùng origin: Vite proxy (dev) / Vercel rewrites (prod) chuyển /api/... tới đúng service.
 function client<Paths extends object>() {
   const c = createClient<Paths>({ baseUrl: globalThis.location?.origin ?? 'http://localhost' });
-  c.use(auth);
+  c.use(auth, idempotency);
   return c;
 }
 
@@ -68,7 +81,8 @@ export async function unwrap<T>(request: Promise<FetchResult<T>>): Promise<T> {
   const { data, error, response } = result;
   if (!response.ok || error !== undefined) {
     const detail = (error as { detail?: unknown } | undefined)?.detail;
-    const message = typeof detail === 'string' && detail ? detail : (DEFAULT_MESSAGE[response.status] ?? 'Có lỗi xảy ra.');
+    const message =
+      typeof detail === 'string' && detail ? detail : (DEFAULT_MESSAGE[response.status] ?? 'Có lỗi xảy ra.');
     throw new ApiError(response.status, message);
   }
   return data as T;
