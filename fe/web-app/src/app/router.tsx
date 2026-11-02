@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { GoogleCallbackPage, LoginPage, OnboardingPage, RegisterPage } from '../features/auth';
+import { GoogleCallbackPage, LoginPage, RegisterPage } from '../features/auth';
 import { BillingResultPage, PlansPage } from '../features/billing';
-import { OutfitDetailPage, SavedOutfitsPage, SuggestPage } from '../features/outfit';
+import { OutfitDetailPage, SavedOutfitsPage, StylePreferencesPage, SuggestPage } from '../features/outfit';
 import { ProfilePage } from '../features/profile';
 import { CreatePollPage, MyPollsPage, PollDetailPage, PublicPollPage } from '../features/voting';
 import { AddItemPage, ItemDetailPage, WardrobePage } from '../features/wardrobe';
@@ -32,7 +32,7 @@ export const router = createBrowserRouter([
         element: <AppShell />,
         children: [
           { index: true, element: <HomePage /> },
-          { path: 'onboarding', element: <OnboardingPage /> },
+          { path: 'onboarding', element: <StylePreferencesPage /> },
           { path: 'wardrobe', element: <WardrobePage /> },
           { path: 'wardrobe/add', element: <AddItemPage /> },
           { path: 'wardrobe/:id', element: <ItemDetailPage /> },
@@ -43,6 +43,7 @@ export const router = createBrowserRouter([
           { path: 'polls/new', element: <CreatePollPage /> },
           { path: 'polls/:code', element: <PollDetailPage /> },
           { path: 'profile', element: <ProfilePage /> },
+          { path: 'profile/style', element: <StylePreferencesPage /> },
           { path: 'plans', element: <PlansPage /> },
           { path: 'billing/result', element: <BillingResultPage /> },
           { path: '*', element: <NotFound /> },

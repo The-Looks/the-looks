@@ -39,6 +39,29 @@ paths:
               schema: { $ref: '#/components/schemas/OutfitSuggestion' }
         '204': { description: Tủ đồ chưa đủ món để phối }
         '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/preferences:
+    get:
+      summary: Hồ sơ phong cách (giới tính, phong cách, ngân sách); trống nếu chưa khai
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StylePreferences' }
+    put:
+      summary: Lưu hồ sơ phong cách. Dùng làm gu ban đầu cho gợi ý outfit và để chọn sản phẩm Gợi ý mua thêm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/StylePreferences' }
+      responses:
+        '200':
+          description: Đã lưu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/StylePreferences' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/outfits/shopping:
     get:
       summary: Gợi ý mua thêm - món tủ đồ còn thiếu cho dịp này + sản phẩm trên sàn (link affiliate)
@@ -163,6 +186,17 @@ components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
   schemas:
+    StylePreferences:
+      type: object
+      properties:
+        gender: { type: [string, 'null'], enum: [MALE, FEMALE, OTHER, null], description: null = không muốn nói }
+        styles:
+          type: array
+          items: { type: string, enum: [feminine, sporty, minimal, streetwear, vintage, office] }
+        budget:
+          type: [string, 'null']
+          enum: [LOW, MID, HIGH, null]
+          description: Giá một món. LOW < 200.000đ, MID 200.000–500.000đ, HIGH > 500.000đ, null = không giới hạn
     ShoppingSuggestion:
       type: object
       required: [gap, products]

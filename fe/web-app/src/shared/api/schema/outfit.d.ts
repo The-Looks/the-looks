@@ -89,6 +89,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/outfits/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hồ sơ phong cách (giới tính, phong cách, ngân sách); trống nếu chưa khai */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StylePreferences"];
+                    };
+                };
+            };
+        };
+        /** Lưu hồ sơ phong cách. Dùng làm gu ban đầu cho gợi ý outfit và để chọn sản phẩm Gợi ý mua thêm */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["StylePreferences"];
+                };
+            };
+            responses: {
+                /** @description Đã lưu */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["StylePreferences"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/outfits/shopping": {
         parameters: {
             query?: never;
@@ -413,6 +474,19 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        StylePreferences: {
+            /**
+             * @description null = không muốn nói
+             * @enum {string|null}
+             */
+            gender?: "MALE" | "FEMALE" | "OTHER" | null;
+            styles?: ("feminine" | "sporty" | "minimal" | "streetwear" | "vintage" | "office")[];
+            /**
+             * @description Giá một món. LOW < 200.000đ, MID 200.000–500.000đ, HIGH > 500.000đ, null = không giới hạn
+             * @enum {string|null}
+             */
+            budget?: "LOW" | "MID" | "HIGH" | null;
+        };
         ShoppingSuggestion: {
             gap: {
                 /** @enum {string} */

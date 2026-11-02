@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import vn.thelooks.outfit.application.port.out.AffiliateClickRepository;
+import vn.thelooks.outfit.application.port.out.PreferencesRepository;
 import vn.thelooks.outfit.application.port.out.ProductCatalog;
 import vn.thelooks.outfit.application.port.out.WardrobeReader;
 import vn.thelooks.outfit.application.usecase.ShopForGapUseCase;
@@ -25,18 +26,21 @@ class ShoppingService implements ShopForGapUseCase {
     private final WardrobeReader wardrobe;
     private final ProductCatalog catalog;
     private final AffiliateClickRepository clicks;
+    private final PreferencesRepository preferences;
     private final Clock clock;
 
-    ShoppingService(WardrobeReader wardrobe, ProductCatalog catalog, AffiliateClickRepository clicks, Clock clock) {
+    ShoppingService(WardrobeReader wardrobe, ProductCatalog catalog, AffiliateClickRepository clicks,
+            PreferencesRepository preferences, Clock clock) {
         this.wardrobe = wardrobe;
         this.catalog = catalog;
         this.clicks = clicks;
+        this.preferences = preferences;
         this.clock = clock;
     }
 
     @Override
     public Optional<Suggestion> suggest(UUID ownerId, Occasion occasion) {
-        return WardrobeGaps.find(wardrobe.confirmedItems(ownerId), occasion)
+        return WardrobeGaps.find(wardrobe.confirmedItems(ownerId), occasion, preferences.find(ownerId))
                 .map(gap -> new Suggestion(gap, catalog.search(gap, PRODUCTS)))
                 .filter(s -> !s.products().isEmpty());
     }

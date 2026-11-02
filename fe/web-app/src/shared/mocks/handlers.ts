@@ -137,6 +137,12 @@ function mockSuggestions(occasion?: string): OutfitSuggestion[] {
     }));
 }
 
+let preferences: { gender?: string | null; styles?: string[]; budget?: string | null } = {
+  gender: null,
+  styles: [],
+  budget: null,
+};
+
 const outfit: HttpHandler[] = [
   http.get('*/api/app/outfits/suggestions', ({ request }) =>
     HttpResponse.json(mockSuggestions(new URL(request.url).searchParams.get('occasion') ?? undefined)),
@@ -144,6 +150,11 @@ const outfit: HttpHandler[] = [
   http.get('*/api/app/outfits/quick-pick', () => {
     const s = mockSuggestions()[0];
     return s ? HttpResponse.json(s) : new HttpResponse(null, { status: 204 });
+  }),
+  http.get('*/api/app/outfits/preferences', () => HttpResponse.json(preferences)),
+  http.put('*/api/app/outfits/preferences', async ({ request }) => {
+    preferences = (await request.json()) as typeof preferences;
+    return HttpResponse.json(preferences);
   }),
   http.get('*/api/app/outfits/shopping', () =>
     HttpResponse.json({

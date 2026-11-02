@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import vn.thelooks.outfit.application.port.out.ProductCatalog;
 import vn.thelooks.outfit.domain.model.ProductOffer;
+import vn.thelooks.outfit.domain.model.StylePreferences.Gender;
 import vn.thelooks.outfit.domain.model.WardrobeGap;
 
 /**
@@ -40,7 +42,7 @@ class AccessTradeTikTokCatalog implements ProductCatalog {
     static final Map<String, Set<String>> CATEGORY_WORDS = Map.of(
             "TOP", Set.of("t-shirt", "shirts", "polo", "blouse", "tops", "tanks", "hoodies", "sweatshirts"),
             "BOTTOM", Set.of("jeans", "pants", "trousers", "shorts", "skirts", "leggings"),
-            "SHOES", Set.of("trainers", "shoes", "sneakers", "sandals", "flip flops", "boots", "slip-ons", "loafers", "heels"));
+            "SHOES", Set.of("trainers", "shoes", "sneakers", "sandals", "flip flops", "boots", "slip-ons", "loafers", "heels", "mary jane"));
 
     private record Cached(Instant at, List<ProductOffer> offers) {
     }
@@ -70,20 +72,49 @@ class AccessTradeTikTokCatalog implements ProductCatalog {
             return List.of();
         }
         Instant now = clock.instant();
-        Cached hit = searches.get(gap.keyword());
+        String cacheKey = gap.keyword() + '|' + gap.gender();
+        Cached hit = searches.get(cacheKey);
         if (hit == null || now.isAfter(hit.at().plus(CACHE_TTL))) {
             List<ProductOffer> found = fetch(gap);
             if (found == null) {
-                return hit == null ? List.of() : hit.offers().stream().limit(limit).toList(); // lỗi mạng: dùng tạm kết quả cũ
+                return hit == null ? List.of() : withinBudget(hit.offers(), gap, limit); // lỗi mạng: dùng tạm kết quả cũ
             }
             hit = new Cached(now, found);
-            searches.put(gap.keyword(), hit);
+            searches.put(cacheKey, hit);
             if (offers.size() > MAX_REMEMBERED) {
                 offers.clear();
             }
             found.forEach(o -> offers.put(o.id(), o));
         }
-        return hit.offers().stream().limit(limit).toList();
+        return withinBudget(hit.offers(), gap, limit);
+    }
+
+    /** Ưu tiên món trong ngân sách; không món nào vừa thì vẫn gợi ý món bán chạy nhất, còn hơn để trống. */
+    static List<ProductOffer> withinBudget(List<ProductOffer> all, WardrobeGap gap, int limit) {
+        if (gap.budget() != null) {
+            List<ProductOffer> fit = all.stream().filter(o -> gap.budget().fits(o.minPriceVnd())).limit(limit).toList();
+            if (!fit.isEmpty()) {
+                return fit;
+            }
+        }
+        return all.stream().limit(limit).toList();
+    }
+
+    private static final Pattern NAM = Pattern.compile("(?U)\\bnam\\b");
+
+    /** Tên sản phẩm Việt thường ghi "nam" / "nữ" / "nam nữ"; danh mục TikTok có Men's / Women's. */
+    static boolean fitsGender(Product p, Gender gender) {
+        if (gender == null || gender == Gender.OTHER) {
+            return true;
+        }
+        String leaf = p.categoryChains() == null || p.categoryChains().isEmpty() || p.categoryChains().getLast().localName() == null
+                ? "" : p.categoryChains().getLast().localName().toLowerCase(Locale.ROOT);
+        String title = p.title().toLowerCase(Locale.ROOT).replace("việt nam", "");
+        boolean male = NAM.matcher(title).find();
+        boolean female = title.contains("nữ");
+        return gender == Gender.MALE
+                ? !leaf.contains("women") && !(female && !male)
+                : !(leaf.contains("men's") && !leaf.contains("women")) && !(male && !female);
     }
 
     @Override
@@ -123,7 +154,8 @@ class AccessTradeTikTokCatalog implements ProductCatalog {
             }
             Set<String> words = CATEGORY_WORDS.getOrDefault(gap.category(), Set.of());
             return body.data().products().stream()
-                    .filter(p -> !Boolean.FALSE.equals(p.hasInventory()) && p.matches(words))
+                    .filter(p -> !Boolean.FALSE.equals(p.hasInventory()) && p.matches(words) && notBlank(p.title())
+                            && fitsGender(p, gap.gender()))
                     .map(AccessTradeTikTokCatalog::toOffer)
                     .flatMap(Optional::stream)
                     .toList();

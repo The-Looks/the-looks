@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { authApi, errorMessage, unwrap } from '../../../shared/api/client';
 import { formatDate } from '../../../shared/lib/format';
 import { session } from '../../../shared/lib/session';
-import { Button, Card, Notice, PageHeader, Spinner } from '../../../shared/ui';
+import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../shared/ui';
 
 export function ProfilePage() {
   const me = useQuery({ queryKey: ['me'], queryFn: () => unwrap(authApi.GET('/api/app/me')) });
@@ -19,6 +19,17 @@ export function ProfilePage() {
           <p className="small muted">Tham gia từ {formatDate(me.data.createdAt)}</p>
         </Card>
       )}
+      <Card>
+        <h2>Phong cách của bạn</h2>
+        <p className="small muted">
+          Giới tính, phong cách hay mặc, ngân sách: để AI gợi ý outfit và món nên mua hợp với bạn hơn.
+        </p>
+        <div>
+          <ButtonLink to="/profile/style" kind="outline" small>
+            Chỉnh phong cách
+          </ButtonLink>
+        </div>
+      </Card>
       <Card>
         <h2>Dữ liệu của bạn</h2>
         <p className="small muted">
