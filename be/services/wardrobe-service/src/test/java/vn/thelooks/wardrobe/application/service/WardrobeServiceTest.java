@@ -125,6 +125,16 @@ class WardrobeServiceTest {
     }
 
     @Test
+    void sameUploadSentTwiceIsScannedOnce() {
+        Scan first = service.start(USER, photos(1));
+        Scan again = service.start(USER, photos(1));
+        assertThat(again.id()).isEqualTo(first.id());
+        assertThat(itemStore).hasSize(2); // 2 món của lần đầu, không tách lại
+        assertThat(service.start(USER, List.of(new UploadedImage(new byte[] {7}, "image/jpeg"))).id())
+                .isNotEqualTo(first.id());
+    }
+
+    @Test
     void confirmUpdateDeleteAndOwnership() {
         Scan scan = service.start(USER, photos(1));
         ClothingItem item = service.scan(USER, scan.id()).orElseThrow().items().getFirst();
@@ -156,7 +166,14 @@ class WardrobeServiceTest {
     }
 
     class ScanRepo implements ScanRepository {
+        final Map<String, UUID> byHash = new HashMap<>();
         public Scan save(Scan scan) { scanStore.put(scan.id(), scan); return scan; }
+        public Scan saveUnlessDuplicate(Scan scan, String hash, Duration window) {
+            UUID old = byHash.get(hash);
+            if (old != null) return scanStore.get(old);
+            byHash.put(hash, scan.id());
+            return save(scan);
+        }
         public Optional<Scan> findById(UUID id) { return Optional.ofNullable(scanStore.get(id)); }
     }
 }
