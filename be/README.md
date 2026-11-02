@@ -6,7 +6,7 @@
 | `services/wardrobe-service` | Tủ đồ số: upload, AI nhận diện, xác nhận/sửa/xoá | 8082 | Member 1 |
 | `services/outfit-service` | AI gợi ý theo dịp + Quick Pick | 8083 | Member 2 (Tuấn) |
 | `services/voting-service` | Ask Friends: bình chọn A/B qua link | 8084 | Member 3 (Phát) |
-| `services/billing-service` | Gói Free / Plus / Pro, thanh toán PayOS | 8085 | Member 2 (Tuấn) |
+| `services/billing-service` | Gói Free / Plus / Pro, thanh toán VietQR qua SePay | 8085 | Member 2 (Tuấn) |
 | `packages/contracts` | OpenAPI của từng service — **sửa ở đây trước khi code** | | |
 | `packages/security` | Xác thực JWT dùng chung + chuyển tiếp token khi gọi service khác | | |
 | `packages/observability` | Correlation ID (header `X-Correlation-Id`, có trong log) | | |
@@ -117,10 +117,11 @@ Giá và quyền lợi nằm trong `billing-service/.../domain/model/Plan.java`.
 
 - Service khác lấy giới hạn của người dùng: `GET /api/app/billing/me` (chuyển tiếp JWT). wardrobe-service dùng `limits.wardrobeItems`,
   outfit-service dùng `limits.aiSuggestionsPerDay`, tính năng Pro kiểm tra `features`.
-- Thanh toán: `PAYMENT_GATEWAY=fake` (mặc định, bấm là thành công, chỉ dùng khi dev) hoặc `payos`
-  (cần `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` từ https://my.payos.vn).
-  Khai báo webhook `https://<domain>/api/public/billing/payos/webhook` trong trang PayOS.
-- Gói kích hoạt khi webhook tới **hoặc** khi người dùng quay lại trang kết quả (hỏi trạng thái từ PayOS), chỉ một lần.
+- Thanh toán: `PAYMENT_GATEWAY=fake` (hỏi trạng thái là thành công, chỉ dùng khi dev) hoặc `sepay`
+  (cần `SEPAY_ACCOUNT_NUMBER`, `SEPAY_BANK`, `SEPAY_WEBHOOK_API_KEY` từ https://my.sepay.vn).
+  Khai báo webhook `https://<domain>/api/public/billing/sepay/webhook`, xác thực kiểu API Key.
+- Web-app hiện ảnh VietQR, nội dung chuyển khoản `TLK<mã đơn>`; gói kích hoạt khi webhook báo tiền vào, chỉ một lần.
+- Tự gia hạn (mặc định bật): nhắc trước 3 ngày, giữ quyền lợi thêm 3 ngày ân hạn sau khi hết hạn; tắt thì hết hạn là về Free.
 - Đổi gói khi còn hạn: thời gian còn lại quy ra tiền rồi đổi sang thời gian của gói mới, không mất tiền.
 
 ## wardrobe-service: tủ đồ, quét ảnh nhiều món

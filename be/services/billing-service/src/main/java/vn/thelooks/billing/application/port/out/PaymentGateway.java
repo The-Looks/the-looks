@@ -4,20 +4,20 @@ import java.util.Map;
 import java.util.Optional;
 import vn.thelooks.billing.domain.model.Order;
 
-/** Cổng thanh toán (PayOS, hoặc bản giả khi dev). */
+/** Cổng thanh toán (SePay, hoặc bản giả khi dev). */
 public interface PaymentGateway {
 
-    /** Tạo link thanh toán cho đơn đã lưu (đã có orderCode). */
+    /** URL ảnh VietQR cho đơn đã lưu (đã có orderCode). Web-app hiện ảnh này để người dùng quét. */
     String createCheckoutUrl(Order order);
 
-    /** Hỏi trực tiếp cổng thanh toán xem đơn đã trả đủ tiền chưa. Dùng khi người dùng quay lại trang web. */
+    /** Hỏi trực tiếp cổng thanh toán xem đơn đã trả chưa. SePay chỉ báo qua webhook nên luôn false. */
     boolean isPaid(long orderCode, long amountVnd);
 
-    /**
-     * Webhook từ cổng thanh toán: kiểm tra chữ ký.
-     * @return mã đơn đã thanh toán thành công; rỗng nếu chữ ký sai hoặc không phải thông báo thanh toán thành công
-     */
-    Optional<PaidNotice> verifyWebhook(Map<String, Object> body);
+    /** Webhook có đúng do cổng thanh toán gửi không (header Authorization). */
+    boolean isAuthentic(String authorization);
+
+    /** Tiền vào cho một đơn; rỗng nếu không phải tiền vào hoặc nội dung không có mã đơn. */
+    Optional<PaidNotice> parseWebhook(Map<String, Object> body);
 
     record PaidNotice(long orderCode, long amountVnd) {
     }

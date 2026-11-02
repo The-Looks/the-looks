@@ -4,7 +4,7 @@ import { ButtonLink, Card, EmptyState, Notice, Spinner } from '../../../shared/u
 import { useConfirmOrder, useMyPlan } from '../api';
 import { formatDate, vnd } from '../labels';
 
-/** PayOS đưa người dùng về đây (returnUrl) kèm ?orderCode=...; hỏi backend xem đơn đã thanh toán chưa. */
+/** Trang thanh toán ?orderCode=...: hiện mã VietQR, hỏi backend tới khi đơn nhận được tiền. */
 export function BillingResultPage() {
   const [params] = useSearchParams();
   const raw = Number(params.get('orderCode'));
@@ -44,23 +44,40 @@ export function BillingResultPage() {
       </Card>
     );
   }
-  return (
-    <div className="stack">
-      <Notice tone="warn">
-        {o.status === 'CANCELLED'
-          ? `Đơn #${o.orderCode} đã huỷ, bạn chưa bị trừ tiền.`
-          : `Đơn #${o.orderCode} chưa nhận được tiền. Nếu bạn vừa chuyển khoản, đợi vài giây, trang sẽ tự cập nhật.`}
-      </Notice>
-      <div className="row">
-        {o.status === 'PENDING' && o.checkoutUrl && (
-          <a className="btn btn-sm" href={o.checkoutUrl}>
-            Mở lại trang thanh toán
-          </a>
-        )}
+  if (o.status === 'CANCELLED' || !o.checkoutUrl) {
+    return (
+      <div className="stack">
+        <Notice tone="warn">Đơn #{o.orderCode} đã huỷ, bạn chưa bị trừ tiền.</Notice>
         <ButtonLink to="/plans" kind="ghost" small>
           Chọn gói khác
         </ButtonLink>
       </div>
-    </div>
+    );
+  }
+  // Nội dung chuyển khoản nằm sẵn trong ảnh QR (tham số des)
+  const transferNote = new URL(o.checkoutUrl).searchParams.get('des');
+  return (
+    <Card>
+      <span className="eyebrow">Đơn #{o.orderCode}</span>
+      <h1>Quét mã để thanh toán {vnd(o.amountVnd)}</h1>
+      <p className="muted">Mở app ngân hàng hoặc ví, chọn quét QR. Trang này tự cập nhật khi nhận được tiền.</p>
+      <img
+        src={o.checkoutUrl}
+        alt={`Mã VietQR thanh toán ${vnd(o.amountVnd)}`}
+        width={280}
+        height={280}
+        style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}
+      />
+      {transferNote && (
+        <Notice>
+          Chuyển khoản tay thì ghi đúng nội dung <strong>{transferNote}</strong> và đúng số tiền, nếu không gói sẽ không
+          tự kích hoạt.
+        </Notice>
+      )}
+      <Spinner label="Đang chờ nhận tiền…" />
+      <ButtonLink to="/plans" kind="ghost" small>
+        Chọn gói khác
+      </ButtonLink>
+    </Card>
   );
 }

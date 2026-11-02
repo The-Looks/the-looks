@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 import vn.thelooks.billing.application.port.out.SubscriptionRepository;
+import vn.thelooks.billing.domain.model.BillingPeriod;
 import vn.thelooks.billing.domain.model.Plan;
 import vn.thelooks.billing.domain.model.Subscription;
 
@@ -34,13 +35,16 @@ class SubscriptionRepositoryAdapter implements SubscriptionRepository {
     @Override
     public void save(Subscription s) {
         jdbc.sql("""
-                insert into billing_subscription (owner_id, plan, expires_at, updated_at)
-                values (:owner, :plan, :expires, now())
-                on conflict (owner_id) do update set plan = excluded.plan, expires_at = excluded.expires_at, updated_at = now()
+                insert into billing_subscription (owner_id, plan, period, expires_at, auto_renew, updated_at)
+                values (:owner, :plan, :period, :expires, :autoRenew, now())
+                on conflict (owner_id) do update set plan = excluded.plan, period = excluded.period,
+                    expires_at = excluded.expires_at, auto_renew = excluded.auto_renew, updated_at = now()
                 """)
                 .param("owner", s.ownerId())
                 .param("plan", s.plan().name())
+                .param("period", s.period().name())
                 .param("expires", Timestamp.from(s.expiresAt()))
+                .param("autoRenew", s.autoRenew())
                 .update();
     }
 
@@ -50,6 +54,7 @@ class SubscriptionRepositoryAdapter implements SubscriptionRepository {
 
     private static Subscription map(ResultSet rs, int row) throws SQLException {
         Instant expires = rs.getTimestamp("expires_at").toInstant();
-        return new Subscription(rs.getObject("owner_id", UUID.class), Plan.valueOf(rs.getString("plan")), expires);
+        return new Subscription(rs.getObject("owner_id", UUID.class), Plan.valueOf(rs.getString("plan")),
+                BillingPeriod.valueOf(rs.getString("period")), expires, rs.getBoolean("auto_renew"));
     }
 }

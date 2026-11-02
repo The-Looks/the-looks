@@ -2,29 +2,23 @@ package vn.thelooks.billing.infrastructure.payment;
 
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import vn.thelooks.billing.application.port.out.PaymentGateway;
 import vn.thelooks.billing.domain.model.Order;
 
 /**
- * Thanh toán giả cho máy dev và demo: link thanh toán đưa thẳng về trang kết quả, và mọi đơn coi như đã trả.
- * KHÔNG bật ở production (PAYMENT_GATEWAY=payos).
+ * Thanh toán giả cho máy dev: hiện một mã QR mẫu, và lần hỏi trạng thái đầu tiên coi như đã trả.
+ * KHÔNG bật ở production (PAYMENT_GATEWAY=sepay).
  */
 @Component
 @ConditionalOnProperty(name = "thelooks.billing.gateway", havingValue = "fake")
 class FakePaymentGateway implements PaymentGateway {
 
-    private final String returnUrl;
-
-    FakePaymentGateway(@Value("${thelooks.billing.return-url}") String returnUrl) {
-        this.returnUrl = returnUrl;
-    }
-
     @Override
     public String createCheckoutUrl(Order order) {
-        return returnUrl + "?orderCode=" + order.orderCode() + "&status=PAID&fake=1";
+        return "https://qr.sepay.vn/img?acc=0000000000&bank=VCB&amount=" + order.amountVnd()
+                + "&des=" + SePayGateway.CODE_PREFIX + order.orderCode();
     }
 
     @Override
@@ -33,7 +27,12 @@ class FakePaymentGateway implements PaymentGateway {
     }
 
     @Override
-    public Optional<PaidNotice> verifyWebhook(Map<String, Object> body) {
+    public boolean isAuthentic(String authorization) {
+        return false;
+    }
+
+    @Override
+    public Optional<PaidNotice> parseWebhook(Map<String, Object> body) {
         return Optional.empty();
     }
 }

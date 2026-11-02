@@ -16,7 +16,7 @@ export function PlansPage() {
       <PageHeader
         eyebrow="Gói thành viên"
         title="Chọn gói phù hợp"
-        sub="Thanh toán qua VietQR bằng app ngân hàng hoặc MoMo. Đổi gói khi còn hạn, thời gian còn lại được quy đổi sang gói mới."
+        sub="Quét VietQR bằng app ngân hàng. Gói tự gia hạn, nhắc trước 3 ngày, tắt lúc nào cũng được. Đổi gói khi còn hạn, thời gian còn lại được quy đổi sang gói mới."
       />
 
       {me.data && me.data.plan !== 'FREE' && me.data.expiresAt && (
@@ -96,7 +96,7 @@ function PlanCard({
       </ul>
       {info.plan !== 'FREE' && (
         <Button block kind={info.plan === 'PRO' ? 'pink' : 'primary'} onClick={onBuy} disabled={busy}>
-          {busy ? 'Đang tạo link thanh toán…' : current ? 'Gia hạn' : `Chọn ${info.name}`}
+          {busy ? 'Đang tạo mã QR…' : current ? 'Gia hạn' : `Chọn ${info.name}`}
         </Button>
       )}
     </Card>

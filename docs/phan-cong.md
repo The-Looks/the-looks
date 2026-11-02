@@ -37,7 +37,7 @@ Mỗi người sở hữu trọn phần của mình: backend, màn hình web và
 | 2.5 | **Thống kê tủ đồ** (Pro): món theo loại/màu, món lâu chưa mặc, tỉ lệ đồ được mặc | 13/12 | Dùng `WearLog` có sẵn |
 | 2.6 | **Lịch mặc** (Pro): lên lịch outfit theo ngày, đánh dấu đã mặc | 20/12 | |
 | 2.7 | **Deploy**: Vercel (web), Render + Neon (backend), API gateway, biến môi trường, tên miền | 27/12 | Bản demo web đã sẵn sàng deploy |
-| 2.8 | Tài khoản **Anthropic** và **PayOS**, theo dõi chi phí AI hằng tuần | 15/11 (Anthropic) · 13/12 (PayOS) | Ngân sách AI 25 USD/tháng |
+| 2.8 | Tài khoản **Anthropic** và **SePay**, theo dõi chi phí AI hằng tuần | 15/11 (Anthropic) · 13/12 (SePay) | Ngân sách AI 25 USD/tháng |
 
 ## Phát (Member 3) · Đăng nhập, Ask Friends, admin
 

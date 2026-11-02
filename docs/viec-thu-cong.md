@@ -37,11 +37,17 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   1. Tạo key ở https://console.anthropic.com → API Keys. Đặt **giới hạn chi tiêu tháng** ngay trong console.
   2. Biến môi trường outfit-service: `AI_PROVIDER=claude`, `ANTHROPIC_API_KEY=...`
      (model mặc định `claude-haiku-5-5`; ngân sách app tự giới hạn bằng `AI_MONTHLY_BUDGET_USD`, mặc định 25).
-- [ ] **PayOS (thanh toán gói)** · Tuấn · trước khi bán gói thật
-  1. Đăng ký https://my.payos.vn bằng tài khoản ngân hàng của nhóm, tạo kênh thanh toán.
-  2. Lấy `Client ID`, `API Key`, `Checksum Key` → biến `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, và `PAYMENT_GATEWAY=payos`.
-  3. Khai báo webhook: `https://<tên-miền>/api/public/billing/payos/webhook`.
-  4. Mua thử 1 gói Plus tháng bằng tiền thật để kiểm tra trọn luồng.
+- [ ] **SePay (thanh toán gói qua VietQR)** · Tuấn · trước khi bán gói thật
+  1. Đăng ký https://my.sepay.vn, liên kết tài khoản ngân hàng nhận tiền của nhóm (tài khoản cá nhân được).
+  2. **WebHooks → Thêm webhook**: sự kiện *Có tiền vào*, URL `https://the-looks.vercel.app/api/public/billing/sepay/webhook`,
+     kiểu chứng thực **API Key**, tự đặt một chuỗi ngẫu nhiên dài làm key.
+  3. Render → `thelooks-billing` → Environment: `SEPAY_ACCOUNT_NUMBER` (số tài khoản), `SEPAY_BANK` (tên ngắn, vd `MBBank`, `VCB`),
+     `SEPAY_WEBHOOK_API_KEY` (key ở bước 2). `DB_URL` dùng database `thelooks_billing`.
+  4. Vercel: xoá biến `VITE_MOCK_SERVICES` (không còn service nào dùng dữ liệu giả) → Redeploy.
+  5. Mua thử gói Plus tháng 39.000đ bằng tiền thật, xem gói kích hoạt trong vài giây.
+  Chuyển trùng, sai nội dung hoặc sai số tiền: app không tự kích hoạt, log của billing ghi lại, phải đối soát và hoàn tiền tay.
+- [ ] **Trừ tiền tự động thật (VNPay token / liên kết MoMo)** · nhóm · khi có hộ kinh doanh hoặc công ty
+  Hiện "tự gia hạn" = nhắc trước 3 ngày + giữ gói 3 ngày ân hạn, người dùng vẫn tự quét QR. Thêm adapter `PaymentGateway` mới khi có hợp đồng.
 - [ ] **Cloudinary (lưu ảnh tủ đồ)** · Tuấn hoặc Thạch · trước khi deploy
   Đăng ký https://cloudinary.com (gói Free) → Dashboard lấy Cloud name, API Key, API Secret.
   Biến môi trường wardrobe-service: `IMAGE_STORAGE=cloudinary`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
@@ -81,7 +87,7 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   6. Mở `https://thelooks-auth.onrender.com/actuator/health` thấy `UP` là chạy.
   7. Vercel: đổi `VITE_MOCK_SERVICES=billing` (chỉ billing còn giả) → Redeploy.
   Gói free: service ngủ sau 15 phút không dùng, lần mở đầu chờ khoảng 1 phút. Ảnh tủ đồ mất khi service khởi động lại
-  cho tới khi bật Cloudinary. billing-service deploy sau khi có PayOS.
+  cho tới khi bật Cloudinary. `thelooks-billing` cần thêm 3 biến SePay (mục 2).
 - [ ] **Mua tên miền** · nhóm · trước khi ra mắt T1/2027 (ngân sách 500.000đ)
 
 ## 4. Máy dev của Tuấn
@@ -100,7 +106,7 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
     Cài đặt `GarmentDetector` (đề xuất Claude Haiku 5.5 vision), `ImageCropper`, lưu Cloudinary; không lưu ảnh gốc.
 - [ ] **Báo Phát các điểm review PR #2, #3** · Tuấn
   Chống spam bình chọn (thêm IP vào voter key + giới hạn tần suất), cache kiểm tra phiên ~30 giây, thêm test đăng nhập/refresh/bình chọn.
-- [ ] **Chốt giá gói** · nhóm · trước khi bật PayOS
+- [ ] **Chốt giá gói** · nhóm · trước khi bật SePay
   Đang đề xuất: Plus 39.000đ/tháng · 390.000đ/năm, Pro 79.000đ/tháng · 790.000đ/năm (sửa trong `Plan.java`).
 - [ ] **Chọn hướng cho affiliate và phí giao dịch** (luồng doanh thu 2 và 3) · nhóm
   Cần: nền tảng affiliate (Shopee/TikTok/AccessTrade…), % phí trên đơn mua qua đối tác, đối tác đầu tiên.

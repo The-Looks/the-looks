@@ -16,6 +16,7 @@ import vn.thelooks.billing.application.port.out.SubscriptionRepository;
 import vn.thelooks.billing.application.usecase.CheckoutUseCase;
 import vn.thelooks.billing.application.usecase.ConfirmPaymentUseCase;
 import vn.thelooks.billing.application.usecase.GetEntitlementsQuery;
+import vn.thelooks.billing.application.usecase.SetAutoRenewUseCase;
 import vn.thelooks.billing.domain.exception.InvalidPlanException;
 import vn.thelooks.billing.domain.exception.OrderNotFoundException;
 import vn.thelooks.billing.domain.model.BillingPeriod;
@@ -27,7 +28,7 @@ import vn.thelooks.billing.domain.model.Subscription;
 import vn.thelooks.billing.domain.service.SubscriptionCalculator;
 
 @Service
-class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPaymentUseCase {
+class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPaymentUseCase, SetAutoRenewUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(BillingService.class);
 
@@ -52,7 +53,20 @@ class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPa
         return Entitlements.of(subscriptions.find(ownerId).orElse(null), clock.instant());
     }
 
-    /** Không bọc transaction: gọi cổng thanh toán qua mạng, không giữ kết nối DB. */
+    @Override
+    public Entitlements setAutoRenew(UUID ownerId, boolean enabled) {
+        return tx.execute(status -> {
+            Instant now = clock.instant();
+            Subscription current = subscriptions.findForUpdate(ownerId)
+                    .filter(s -> s.activeAt(now))
+                    .orElseThrow(() -> new InvalidPlanException("Bạn đang dùng gói Free, không có gì để gia hạn"));
+            Subscription updated = current.withAutoRenew(enabled);
+            subscriptions.save(updated);
+            return Entitlements.of(updated, now);
+        });
+    }
+
+    /** Không bọc transaction: tạo mã thanh toán không nên giữ kết nối DB. */
     @Override
     public Order checkout(UUID ownerId, Plan plan, BillingPeriod period) {
         if (plan == null || !plan.paid() || period == null) {
@@ -77,14 +91,18 @@ class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPa
     }
 
     @Override
-    public boolean handleWebhook(Map<String, Object> body) {
-        var notice = gateway.verifyWebhook(body);
-        if (notice.isEmpty()) {
+    public boolean handleWebhook(Map<String, Object> body, String authorization) {
+        if (!gateway.isAuthentic(authorization)) {
             return false;
+        }
+        var notice = gateway.parseWebhook(body);
+        if (notice.isEmpty()) {
+            return true;
         }
         var order = orders.find(notice.get().orderCode());
         if (order.isEmpty()) {
-            log.info("Webhook cho đơn không tồn tại {} (có thể là webhook thử của PayOS)", notice.get().orderCode());
+            log.warn("Tiền vào cho đơn không tồn tại {}: {}đ, cần kiểm tra và hoàn tiền tay",
+                    notice.get().orderCode(), notice.get().amountVnd());
             return true;
         }
         if (notice.get().amountVnd() < order.get().amountVnd()) {
@@ -96,20 +114,21 @@ class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPa
     }
 
     /**
-     * Đơn PENDING → PAID và cộng thời hạn gói, trong một transaction. Webhook và người dùng quay lại
-     * có thể tới cùng lúc: markPaid chỉ thành công một lần nên gói không bị cộng hai lần.
+     * Đơn PENDING → PAID và cộng thời hạn gói, trong một transaction. Webhook gửi lại hoặc tới cùng lúc với trang kết quả:
+     * markPaid chỉ thành công một lần nên gói không bị cộng hai lần. Gia hạn xong thì tự gia hạn bật lại.
      * Dùng TransactionTemplate vì @Transactional không có tác dụng khi gọi hàm trong cùng class.
      */
     void activate(long orderCode) {
         tx.executeWithoutResult(status -> {
             Instant now = clock.instant();
             if (!orders.markPaid(orderCode, now)) {
+                log.info("Đơn {} đã xử lý trước đó (có thể chuyển khoản trùng, cần kiểm tra)", orderCode);
                 return;
             }
             Order order = orders.find(orderCode).orElseThrow();
             Subscription current = subscriptions.findForUpdate(order.ownerId()).orElse(null);
             Instant expiry = SubscriptionCalculator.newExpiry(current, order.plan(), order.period(), now);
-            subscriptions.save(new Subscription(order.ownerId(), order.plan(), expiry));
+            subscriptions.save(new Subscription(order.ownerId(), order.plan(), order.period(), expiry, true));
             log.info("Kích hoạt gói {} cho {} tới {} (đơn {})", order.plan(), order.ownerId(), expiry, orderCode);
         });
     }

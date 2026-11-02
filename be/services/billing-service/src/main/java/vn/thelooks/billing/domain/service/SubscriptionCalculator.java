@@ -12,7 +12,7 @@ import vn.thelooks.billing.domain.model.Subscription;
  * Ngày hết hạn mới sau khi thanh toán.
  * <ul>
  *   <li>Chưa có gói / đã hết hạn: tính từ bây giờ.</li>
- *   <li>Gia hạn cùng gói: cộng tiếp vào ngày hết hạn cũ.</li>
+ *   <li>Gia hạn cùng gói (kể cả trong thời gian ân hạn): cộng tiếp vào ngày hết hạn cũ, nên ân hạn không thành ngày miễn phí.</li>
  *   <li>Đổi gói khi gói cũ còn hạn: thời gian còn lại quy ra tiền theo giá tháng của gói cũ,
  *       rồi đổi sang thời gian của gói mới, cộng thêm vào. Không ai mất tiền khi nâng hoặc hạ gói.</li>
  * </ul>
@@ -38,7 +38,8 @@ public final class SubscriptionCalculator {
         if (!active) {
             return base;
         }
-        long remainingSeconds = Duration.between(now, current.expiresAt()).toSeconds();
+        // Đổi gói trong thời gian ân hạn: không còn thời gian để quy đổi
+        long remainingSeconds = Math.max(0, Duration.between(now, current.expiresAt()).toSeconds());
         double creditVnd = remainingSeconds * (double) current.plan().monthlyPriceVnd() / SECONDS_PER_MONTH;
         long creditSeconds = Math.round(creditVnd * SECONDS_PER_MONTH / plan.monthlyPriceVnd());
         return base.plusSeconds(creditSeconds);

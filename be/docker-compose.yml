@@ -107,11 +107,9 @@ services:
       JWT_JWK_SET_URI: http://auth-service:8081/.well-known/jwks.json
       SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active
       PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-fake}
-      BILLING_RETURN_URL: ${WEB_APP_URL:-http://localhost:5173}/billing/result
-      BILLING_CANCEL_URL: ${WEB_APP_URL:-http://localhost:5173}/plans
-      PAYOS_CLIENT_ID: ${PAYOS_CLIENT_ID:-}
-      PAYOS_API_KEY: ${PAYOS_API_KEY:-}
-      PAYOS_CHECKSUM_KEY: ${PAYOS_CHECKSUM_KEY:-}
+      SEPAY_ACCOUNT_NUMBER: ${SEPAY_ACCOUNT_NUMBER:-}
+      SEPAY_BANK: ${SEPAY_BANK:-}
+      SEPAY_WEBHOOK_API_KEY: ${SEPAY_WEBHOOK_API_KEY:-}
     ports: ["8085:8085"]
     depends_on:
       postgres:

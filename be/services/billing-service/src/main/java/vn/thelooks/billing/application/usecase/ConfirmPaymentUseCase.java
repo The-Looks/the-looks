@@ -6,9 +6,9 @@ import vn.thelooks.billing.domain.model.Order;
 
 public interface ConfirmPaymentUseCase {
 
-    /** Người dùng quay lại từ trang thanh toán: hỏi cổng thanh toán, nếu đã trả thì kích hoạt gói. */
+    /** Trang thanh toán hỏi định kỳ: trạng thái đơn (gói được kích hoạt khi webhook báo tiền vào). */
     Order confirm(UUID ownerId, long orderCode);
 
-    /** Webhook từ cổng thanh toán. @return false nếu chữ ký sai */
-    boolean handleWebhook(Map<String, Object> body);
+    /** Webhook từ cổng thanh toán. @return false nếu không xác thực được người gửi */
+    boolean handleWebhook(Map<String, Object> body, String authorization);
 }

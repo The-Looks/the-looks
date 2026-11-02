@@ -261,10 +261,24 @@ const PLANS = [
     features: ['WARDROBE_STATS', 'COST_PER_WEAR', 'WEAR_CALENDAR', 'TRY_ON_3D'],
   },
 ] as const;
-let myPlan: { plan: 'FREE' | 'PLUS' | 'PRO'; expiresAt: string | null } = { plan: 'FREE', expiresAt: null };
+let myPlan: {
+  plan: 'FREE' | 'PLUS' | 'PRO';
+  expiresAt: string | null;
+  period: 'MONTHLY' | 'YEARLY' | null;
+  autoRenew: boolean;
+  status: 'ACTIVE' | null;
+} = { plan: 'FREE', expiresAt: null, period: null, autoRenew: false, status: null };
 const orders = new Map<
   number,
-  { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY'; amountVnd: number; status: string; createdAt: string }
+  {
+    plan: 'PLUS' | 'PRO';
+    period: 'MONTHLY' | 'YEARLY';
+    amountVnd: number;
+    status: string;
+    createdAt: string;
+    checkoutUrl: string;
+    polls: number;
+  }
 >();
 let nextOrder = 100001;
 const entitlements = () => {
@@ -275,31 +289,45 @@ const entitlements = () => {
 const billing: HttpHandler[] = [
   http.get('*/api/public/billing/plans', () => HttpResponse.json(PLANS)),
   http.get('*/api/app/billing/me', () => HttpResponse.json(entitlements())),
+  http.put('*/api/app/billing/me/auto-renew', async ({ request }) => {
+    if (myPlan.plan === 'FREE') return problem(400, 'Bạn đang dùng gói Free, không có gì để gia hạn');
+    myPlan.autoRenew = ((await request.json()) as { enabled: boolean }).enabled;
+    return HttpResponse.json(entitlements());
+  }),
   http.post('*/api/app/billing/checkout', async ({ request }) => {
     const body = (await request.json()) as { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY' };
     const p = PLANS.find((x) => x.plan === body.plan)!;
     const orderCode = nextOrder++;
+    const amountVnd = body.period === 'MONTHLY' ? p.monthlyPriceVnd : p.yearlyPriceVnd;
     const order = {
       plan: body.plan,
       period: body.period,
-      amountVnd: body.period === 'MONTHLY' ? p.monthlyPriceVnd : p.yearlyPriceVnd,
+      amountVnd,
       status: 'PENDING',
       createdAt: new Date().toISOString(),
+      checkoutUrl: `https://qr.sepay.vn/img?acc=0000000000&bank=VCB&amount=${amountVnd}&des=TLK${orderCode}`,
+      polls: 0,
     };
     orders.set(orderCode, order);
-    const checkoutUrl = `${location.origin}/billing/result?orderCode=${orderCode}&status=PAID&fake=1`;
-    return HttpResponse.json({ orderCode, ...order, checkoutUrl }, { status: 201 });
+    return HttpResponse.json({ orderCode, ...order }, { status: 201 });
   }),
   http.post('*/api/app/billing/orders/:code/confirm', ({ params }) => {
     const code = Number(params.code);
     const order = orders.get(code);
     if (!order) return problem(404, `Không tìm thấy đơn ${code}`);
-    if (order.status === 'PENDING') {
+    // Giả lập người dùng quét QR: lần hỏi thứ 3 (~6 giây) thì coi như đã nhận tiền
+    if (order.status === 'PENDING' && ++order.polls >= 3) {
       order.status = 'PAID';
       const months = order.period === 'MONTHLY' ? 1 : 12;
       const expires = new Date();
       expires.setMonth(expires.getMonth() + months);
-      myPlan = { plan: order.plan, expiresAt: expires.toISOString() };
+      myPlan = {
+        plan: order.plan,
+        expiresAt: expires.toISOString(),
+        period: order.period,
+        autoRenew: true,
+        status: 'ACTIVE',
+      };
     }
     return HttpResponse.json({ orderCode: code, ...order });
   }),

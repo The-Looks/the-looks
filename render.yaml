@@ -2,8 +2,7 @@
 # - Biến `sync: false` là bí mật: Render hỏi khi tạo Blueprint, không ghi vào file này.
 # - Gói free không nhận được traffic mạng nội bộ, nên các service gọi nhau qua URL public.
 #   Nếu Render đổi tên service (tên đã có người dùng), sửa các URL *.onrender.com bên dưới.
-# - billing-service chưa deploy (chưa có PayOS): BILLING_SERVICE_URL trỏ chỗ không có gì,
-#   outfit và wardrobe tự dùng hạn mức gói Free.
+# - billing-service nhận tiền qua SePay; SePay gọi webhook qua link Vercel (xem docs/viec-thu-cong.md).
 
 envVarGroups:
   - name: thelooks-shared
@@ -19,7 +18,7 @@ envVarGroups:
       - key: SESSION_VALIDATION_URI
         value: https://thelooks-auth.onrender.com/api/public/auth/session/active
       - key: BILLING_SERVICE_URL
-        value: http://localhost:8085
+        value: https://thelooks-billing.onrender.com
 
 services:
   - type: web
@@ -113,3 +112,28 @@ services:
         value: https://thelooks-outfit.onrender.com
       - key: VOTER_KEY_SECRET
         generateValue: true
+
+  - type: web
+    name: thelooks-billing
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./be
+    dockerfilePath: ./be/services/billing-service/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - fromGroup: thelooks-shared
+      - key: PORT
+        value: 8085
+      - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_billing?sslmode=require
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: PAYMENT_GATEWAY
+        value: sepay
+      - key: SEPAY_ACCOUNT_NUMBER # số tài khoản nhận tiền đã liên kết SePay
+        sync: false
+      - key: SEPAY_BANK # vd MBBank, VCB, TPBank
+        sync: false
+      - key: SEPAY_WEBHOOK_API_KEY # API key đặt khi tạo webhook trên SePay
+        sync: false

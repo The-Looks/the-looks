@@ -76,6 +76,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/billing/me/auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Bật / tắt tự gia hạn gói đang dùng */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description Gói sau khi đổi */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Entitlements"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/billing/checkout": {
         parameters: {
             query?: never;
@@ -85,7 +128,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Tạo đơn mua / gia hạn gói và link thanh toán. Đổi gói khi còn hạn thì thời gian còn lại được quy đổi, không mất tiền. */
+        /** Tạo đơn mua / gia hạn gói và mã VietQR. Đổi gói khi còn hạn thì thời gian còn lại được quy đổi, không mất tiền. */
         post: {
             parameters: {
                 query?: never;
@@ -103,7 +146,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Đã tạo đơn; chuyển người dùng tới checkoutUrl */
+                /** @description Đã tạo đơn; hiện ảnh QR ở checkoutUrl */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -113,7 +156,6 @@ export interface paths {
                     };
                 };
                 400: components["responses"]["Problem"];
-                503: components["responses"]["Problem"];
             };
         };
         delete?: never;
@@ -131,7 +173,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Gọi khi người dùng quay lại từ trang thanh toán; nếu đã trả tiền thì kích hoạt gói */
+        /** Trang thanh toán hỏi định kỳ xem đơn đã nhận tiền chưa (gói kích hoạt khi webhook báo tiền vào) */
         post: {
             parameters: {
                 query?: never;
@@ -161,7 +203,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/public/billing/payos/webhook": {
+    "/api/public/billing/sepay/webhook": {
         parameters: {
             query?: never;
             header?: never;
@@ -170,7 +212,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Webhook của PayOS (xác thực bằng chữ ký HMAC-SHA256 checksum key) */
+        /** Webhook của SePay khi có tiền vào (header Authorization "Apikey <key>") */
         post: {
             parameters: {
                 query?: never;
@@ -184,15 +226,15 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Đã nhận */
+                /** @description Đã nhận: {"success": true} */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
                 };
-                /** @description Sai chữ ký */
-                400: {
+                /** @description Sai API key */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -236,8 +278,18 @@ export interface components {
         };
         Entitlements: {
             plan: components["schemas"]["Plan"];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Ngày hết kỳ đã trả (null với FREE)
+             */
             expiresAt?: string | null;
+            period?: components["schemas"]["BillingPeriod"] | null;
+            autoRenew: boolean;
+            /**
+             * @description RENEWAL_DUE = còn ≤ 3 ngày; GRACE = đã quá hạn, còn trong 3 ngày ân hạn. null với FREE
+             * @enum {string|null}
+             */
+            status?: "ACTIVE" | "RENEWAL_DUE" | "GRACE" | null;
             limits: components["schemas"]["Limits"];
             features: components["schemas"]["Feature"][];
         };
@@ -250,7 +302,10 @@ export interface components {
             amountVnd: number;
             /** @enum {string} */
             status: "PENDING" | "PAID" | "CANCELLED";
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description URL ảnh VietQR để người dùng quét
+             */
             checkoutUrl?: string;
             /** Format: date-time */
             createdAt: string;
