@@ -73,7 +73,7 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
      - `DB_URL`: `jdbc:postgresql://<host Neon>/<database của service>?sslmode=require`
        (auth → `thelooks_identity`, wardrobe → `thelooks_wardrobe`, outfit → `thelooks_outfit`, voting → `thelooks_voting`)
      - `DB_PASSWORD`: mật khẩu Neon (cả 4 service giống nhau)
-     - `WEB_ORIGIN`, `PUBLIC_BASE_URL`, `SHARE_BASE_URL`: link Vercel, vd `https://the-looks.vercel.app`
+     - `WEB_ORIGIN` trên cả 4 service, `PUBLIC_BASE_URL`, `SHARE_BASE_URL`: cùng link Vercel, vd `https://the-looks.vercel.app`
      - `ANTHROPIC_API_KEY`: key Claude (wardrobe và outfit)
   4. Service `thelooks-auth` → Environment → **Secret Files** → thêm file tên `jwt-private.pem`, dán nội dung khoá ở bước 1.
   5. Kiểm tra tên 4 service trên Render đúng là `thelooks-auth`, `-wardrobe`, `-outfit`, `-voting`.
