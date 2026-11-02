@@ -14,6 +14,11 @@ public class ObservabilityAutoConfiguration {
     }
 
     @Bean
+    IdempotencyFilter idempotencyFilter() {
+        return new IdempotencyFilter();
+    }
+
+    @Bean
     CorrelationIdForwardingInterceptor correlationIdForwardingInterceptor() {
         return new CorrelationIdForwardingInterceptor();
     }
