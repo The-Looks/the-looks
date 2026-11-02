@@ -1,14 +1,16 @@
 import createClient, { type Middleware } from 'openapi-fetch';
 import { session } from '../lib/session';
-import type { paths as IdentityPaths } from './schema/identity';
+import type { paths as AuthPaths } from './schema/auth';
 import type { paths as OutfitPaths } from './schema/outfit';
 import type { paths as VotingPaths } from './schema/voting';
 import type { paths as WardrobePaths } from './schema/wardrobe';
 
-/** Gắn JWT vào mọi request; 401 → xoá phiên, RequireAuth tự đưa về /login. */
+/** Làm mới access token khi cần, rồi gắn Bearer token cho API có bảo vệ. */
 const auth: Middleware = {
-  onRequest({ request }) {
-    const token = session.getToken();
+  async onRequest({ request }) {
+    const path = new URL(request.url).pathname;
+    if (!path.startsWith('/api/app/') && !path.startsWith('/api/admin/')) return request;
+    const token = await session.validToken();
     if (token) request.headers.set('Authorization', `Bearer ${token}`);
     return request;
   },
@@ -25,7 +27,7 @@ function client<Paths extends object>() {
   return c;
 }
 
-export const identityApi = client<IdentityPaths>();
+export const authApi = client<AuthPaths>();
 export const wardrobeApi = client<WardrobePaths>();
 export const outfitApi = client<OutfitPaths>();
 export const votingApi = client<VotingPaths>();

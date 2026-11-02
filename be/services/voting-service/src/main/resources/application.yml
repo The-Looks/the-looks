@@ -1,5 +1,6 @@
 server:
   port: 8084
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -35,3 +36,9 @@ thelooks:
   security:
     issuer: ${JWT_ISSUER}
     jwk-set-uri: ${JWT_JWK_SET_URI}
+    session-validation-uri: ${SESSION_VALIDATION_URI:http://localhost:8081/api/public/auth/session/active}
+  services:
+    outfit-url: ${OUTFIT_SERVICE_URL}
+  voting:
+    share-base-url: ${SHARE_BASE_URL}
+    voter-key-secret: ${VOTER_KEY_SECRET}

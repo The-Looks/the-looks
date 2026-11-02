@@ -66,7 +66,7 @@ export interface paths {
                             code: string;
                             /**
                              * Format: uri
-                             * @description link gửi qua Zalo
+                             * @description link gửi qua Zalo, mở trên web-app tại /v/{code}
                              */
                             shareUrl: string;
                             /** Format: date-time */

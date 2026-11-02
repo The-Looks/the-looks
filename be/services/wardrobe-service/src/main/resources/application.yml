@@ -35,3 +35,4 @@ thelooks:
   security:
     issuer: ${JWT_ISSUER}
     jwk-set-uri: ${JWT_JWK_SET_URI}
+    session-validation-uri: ${SESSION_VALIDATION_URI:http://localhost:8081/api/public/auth/session/active}

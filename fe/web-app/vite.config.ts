@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 // Mỗi nhóm đường dẫn API đi tới một service (thay cho API gateway khi dev).
 // Production làm việc tương tự bằng rewrites trong vercel.json.
 const services = {
-  identity: 'http://localhost:8081',
+  auth: 'http://localhost:8081',
   wardrobe: 'http://localhost:8082',
   outfit: 'http://localhost:8083',
   voting: 'http://localhost:8084',
@@ -43,8 +43,8 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api/public/auth': services.identity,
-      '/api/app/me': services.identity,
+      '/api/public/auth': services.auth,
+      '/api/app/me': services.auth,
       '/api/app/wardrobe': services.wardrobe,
       '/api/app/outfits': services.outfit,
       '/api/app/polls': services.voting,
