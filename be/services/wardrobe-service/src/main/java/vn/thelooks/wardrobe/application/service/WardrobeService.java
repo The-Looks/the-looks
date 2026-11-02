@@ -1,7 +1,12 @@
 package vn.thelooks.wardrobe.application.service;
 
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -64,6 +69,22 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
 
     // ---------------------------------------------------------------- quét ảnh
 
+    /** Gửi lại đúng bộ ảnh trong khoảng này thì coi là trùng (bấm 2 lần, trình duyệt / proxy gửi lại request). */
+    static final Duration DUPLICATE_WINDOW = Duration.ofMinutes(2);
+
+    static String contentHash(List<UploadedImage> uploads) {
+        try {
+            MessageDigest sha = MessageDigest.getInstance("SHA-256");
+            for (UploadedImage u : uploads) {
+                sha.update(ByteBuffer.allocate(4).putInt(u.content().length).array());
+                sha.update(u.content());
+            }
+            return HexFormat.of().formatHex(sha.digest());
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     @Override
     public Scan start(UUID ownerId, List<UploadedImage> uploads) {
         if (uploads == null || uploads.isEmpty() || uploads.size() > MAX_IMAGES) {
@@ -84,8 +105,12 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
         }
         // Đọc và chuẩn hoá ảnh ngay: ảnh hỏng báo lỗi 400 thay vì thất bại âm thầm khi chạy nền
         List<NormalizedImage> normalized = uploads.stream().map(u -> images.normalize(u.content(), u.contentType())).toList();
-        Scan scan = scans.save(new Scan(UUID.randomUUID(), ownerId, ScanStatus.PROCESSING, uploads.size(), List.of(), 0,
-                clock.instant()));
+        Scan fresh = new Scan(UUID.randomUUID(), ownerId, ScanStatus.PROCESSING, uploads.size(), List.of(), 0, clock.instant());
+        Scan scan = scans.saveUnlessDuplicate(fresh, contentHash(uploads), DUPLICATE_WINDOW);
+        if (!scan.id().equals(fresh.id())) {
+            log.info("Bỏ qua lần quét trùng của {}, dùng lại scan {}", ownerId, scan.id());
+            return scan;
+        }
         background.execute(() -> process(scan, normalized, max));
         return scan;
     }

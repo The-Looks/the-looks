@@ -1,11 +1,14 @@
 package vn.thelooks.wardrobe.infrastructure.persistence;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import vn.thelooks.wardrobe.application.port.out.ScanRepository;
 import vn.thelooks.wardrobe.domain.model.Scan;
 import vn.thelooks.wardrobe.domain.model.ScanStatus;
@@ -15,9 +18,36 @@ import vn.thelooks.wardrobe.domain.model.ScanStatus;
 class ScanRepositoryAdapter implements ScanRepository {
 
     private final JdbcClient jdbc;
+    private final TransactionTemplate tx;
 
-    ScanRepositoryAdapter(JdbcClient jdbc) {
+    ScanRepositoryAdapter(JdbcClient jdbc, PlatformTransactionManager transactions) {
         this.jdbc = jdbc;
+        this.tx = new TransactionTemplate(transactions);
+    }
+
+    /** Khoá theo người dùng tới hết transaction: hai request trùng tới cùng lúc phải chờ nhau rồi mới kiểm tra. */
+    @Override
+    public Scan saveUnlessDuplicate(Scan s, String contentHash, Duration window) {
+        return tx.execute(status -> {
+            jdbc.sql("select count(*) from (select pg_advisory_xact_lock(hashtextextended(:owner, 0))) l")
+                    .param("owner", s.ownerId().toString()).query(Long.class).single();
+            Optional<UUID> existing = jdbc.sql("""
+                    select id from wardrobe_scan
+                    where owner_id = :owner and content_hash = :hash and created_at > :since
+                    order by created_at desc limit 1
+                    """)
+                    .param("owner", s.ownerId())
+                    .param("hash", contentHash)
+                    .param("since", Timestamp.from(s.createdAt().minus(window)))
+                    .query(UUID.class).optional();
+            if (existing.isPresent()) {
+                return findById(existing.get()).orElseThrow();
+            }
+            save(s);
+            jdbc.sql("update wardrobe_scan set content_hash = :hash where id = :id")
+                    .param("hash", contentHash).param("id", s.id()).update();
+            return s;
+        });
     }
 
     @Override
