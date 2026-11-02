@@ -10,5 +10,7 @@ public interface BallotRepository {
 
     boolean exists(UUID pollId, String voterKey);
 
+    long countByIp(UUID pollId, String ipKey);
+
     PollResult tally(UUID pollId);
 }

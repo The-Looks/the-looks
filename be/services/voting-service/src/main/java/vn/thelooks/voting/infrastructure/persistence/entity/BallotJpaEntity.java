@@ -23,6 +23,9 @@ public class BallotJpaEntity extends BaseEntity {
     @Column(name = "voter_key", nullable = false, length = 64)
     private String voterKey;
 
+    @Column(name = "ip_key", nullable = false, length = 64)
+    private String ipKey;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 8)
     private Choice choice;
@@ -33,10 +36,11 @@ public class BallotJpaEntity extends BaseEntity {
     protected BallotJpaEntity() {
     }
 
-    public BallotJpaEntity(UUID id, UUID pollId, String voterKey, Choice choice, Instant castAt) {
+    public BallotJpaEntity(UUID id, UUID pollId, String voterKey, String ipKey, Choice choice, Instant castAt) {
         this.id = id;
         this.pollId = pollId;
         this.voterKey = voterKey;
+        this.ipKey = ipKey;
         this.choice = choice;
         this.castAt = castAt;
     }

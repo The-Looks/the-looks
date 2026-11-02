@@ -76,7 +76,8 @@ class PollController {
     ResponseEntity<PollResponse.Result> vote(@PathVariable String code, @Valid @RequestBody VoteRequest body,
             @CookieValue(name = "vote_id", required = false) String voterId, HttpServletRequest request) {
         var id = voterId != null && voterId.matches("[A-Za-z0-9_-]{43}") ? voterId : newVoterId();
-        var result = castVote.vote(code, body.choice(), voterKeys.forPoll(code, id));
+        // request.getRemoteAddr() đã là IP thật của khách nhờ server.forward-headers-strategy=framework
+        var result = castVote.vote(code, body.choice(), voterKeys.forPoll(code, id), request.getRemoteAddr());
         var cookie = ResponseCookie.from("vote_id", id)
                 .httpOnly(true).secure(request.isSecure()).sameSite("Lax")
                 .path("/api/public/polls").maxAge(Duration.ofDays(365)).build();

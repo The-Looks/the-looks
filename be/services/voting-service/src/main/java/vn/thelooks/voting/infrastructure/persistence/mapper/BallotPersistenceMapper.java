@@ -9,6 +9,6 @@ public final class BallotPersistenceMapper {
     }
 
     public static BallotJpaEntity toEntity(Ballot ballot) {
-        return new BallotJpaEntity(ballot.id(), ballot.pollId(), ballot.voterKey(), ballot.choice(), ballot.castAt());
+        return new BallotJpaEntity(ballot.id(), ballot.pollId(), ballot.voterKey(), ballot.ipKey(), ballot.choice(), ballot.castAt());
     }
 }
