@@ -12,6 +12,7 @@ servers:
     description: local
 security:
   - bearerAuth: []
+  - cookieAuth: []
 
 paths:
   /api/app/outfits/suggestions:
@@ -185,6 +186,7 @@ paths:
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+    cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
     StylePreferences:
       type: object

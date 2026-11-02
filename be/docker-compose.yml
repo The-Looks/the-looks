@@ -54,6 +54,7 @@ services:
       DB_USER: thelooks
       DB_PASSWORD: thelooks
       JWT_ISSUER: ${JWT_ISSUER}
+      WEB_ORIGIN: ${WEB_ORIGIN}
       JWT_JWK_SET_URI: http://auth-service:8081/.well-known/jwks.json
       SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active
     ports: ["8082:8082"]
@@ -69,6 +70,7 @@ services:
       DB_USER: thelooks
       DB_PASSWORD: thelooks
       JWT_ISSUER: ${JWT_ISSUER}
+      WEB_ORIGIN: ${WEB_ORIGIN}
       JWT_JWK_SET_URI: http://auth-service:8081/.well-known/jwks.json
       WARDROBE_SERVICE_URL: http://wardrobe-service:8082
       BILLING_SERVICE_URL: http://billing-service:8085
@@ -86,6 +88,7 @@ services:
       DB_USER: thelooks
       DB_PASSWORD: thelooks
       JWT_ISSUER: ${JWT_ISSUER}
+      WEB_ORIGIN: ${WEB_ORIGIN}
       JWT_JWK_SET_URI: http://auth-service:8081/.well-known/jwks.json
       OUTFIT_SERVICE_URL: http://outfit-service:8083
       SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active

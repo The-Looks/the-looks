@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react';
+import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
+import { PictureOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { categoryLabel } from '../lib/labels';
 
@@ -75,6 +76,28 @@ export function ItemTile({ category, imageUrl, label }: { category?: string; ima
           <span className="tile-label">{name}</span>
         </>
       )}
+    </div>
+  );
+}
+
+export function MotionArtwork({ className = '' }: { className?: string }) {
+  return (
+    <picture className={['motion-artwork', className].filter(Boolean).join(' ')} aria-hidden="true">
+      <source media="(prefers-reduced-motion: reduce)" srcSet="/assets/animations/looksy-hanger.png" />
+      <img src="/assets/animations/looksy-hanger.gif" width="240" height="240" alt="" loading="lazy" />
+    </picture>
+  );
+}
+
+/** Shows an uploaded asset automatically, with a designed fallback until it exists. */
+export function AssetPlaceholder({ label, assetPath, className = '', animated = false }: { label: string; assetPath: string; className?: string; animated?: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setLoaded(false); setFailed(false); }, [assetPath]);
+  return (
+    <div className={['asset-placeholder', loaded && 'has-image', className].filter(Boolean).join(' ')} data-asset-path={assetPath}>
+      {!failed && <img className="asset-placeholder-image" src={`/${assetPath.replace(/^\//, '')}`} alt={label} loading="lazy" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} />}
+      {!loaded && <>{animated ? <MotionArtwork className="asset-motion" /> : <PictureOutlined aria-hidden="true" />}<span>{label}</span><small>Ảnh sẽ được bổ sung</small></>}
     </div>
   );
 }

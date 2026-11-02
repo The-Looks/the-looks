@@ -6,17 +6,16 @@ import type { paths as OutfitPaths } from './schema/outfit';
 import type { paths as VotingPaths } from './schema/voting';
 import type { paths as WardrobePaths } from './schema/wardrobe';
 
-/** Làm mới access token khi cần, rồi gắn Bearer token cho API có bảo vệ. */
+/** Refreshes the HttpOnly access cookie before protected API calls. */
 const auth: Middleware = {
   async onRequest({ request }) {
     const path = new URL(request.url).pathname;
     if (!path.startsWith('/api/app/') && !path.startsWith('/api/admin/')) return request;
-    const token = await session.validToken();
-    if (token) request.headers.set('Authorization', `Bearer ${token}`);
+    await session.ensureValid();
     return request;
   },
   onResponse({ response }) {
-    if (response.status === 401 && session.getToken()) session.clear();
+    if (response.status === 401 && session.getExpiry()) session.clear();
     return response;
   },
 };
@@ -36,7 +35,7 @@ const idempotency: Middleware = {
 
 // Cùng origin: Vite proxy (dev) / Vercel rewrites (prod) chuyển /api/... tới đúng service.
 function client<Paths extends object>() {
-  const c = createClient<Paths>({ baseUrl: globalThis.location?.origin ?? 'http://localhost' });
+  const c = createClient<Paths>({ baseUrl: globalThis.location?.origin ?? 'http://localhost', credentials: 'same-origin' });
   c.use(auth, idempotency);
   return c;
 }

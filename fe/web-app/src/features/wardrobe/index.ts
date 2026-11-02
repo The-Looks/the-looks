@@ -3,3 +3,4 @@ export { WardrobeSummary } from './components/WardrobeSummary';
 export { AddItemPage } from './pages/AddItemPage';
 export { ItemDetailPage } from './pages/ItemDetailPage';
 export { WardrobePage } from './pages/WardrobePage';
+export { useWardrobe } from './api';

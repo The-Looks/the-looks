@@ -11,6 +11,7 @@ servers:
     description: local
 security:
   - bearerAuth: []
+  - cookieAuth: []
 
 paths:
   /api/public/auth/register:
@@ -36,9 +37,20 @@ paths:
               schema: { $ref: '#/components/schemas/User' }
         '400': { $ref: 'common.yaml#/components/responses/Problem' }
         '409': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/public/auth/password-policy:
+    get:
+      summary: Quy tắc mật khẩu dùng cho form đăng ký
+      description: Frontend dùng quy tắc này để hiển thị độ mạnh tại chỗ; không gửi mật khẩu khi người dùng đang nhập.
+      security: []
+      responses:
+        '200':
+          description: Quy tắc hiện hành của auth-service
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PasswordPolicy' }
   /api/public/auth/login:
     post:
-      summary: Đăng nhập, nhận JWT
+      summary: Đăng nhập, đặt access và refresh token vào cookie HttpOnly
       security: []
       requestBody:
         required: true
@@ -52,14 +64,13 @@ paths:
                 password: { type: string }
       responses:
         '200':
-          description: OK
+          description: Đặt access_token và refresh_token qua Set-Cookie; body chỉ có thời điểm hết hạn access token
           content:
             application/json:
               schema:
                 type: object
-                required: [accessToken, expiresAt]
+                required: [expiresAt]
                 properties:
-                  accessToken: { type: string }
                   expiresAt: { type: string, format: date-time }
         '401': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/public/auth/refresh:
@@ -69,14 +80,14 @@ paths:
       security: []
       responses:
         '200':
-          description: Access token mới; Set-Cookie chứa refresh token mới
+          description: Access và refresh cookie mới
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AccessToken' }
+              schema: { $ref: '#/components/schemas/Session' }
         '401': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/public/auth/logout:
     post:
-      summary: Thu hồi phiên hiện tại và xoá refresh cookie
+      summary: Thu hồi phiên hiện tại và xoá access cùng refresh cookie
       security: []
       responses:
         '204': { description: Đã đăng xuất }
@@ -99,7 +110,7 @@ paths:
   /api/public/auth/google/callback:
     get:
       summary: Xác thực Google callback rồi chuyển về web-app
-      description: Server kiểm tra state và nonce; chỉ gộp tài khoản cùng email khi email_verified là true. Thành công đặt refresh cookie rồi chuyển về /auth/callback.
+      description: Server kiểm tra state và nonce; chỉ gộp tài khoản cùng email khi email_verified là true. Thành công đặt access và refresh cookie rồi chuyển về /auth/callback.
       security: []
       parameters:
         - { name: code, in: query, required: true, schema: { type: string } }
@@ -120,7 +131,18 @@ paths:
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: access_token
   schemas:
+    PasswordPolicy:
+      type: object
+      required: [minLength, strongLength, recommendedCharacterTypes]
+      properties:
+        minLength: { type: integer, minimum: 1, example: 8 }
+        strongLength: { type: integer, minimum: 1, example: 12 }
+        recommendedCharacterTypes: { type: integer, minimum: 1, maximum: 4, example: 3 }
     User:
       type: object
       required: [id, email, username, roles, createdAt]
@@ -132,9 +154,8 @@ components:
           type: array
           items: { type: string }
         createdAt: { type: string, format: date-time }
-    AccessToken:
+    Session:
       type: object
-      required: [accessToken, expiresAt]
+      required: [expiresAt]
       properties:
-        accessToken: { type: string }
         expiresAt: { type: string, format: date-time }

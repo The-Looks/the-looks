@@ -18,9 +18,6 @@
   --pink-soft: #fbe4ea;
   --on-accent: #ffffff;
 
-  --font-head: 'Plus Jakarta Sans', 'Segoe UI', system-ui, sans-serif;
-  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
-
   --r-sm: 10px;
   --r-md: 14px;
   --r-lg: 20px;
@@ -43,7 +40,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font: 14px/1.5 var(--font-body);
+  font: var(--type-14)/1.5 var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
 img {
@@ -58,16 +55,16 @@ h3 {
   text-wrap: balance;
 }
 h1 {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: var(--type-24);
+  font-weight: var(--weight-extrabold);
 }
 h2 {
-  font-size: 17px;
-  font-weight: 700;
+  font-size: var(--type-17);
+  font-weight: var(--weight-bold);
 }
 h3 {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: var(--type-15);
+  font-weight: var(--weight-bold);
 }
 p {
   margin: 0;
@@ -83,7 +80,7 @@ a {
   color: var(--muted);
 }
 .small {
-  font-size: 12px;
+  font-size: var(--type-12);
 }
 .stack {
   display: grid;
@@ -149,11 +146,11 @@ a {
   gap: 2px;
   text-decoration: none;
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--type-11);
+  font-weight: var(--weight-semibold);
 }
 .nav a .nav-ico {
-  font-size: 18px;
+  font-size: var(--type-18);
   line-height: 1;
 }
 .nav a.active {
@@ -184,7 +181,7 @@ a {
     display: flex;
     justify-content: flex-start;
     gap: 12px;
-    font-size: 14px;
+    font-size: var(--type-14);
     padding: 10px 12px;
     border-radius: var(--r-sm);
   }
@@ -199,8 +196,8 @@ a {
   align-items: center;
   gap: 8px;
   font-family: var(--font-head);
-  font-weight: 800;
-  font-size: 15px;
+  font-weight: var(--weight-extrabold);
+  font-size: var(--type-15);
   letter-spacing: 0.02em;
 }
 .brand-mark {
@@ -218,12 +215,12 @@ a {
 .page-header .back {
   justify-self: start;
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--type-13);
+  font-weight: var(--weight-semibold);
 }
 .eyebrow {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--type-11);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--purple);
@@ -238,7 +235,7 @@ a {
   padding: 0 20px;
   border-radius: 999px;
   border: 1.5px solid transparent;
-  font: 600 15px var(--font-body);
+  font: var(--weight-semibold) var(--type-15) var(--font-body);
   cursor: pointer;
   text-decoration: none;
   background: var(--purple);
@@ -275,7 +272,7 @@ a {
 .btn-sm {
   min-height: 34px;
   padding: 0 14px;
-  font-size: 13px;
+  font-size: var(--type-13);
 }
 .btn-block {
   width: 100%;
@@ -290,7 +287,7 @@ a {
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--ink);
-  font: 600 13px var(--font-body);
+  font: var(--weight-semibold) var(--type-13) var(--font-body);
   cursor: pointer;
 }
 .chip[aria-pressed='true'] {
@@ -328,8 +325,8 @@ a.card:hover {
   display: inline-block;
   padding: 3px 9px;
   border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--type-11);
+  font-weight: var(--weight-semibold);
   background: var(--lav-soft);
   color: var(--purple);
 }
@@ -366,11 +363,11 @@ a.card:hover {
   object-fit: cover;
 }
 .tile-emoji {
-  font-size: 30px;
+  font-size: var(--type-30);
   line-height: 1;
 }
 .tile-label {
-  font-size: 11px;
+  font-size: var(--type-11);
   color: var(--muted);
 }
 
@@ -379,14 +376,14 @@ a.card:hover {
   gap: 6px;
 }
 .field label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--type-12);
+  font-weight: var(--weight-semibold);
   color: var(--muted);
 }
 .field input,
 .field select,
 .field textarea {
-  font: 14px var(--font-body);
+  font: var(--type-14) var(--font-body);
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -415,7 +412,7 @@ a.card:hover {
 .notice {
   border-radius: var(--r-md);
   padding: 12px 14px;
-  font-size: 13px;
+  font-size: var(--type-13);
   background: var(--lav-soft);
 }
 .notice-error {
@@ -436,7 +433,7 @@ a.card:hover {
   color: var(--muted);
 }
 .empty .empty-ico {
-  font-size: 36px;
+  font-size: var(--type-36);
 }
 
 .spinner {
@@ -478,8 +475,8 @@ a.card:hover {
   padding: 6px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));
   background: var(--pink);
   color: #fff;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--type-12);
+  font-weight: var(--weight-semibold);
   text-align: center;
 }
 

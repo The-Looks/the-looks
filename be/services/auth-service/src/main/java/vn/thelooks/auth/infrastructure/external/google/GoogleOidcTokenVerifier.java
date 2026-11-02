@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Locale;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -13,12 +15,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import vn.thelooks.auth.application.port.out.GoogleTokenVerifier;
 import vn.thelooks.auth.domain.exception.InvalidCredentialsException;
 
 @Component
 class GoogleOidcTokenVerifier implements GoogleTokenVerifier {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GoogleOidcTokenVerifier.class);
     private final RestClient http = RestClient.create();
     private final NimbusJwtDecoder decoder;
     private final String clientId;
@@ -62,7 +66,11 @@ class GoogleOidcTokenVerifier implements GoogleTokenVerifier {
             var authoritative = email.endsWith("@gmail.com")
                     || (hostedDomain != null && email.endsWith("@" + hostedDomain.toLowerCase(Locale.ROOT)));
             return new Profile(subject, email, verified, jwt.getClaimAsString("name"), authoritative);
+        } catch (RestClientResponseException e) {
+            LOG.warn("Google login rejected by token endpoint: HTTP {}", e.getStatusCode().value());
+            throw invalid();
         } catch (JwtException | RestClientException e) {
+            LOG.warn("Google login rejected during token exchange or ID token validation: {}", e.getClass().getSimpleName());
             throw invalid();
         }
     }

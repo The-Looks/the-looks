@@ -2,7 +2,6 @@ package vn.thelooks.auth.presentation.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
-import java.time.Instant;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -45,13 +44,10 @@ class GoogleController {
             HttpServletRequest request) {
         try {
             var tokens = google.complete(code, state, stateCookie);
-            var age = Duration.between(Instant.now(), tokens.refreshExpiresAt());
-            var refreshCookie = ResponseCookie.from("refresh_token", tokens.refreshToken())
-                    .httpOnly(true).secure(request.isSecure()).sameSite("Lax")
-                    .path("/api/public/auth").maxAge(age.isNegative() ? Duration.ZERO : age).build();
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "/auth/callback")
                     .header(HttpHeaders.SET_COOKIE, clearState(request).toString())
-                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, AuthCookies.refresh(tokens, request).toString())
+                    .header(HttpHeaders.SET_COOKIE, AuthCookies.access(tokens, request).toString())
                     .header(HttpHeaders.CACHE_CONTROL, "no-store").build();
         } catch (InvalidCredentialsException e) {
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "/login?google=failed")

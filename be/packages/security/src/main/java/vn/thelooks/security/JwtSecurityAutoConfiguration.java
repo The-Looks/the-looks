@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 
 /**
  * Mọi service đều là OAuth2 resource server, xác thực JWT do auth-service phát.
@@ -35,16 +36,19 @@ public class JwtSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(SecurityFilterChain.class)
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http,
+            @Value("${WEB_ORIGIN:http://localhost:5173}") String webOrigin) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // API stateless dùng Bearer token, không dùng cookie session
+                .csrf(csrf -> csrf.disable()) // CookieOriginFilter protects cookie-authenticated writes.
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new CookieOriginFilter(webOrigin), BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health/**", "/api/public/**", "/.well-known/jwks.json").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("PERMISSION_ADMIN_ACCESS")
                         .requestMatchers("/api/app/me").hasAuthority("PERMISSION_ACCOUNT_READ_SELF")
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))
+                .oauth2ResourceServer(o -> o.bearerTokenResolver(new CookieBearerTokenResolver())
+                        .jwt(Customizer.withDefaults()))
                 .build();
     }
 

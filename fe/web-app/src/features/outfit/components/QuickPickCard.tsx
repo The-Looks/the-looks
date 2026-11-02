@@ -1,7 +1,6 @@
 import { ApiError, errorMessage } from '../../../shared/api/client';
-import { Button, ButtonLink, Card, Garment, Notice } from '../../../shared/ui';
+import { Button, ButtonLink, Card, Notice } from '../../../shared/ui';
 import { useQuickPick } from '../api';
-import { FeedbackButtons } from './FeedbackButtons';
 import { OutfitCard } from './OutfitCard';
 import { SaveButton } from './SaveButton';
 
@@ -11,31 +10,17 @@ export function QuickPickCard() {
 
   return (
     <div className="stack">
-      <Card hero>
-        <div className="quick-copy">
-          <span className="eyebrow" style={{ color: 'inherit', opacity: 0.85 }}>
-            Quick Pick
-          </span>
-          <h2>Hôm nay mặc gì?</h2>
-          <p className="muted">Khơi gợi cảm hứng từ tủ đồ của bạn. Ưu tiên những món đã lâu chưa được diện.</p>
-          <div className="row">
-            <Button kind="ghost" onClick={() => pick.mutate()} disabled={pick.isPending}>
-              {pick.isPending ? 'Đang chọn…' : pick.data ? 'Chọn bộ khác' : 'Gợi ý cho tôi'}
-            </Button>
-          </div>
+      <Card className="home-hero-card">
+        <div className="home-hero-photo" aria-hidden="true" />
+        <div className="home-hero-glass">
+          <span className="eyebrow home-kicker">✦ Quick Pick</span>
+          <h2>Hôm nay<br />mặc gì?</h2>
+          <p>Một chạm, AI chọn bộ đồ ưu tiên những món bạn lâu chưa mặc.</p>
+          <Button kind="ghost" onClick={() => pick.mutate()} disabled={pick.isPending}>
+            {pick.isPending ? 'Đang chọn…' : pick.data ? 'Chọn bộ khác' : 'Gợi ý cho tôi'} <span aria-hidden="true">→</span>
+          </Button>
         </div>
-        <div className="outfit-preview" aria-hidden="true">
-          <div className="preview-top">
-            <Garment category="TOP" />
-          </div>
-          <div className="preview-bottom">
-            <Garment category="BOTTOM" />
-          </div>
-          <div className="preview-shoe">
-            <Garment category="SHOES" />
-          </div>
-          <span>Phối mới từ đồ đang có</span>
-        </div>
+        <div className="home-hero-stamp" aria-hidden="true">YOUR STYLE<br />YOUR STORY<br />✦</div>
       </Card>
 
       {pick.isError && (
@@ -51,18 +36,7 @@ export function QuickPickCard() {
           </ButtonLink>
         </Notice>
       )}
-      {pick.data && (
-        <OutfitCard
-          key={pick.data.items.map((i) => i.id).join('-')}
-          suggestion={pick.data}
-          actions={
-            <>
-              <SaveButton suggestion={pick.data} />
-              <FeedbackButtons suggestion={pick.data} onDisliked={() => pick.mutate()} />
-            </>
-          }
-        />
-      )}
+      {pick.data && <OutfitCard suggestion={pick.data} actions={<SaveButton suggestion={pick.data} />} />}
     </div>
   );
 }

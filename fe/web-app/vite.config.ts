@@ -19,7 +19,7 @@ export default defineConfig({
       // Bản demo dùng service worker của MSW; hai service worker cùng scope sẽ đè nhau.
       disable: !!process.env.VITE_MOCK_SERVICES,
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.svg', 'assets/animations/looksy-hanger.gif', 'assets/animations/looksy-hanger.png'],
       manifest: {
         name: 'The Looks',
         short_name: 'The Looks',

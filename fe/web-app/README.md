@@ -10,7 +10,8 @@ npm run dev            # http://localhost:5173
 ```
 
 Mặc định cả bốn service chạy giả lập (MSW) theo contract — đăng nhập bằng email/mật khẩu bất kỳ.
-Token của chế độ này chỉ dùng cho mock; không chứa secret và service thật sẽ từ chối.
+Chế độ mock chỉ giữ danh tính demo trong `sessionStorage`; không tạo JWT. Với backend thật,
+access và refresh token đều ở cookie HttpOnly. JavaScript chỉ giữ thời điểm hết hạn access token.
 Khi auth-service thật đã chạy, bỏ `auth` khỏi `VITE_MOCK_SERVICES` rồi mới kết nối
 các service thật cần JWT. Ví dụ, để gọi outfit-service thật:
 
@@ -21,6 +22,14 @@ các service thật cần JWT. Ví dụ, để gọi outfit-service thật:
 
 Trong `.env.development.local`, đặt `VITE_MOCK_SERVICES=wardrobe,voting` khi auth-service
 và outfit-service thật đã sẵn sàng. Service nào xong backend thật thì bỏ tên nó khỏi danh sách.
+
+Google OAuth thật cần mở web bằng đúng origin trong `WEB_ORIGIN` và
+`GOOGLE_REDIRECT_URI` của auth-service (local mặc định là `http://localhost:5173`,
+không dùng `127.0.0.1`). `VITE_GOOGLE_ORIGIN` đưa nút Google về origin này trước
+khi bắt đầu OAuth để cookie `state` được gửi lại ở callback. Nếu `auth` còn trong
+`VITE_MOCK_SERVICES`, nút Google chỉ mô phỏng đăng nhập; muốn thử Google thật thì
+bỏ `auth` khỏi danh sách rồi khởi động lại Vite. Nếu quay về `/login?google=failed`,
+xem log auth-service để biết callback bị từ chối ở bước state, token, email hay liên kết tài khoản.
 
 ## Lệnh
 

@@ -12,6 +12,8 @@ import java.util.Base64;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ import vn.thelooks.auth.domain.enums.UserStatus;
 @Service
 class GoogleOidcService implements GoogleLoginUseCase {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GoogleOidcService.class);
     private static final SecureRandom RANDOM = new SecureRandom();
     private final GoogleOAuthFlowStore flows;
     private final GoogleAccountLinkStore identities;
@@ -85,11 +88,23 @@ class GoogleOidcService implements GoogleLoginUseCase {
     public LoginUseCase.AuthTokens complete(String code, String state, String stateCookie) {
         if (code == null || code.isBlank() || state == null || stateCookie == null
                 || !MessageDigest.isEqual(state.getBytes(StandardCharsets.UTF_8),
-                        stateCookie.getBytes(StandardCharsets.UTF_8))) throw invalid();
-        var flow = flows.consume(sha256(state)).orElseThrow(GoogleOidcService::invalid);
-        if (!flow.expiresAt().isAfter(Instant.now(clock))) throw invalid();
+                        stateCookie.getBytes(StandardCharsets.UTF_8))) {
+            LOG.warn("Google login rejected: missing code/state or state cookie mismatch");
+            throw invalid();
+        }
+        var flow = flows.consume(sha256(state)).orElseThrow(() -> {
+            LOG.warn("Google login rejected: OAuth flow missing or already consumed");
+            return invalid();
+        });
+        if (!flow.expiresAt().isAfter(Instant.now(clock))) {
+            LOG.warn("Google login rejected: OAuth flow expired");
+            throw invalid();
+        }
         var profile = google.exchangeAndVerify(code, flow.codeVerifier(), flow.nonce());
-        if (!profile.emailVerified()) throw invalid();
+        if (!profile.emailVerified()) {
+            LOG.warn("Google login rejected: provider email is unverified");
+            throw invalid();
+        }
         var userId = identities.findUserId(profile.subject()).orElse(null);
         User user;
         if (userId != null) {
@@ -98,7 +113,10 @@ class GoogleOidcService implements GoogleLoginUseCase {
             var email = profile.email().trim().toLowerCase(Locale.ROOT);
             var existing = users.findByEmail(email);
             if (existing.isPresent()) {
-                if (!profile.googleAuthoritativeForEmail()) throw invalid();
+                if (!profile.googleAuthoritativeForEmail()) {
+                    LOG.warn("Google login rejected: provider does not manage an existing account email");
+                    throw invalid();
+                }
                 user = existing.get();
                 if (!user.emailVerified()) {
                     user = users.save(new User(user.id(), user.email(), user.passwordHash(), user.username(), true,

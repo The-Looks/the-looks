@@ -1,69 +1,102 @@
+import { CheckCircleFilled, ClockCircleOutlined, HeartOutlined, LockOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { errorMessage } from '../../../shared/api/client';
 import { formatDateTime } from '../../../shared/lib/format';
-import { Brand, Button, Card, Notice, ProgressBar, Spinner } from '../../../shared/ui';
+import { AssetPlaceholder, Brand, Button, Notice, ProgressBar, Spinner } from '../../../shared/ui';
 import { useCastVote, usePoll } from '../api';
 
 export function PublicPollPage() {
   const { code = '' } = useParams();
   const poll = usePoll(code);
   const vote = useCastVote(code);
-  const result = vote.data ?? poll.data?.result;
+  const [choice, setChoice] = useState<'A' | 'B' | null>(null);
   const expired = !!poll.data && Date.parse(poll.data.expiresAt) <= Date.now();
+  const showResult = expired || vote.isSuccess;
+  const result = vote.data ?? poll.data?.result;
+  const hoursLeft = poll.data ? Math.max(0, Math.ceil((Date.parse(poll.data.expiresAt) - Date.now()) / 3_600_000)) : 0;
 
   return (
-    <main className="auth-page">
-      <div className="stack-lg" style={{ width: 'min(100%, 680px)' }}>
-        <Brand />
-        {poll.isPending && <Spinner />}
-        {poll.isError && <Notice tone="error">{errorMessage(poll.error)}</Notice>}
-        {poll.data && (
-          <>
-            <header className="stack">
-              <span className="eyebrow">Ask Friends</span>
-              <h1>{poll.data.question ?? 'Set nào đẹp hơn?'}</h1>
-              <p className="muted">Chọn một outfit. Bạn không cần đăng nhập.</p>
-              <p className="small muted">Bình chọn đến {formatDateTime(poll.data.expiresAt)}</p>
-            </header>
-            {expired && <Notice tone="warn">Bình chọn đã kết thúc.</Notice>}
-            {vote.isError && <Notice tone="error">{errorMessage(vote.error)}</Notice>}
-            <div className="grid-cards">
-              {(['A', 'B'] as const).map((choice) => {
-                const option = choice === 'A' ? poll.data.optionA : poll.data.optionB;
-                return (
-                  <Card key={choice}>
-                    <div className="stack">
-                      <h2>Outfit {choice}</h2>
-                      {option?.imageUrls?.length ? (
-                        <div className="grid-cards">
-                          {option.imageUrls.map((url, index) => (
-                            <img key={url} src={url} alt={`Outfit ${choice}, ảnh ${index + 1}`} style={{ width: '100%', borderRadius: 12 }} />
-                          ))}
-                        </div>
-                      ) : <p className="muted">Chưa có ảnh outfit.</p>}
-                      <Button disabled={expired || vote.isPending || vote.isSuccess} onClick={() => vote.mutate(choice)}>
-                        {vote.isSuccess ? 'Đã bình chọn' : `Chọn outfit ${choice}`}
-                      </Button>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-            {result && (
-              <Card>
-                <h2>Kết quả</h2>
-                {(['A', 'B'] as const).map((choice) => (
-                  <div className="stack" key={choice}>
-                    <div className="spread"><span>Outfit {choice}</span><strong>{choice === 'A' ? result.percentA : result.percentB}%</strong></div>
-                    <ProgressBar percent={choice === 'A' ? result.percentA : result.percentB} />
+    <div className="guest-page">
+      <header className="guest-topbar">
+        <Link to="/ask-friends" className="guest-brand"><Brand /></Link>
+        <span className="small muted">Bình chọn cùng bạn bè</span>
+        <Link to="/ask-friends" className="guest-help-link">Tìm hiểu THE LOOKS</Link>
+      </header>
+      <main className="guest-layout">
+        <aside className="guest-side">
+          <section className="guest-invite">
+            <span className="guest-heart"><HeartOutlined /></span>
+            <h2>Bạn bè mời bạn <span>chọn outfit</span></h2>
+            <strong>Bình chọn ẩn danh</strong>
+            <p>{poll.data ? `Còn ${hoursLeft} giờ để chọn · mở đến ${formatDateTime(poll.data.expiresAt)}` : 'Mở link để xem bình chọn'}</p>
+            <span className="guest-no-login">Không cần cài app</span>
+          </section>
+          <section className="guest-info">
+            <h3><ShareAltOutlined /> Bình chọn từ link Zalo</h3>
+            <ol><li>Xem hai outfit được mời chọn.</li><li>Chạm vào set hợp nhất.</li><li>Gửi phiếu và xem kết quả.</li></ol>
+            <hr /><p className="small muted"><LockOutlined /> Chỉ người có link mới xem được.</p>
+          </section>
+        </aside>
+
+        <section className="guest-panel" aria-live="polite">
+          {poll.isPending && <Spinner label="Đang tải bình chọn…" />}
+          {poll.isError && <Notice tone="error">{errorMessage(poll.error)}</Notice>}
+          {poll.data && (
+            <>
+              {!showResult ? (
+                <>
+                  <h1>{poll.data.question ?? 'Set nào hợp với mình hơn?'}</h1>
+                  <p className="muted">Chạm vào một set để chọn rồi gửi bình chọn của bạn.</p>
+                  <div className="guest-options" role="radiogroup" aria-label="Chọn outfit">
+                    {(['A', 'B'] as const).map((value) => {
+                      const option = value === 'A' ? poll.data.optionA : poll.data.optionB;
+                      const image = option?.imageUrls?.[0];
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          role="radio"
+                          aria-checked={choice === value}
+                          className={`guest-option${choice === value ? ' selected' : ''}`}
+                          disabled={vote.isPending}
+                          onClick={() => setChoice(value)}
+                        >
+                          {image ? <img src={image} alt={`Outfit ${value}`} /> : <AssetPlaceholder label={`Ảnh outfit ${value}`} assetPath={`assets/polls/${code}-${value.toLowerCase()}.jpg`} />}
+                          <span className="guest-option-label"><span className="guest-radio">{choice === value && <CheckCircleFilled />}</span><span><strong>Set {value}</strong><small>Chạm để chọn Set {value}</small></span></span>
+                        </button>
+                      );
+                    })}
                   </div>
-                ))}
-              </Card>
-            )}
-          </>
-        )}
-        <Link to="/">Khám phá The Looks</Link>
-      </div>
-    </main>
+                  {vote.isError && <Notice tone="error">{errorMessage(vote.error)}</Notice>}
+                  <div className="guest-actions">
+                    <Button disabled={!choice || vote.isPending} onClick={() => choice && vote.mutate(choice)}>
+                      {vote.isPending ? 'Đang gửi…' : 'Gửi bình chọn'} <span aria-hidden="true">→</span>
+                    </Button>
+                    <span><strong>Không cần tài khoản hoặc cài ứng dụng</strong><small>Kết quả hiện sau khi bạn gửi phiếu.</small></span>
+                  </div>
+                </>
+              ) : (
+                <div className="guest-result">
+                  <CheckCircleFilled />
+                  <h2>{expired && !vote.isSuccess ? 'Bình chọn đã kết thúc' : 'Cảm ơn bạn đã bình chọn!'}</h2>
+                  <p className="muted">{expired && !vote.isSuccess ? 'Bạn có thể xem kết quả bên dưới.' : 'Phiếu của bạn đã được ghi nhận. Cùng xem bạn bè đã chọn set nào.'}</p>
+                  {result ? (['A', 'B'] as const).map((value) => (
+                    <div className="guest-result-row" key={value}>
+                      <div><strong>Set {value}</strong><strong>{value === 'A' ? result.percentA : result.percentB}%</strong></div>
+                      <ProgressBar percent={value === 'A' ? result.percentA : result.percentB} />
+                    </div>
+                  )) : <p className="muted">Kết quả sẽ hiển thị khi có bình chọn.</p>}
+                  <div className="row" style={{ justifyContent: 'center', marginTop: 28 }}>
+                    <Link to="/ask-friends" className="btn btn-outline">Khám phá THE LOOKS</Link>
+                  </div>
+                </div>
+              )}
+              <div className="guest-footer"><ClockCircleOutlined /> Liên kết riêng tư · Không cần tài khoản để bình chọn</div>
+            </>
+          )}
+        </section>
+      </main>
+    </div>
   );
 }
