@@ -102,8 +102,15 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   Chống spam bình chọn (thêm IP vào voter key + giới hạn tần suất), cache kiểm tra phiên ~30 giây, thêm test đăng nhập/refresh/bình chọn.
 - [ ] **Chốt giá gói** · nhóm · trước khi bật PayOS
   Đang đề xuất: Plus 39.000đ/tháng · 390.000đ/năm, Pro 79.000đ/tháng · 790.000đ/năm (sửa trong `Plan.java`).
-- [ ] **Chọn hướng cho affiliate và phí giao dịch** (luồng doanh thu 2 và 3) · nhóm
-  Cần: nền tảng affiliate (Shopee/TikTok/AccessTrade…), % phí trên đơn mua qua đối tác, đối tác đầu tiên.
+- [x] **Chọn nền tảng affiliate** (luồng doanh thu 2) · 02/11: AccessTrade (tài khoản publisher của Tuấn)
+  Đã duyệt: TikTok Shop, Adidas, ALDO, ANTA, Aristino, Shondo, Hoàng Phúc, Bảo Tín Mạnh Hải. Chờ duyệt: Shopee, Shein.
+- [ ] **Bật "Gợi ý mua thêm" (TikTok Shop)** · Tuấn · sau khi merge PR affiliate
+  1. AccessTrade → API key → **tạo key mới** (key cũ đã lộ trong log lúc kiểm tra), thay vào `be/.env`.
+  2. Render → `thelooks-outfit` → Environment: `ACCESSTRADE_API_KEY` = key mới → Save.
+  3. Xem lượt bấm: Neon, database `thelooks_outfit`, bảng `affiliate_click`; hoa hồng xem trên AccessTrade (đối chiếu theo `sub1`).
+  Rút tiền: AccessTrade chỉ mở **Thông tin thanh toán** khi hoa hồng trên 200.000đ.
+- [ ] **Phí giao dịch** (luồng doanh thu 3) · nhóm · chưa chốt
+  Cần: % phí trên đơn mua qua đối tác, đối tác đầu tiên.
 
 ## 6. Tài liệu nộp và pháp lý
 

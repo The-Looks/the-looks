@@ -39,6 +39,35 @@ paths:
               schema: { $ref: '#/components/schemas/OutfitSuggestion' }
         '204': { description: Tủ đồ chưa đủ món để phối }
         '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/shopping:
+    get:
+      summary: Gợi ý mua thêm - món tủ đồ còn thiếu cho dịp này + sản phẩm trên sàn (link affiliate)
+      parameters:
+        - { name: occasion, in: query, required: true, schema: { $ref: '#/components/schemas/Occasion' } }
+      responses:
+        '200':
+          description: Gợi ý
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShoppingSuggestion' }
+        '204': { description: Tủ đồ đủ món, hoặc chưa có sản phẩm phù hợp }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/shopping/{productId}/open:
+    post:
+      summary: Ghi lượt bấm và trả link affiliate (chỉ cho sản phẩm vừa được gợi ý)
+      parameters:
+        - { name: productId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Link sang sàn
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url]
+                properties:
+                  url: { type: string, format: uri }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/outfits:
     get:
       summary: Outfit đã lưu, mới nhất trước
@@ -134,6 +163,29 @@ components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
   schemas:
+    ShoppingSuggestion:
+      type: object
+      required: [gap, products]
+      properties:
+        gap:
+          type: object
+          required: [category, label]
+          properties:
+            category: { type: string, enum: [TOP, BOTTOM, SHOES] }
+            label: { type: string, description: 'Tên tiếng Việt, vd "giày"' }
+        products: { type: array, items: { $ref: '#/components/schemas/ProductOffer' } }
+    ProductOffer:
+      type: object
+      required: [id, title, minPriceVnd, maxPriceVnd, shopName, unitsSold, source]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        imageUrl: { type: [string, 'null'], format: uri }
+        minPriceVnd: { type: integer, format: int64 }
+        maxPriceVnd: { type: integer, format: int64 }
+        shopName: { type: string }
+        unitsSold: { type: integer, format: int64 }
+        source: { type: string, description: 'Sàn bán, vd TIKTOK_SHOP' }
     Occasion:
       type: string
       enum: [SCHOOL, WORK, HANGOUT, DATE]

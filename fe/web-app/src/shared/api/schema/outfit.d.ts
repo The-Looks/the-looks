@@ -89,6 +89,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/outfits/shopping": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gợi ý mua thêm - món tủ đồ còn thiếu cho dịp này + sản phẩm trên sàn (link affiliate) */
+        get: {
+            parameters: {
+                query: {
+                    occasion: components["schemas"]["Occasion"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Gợi ý */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ShoppingSuggestion"];
+                    };
+                };
+                /** @description Tủ đồ đủ món */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                503: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/app/outfits/shopping/{productId}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ghi lượt bấm và trả link affiliate (chỉ cho sản phẩm vừa được gợi ý) */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    productId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Link sang sàn */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uri */
+                            url: string;
+                        };
+                    };
+                };
+                404: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/outfits": {
         parameters: {
             query?: never;
@@ -325,6 +413,30 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        ShoppingSuggestion: {
+            gap: {
+                /** @enum {string} */
+                category: "TOP" | "BOTTOM" | "SHOES";
+                /** @description Tên tiếng Việt, vd "giày" */
+                label: string;
+            };
+            products: components["schemas"]["ProductOffer"][];
+        };
+        ProductOffer: {
+            id: string;
+            title: string;
+            /** Format: uri */
+            imageUrl?: string | null;
+            /** Format: int64 */
+            minPriceVnd: number;
+            /** Format: int64 */
+            maxPriceVnd: number;
+            shopName: string;
+            /** Format: int64 */
+            unitsSold: number;
+            /** @description Sàn bán, vd TIKTOK_SHOP */
+            source: string;
+        };
         /**
          * @description đi học, đi làm, đi chơi, hẹn hò
          * @enum {string}
