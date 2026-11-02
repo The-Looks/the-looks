@@ -44,6 +44,9 @@ thelooks:
     provider: ${AI_PROVIDER:none}
     model: ${AI_MODEL:claude-haiku-5-5}
     monthly-budget-usd: ${AI_MONTHLY_BUDGET_USD:25}
+  affiliate:
+    # "Gợi ý mua thêm" trên TikTok Shop qua AccessTrade. Để trống = tắt tính năng
+    accesstrade-api-key: ${ACCESSTRADE_API_KEY:}
   weather:
     # Mặc định TP.HCM (đổi bằng WEATHER_LAT / WEATHER_LON khi chạy cho cơ sở khác)
     latitude: ${WEATHER_LAT:10.8231}

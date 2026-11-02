@@ -90,6 +90,8 @@ services:
         value: claude
       - key: ANTHROPIC_API_KEY
         sync: false
+      - key: ACCESSTRADE_API_KEY # "Gợi ý mua thêm" (TikTok Shop); để trống = tắt
+        sync: false
 
   - type: web
     name: thelooks-voting

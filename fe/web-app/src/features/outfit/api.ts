@@ -27,6 +27,28 @@ export function useQuickPick() {
   });
 }
 
+/** Gợi ý mua thêm món tủ đồ còn thiếu cho dịp này. null = tủ đồ đủ món hoặc không có sản phẩm (204). */
+export function useShopping(occasion: Occasion | null) {
+  return useQuery({
+    queryKey: ['outfits', 'shopping', occasion],
+    queryFn: async () =>
+      (await unwrap(outfitApi.GET('/api/app/outfits/shopping', { params: { query: { occasion: occasion! } } }))) ??
+      null,
+    enabled: occasion !== null,
+    staleTime: 10 * 60 * 1000,
+    retry: false,
+  });
+}
+
+/** Ghi lượt bấm, lấy link affiliate rồi mở sàn. */
+export function useOpenProduct() {
+  return useMutation({
+    mutationFn: (productId: string) =>
+      unwrap(outfitApi.POST('/api/app/outfits/shopping/{productId}/open', { params: { path: { productId } } })),
+    onSuccess: ({ url }) => window.location.assign(url),
+  });
+}
+
 export function useSavedOutfits() {
   return useQuery({
     queryKey: outfitKeys.saved,

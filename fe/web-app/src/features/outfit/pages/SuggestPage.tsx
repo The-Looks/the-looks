@@ -6,12 +6,13 @@ import { useSuggestions } from '../api';
 import { FeedbackButtons } from '../components/FeedbackButtons';
 import { OutfitCard } from '../components/OutfitCard';
 import { SaveButton } from '../components/SaveButton';
+import { ShoppingCard } from '../components/ShoppingCard';
 import { OCCASIONS, occasionLabel } from '../occasions';
 
 export function SuggestPage() {
   const [params, setParams] = useSearchParams();
   const selected = params.get('occasion');
-  const occasion: Occasion | null = OCCASIONS.find(o => o.value === selected)?.value ?? null;
+  const occasion: Occasion | null = OCCASIONS.find((o) => o.value === selected)?.value ?? null;
   const setOccasion = (value: Occasion) => setParams({ occasion: value });
   const suggestions = useSuggestions(occasion);
 
@@ -87,6 +88,8 @@ export function SuggestPage() {
           </div>
         </section>
       )}
+
+      {occasion && <ShoppingCard occasion={occasion} />}
     </div>
   );
 }

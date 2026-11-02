@@ -145,6 +145,22 @@ const outfit: HttpHandler[] = [
     const s = mockSuggestions()[0];
     return s ? HttpResponse.json(s) : new HttpResponse(null, { status: 204 });
   }),
+  http.get('*/api/app/outfits/shopping', () =>
+    HttpResponse.json({
+      gap: { category: 'SHOES', label: 'giày' },
+      products: [1, 2, 3].map((n) => ({
+        id: `mock-${n}`,
+        title: `Giày sneaker trắng basic mẫu ${n} (dữ liệu giả lập)`,
+        imageUrl: null,
+        minPriceVnd: 250000 + n * 50000,
+        maxPriceVnd: 300000 + n * 50000,
+        shopName: 'Shop mẫu',
+        unitsSold: 1000 * n,
+        source: 'TIKTOK_SHOP',
+      })),
+    }),
+  ),
+  http.post('*/api/app/outfits/shopping/:id/open', () => HttpResponse.json({ url: 'https://shop.tiktok.com/' })),
   http.get('*/api/app/outfits', () => HttpResponse.json(savedOutfits)),
   http.post('*/api/app/outfits', async ({ request }) => {
     const body = (await request.json()) as { itemIds: string[]; occasion?: SavedOutfit['occasion'] };
