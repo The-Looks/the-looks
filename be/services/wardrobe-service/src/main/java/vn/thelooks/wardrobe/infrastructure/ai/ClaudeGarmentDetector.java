@@ -73,14 +73,14 @@ class ClaudeGarmentDetector implements GarmentDetector {
 
     ClaudeGarmentDetector(@Value("${thelooks.ai.model}") String model) {
         this.model = model;
-        this.client = AnthropicOkHttpClient.builder().fromEnv().timeout(Duration.ofSeconds(60)).maxRetries(2).build();
+        this.client = AnthropicOkHttpClient.builder().fromEnv().timeout(Duration.ofSeconds(18)).maxRetries(0).build();
     }
 
     @Override
     public List<DetectedGarment> detect(byte[] image, String contentType) {
         StructuredMessageCreateParams<Detections> params = MessageCreateParams.builder()
                 .model(model)
-                .maxTokens(4000L)
+                .maxTokens(2500L)
                 .system(SYSTEM)
                 .outputConfig(Detections.class)
                 .addUserMessageOfContentBlockParams(List.of(

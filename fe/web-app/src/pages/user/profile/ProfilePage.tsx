@@ -6,12 +6,14 @@ import { authApi, errorMessage, outfitApi, unwrap, votingApi, wardrobeApi } from
 import { formatDate } from '../../../services/shared/format';
 import { session } from '../../../services/shared/session';
 import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { usePreferences } from '../../../hooks/user/outfit/api';
 
 export function ProfilePage() {
   const me = useQuery({ queryKey: ['me'], queryFn: () => unwrap(authApi.GET('/api/app/me')) });
   const wardrobe = useQuery({ queryKey: ['wardrobe', 'list', undefined, undefined], queryFn: () => unwrap(wardrobeApi.GET('/api/app/wardrobe/items')) });
   const outfits = useQuery({ queryKey: ['outfits'], queryFn: () => unwrap(outfitApi.GET('/api/app/outfits')) });
   const polls = useQuery({ queryKey: ['polls'], queryFn: () => unwrap(votingApi.GET('/api/app/polls')) });
+  const preferences = usePreferences();
 
   return <div className="stack-lg">
     <PageHeader eyebrow="HỒ SƠ PHONG CÁCH" title="Tài khoản của tôi" sub="Thông tin và hoạt động của bạn tại THE LOOKS." />
@@ -25,8 +27,9 @@ export function ProfilePage() {
       </Card>
       <Card>
         <h2>Phong cách của bạn</h2>
-        <p className="muted">Chọn phong cách yêu thích để LOOKSY AI gợi ý gần với gu của bạn hơn.</p>
-        <ButtonLink to="/profile/style" kind="ghost" small><UserOutlined /> Chọn phong cách</ButtonLink>
+        <p className="muted">{preferences.data?.styles?.length ? preferences.data.styles.join(', ') : 'Chọn phong cách yêu thích để LOOKSY AI gợi ý gần với gu của bạn hơn.'}</p>
+        {preferences.data && <p className="small muted">Giới tính: {preferences.data.gender ?? 'Chưa chọn'} · Ngân sách: {preferences.data.budget ?? 'Chưa chọn'}</p>}
+        <ButtonLink to="/profile/style" kind="ghost" small><UserOutlined /> Chỉnh sửa phong cách</ButtonLink>
         <div className="divider" />
         <h2>Dữ liệu của bạn</h2>
         <p className="small muted">Bạn có thể xem và xoá từng món đồ trong tủ bất cứ lúc nào.</p>

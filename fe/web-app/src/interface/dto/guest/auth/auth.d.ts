@@ -364,6 +364,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/auth/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách tài khoản cho quản trị viên (cần ADMIN_ACCESS) */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    size?: number;
+                    search?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Trang người dùng */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminUsersPage"];
+                    };
+                };
+                403: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -385,6 +426,25 @@ export interface components {
             roles: string[];
             /** Format: date-time */
             createdAt: string;
+        };
+        AdminUser: {
+            /** Format: uuid */
+            id: string;
+            username: string;
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            status: "ACTIVE" | "LOCKED";
+            emailVerified: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AdminUsersPage: {
+            items: components["schemas"]["AdminUser"][];
+            /** Format: int64 */
+            total: number;
+            page: number;
+            size: number;
         };
         Session: {
             /** Format: date-time */

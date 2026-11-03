@@ -9,11 +9,13 @@ clearLegacyAccessToken();
 const listeners = new Set<() => void>();
 let expiresAt = 0;
 let refreshing: Promise<boolean> | null = null;
+let refreshUnavailable = false;
 const emit = () => listeners.forEach((listener) => listener());
 
 /** The browser sends HttpOnly access and refresh cookies; JavaScript stores only expiry. */
 export const session = {
   getExpiry: () => expiresAt,
+  isRefreshUnavailable: () => refreshUnavailable,
   start(nextExpiresAt: string) {
     const parsed = Date.parse(nextExpiresAt);
     expiresAt = Number.isFinite(parsed) ? parsed : 0;
@@ -21,6 +23,7 @@ export const session = {
   },
   clear() {
     expiresAt = 0;
+    refreshUnavailable = false;
     clearLegacyAccessToken();
     emit();
   },
@@ -34,15 +37,14 @@ export const session = {
     const request = async () => {
       try {
         const response = await fetch('/api/public/auth/refresh', { method: 'POST', credentials: 'same-origin' });
-        if (!response.ok) { session.clear(); return false; }
+        if (response.status === 401 || response.status === 403) { session.clear(); return false; }
+        if (!response.ok) { refreshUnavailable = true; return false; }
         const body = (await response.json()) as { expiresAt?: string };
-        if (!body.expiresAt) { session.clear(); return false; }
+        if (!body.expiresAt) { refreshUnavailable = true; return false; }
+        refreshUnavailable = false;
         session.start(body.expiresAt);
         return session.isValid();
-      } catch {
-        session.clear();
-        return false;
-      }
+      } catch { refreshUnavailable = true; return false; }
     };
     // Multiple tabs share the refresh cookie. Serialize refresh to avoid rotating it twice.
     refreshing = (async () => {
@@ -64,5 +66,5 @@ export const session = {
 
 export function useSession() {
   const current = useSyncExternalStore(session.subscribe, session.getExpiry);
-  return { isAuthenticated: session.isValid(current) };
+  return { isAuthenticated: current > Date.now() };
 }

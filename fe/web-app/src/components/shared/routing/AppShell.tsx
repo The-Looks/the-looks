@@ -48,7 +48,7 @@ export function AppShell({ children, publicPreview = false }: { children?: React
     <Layout className="app-frame app-frame-topnav">
       <Layout className="app-main-layout">
         <header className="app-topbar app-topbar-editorial">
-          <Link to="/" className="app-header-brand" aria-label="THE LOOKS, về trang chủ"><Brand /></Link>
+          <Link to="/" className="app-header-brand" aria-label="THE LOOKS, về trang chủ"><Brand /><span className="app-header-wordmark">The Looks</span></Link>
           <nav className="app-header-nav" aria-label="Điều hướng chính">
             {NAV.map((item) => <Link key={item.to} to={item.to} className={selected === item.to ? 'active' : ''} aria-current={selected === item.to ? 'page' : undefined}>{item.label}</Link>)}
           </nav>
@@ -69,7 +69,7 @@ export function AppShell({ children, publicPreview = false }: { children?: React
           </div>
         </header>
 
-        <main className="app-page">{children ?? <Outlet />}</main>
+        <main className="app-page"><div key={pathname} className="route-transition">{children ?? <Outlet />}</div></main>
       </Layout>
 
       <nav className="app-mobile-nav" aria-label="Điều hướng di động">

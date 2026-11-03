@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import type { StylePreferences } from '../../../interface/dto/types';
-import { Button, ButtonLink, Card, Chip, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { Button, Card, Chip, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { usePreferences, useSavePreferences } from '../../../hooks/user/outfit/api';
 
 type Style = NonNullable<StylePreferences['styles']>[number];
@@ -28,7 +28,7 @@ const BUDGETS: { value: NonNullable<StylePreferences['budget']>; label: string }
 
 /**
  * Hồ sơ phong cách: dùng cho bước đầu sau khi đăng ký (/onboarding) và trang Cá nhân (/profile/style).
- * Mọi mục đều không bắt buộc; AI vẫn tự học thêm từ lượt thích và đồ hay mặc.
+ * Bước đăng ký xác nhận giới tính và ít nhất một phong cách; sau đó có thể sửa trong hồ sơ.
  */
 export function StylePreferencesPage() {
   const onboarding = useLocation().pathname === '/onboarding';
@@ -36,6 +36,7 @@ export function StylePreferencesPage() {
   const current = usePreferences();
   const save = useSavePreferences();
   const [form, setForm] = useState<StylePreferences>({ gender: null, styles: [], budget: null });
+  const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
     if (current.data) setForm({ gender: null, styles: [], budget: null, ...current.data });
@@ -54,7 +55,7 @@ export function StylePreferencesPage() {
       <PageHeader
         eyebrow={onboarding ? 'Bước 1/2' : undefined}
         title="Phong cách của bạn"
-        sub="Giúp AI gợi ý outfit và món nên mua hợp với bạn hơn. Không bắt buộc, sửa lại lúc nào cũng được."
+        sub="Chọn giới tính và phong cách để cá nhân hóa gợi ý. Bạn có thể sửa lại trong hồ sơ bất cứ lúc nào."
         back={onboarding ? undefined : { to: '/profile', label: 'Cá nhân' }}
       />
       {current.isError && <Notice tone="error">{errorMessage(current.error)}</Notice>}
@@ -72,7 +73,7 @@ export function StylePreferencesPage() {
             </Chip>
           ))}
         </div>
-        <p className="small muted">Bấm lại để bỏ chọn nếu bạn không muốn nói.</p>
+        <p className="small muted">Bạn có thể chọn Khác nếu không muốn dùng gợi ý theo Nam hoặc Nữ.</p>
       </Card>
 
       <Card>
@@ -103,15 +104,11 @@ export function StylePreferencesPage() {
 
       {save.isError && <Notice tone="error">{errorMessage(save.error)}</Notice>}
       {save.isSuccess && !onboarding && <Notice>Đã lưu. Gợi ý sẽ dùng phong cách mới của bạn.</Notice>}
+      {onboarding && <Card><h2>Xác nhận hồ sơ phong cách</h2><p className="muted">Giới tính: {GENDERS.find((item) => item.value === form.gender)?.label ?? 'Chưa chọn'} · Phong cách: {styles.map((style) => STYLES.find((item) => item.value === style)?.label).join(', ') || 'Chưa chọn'} · Ngân sách: {BUDGETS.find((item) => item.value === form.budget)?.label ?? 'Chưa chọn'}</p><label className="row"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /> Tôi xác nhận thông tin phong cách này.</label></Card>}
       <div className="row">
-        <Button onClick={submit} disabled={save.isPending}>
+        <Button onClick={submit} disabled={save.isPending || (onboarding && (!form.gender || styles.length === 0 || !confirmed))}>
           {save.isPending ? 'Đang lưu…' : onboarding ? 'Lưu và thêm món đầu tiên' : 'Lưu'}
         </Button>
-        {onboarding && (
-          <ButtonLink to="/" kind="ghost">
-            Để sau
-          </ButtonLink>
-        )}
       </div>
     </div>
   );

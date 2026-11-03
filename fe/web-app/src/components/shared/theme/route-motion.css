@@ -1,0 +1,22 @@
+.app-header-brand { gap: 12px; }
+.app-header-wordmark {
+  color: #111;
+  font-family: var(--font-head);
+  font-weight: var(--weight-bold);
+  font-size: clamp(16px, 1.25vw, 21px);
+  letter-spacing: -.045em;
+  white-space: nowrap;
+  transform-origin: left center;
+  animation: wordmark-slide 5s cubic-bezier(.16,1,.3,1) infinite;
+}
+@keyframes wordmark-slide {
+  0%, 8% { opacity: 0; transform: translateX(-12px) scaleX(.85); }
+  18%, 80% { opacity: 1; transform: translateX(0) scaleX(1); }
+  92%, 100% { opacity: 0; transform: translateX(12px) scaleX(.85); }
+}
+.route-transition, .login-scene, .auth-scene, .guest-landing, .guest-page, .public-home, .admin-frame { animation: route-enter .36s cubic-bezier(.16,1,.3,1) both; }
+@keyframes route-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.page-back-button { border: 0; background: transparent; cursor: pointer; padding: 0; font: inherit; }
+.guest-vote-back { grid-column: 1 / -1; }
+@media (max-width: 700px) { .app-header-wordmark { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .app-header-wordmark, .route-transition, .login-scene, .auth-scene, .guest-landing, .guest-page, .public-home, .admin-frame { animation: none; } }

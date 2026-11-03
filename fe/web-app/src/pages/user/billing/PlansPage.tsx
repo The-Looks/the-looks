@@ -4,6 +4,7 @@ import type { BillingPeriod, PlanInfo } from '../../../interface/dto/types';
 import { Badge, Button, Card, Chip, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { useCheckout, useMyPlan, usePlans } from '../../../hooks/user/billing/api';
 import { FEATURE_LABEL, PERIOD_LABEL, PLAN_TAGLINE, formatDate, vnd } from '../../../services/user/billing/labels';
+import './plans.css';
 
 export function PlansPage() {
   const [period, setPeriod] = useState<BillingPeriod>('MONTHLY');
@@ -39,7 +40,7 @@ export function PlansPage() {
       {plans.isError && <Notice tone="error">{errorMessage(plans.error)}</Notice>}
       {checkout.isError && <Notice tone="error">{errorMessage(checkout.error)}</Notice>}
 
-      <div className="grid-cards">
+      <div className="plans-grid">
         {plans.data?.map((p) => (
           <PlanCard
             key={p.plan}
@@ -72,7 +73,7 @@ function PlanCard({
   const perMonth = period === 'YEARLY' && price > 0 ? Math.round(price / 12) : null;
   const items = info.limits.wardrobeItems;
   return (
-    <Card hero={info.plan === 'PRO'}>
+    <Card className={`plan-card${info.plan === 'PRO' ? ' plan-card-pro' : ''}`}>
       <div className="spread">
         <h2>{info.name}</h2>
         {current ? (
@@ -82,23 +83,25 @@ function PlanCard({
         ) : null}
       </div>
       <p className="muted small">{PLAN_TAGLINE[info.plan]}</p>
-      <p>
+      <p className="plan-price">
         <strong style={{ fontSize: 28 }}>{price === 0 ? '0đ' : vnd(price)}</strong>
         {price > 0 && <span className="muted"> / {PERIOD_LABEL[period]}</span>}
         {perMonth && <span className="small muted"> · khoảng {vnd(perMonth)}/tháng</span>}
       </p>
-      <ul className="stack" style={{ paddingLeft: 18, margin: 0 }}>
+      <ul className="plan-features">
         <li>{items === null || items === undefined ? 'Tủ đồ không giới hạn' : `Tủ đồ tối đa ${items} món`}</li>
         <li>{info.limits.aiSuggestionsPerDay} lượt AI gợi ý mỗi ngày</li>
         {info.features.map((f) => (
           <li key={f}>{FEATURE_LABEL[f] ?? f}</li>
         ))}
       </ul>
-      {info.plan !== 'FREE' && (
-        <Button block kind={info.plan === 'PRO' ? 'pink' : 'primary'} onClick={onBuy} disabled={busy}>
-          {busy ? 'Đang tạo link thanh toán…' : current ? 'Gia hạn' : `Chọn ${info.name}`}
-        </Button>
-      )}
+      <div className="plan-footer">
+        {info.plan !== 'FREE' ? (
+          <Button block kind={info.plan === 'PRO' ? 'pink' : 'primary'} onClick={onBuy} disabled={busy}>
+            {busy ? 'Đang tạo link thanh toán…' : current ? 'Gia hạn' : `Chọn ${info.name}`}
+          </Button>
+        ) : <span className="plan-free-note">Có sẵn cho mọi tài khoản</span>}
+      </div>
     </Card>
   );
 }

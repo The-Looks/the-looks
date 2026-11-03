@@ -24,6 +24,7 @@ export function PublicPollPage() {
         <Link to="/ask-friends" className="guest-help-link">Tìm hiểu THE LOOKS</Link>
       </header>
       <main className="guest-layout">
+        <Link className="back guest-vote-back" to="/ask-friends">‹ Quay lại</Link>
         <aside className="guest-side">
           <section className="guest-invite">
             <span className="guest-heart"><HeartOutlined /></span>

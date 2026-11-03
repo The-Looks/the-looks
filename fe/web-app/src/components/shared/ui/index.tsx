@@ -1,6 +1,6 @@
 import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
 import { PictureOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { categoryLabel } from '../../../services/shared/labels';
 import { brand } from '../../../services/shared/brand';
 
@@ -125,12 +125,19 @@ export function PageHeader({
   back?: { to: string; label: string };
   action?: ReactNode;
 }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const showBack = back ?? (location.pathname !== '/' ? { to: '/', label: 'Quay lại' } : undefined);
   return (
     <header className="page-header">
-      {back && (
-        <Link className="back" to={back.to}>
-          ‹ {back.label}
-        </Link>
+      {showBack && (
+        <button className="back page-back-button" type="button" onClick={() => {
+          if (back) navigate(back.to);
+          else if (window.history.state?.idx > 0) navigate(-1);
+          else navigate('/');
+        }}>
+          ‹ {showBack.label}
+        </button>
       )}
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}
       <div className="spread">

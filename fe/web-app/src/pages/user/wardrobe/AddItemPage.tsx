@@ -35,21 +35,26 @@ export function AddItemPage() {
         sub="Chụp cả bộ đang mặc hoặc trải nhiều món ra chụp một lần: AI tự tách từng món, bạn chỉ cần kiểm tra lại."
       />
       <Card>
-        <label htmlFor="add-photos" className="btn btn-block" style={{ cursor: processing ? 'wait' : 'pointer' }}>
-          {processing ? 'AI đang tách từng món…' : 'Chụp hoặc chọn ảnh'}
-        </label>
+        <div className="row">
+          <label htmlFor="add-photos" className="btn" style={{ cursor: processing ? 'wait' : 'pointer' }}>
+            {processing ? 'AI đang tách từng món…' : 'Chọn ảnh từ máy'}
+          </label>
+          <label htmlFor="camera-photo" className="btn btn-outline" style={{ cursor: processing ? 'wait' : 'pointer' }}>
+            Chụp ảnh
+          </label>
+        </div>
         <input
           id="add-photos"
           type="file"
-          accept="image/jpeg,image/png"
-          capture="environment"
+          accept="image/*,.heic,.heif"
           multiple
           hidden
           disabled={processing}
           onChange={onFiles}
         />
+        <input id="camera-photo" type="file" accept="image/*" capture="environment" hidden disabled={processing} onChange={onFiles} />
         <p className="small muted">
-          Mẹo: đủ sáng, các món không chồng lên nhau. Tối đa {MAX_IMAGES} ảnh mỗi lần. Ảnh gốc không được lưu, chỉ giữ
+          JPEG, PNG, WebP, AVIF, GIF và định dạng ảnh thiết bị đọc được. Mẹo: đủ sáng, các món không chồng lên nhau. Tối đa {MAX_IMAGES} ảnh mỗi lần. Ảnh gốc không được lưu, chỉ giữ
           ảnh từng món.
         </p>
       </Card>

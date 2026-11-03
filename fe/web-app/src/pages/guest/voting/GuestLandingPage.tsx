@@ -41,6 +41,7 @@ export function GuestLandingPage() {
         <ButtonLink to="/login" kind="outline" small>Mở ứng dụng <ArrowRightOutlined /></ButtonLink>
       </header>
       <main>
+        <Link className="back" to="/">‹ Về trang chủ</Link>
         <section className="guest-landing-hero">
           <div>
             <span className="guest-kicker"><HeartOutlined /> LOOKSY / THE LOOKS</span>

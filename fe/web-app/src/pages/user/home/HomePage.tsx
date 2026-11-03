@@ -55,14 +55,14 @@ export function HomePage() {
         </HomeStoryReveal>
       </div>
 
-      <div className="metric-grid home-metrics" aria-label="Tổng quan hoạt động">
+      <HomeStoryReveal><div className="metric-grid home-metrics" aria-label="Tổng quan hoạt động">
         {metric('Món đồ trong tủ', wardrobe.data?.length ?? '—', <SkinOutlined />, 'Sẵn sàng để phối')}
         {metric('Outfit đã lưu', outfits.data?.length ?? '—', <AppstoreOutlined />, 'Bộ đồ yêu thích')}
         {metric('Bình chọn đang mở', polls.data ? openPolls.length : '—', <HeartOutlined />, 'Bạn bè đang góp ý')}
         {metric('Đã kết thúc', polls.data ? polls.data.length - openPolls.length : '—', <CalendarOutlined />, 'Xem lại kết quả')}
-      </div>
+      </div></HomeStoryReveal>
 
-      <div className="home-content-grid">
+      <HomeStoryReveal><div className="home-content-grid">
         <section className="home-collection-section">
           <div className="section-title"><div><span className="eyebrow">BỘ SƯU TẬP</span><h2>Outfit gần đây</h2></div><Link to="/outfits">Xem tất cả →</Link></div>
           <div className="grid-cards">
@@ -82,8 +82,8 @@ export function HomePage() {
           <div className="section-title"><div><span className="eyebrow">CỦA RIÊNG BẠN</span><h2>Tủ đồ của bạn</h2></div><Link to="/wardrobe">Mở tủ đồ →</Link></div>
           <WardrobeSummary />
         </section>
-      </div>
-      <MyPlanCard />
+      </div></HomeStoryReveal>
+      <HomeStoryReveal><MyPlanCard /></HomeStoryReveal>
     </div>
   );
 }

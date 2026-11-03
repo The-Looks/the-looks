@@ -1,20 +1,23 @@
 import type { Category, ClothingAttributes, ItemStatus } from '../../../interface/dto/types';
 import { unwrap, wardrobeApi } from '../../shared/api/client';
+import { normalizeUpload } from './normalizeUpload';
 
 export const wardrobeRequests = {
   items: (status?: ItemStatus, category?: Category) =>
     unwrap(wardrobeApi.GET('/api/app/wardrobe/items', { params: { query: { status, category } } })),
   item: (id: string) =>
     unwrap(wardrobeApi.GET('/api/app/wardrobe/items/{itemId}', { params: { path: { itemId: id } } })),
-  startScan: (files: File[]) =>
-    unwrap(wardrobeApi.POST('/api/app/wardrobe/scans', {
+  startScan: async (files: File[]) => {
+    const images = await Promise.all(files.map(normalizeUpload));
+    return unwrap(wardrobeApi.POST('/api/app/wardrobe/scans', {
       body: { images: [] },
       bodySerializer: () => {
         const form = new FormData();
-        files.forEach((file) => form.append('images', file));
+        images.forEach((file) => form.append('images', file));
         return form;
       },
-    })),
+    }));
+  },
   scan: (scanId: string) =>
     unwrap(wardrobeApi.GET('/api/app/wardrobe/scans/{scanId}', { params: { path: { scanId } } })),
   confirm: (id: string, attrs: ClothingAttributes) =>

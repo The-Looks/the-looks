@@ -6,18 +6,27 @@ import type { paths as OutfitPaths } from '../../../interface/dto/user/outfit/ou
 import type { paths as VotingPaths } from '../../../interface/dto/shared/voting/voting';
 import type { paths as WardrobePaths } from '../../../interface/dto/user/wardrobe/wardrobe';
 
+const retryCopies = new Map<string, Request>();
+
 /** Refreshes the HttpOnly access cookie before protected API calls. */
 const auth: Middleware = {
-  async onRequest({ request }) {
+  async onRequest({ request, id }) {
     const path = new URL(request.url).pathname;
     if (!path.startsWith('/api/app/') && !path.startsWith('/api/admin/')) return request;
     await session.ensureValid();
+    retryCopies.set(id, request.clone());
     return request;
   },
-  onResponse({ response }) {
-    if (response.status === 401 && session.getExpiry()) session.clear();
+  async onResponse({ request, response, id }) {
+    const retry = retryCopies.get(id);
+    retryCopies.delete(id);
+    const path = new URL(request.url).pathname;
+    if (response.status === 401 && retry && (path.startsWith('/api/app/') || path.startsWith('/api/admin/'))) {
+      if (await session.refresh()) return fetch(retry);
+    }
     return response;
   },
+  onError({ id }) { retryCopies.delete(id); },
 };
 
 /**
@@ -36,7 +45,7 @@ const idempotency: Middleware = {
 // Cùng origin: Vite proxy (dev) / Vercel rewrites (prod) chuyển /api/... tới đúng service.
 function client<Paths extends object>() {
   const c = createClient<Paths>({ baseUrl: globalThis.location?.origin ?? 'http://localhost', credentials: 'same-origin' });
-  c.use(auth, idempotency);
+  c.use(idempotency, auth);
   return c;
 }
 

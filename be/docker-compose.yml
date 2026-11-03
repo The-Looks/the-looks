@@ -1,6 +1,6 @@
 # Chạy cả hệ thống bằng Docker (Dockerfile tự build jar).
-#   docker compose --env-file .env.local up -d --build
-# Chỉ cần database: docker compose --env-file .env.local up -d postgres
+#   docker compose --env-file .env up -d --build
+# Chỉ cần database: docker compose --env-file .env up -d postgres
 services:
   postgres:
     image: postgres:18
@@ -56,7 +56,8 @@ services:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_wardrobe
       BILLING_SERVICE_URL: http://billing-service:8085
-      AI_PROVIDER: ${WARDROBE_AI_PROVIDER:-none}
+      AI_PROVIDER: ${WARDROBE_AI_PROVIDER:-auto}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       IMAGE_STORAGE: ${IMAGE_STORAGE:-local}
       PUBLIC_BASE_URL: ${WEB_APP_URL:-http://localhost:5173}
@@ -89,6 +90,9 @@ services:
       WARDROBE_SERVICE_URL: http://wardrobe-service:8082
       BILLING_SERVICE_URL: http://billing-service:8085
       SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active
+      AI_PROVIDER: ${OUTFIT_AI_PROVIDER:-auto}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports: ["8083:8083"]
     depends_on:
       db-setup:

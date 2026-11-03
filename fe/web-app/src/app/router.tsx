@@ -1,31 +1,34 @@
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
-import { GoogleCallbackPage } from '../pages/guest/auth/GoogleCallbackPage';
-import { LoginPage } from '../pages/guest/auth/LoginPage';
-import { RegisterPage } from '../pages/guest/auth/RegisterPage';
-import { AdminDashboardPage } from '../pages/admin/dashboard/AdminDashboardPage';
-import { BillingResultPage } from '../pages/user/billing/BillingResultPage';
-import { PlansPage } from '../pages/user/billing/PlansPage';
-import { OutfitDetailPage } from '../pages/user/outfit/OutfitDetailPage';
-import { SavedOutfitsPage } from '../pages/user/outfit/SavedOutfitsPage';
-import { StylePreferencesPage } from '../pages/user/outfit/StylePreferencesPage';
-import { SuggestPage } from '../pages/user/outfit/SuggestPage';
-import { ProfilePage } from '../pages/user/profile/ProfilePage';
-import { NotificationsPage, PremiumPage } from '../pages/user/profile/ExtraPages';
-import { CreatePollPage } from '../pages/user/voting/CreatePollPage';
-import { MyPollsPage } from '../pages/user/voting/MyPollsPage';
-import { PollDetailPage } from '../pages/user/voting/PollDetailPage';
-import { PublicPollPage } from '../pages/guest/voting/PublicPollPage';
-import { GuestLandingPage } from '../pages/guest/voting/GuestLandingPage';
-import { AddItemPage } from '../pages/user/wardrobe/AddItemPage';
-import { ItemDetailPage } from '../pages/user/wardrobe/ItemDetailPage';
-import { WardrobePage } from '../pages/user/wardrobe/WardrobePage';
 import { ButtonLink, EmptyState } from '../components/shared/ui/index';
-import { AppShell } from '../components/shared/routing/AppShell';
-import { HomePage } from '../pages/user/home/HomePage';
 import { HomeEntry } from './HomeEntry';
-import { PublicHomePage } from '../pages/guest/home/PublicHomePage';
 import { RequireAuth } from '../components/shared/routing/RequireAuth';
 import { RequireAdmin } from '../components/shared/routing/RequireAdmin';
+
+const GoogleCallbackPage = lazy(() => import('../pages/guest/auth/GoogleCallbackPage').then((m) => ({ default: m.GoogleCallbackPage })));
+const AppShell = lazy(() => import('../components/shared/routing/AppShell').then((m) => ({ default: m.AppShell })));
+const LoginPage = lazy(() => import('../pages/guest/auth/LoginPage').then((m) => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('../pages/guest/auth/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const AdminDashboardPage = lazy(() => import('../pages/admin/dashboard/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })));
+const BillingResultPage = lazy(() => import('../pages/user/billing/BillingResultPage').then((m) => ({ default: m.BillingResultPage })));
+const PlansPage = lazy(() => import('../pages/user/billing/PlansPage').then((m) => ({ default: m.PlansPage })));
+const OutfitDetailPage = lazy(() => import('../pages/user/outfit/OutfitDetailPage').then((m) => ({ default: m.OutfitDetailPage })));
+const SavedOutfitsPage = lazy(() => import('../pages/user/outfit/SavedOutfitsPage').then((m) => ({ default: m.SavedOutfitsPage })));
+const StylePreferencesPage = lazy(() => import('../pages/user/outfit/StylePreferencesPage').then((m) => ({ default: m.StylePreferencesPage })));
+const SuggestPage = lazy(() => import('../pages/user/outfit/SuggestPage').then((m) => ({ default: m.SuggestPage })));
+const ProfilePage = lazy(() => import('../pages/user/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const NotificationsPage = lazy(() => import('../pages/user/profile/ExtraPages').then((m) => ({ default: m.NotificationsPage })));
+const PremiumPage = lazy(() => import('../pages/user/profile/ExtraPages').then((m) => ({ default: m.PremiumPage })));
+const CreatePollPage = lazy(() => import('../pages/user/voting/CreatePollPage').then((m) => ({ default: m.CreatePollPage })));
+const MyPollsPage = lazy(() => import('../pages/user/voting/MyPollsPage').then((m) => ({ default: m.MyPollsPage })));
+const PollDetailPage = lazy(() => import('../pages/user/voting/PollDetailPage').then((m) => ({ default: m.PollDetailPage })));
+const PublicPollPage = lazy(() => import('../pages/guest/voting/PublicPollPage').then((m) => ({ default: m.PublicPollPage })));
+const GuestLandingPage = lazy(() => import('../pages/guest/voting/GuestLandingPage').then((m) => ({ default: m.GuestLandingPage })));
+const AddItemPage = lazy(() => import('../pages/user/wardrobe/AddItemPage').then((m) => ({ default: m.AddItemPage })));
+const ItemDetailPage = lazy(() => import('../pages/user/wardrobe/ItemDetailPage').then((m) => ({ default: m.ItemDetailPage })));
+const WardrobePage = lazy(() => import('../pages/user/wardrobe/WardrobePage').then((m) => ({ default: m.WardrobePage })));
+const HomePage = lazy(() => import('../pages/user/home/HomePage').then((m) => ({ default: m.HomePage })));
+const PublicHomePage = lazy(() => import('../pages/guest/home/PublicHomePage').then((m) => ({ default: m.PublicHomePage })));
 
 function NotFound() {
   return (

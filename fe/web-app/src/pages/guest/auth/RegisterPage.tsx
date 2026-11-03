@@ -45,6 +45,7 @@ export function RegisterPage() {
         <p>Lưu tủ đồ, khám phá bộ phối mới và hỏi bạn bè chỉ bằng một đường link.</p>
       </aside>
       <section className={`auth-panel register-panel${animateFromLogin ? ' register-panel-enter' : ''}`}>
+        <Link className="back" to="/login">‹ Đăng nhập</Link>
         <Brand />
         <div className="stack"><span className="eyebrow">BẮT ĐẦU CÙNG THE LOOKS</span><h2>Tạo tài khoản</h2><p className="muted">Chỉ mất một phút để bắt đầu.</p></div>
         <form className="stack" onSubmit={submit}>

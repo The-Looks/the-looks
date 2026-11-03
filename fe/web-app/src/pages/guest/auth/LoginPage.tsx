@@ -10,7 +10,7 @@ import { Brand, Button, Field, Notice } from '../../../components/shared/ui/inde
 
 // auth-service — Phát. Contract: auth-api.yaml
 export function LoginPage() {
-  const mockAuth = import.meta.env.VITE_MOCK_SERVICES?.split(',').map((service) => service.trim()).includes('auth') ?? false;
+  const mockAuth = import.meta.env.DEV && (import.meta.env.VITE_MOCK_SERVICES?.split(',').map((service) => service.trim()).includes('auth') ?? false);
   const { isAuthenticated } = useSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -45,6 +45,7 @@ export function LoginPage() {
     <main className="login-scene">
       <div className="login-motion-wall" aria-hidden="true" />
       <section className="auth-panel login-panel">
+        <Link className="back" to="/">‹ Trang chủ</Link>
         <Brand />
         <div className="stack"><span className="eyebrow">CHÀO MỪNG ĐẾN THE LOOKS</span><h2>Đăng nhập</h2><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
         <form className="stack" onSubmit={submit}>
@@ -63,15 +64,14 @@ export function LoginPage() {
             mockGoogleLogin.mutate();
             return;
           }
-          const origin = import.meta.env.VITE_GOOGLE_ORIGIN || window.location.origin;
-          window.location.assign(new URL('/api/public/auth/google/start', origin));
+          window.location.assign(new URL('/api/public/auth/google/start', window.location.origin));
         }}>
           <GoogleOutlined /> {mockAuth ? 'Google (mô phỏng)' : 'Đăng nhập bằng Google'}
         </Button>
         <p className="auth-note">
           Chưa có tài khoản? <Link to="/register" state={{ fromLogin: true }}>Đăng ký</Link>
         </p>
-        {import.meta.env.VITE_MOCK_SERVICES?.includes('auth') && <p className="auth-note">Bản demo admin: admin@thelooks.local · nhập mật khẩu bất kỳ.</p>}
+        {mockAuth && <p className="auth-note">Bản demo admin: admin@thelooks.local · nhập mật khẩu bất kỳ.</p>}
       </section>
     </main>
   );

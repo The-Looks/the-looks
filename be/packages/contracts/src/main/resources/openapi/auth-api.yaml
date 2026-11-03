@@ -127,6 +127,20 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/User' }
+  /api/admin/auth/users:
+    get:
+      summary: Danh sách tài khoản cho quản trị viên (cần ADMIN_ACCESS)
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { name: search, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: Trang người dùng
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminUsersPage' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
 
 components:
   securitySchemes:
@@ -154,6 +168,24 @@ components:
           type: array
           items: { type: string }
         createdAt: { type: string, format: date-time }
+    AdminUser:
+      type: object
+      required: [id, username, email, status, emailVerified, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        email: { type: string, format: email }
+        status: { type: string, enum: [ACTIVE, LOCKED] }
+        emailVerified: { type: boolean }
+        createdAt: { type: string, format: date-time }
+    AdminUsersPage:
+      type: object
+      required: [items, total, page, size]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/AdminUser' } }
+        total: { type: integer, format: int64 }
+        page: { type: integer }
+        size: { type: integer }
     Session:
       type: object
       required: [expiresAt]

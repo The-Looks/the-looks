@@ -25,6 +25,7 @@ export function PublicHomePage() {
       </header>
 
       <main>
+        <Link className="back" to="/">‹ Về trang chủ</Link>
         <section className="public-home-hero" aria-labelledby="public-home-title">
           <div className="public-home-hero-copy">
             <span className="eyebrow">WEAR MORE. BUY SMARTER.</span>
