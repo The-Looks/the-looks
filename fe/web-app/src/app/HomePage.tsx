@@ -6,6 +6,7 @@ import { useMyPolls } from '../features/voting';
 import { WardrobeSummary, useWardrobe } from '../features/wardrobe';
 import { formatDate } from '../shared/lib/format';
 import { AssetPlaceholder, ButtonLink, Card, PageHeader, ProgressBar } from '../shared/ui';
+import { HomeStoryDivider, HomeStoryReveal } from './HomeStory';
 
 const metric = (label: string, value: number | string, icon: React.ReactNode, detail: string) => (
   <div className="metric-card">
@@ -23,28 +24,33 @@ export function HomePage() {
 
   return (
     <div className="stack-lg home-page">
-      <PageHeader eyebrow="WEAR MORE. BUY SMARTER." title="Chào bạn! 👋"
-        sub="Hôm nay bạn muốn mặc gì? Cùng tìm bộ đồ phù hợp nhé."
+      <PageHeader eyebrow="WEAR MORE. BUY SMARTER." title="Chào bạn!"
         action={<ButtonLink to="/outfits/suggest" small><PlusOutlined /> <span className="home-create-label">Tạo outfit mới</span></ButtonLink>} />
 
-      <div className="home-editorial-grid">
+      <div className="home-editorial-flow">
         <QuickPickCard />
-        <Card className="home-poll-card">
-          <div className="section-title"><h2>Bình chọn đang mở</h2><Link to="/polls">Xem tất cả →</Link></div>
-          {featuredPoll ? (
-            <>
-              <h3>{featuredPoll.question ?? 'Set nào đẹp hơn?'}</h3>
-              <p className="small muted">● Đang nhận bình chọn · {featuredPoll.result ? featuredPoll.result.votesA + featuredPoll.result.votesB : 0} lượt bình chọn · kết thúc {formatDate(featuredPoll.expiresAt)}</p>
-              {featuredPoll.result && <ProgressBar percent={featuredPoll.result.percentA} />}
-              <ButtonLink to={`/polls/${featuredPoll.code}`} kind="outline" small>Xem chi tiết ↗</ButtonLink>
-            </>
-          ) : (
-            <>
-              <p className="muted">Chưa có bình chọn nào đang mở. Tạo link để bạn bè giúp bạn chọn outfit.</p>
-              <ButtonLink to="/polls/new" kind="outline" small>Tạo bình chọn</ButtonLink>
-            </>
-          )}
-        </Card>
+        <HomeStoryDivider />
+        <HomeStoryReveal>
+          <Card className="home-poll-card">
+            <div className="home-poll-copy">
+              <div className="section-title"><h2>Bình chọn đang mở</h2><Link to="/polls">Xem tất cả →</Link></div>
+              {featuredPoll ? (
+                <>
+                  <h3>{featuredPoll.question ?? 'Set nào đẹp hơn?'}</h3>
+                  <p className="small muted">Đang nhận bình chọn · {featuredPoll.result ? featuredPoll.result.votesA + featuredPoll.result.votesB : 0} lượt bình chọn · kết thúc {formatDate(featuredPoll.expiresAt)}</p>
+                  {featuredPoll.result && <ProgressBar percent={featuredPoll.result.percentA} />}
+                  <ButtonLink to={`/polls/${featuredPoll.code}`} kind="outline" small>Xem chi tiết ↗</ButtonLink>
+                </>
+              ) : (
+                <>
+                  <h3>Chọn cùng bạn bè</h3>
+                  <p className="muted">Chưa có bình chọn nào đang mở. Tạo link để bạn bè giúp bạn chọn outfit.</p>
+                  <ButtonLink to="/polls/new" kind="outline" small>Tạo bình chọn</ButtonLink>
+                </>
+              )}
+            </div>
+          </Card>
+        </HomeStoryReveal>
       </div>
 
       <div className="metric-grid home-metrics" aria-label="Tổng quan hoạt động">

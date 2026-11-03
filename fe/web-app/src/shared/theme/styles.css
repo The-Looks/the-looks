@@ -468,18 +468,6 @@ a.card:hover {
   width: min(100%, 400px);
 }
 
-.demo-banner {
-  position: sticky;
-  top: env(safe-area-inset-top, 0px);
-  z-index: 50;
-  padding: 6px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));
-  background: var(--pink);
-  color: #fff;
-  font-size: var(--type-12);
-  font-weight: var(--weight-semibold);
-  text-align: center;
-}
-
 /* Brand refresh: 1100px canvas; 12 equal columns and 16px gutters.
    Main overview splits 7/5 columns; mobile returns to one reading column. */
 :root { --muted: #6e627b; --sidebar-w: 232px; --r-lg: 24px; --r-md: 16px; }

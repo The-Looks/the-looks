@@ -11,6 +11,7 @@ import '../shared/theme/styles.css';
 import '../shared/theme/web-app.css';
 import '../shared/theme/experience.css';
 import '../shared/theme/guest-figma.css';
+import '../shared/theme/home-redesign.css';
 import { router } from './router';
 
 session.subscribe(() => {
