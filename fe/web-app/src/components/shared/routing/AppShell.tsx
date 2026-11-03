@@ -4,6 +4,7 @@ import { Avatar, Badge, Drawer, Input, Layout, Tooltip } from 'antd';
 import {
   AppstoreOutlined,
   BellOutlined,
+  CheckSquareOutlined,
   CrownOutlined,
   HeartOutlined,
   HomeOutlined,
@@ -23,10 +24,10 @@ const NAV = [
   { to: '/wardrobe', label: brand.content.wardrobe, icon: <SkinOutlined /> },
   { to: '/outfits/suggest', label: 'LOOKSY AI', icon: <AppstoreOutlined /> },
   { to: '/outfits', label: 'Outfit đã lưu', icon: <HeartOutlined /> },
-  { to: '/polls', label: brand.content.voting, icon: <HeartOutlined /> },
+  { to: '/polls', label: brand.content.voting, icon: <CheckSquareOutlined /> },
 ] as const;
 
-const MOBILE_NAV = [NAV[0], NAV[1], NAV[2], NAV[4]];
+const MOBILE_NAV = NAV;
 
 function currentKey(pathname: string) {
   if (pathname === '/') return '/';
@@ -74,16 +75,15 @@ export function AppShell({ children, publicPreview = false }: { children?: React
 
       <nav className="app-mobile-nav" aria-label="Điều hướng di động">
         {MOBILE_NAV.map((item) => <Link key={item.to} to={item.to} className={selected === item.to ? 'active' : ''} aria-current={selected === item.to ? 'page' : undefined}>
-          {item.icon}<span>{item.label === 'LOOKSY AI' ? 'Khám phá' : item.label}</span>
+          {item.icon}<span>{item.to === '/outfits/suggest' ? 'AI phối đồ' : item.to === '/outfits' ? 'Đã lưu' : item.label}</span>
         </Link>)}
       </nav>
 
-      <Drawer id="account-drawer" title={<Brand />} placement="right" open={menuOpen} onClose={closeMenu} width={320} className="app-account-drawer">
+      <Drawer id="account-drawer" title="Tài khoản" placement="right" open={menuOpen} onClose={closeMenu} width={320} className="app-account-drawer">
         <div className="drawer-identity"><Avatar size={48} className="user-avatar">{avatarLetter}</Avatar><div><strong>{publicPreview ? 'Khách' : me.data?.username ?? 'Tài khoản'}</strong><span>{publicPreview ? 'Khám phá THE LOOKS' : me.data?.email ?? ''}</span></div></div>
         <nav className="drawer-navigation" aria-label="Menu tài khoản">
-          {NAV.map((item) => <Link key={item.to} to={item.to} onClick={closeMenu} className={selected === item.to ? 'active' : ''}>{item.icon}<span>{item.label}</span></Link>)}
-          <Link to={publicPreview ? '/login' : '/profile'} onClick={closeMenu}><UserOutlined /><span>{publicPreview ? 'Đăng nhập' : 'Hồ sơ'}</span></Link>
-          <Link to={publicPreview ? '/register' : '/plans'} onClick={closeMenu}><CrownOutlined /><span>{publicPreview ? 'Tạo tài khoản' : 'THE LOOKS Premium'}</span></Link>
+          <Link to={publicPreview ? '/login' : '/profile'} onClick={closeMenu} className={pathname.startsWith('/profile') ? 'active' : ''}><UserOutlined /><span>{publicPreview ? 'Đăng nhập' : 'Hồ sơ'}</span></Link>
+          <Link to={publicPreview ? '/register' : '/plans'} onClick={closeMenu} className={pathname.startsWith('/plans') ? 'active' : ''}><CrownOutlined /><span>{publicPreview ? 'Tạo tài khoản' : 'THE LOOKS Premium'}</span></Link>
           {isAdmin && <Link to="/admin" onClick={closeMenu}><AppstoreOutlined /><span>Quản trị hệ thống</span></Link>}
         </nav>
         {!publicPreview && <button className="drawer-logout" type="button" onClick={() => { closeMenu(); void session.logout().then(() => navigate('/')); }}><LogoutOutlined /> Đăng xuất</button>}

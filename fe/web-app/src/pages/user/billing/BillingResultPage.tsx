@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
+import { FileTextOutlined } from '@ant-design/icons';
 import { errorMessage } from '../../../services/shared/api/client';
 import { ButtonLink, Card, EmptyState, Notice, Spinner } from '../../../components/shared/ui/index';
 import { useConfirmOrder, useMyPlan } from '../../../hooks/user/billing/api';
@@ -14,7 +15,7 @@ export function BillingResultPage() {
 
   if (orderCode === null) {
     return (
-      <EmptyState icon="🧾" title="Không có mã đơn">
+      <EmptyState icon={<FileTextOutlined />} title="Không có mã đơn">
         <ButtonLink to="/plans" small>
           Xem các gói
         </ButtonLink>

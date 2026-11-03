@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AppstoreOutlined, BookOutlined, CoffeeOutlined, HeartOutlined, LaptopOutlined } from '@ant-design/icons';
 import { ApiError, errorMessage } from '../../../services/shared/api/client';
 import type { Occasion } from '../../../interface/dto/types';
 import { ButtonLink, EmptyState, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
@@ -6,6 +7,14 @@ import { useSuggestions } from '../../../hooks/user/outfit/api';
 import { OutfitCard } from '../../../components/user/outfit/OutfitCard';
 import { SaveButton } from '../../../components/user/outfit/SaveButton';
 import { OCCASIONS, occasionLabel } from '../../../services/user/outfit/occasions';
+import { ScrollReveal } from '../../../components/shared/home/HomeStory';
+
+const occasionIcons = {
+  SCHOOL: <BookOutlined />,
+  WORK: <LaptopOutlined />,
+  HANGOUT: <CoffeeOutlined />,
+  DATE: <HeartOutlined />,
+} as const;
 
 export function SuggestPage() {
   const [occasion, setOccasion] = useState<Occasion | null>(null);
@@ -24,7 +33,7 @@ export function SuggestPage() {
         }
       />
 
-      <div className="grid-cards" role="radiogroup" aria-label="Chọn dịp">
+      <ScrollReveal><div className="grid-cards occasion-grid reveal-list" role="radiogroup" aria-label="Chọn dịp">
         {OCCASIONS.map((o) => (
           <button
             key={o.value}
@@ -41,14 +50,12 @@ export function SuggestPage() {
               background: occasion === o.value ? 'var(--lav-soft)' : undefined,
             }}
           >
-            <span style={{ fontSize: 'var(--type-24)' }} aria-hidden="true">
-              {o.icon}
-            </span>
+            <span className="occasion-icon" aria-hidden="true">{occasionIcons[o.value]}</span>
             <h3>{o.label}</h3>
             <span className="small muted">{o.hint}</span>
           </button>
         ))}
-      </div>
+      </div></ScrollReveal>
 
       {occasion && (
         <section className="stack" aria-live="polite">
@@ -62,18 +69,18 @@ export function SuggestPage() {
             </Notice>
           )}
           {suggestions.data?.length === 0 && (
-            <EmptyState icon="🧺" title="Chưa đủ đồ để phối cho dịp này">
+            <EmptyState icon={<AppstoreOutlined />} title="Chưa đủ đồ để phối cho dịp này">
               <p>Thêm vài món áo, quần hoặc váy đã xác nhận vào tủ đồ.</p>
               <ButtonLink to="/wardrobe/add" small>
                 Thêm món đồ
               </ButtonLink>
             </EmptyState>
           )}
-          <div className="grid-cards">
+          <ScrollReveal><div className="grid-cards suggestion-results reveal-list">
             {suggestions.data?.map((s) => (
               <OutfitCard key={s.items.map((i) => i.id).join('-')} suggestion={s} actions={<SaveButton suggestion={s} />} />
             ))}
-          </div>
+          </div></ScrollReveal>
         </section>
       )}
     </div>

@@ -7,6 +7,7 @@ import { formatDate } from '../../../services/shared/format';
 import { session } from '../../../services/shared/session';
 import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { usePreferences } from '../../../hooks/user/outfit/api';
+import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 
 export function ProfilePage() {
   const me = useQuery({ queryKey: ['me'], queryFn: () => unwrap(authApi.GET('/api/app/me')) });
@@ -19,7 +20,7 @@ export function ProfilePage() {
     <PageHeader eyebrow="HỒ SƠ PHONG CÁCH" title="Tài khoản của tôi" sub="Thông tin và hoạt động của bạn tại THE LOOKS." />
     {me.isPending && <Spinner />}
     {me.isError && <Notice tone="error">{errorMessage(me.error)}</Notice>}
-    {me.data && <div className="profile-grid">
+    {me.data && <ScrollReveal><div className="profile-grid">
       <Card>
         <div className="profile-identity"><Avatar size={72} className="user-avatar">{me.data.username.slice(0, 1).toUpperCase()}</Avatar><div><h2>{me.data.username}</h2><p className="muted">{me.data.email}</p><p className="small muted">Tham gia từ {formatDate(me.data.createdAt)}</p></div></div>
         <div className="divider" />
@@ -35,7 +36,7 @@ export function ProfilePage() {
         <p className="small muted">Bạn có thể xem và xoá từng món đồ trong tủ bất cứ lúc nào.</p>
         {me.data.roles?.includes('ADMIN') && <Link to="/admin" className="admin-switch"><AppstoreOutlined /> Mở dashboard quản trị</Link>}
       </Card>
-    </div>}
+    </div></ScrollReveal>}
     <Card><div className="spread"><div><h2>Đăng xuất</h2><p className="small muted">Kết thúc phiên đăng nhập trên thiết bị này.</p></div><Button kind="outline" onClick={() => void session.logout()}><LogoutOutlined /> Đăng xuất</Button></div></Card>
   </div>;
 }

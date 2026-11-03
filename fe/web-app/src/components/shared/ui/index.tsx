@@ -149,11 +149,11 @@ export function PageHeader({
   );
 }
 
-export function EmptyState({ title, children }: { icon: string; title: string; children?: ReactNode }) {
+export function EmptyState({ icon, title, children }: { icon?: ReactNode; title: string; children?: ReactNode }) {
   return (
     <div className="empty">
       <span className="empty-ico" aria-hidden="true">
-        <Icon name="spark" />
+        {icon ?? <Icon name="spark" />}
       </span>
       <h3>{title}</h3>
       {children}

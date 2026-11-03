@@ -4,6 +4,7 @@ import type { BillingPeriod, PlanInfo } from '../../../interface/dto/types';
 import { Badge, Button, Card, Chip, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { useCheckout, useMyPlan, usePlans } from '../../../hooks/user/billing/api';
 import { FEATURE_LABEL, PERIOD_LABEL, PLAN_TAGLINE, formatDate, vnd } from '../../../services/user/billing/labels';
+import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 import './plans.css';
 
 export function PlansPage() {
@@ -40,7 +41,7 @@ export function PlansPage() {
       {plans.isError && <Notice tone="error">{errorMessage(plans.error)}</Notice>}
       {checkout.isError && <Notice tone="error">{errorMessage(checkout.error)}</Notice>}
 
-      <div className="plans-grid">
+      <ScrollReveal><div className="plans-grid reveal-list">
         {plans.data?.map((p) => (
           <PlanCard
             key={p.plan}
@@ -51,7 +52,7 @@ export function PlansPage() {
             onBuy={() => p.plan !== 'FREE' && checkout.mutate({ plan: p.plan, period })}
           />
         ))}
-      </div>
+      </div></ScrollReveal>
     </div>
   );
 }

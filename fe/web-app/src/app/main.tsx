@@ -13,6 +13,7 @@ import '../components/shared/theme/experience.css';
 import '../components/shared/theme/guest-figma.css';
 import '../components/shared/theme/home-redesign.css';
 import '../components/shared/theme/route-motion.css';
+import '../components/shared/theme/editorial-pages.css';
 import { router } from './router';
 import { Spinner } from '../components/shared/ui/index';
 

@@ -9,17 +9,20 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: clamp(24px, 3vw, 54px);
-  background: #faf8fce8;
-  border-bottom: 1px solid var(--line);
+  background: linear-gradient(104deg, #f1e7faf2 0%, #faf8fcf4 54%, #faeaf1ed 100%);
+  border-bottom: 1px solid #e4d3ed;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 28px #251d2f08;
 }
 .app-header-brand { display: inline-flex; align-items: center; color: var(--ink); text-decoration: none; }
-.app-header-brand .brand img { width: 132px; height: 72px; }
+.app-header-brand .brand { display: grid; place-items: center; width: 72px; height: 61px; border: 1px solid #ffffffa8; border-radius: 18px; background: #ffffffbd; box-shadow: inset 0 1px 0 #fff, 0 7px 18px #251d2f0b; }
+.app-header-brand .brand img { width: 68px; height: 53px; object-fit: contain; }
 .app-header-nav { display: flex; align-items: center; justify-content: center; gap: clamp(8px, 1.7vw, 30px); min-width: 0; }
-.app-header-nav a { position: relative; padding: 13px 5px; color: var(--muted); font: var(--weight-semibold) var(--type-12) var(--font-body); text-decoration: none; white-space: nowrap; transition: color .25s ease; }
-.app-header-nav a::after { content: ''; position: absolute; left: 5px; right: 5px; bottom: 7px; height: 2px; border-radius: 2px; background: var(--purple); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.16, 1, .3, 1); }
-.app-header-nav a:hover, .app-header-nav a.active { color: var(--purple); }
+.app-header-nav a { position: relative; padding: 12px 10px; border-radius: 999px; color: #5f526a; font: var(--weight-semibold) var(--type-12) var(--font-body); text-decoration: none; white-space: nowrap; transition: color .3s cubic-bezier(.16, 1, .3, 1), background .3s cubic-bezier(.16, 1, .3, 1), transform .3s cubic-bezier(.16, 1, .3, 1); }
+.app-header-nav a::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: 4px; height: 2px; border-radius: 2px; background: var(--purple); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.16, 1, .3, 1); }
+.app-header-nav a:hover, .app-header-nav a.active { color: var(--purple-dark); background: #ffffffa8; }
+.app-header-nav a:hover { transform: translateY(-1px); }
 .app-header-nav a:hover::after, .app-header-nav a.active::after { transform: scaleX(1); }
 .app-topbar-editorial .topbar-actions { justify-self: end; gap: 12px; }
 .app-topbar-editorial .topbar-search { width: clamp(150px, 16vw, 230px); }
@@ -28,8 +31,8 @@
 .topbar-avatar-trigger:active { transform: scale(.96); }
 .topbar-avatar-trigger:focus-visible, .app-header-nav a:focus-visible, .drawer-navigation a:focus-visible, .drawer-logout:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
 .topbar-avatar-trigger .ant-avatar { width: 34px; height: 34px; line-height: 34px; }
-.app-account-drawer .ant-drawer-header { border-bottom: 1px solid var(--line); padding: 10px 24px; }
-.app-account-drawer .ant-drawer-title .brand img { width: 120px; height: 65px; }
+.app-account-drawer .ant-drawer-header { min-height: 69px; border-bottom: 1px solid #e4d3ed; padding: 10px 24px; background: var(--lav-soft); }
+.app-account-drawer .ant-drawer-title { color: var(--ink); font: var(--weight-bold) var(--type-16) var(--font-head); }
 .app-account-drawer .ant-drawer-body { display: flex; flex-direction: column; gap: 26px; padding: 24px; background: var(--bg); }
 .drawer-identity { display: flex; align-items: center; gap: 13px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
 .drawer-identity > div { display: grid; min-width: 0; }
@@ -100,8 +103,8 @@
 .home-story-divider-image { position: absolute; top: 7px; width: 112px; height: 69px; border-radius: 12px; filter: blur(5px); opacity: .32; background-position: center; background-size: cover; }
 .home-story-divider-image.first { left: 7%; background-image: var(--asset-quick-pick); transform: rotate(-8deg); }
 .home-story-divider-image.second { right: 7%; background-image: var(--asset-auth-wall); transform: rotate(8deg); }
-.home-story-reveal { opacity: 0; transform: translateY(44px); filter: blur(10px); transition: opacity .8s cubic-bezier(.16, 1, .3, 1), transform .8s cubic-bezier(.16, 1, .3, 1), filter .8s cubic-bezier(.16, 1, .3, 1); }
-.home-story-reveal.is-visible { opacity: 1; transform: translateY(0); filter: blur(0); }
+.scroll-reveal { opacity: 0; transform: translate3d(0, 22px, 0); transition: opacity .68s cubic-bezier(.16, 1, .3, 1), transform .68s cubic-bezier(.16, 1, .3, 1); }
+.scroll-reveal.is-visible { opacity: 1; transform: translate3d(0, 0, 0); }
 .app-page .home-story-reveal .home-poll-card {
   isolation: isolate;
   position: relative;
@@ -132,15 +135,17 @@
 @media (max-width: 1220px) { .app-topbar-editorial .topbar-search { display: none; } }
 @media (max-width: 1023px) {
   .app-topbar-editorial { height: 68px; grid-template-columns: 1fr auto; padding: 0 22px; }
-  .app-header-brand .brand img { height: 62px; }
+  .app-header-brand .brand { width: 64px; height: 53px; border-radius: 15px; }
+  .app-header-brand .brand img { width: 60px; height: 48px; }
   .app-header-nav { display: none; }
   .app-frame-topnav .app-page { padding: 25px 22px 100px; }
-  .app-mobile-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .app-mobile-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); background: #faf8fcf5; border-top-color: #e4d3ed; backdrop-filter: blur(16px); }
   .app-page .home-editorial-flow .home-hero-card { min-height: 520px; }
 }
 @media (max-width: 650px) {
   .app-topbar-editorial { padding: 0 16px; }
-  .app-header-brand .brand img { width: 116px; }
+  .app-header-brand .brand { width: 56px; height: 48px; }
+  .app-header-brand .brand img { width: 52px; height: 43px; }
   .app-frame-topnav .app-page { padding: 24px 16px 104px; }
   .home-page { gap: 20px; }
   .app-page .home-editorial-flow .home-hero-card { min-height: 520px; border-radius: 21px; align-items: flex-start; }
@@ -159,6 +164,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .app-page .home-editorial-flow .home-hero-card > .home-hero-photo { animation: none; }
-  .home-story-reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  .scroll-reveal { opacity: 1; transform: none; transition: none; }
   .app-header-nav a, .app-header-nav a::after, .topbar-avatar-trigger, .drawer-navigation a { transition: none; }
 }

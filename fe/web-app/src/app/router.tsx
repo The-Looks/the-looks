@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { CompassOutlined } from '@ant-design/icons';
 import { createBrowserRouter } from 'react-router-dom';
 import { ButtonLink, EmptyState } from '../components/shared/ui/index';
 import { HomeEntry } from './HomeEntry';
@@ -32,7 +33,7 @@ const PublicHomePage = lazy(() => import('../pages/guest/home/PublicHomePage').t
 
 function NotFound() {
   return (
-    <EmptyState icon="🧭" title="Không tìm thấy trang">
+    <EmptyState icon={<CompassOutlined />} title="Không tìm thấy trang">
       <ButtonLink to="/" small>
         Về trang chủ
       </ButtonLink>

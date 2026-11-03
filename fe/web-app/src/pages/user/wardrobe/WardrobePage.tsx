@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, SkinOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
 import { Link, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import type { Category } from '../../../interface/dto/types';
 import { CATEGORY_LABEL, categoryLabel } from '../../../services/shared/labels';
 import { Badge, ButtonLink, Chip, EmptyState, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 import { useWardrobe } from '../../../hooks/user/wardrobe/api';
 
 const STATUS_BADGE = {
@@ -47,11 +48,12 @@ export function WardrobePage() {
       {items.isPending && <Spinner />}
       {items.isError && <Notice tone="error">{errorMessage(items.error)}</Notice>}
       {visible?.length === 0 && (
-        <EmptyState icon="👗" title={items.data?.length ? 'Không tìm thấy món đồ' : 'Tủ đồ đang trống'}>
+        <EmptyState icon={<SkinOutlined />} title={items.data?.length ? 'Không tìm thấy món đồ' : 'Tủ đồ đang trống'}>
           <p>{items.data?.length ? 'Thử từ khóa khác hoặc chọn lại danh mục.' : 'Chụp vài món bạn mặc nhiều nhất để AI bắt đầu gợi ý.'}</p>
+          {!items.data?.length && <ButtonLink to="/wardrobe/add" small>Thêm món đầu tiên</ButtonLink>}
         </EmptyState>
       )}
-      <div className="wardrobe-grid">
+      <ScrollReveal><div className="wardrobe-grid reveal-list">
         {visible?.map((item) => {
           const badge = item.status !== 'CONFIRMED' ? STATUS_BADGE[item.status] : null;
           return (
@@ -65,7 +67,7 @@ export function WardrobePage() {
             </Link>
           );
         })}
-      </div>
+      </div></ScrollReveal>
     </div>
   );
 }
