@@ -12,6 +12,7 @@
     { "source": "/api/public/polls/:path*", "destination": "https://thelooks-voting.onrender.com/api/public/polls/:path*" },
     { "source": "/api/app/billing/:path*", "destination": "https://thelooks-billing.onrender.com/api/app/billing/:path*" },
     { "source": "/api/public/billing/:path*", "destination": "https://thelooks-billing.onrender.com/api/public/billing/:path*" },
+    { "source": "/api/admin/outfits/ai-usage", "destination": "https://thelooks-outfit.onrender.com/api/admin/outfits/ai-usage" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

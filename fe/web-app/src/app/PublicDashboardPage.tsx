@@ -26,7 +26,7 @@ export function PublicDashboardPage() {
             <div className="home-hero-glass"><span className="eyebrow home-kicker">✦ Quick Pick</span><h2>Hôm nay<br />mặc gì?</h2><p>Một chạm, AI chọn bộ đồ ưu tiên những món bạn lâu chưa mặc.</p><ButtonLink to="/outfits/suggest" kind="ghost" small>Gợi ý cho tôi →</ButtonLink></div>
             <div className="home-hero-stamp" aria-hidden="true">YOUR STYLE<br />YOUR STORY<br />✦</div>
           </Card></div>
-          <Card className="home-poll-card"><div className="section-title"><h2>Bình chọn đang mở</h2><Link to="/ask-friends">Xem tất cả →</Link></div><h3>Đi hẹn hò tối nay nên mặc bộ nào?</h3><p className="small muted">● Đang nhận bình chọn · 18 lượt bình chọn</p><ProgressBar percent={67} /><ButtonLink to="/v/demo42" kind="outline" small>Xem chi tiết ↗</ButtonLink></Card>
+          <Card className="home-poll-card"><div className="section-title"><h2>Bình chọn đang mở</h2><Link to="/ask-friends">Xem cách tham gia →</Link></div><h3>Đi hẹn hò tối nay nên mặc bộ nào?</h3><p className="small muted">● Đang nhận bình chọn · 18 lượt bình chọn</p><ProgressBar percent={67} /><ButtonLink to="/ask-friends" kind="outline" small>Mở link bạn bè gửi ↗</ButtonLink></Card>
         </div>
 
         <div className="metric-grid home-metrics" aria-label="Số liệu minh họa">

@@ -4,13 +4,14 @@ import { errorMessage } from '../../../shared/api/client';
 import type { Category } from '../../../shared/api/types';
 import { CATEGORY_LABEL, categoryLabel } from '../../../shared/lib/labels';
 import { Button, Card, Chip, ItemTile, Notice, PageHeader, Spinner } from '../../../shared/ui';
-import { useConfirm, useDelete, useItem } from '../api';
+import { useConfirm, useDelete, useItem, useUpdateItem } from '../api';
 
 export function ItemDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const item = useItem(id);
   const confirm = useConfirm(id);
+  const update = useUpdateItem(id);
   const remove = useDelete();
   const [category, setCategory] = useState<Category | undefined>();
 
@@ -44,8 +45,8 @@ export function ItemDetailPage() {
               </p>
             </>
           )}
-          {(confirm.isError || remove.isError) && (
-            <Notice tone="error">{errorMessage(confirm.error ?? remove.error)}</Notice>
+          {(confirm.isError || update.isError || remove.isError) && (
+            <Notice tone="error">{errorMessage(confirm.error ?? update.error ?? remove.error)}</Notice>
           )}
           <div className="row">
             {item.data.status === 'PENDING_REVIEW' && (
@@ -61,6 +62,19 @@ export function ItemDetailPage() {
                 disabled={confirm.isPending || !category}
               >
                 Xác nhận
+              </Button>
+            )}
+            {item.data.status === 'CONFIRMED' && category !== item.data.category && (
+              <Button
+                onClick={() => update.mutate({
+                  category,
+                  colors: item.data.colors,
+                  seasons: item.data.seasons,
+                  styleTags: item.data.styleTags,
+                })}
+                disabled={update.isPending || !category}
+              >
+                {update.isPending ? 'Đang lưu…' : 'Lưu loại đồ'}
               </Button>
             )}
             <Button

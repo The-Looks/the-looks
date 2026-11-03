@@ -71,6 +71,15 @@ export function useConfirm(id: string) {
   });
 }
 
+export function useUpdateItem(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (attrs: ClothingAttributes) =>
+      unwrap(wardrobeApi.PUT('/api/app/wardrobe/items/{itemId}', { params: { path: { itemId: id } }, body: attrs })),
+    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+  });
+}
+
 export function useDelete() {
   const qc = useQueryClient();
   return useMutation({

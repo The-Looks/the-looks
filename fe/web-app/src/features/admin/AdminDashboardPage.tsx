@@ -4,11 +4,13 @@ import {
   HeartOutlined, LinkOutlined, LockOutlined, MenuOutlined, NotificationOutlined,
   SearchOutlined, SettingOutlined, ShoppingOutlined, TeamOutlined,
 } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
 import { Avatar, Button, Card, Input, Modal, Select, Table, Tag, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Brand } from '../../shared/ui';
+import { errorMessage, outfitApi, unwrap } from '../../shared/api/client';
 import { adminAudit, adminProducts, adminReports, adminUsers, type AdminUser } from './adminDemoData';
 import './admin-dashboard.css';
 
@@ -69,6 +71,22 @@ function BarChart({ values, labels }: { values: number[]; labels: string[] }) {
   </div></div>;
 }
 
+function AiUsagePanel() {
+  const usage = useQuery({
+    queryKey: ['admin', 'outfits', 'ai-usage'],
+    queryFn: () => unwrap(outfitApi.GET('/api/admin/outfits/ai-usage')),
+  });
+  const report = usage.data;
+  const percent = report?.budgetUsd ? Math.min(100, Math.round(report.costUsd / report.budgetUsd * 100)) : 0;
+  return <Panel title="Chi phí LOOKSY AI" note="Số liệu thực từ outfit-service trong tháng hiện tại">
+    {usage.isPending && <p>Đang tải chi phí AI…</p>}
+    {usage.isError && <p role="alert">{errorMessage(usage.error)}</p>}
+    {report && <><div className="admin-progress-label">{report.month} <strong>${report.costUsd.toFixed(2)} / ${report.budgetUsd.toFixed(2)}</strong></div>
+      <div className="admin-progress"><span style={{ width: `${percent}%` }} /></div>
+      <p className="small muted">{report.topUsers.length} người dùng phát sinh chi phí AI nhiều nhất trong tháng.</p></>}
+  </Panel>;
+}
+
 function Overview({ openUser }: { openUser: (user: AdminUser) => void }) {
   const recentColumns: ColumnsType<AdminUser> = [
     { title: 'Người dùng mới', dataIndex: 'name', render: (name: string, user) => <button className="admin-text-button" onClick={() => openUser(user)}>{name}</button> },
@@ -83,6 +101,7 @@ function Overview({ openUser }: { openUser: (user: AdminUser) => void }) {
     <div className="admin-two-col"><Panel title="Tăng trưởng người dùng" note="Số tài khoản mới trong 7 ngày" extra={<span className="admin-period">7 ngày qua</span>}><BarChart values={[38, 55, 47, 68, 61, 79, 96]} labels={['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']} /></Panel>
       <Panel title="Trạng thái tài khoản" note="Phân bổ trạng thái hiện tại"><div className="admin-donut"><div><strong>78,9%</strong><small>Hoạt động</small></div></div><div className="admin-legend"><span>Hoạt động</span><span>Tạm khóa</span><span>Khác</span></div></Panel></div>
     <Panel title="Người dùng mới" note="Người dùng đăng ký gần đây" extra={<span className="admin-text-button">Xem trong mục Người dùng →</span>}><Table rowKey="key" columns={recentColumns} dataSource={adminUsers.slice(0, 3)} pagination={false} size="small" scroll={{ x: 650 }} /></Panel>
+    <AiUsagePanel />
   </>;
 }
 
@@ -240,7 +259,7 @@ export function AdminDashboardPage() {
       <Link to="/" className="admin-account"><Avatar>AD</Avatar><span><strong>Admin LOOKSY</strong><small>Quản trị viên</small></span></Link>
     </aside>
     <div className="admin-content"><header className="admin-topbar"><div className="admin-topbar-title"><Button className="admin-menu-button" icon={<MenuOutlined />} aria-label="Mở menu" onClick={() => setMobileNav((value) => !value)} /><span>Quản trị / {titles[view]}</span><strong>{selectedUser ? 'Chi tiết người dùng' : titles[view]}</strong></div><div className="admin-topbar-actions"><SearchOutlined /><BellOutlined /><Avatar>AD</Avatar></div></header>
-      <main className="admin-page"><div className="admin-page-intro"><h1>{selectedUser ? 'Chi tiết người dùng' : titles[view]}</h1><p>{descriptions[view]}</p><span className="admin-demo-badge">Dữ liệu minh họa · Chưa kết nối admin API</span></div><div className="admin-view-content" key={`${view}-${selectedUser?.key ?? ''}`}>{content[view]}</div></main>
+      <main className="admin-page"><div className="admin-page-intro"><h1>{selectedUser ? 'Chi tiết người dùng' : titles[view]}</h1><p>{descriptions[view]}</p><span className="admin-demo-badge">Các bảng đang dùng dữ liệu minh họa · Chi phí AI lấy từ backend</span></div><div className="admin-view-content" key={`${view}-${selectedUser?.key ?? ''}`}>{content[view]}</div></main>
     </div>
   </div>;
 }
