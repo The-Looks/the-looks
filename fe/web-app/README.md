@@ -4,14 +4,36 @@ App chính cho người dùng: React 18 + Vite + TypeScript, cài được lên 
 
 ## Chạy
 
-```bash
+```powershell
 npm install
 npm run dev            # http://localhost:5173
+```
+
+Chạy HTTPS để kiểm tra cookie `Secure` và request từ trình duyệt:
+
+```powershell
+Copy-Item https.env.example .env.https # Windows PowerShell, một lần
+npm run dev:https      # https://localhost:5173 (chạy auth-service thật)
 ```
 
 Mặc định cả bốn service chạy giả lập (MSW) theo contract — đăng nhập bằng email/mật khẩu bất kỳ.
 Chế độ mock chỉ giữ danh tính demo trong `sessionStorage`; không tạo JWT. Với backend thật,
 access và refresh token đều ở cookie HttpOnly. JavaScript chỉ giữ thời điểm hết hạn access token.
+`dev:https` dùng chứng chỉ tự ký cho môi trường local; trình duyệt sẽ yêu cầu xác nhận
+chứng chỉ lần đầu. Trước khi thử Google login qua HTTPS, đặt `WEB_ORIGIN=https://localhost:5173`
+và `GOOGLE_REDIRECT_URI=https://localhost:5173/api/public/auth/google/callback` cho
+auth-service, rồi đăng ký đúng redirect URI HTTPS đó trong Google Cloud Console.
+Trong PowerShell ở `be/`, chạy auth-service cho chế độ HTTPS:
+
+```powershell
+$env:WEB_ORIGIN = 'https://localhost:5173'
+$env:GOOGLE_REDIRECT_URI = 'https://localhost:5173/api/public/auth/google/callback'
+.\mvnw.cmd -pl services/auth-service spring-boot:run
+```
+
+Ở local, trình duyệt ↔ Vite dùng HTTPS, còn Vite ↔ backend vẫn dùng HTTP trên
+loopback. Bản deploy dùng HTTPS ở cả đường từ trình duyệt tới Vercel và từ
+Vercel tới các service trên Render.
 Khi auth-service thật đã chạy, bỏ `auth` khỏi `VITE_MOCK_SERVICES` rồi mới kết nối
 các service thật cần JWT. Ví dụ, để gọi outfit-service thật:
 
