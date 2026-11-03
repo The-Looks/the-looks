@@ -54,7 +54,7 @@ Cần dữ liệu service khác → gọi REST API của nó (JWT được chuy�
 
 ## Chạy local
 
-Yêu cầu: JDK 25, PostgreSQL 18. Không cần cài Maven (dùng `mvnw`).
+Yêu cầu: JDK 25 (hoặc JDK 21 với `-Djava.version=21`), PostgreSQL 18. Không cần cài Maven (dùng `mvnw`).
 
 ```bash
 # 1 lần: tạo database (Postgres cài trên máy)

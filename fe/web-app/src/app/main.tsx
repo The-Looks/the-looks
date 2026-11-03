@@ -24,7 +24,7 @@ session.subscribe(() => {
 
 /**
  * Bật MSW cho các service trong VITE_MOCK_SERVICES.
- * Dev: đặt trong .env.development. Bản demo trên Vercel: đặt biến môi trường lúc build (để trống ở production thật).
+ * Chỉ dùng cho `npm run dev:mock`; production luôn gọi backend thật.
  */
 async function enableMocks() {
   if (import.meta.env.PROD) return;
