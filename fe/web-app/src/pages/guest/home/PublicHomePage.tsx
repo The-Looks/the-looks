@@ -1,6 +1,8 @@
 import { ArrowRightOutlined, AppstoreOutlined, HeartOutlined, SkinOutlined, StarOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { Brand, ButtonLink } from '../../../components/shared/ui/index';
+import { ButtonLink } from '../../../components/shared/ui/index';
+import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
+import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 
 const features = [
   { icon: <SkinOutlined />, title: 'Tủ đồ của bạn', description: 'Sắp xếp những món bạn đang có để tìm lại nhanh hơn và phối theo cách mới.' },
@@ -11,18 +13,7 @@ const features = [
 export function PublicHomePage() {
   return (
     <div className="public-home">
-      <header className="public-home-header">
-        <Link to="/" className="public-home-brand" aria-label="THE LOOKS, trang chủ"><Brand /></Link>
-        <nav aria-label="Điều hướng trang chủ">
-          <a href="#features">Khám phá</a>
-          <a href="#how-it-works">Cách hoạt động</a>
-          <Link to="/ask-friends">Hỏi bạn bè</Link>
-        </nav>
-        <div className="public-home-actions">
-          <ButtonLink to="/login" kind="outline" small>Đăng nhập</ButtonLink>
-          <ButtonLink to="/register" small>Bắt đầu</ButtonLink>
-        </div>
-      </header>
+      <PublicHeader page="home" />
 
       <main>
         <Link className="back" to="/">‹ Về trang chủ</Link>
@@ -74,7 +65,7 @@ export function PublicHomePage() {
         </section>
         <section className="public-home-close"><span className="eyebrow">THE LOOKS</span><h2>Hôm nay bạn muốn mặc gì?</h2><p>Bắt đầu hành trình phong cách của riêng bạn.</p><ButtonLink to="/register">Bắt đầu miễn phí <ArrowRightOutlined /></ButtonLink></section>
       </main>
-      <footer className="public-home-footer"><Brand /><span>© THE LOOKS · Style your story</span><Link to="/ask-friends">Bình chọn cùng bạn bè <ArrowRightOutlined /></Link></footer>
+      <SiteFooter />
     </div>
   );
 }

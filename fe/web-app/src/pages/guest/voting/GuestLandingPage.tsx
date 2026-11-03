@@ -1,7 +1,9 @@
 import { ArrowRightOutlined, HeartOutlined, LinkOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AssetPlaceholder, Brand, Button, ButtonLink, Notice } from '../../../components/shared/ui/index';
+import { AssetPlaceholder, Button, ButtonLink, Notice } from '../../../components/shared/ui/index';
+import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
+import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 
 const steps = [
   { number: '01', title: 'Tạo trên app', detail: 'Chọn hai outfit và đặt câu hỏi.' },
@@ -31,15 +33,7 @@ export function GuestLandingPage() {
 
   return (
     <div className="guest-landing">
-      <header className="guest-topbar">
-        <Link to="/ask-friends" className="guest-brand"><Brand /></Link>
-        <nav className="guest-landing-nav" aria-label="Điều hướng trang giới thiệu">
-          <Link to="/ask-friends" className="active">Trang chủ</Link>
-          <a href="#how-it-works">Cách hoạt động</a>
-          <a href="#open-poll">Mở link bình chọn</a>
-        </nav>
-        <ButtonLink to="/login" kind="outline" small>Mở ứng dụng <ArrowRightOutlined /></ButtonLink>
-      </header>
+      <PublicHeader page="friends" />
       <main>
         <Link className="back" to="/">‹ Về trang chủ</Link>
         <section className="guest-landing-hero">
@@ -75,6 +69,7 @@ export function GuestLandingPage() {
           <p className="small muted"><LinkOutlined /> Bình chọn được chia sẻ qua liên kết riêng tư.</p>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

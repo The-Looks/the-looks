@@ -238,12 +238,8 @@
 .public-home-close .eyebrow { color: var(--lavender); }
 .public-home-close h2 { margin: 11px 0 9px; font-size: clamp(var(--type-28), 3vw, var(--type-38)); }
 .public-home-close p { margin-bottom: 22px; color: #e4d6ea; font-size: var(--type-13); }
-.public-home-footer { width: min(100% - 80px, 1390px); min-height: 85px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-top: 1px solid var(--line); }
-.public-home-footer .brand { font-size: var(--type-15); }
-.public-home-footer span:not(.brand):not(.brand-mark):not(.anticon) { color: var(--muted); font-size: var(--type-11); }
-.public-home-footer > a { font-size: var(--type-11); font-weight: var(--weight-bold); }
 @media (max-width: 1000px) {
-  .public-home-header, .public-home-hero, .public-home-features, .public-home-steps, .public-home-close, .public-home-footer { width: min(100% - 40px, 1390px); }
+  .public-home-header, .public-home-hero, .public-home-features, .public-home-steps, .public-home-close { width: min(100% - 40px, 1390px); }
   .public-home-header nav { gap: 14px; }
   .public-home-hero { grid-template-columns: 1fr 1fr; }
   .public-home-hero-copy { padding: 40px 32px; }
@@ -276,6 +272,5 @@
   .public-home-steps { display: block; padding: 28px 22px; margin-bottom: 52px; }
   .public-home-steps h2 { font-size: var(--type-28); }
   .public-home-close { padding: 42px 20px; }
-  .public-home-footer { flex-wrap: wrap; padding: 18px 0; }
 }
 @media (prefers-reduced-motion: reduce) { .public-home-visual-photo { animation: none; } .public-home-feature { transition: none; } }

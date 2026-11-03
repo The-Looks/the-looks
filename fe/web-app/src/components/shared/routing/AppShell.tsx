@@ -1,39 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
-import { Avatar, Badge, Drawer, Input, Layout, Tooltip } from 'antd';
+import { Avatar, Drawer, Layout } from 'antd';
 import {
   AppstoreOutlined,
-  BellOutlined,
-  CheckSquareOutlined,
   CrownOutlined,
-  HeartOutlined,
-  HomeOutlined,
   LogoutOutlined,
-  SearchOutlined,
-  SkinOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { authRequests } from '../../../services/guest/auth/requests';
-import { brand } from '../../../services/shared/brand';
 import { session } from '../../../services/shared/session';
-import { Brand } from '../ui/index';
-
-const NAV = [
-  { to: '/', label: brand.content.home, icon: <HomeOutlined /> },
-  { to: '/wardrobe', label: brand.content.wardrobe, icon: <SkinOutlined /> },
-  { to: '/outfits/suggest', label: 'LOOKSY AI', icon: <AppstoreOutlined /> },
-  { to: '/outfits', label: 'Outfit đã lưu', icon: <HeartOutlined /> },
-  { to: '/polls', label: brand.content.voting, icon: <CheckSquareOutlined /> },
-] as const;
-
-const MOBILE_NAV = NAV;
-
-function currentKey(pathname: string) {
-  if (pathname === '/') return '/';
-  if (pathname.startsWith('/outfits/suggest')) return '/outfits/suggest';
-  return NAV.find((item) => item.to !== '/' && pathname.startsWith(item.to))?.to ?? '';
-}
+import { APP_NAV, AppHeader, currentAppNav } from '../layout/AppHeader';
+import { SiteFooter } from '../layout/SiteFooter';
 
 export function AppShell({ children, publicPreview = false }: { children?: ReactNode; publicPreview?: boolean }) {
   const navigate = useNavigate();
@@ -41,40 +19,21 @@ export function AppShell({ children, publicPreview = false }: { children?: React
   const [menuOpen, setMenuOpen] = useState(false);
   const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me, enabled: !publicPreview });
   const isAdmin = me.data?.roles?.includes('ADMIN') ?? false;
-  const selected = currentKey(pathname);
+  const selected = currentAppNav(pathname);
   const avatarLetter = publicPreview ? 'B' : me.data?.username?.slice(0, 1).toUpperCase() ?? 'T';
   const closeMenu = () => setMenuOpen(false);
 
   return (
     <Layout className="app-frame app-frame-topnav">
       <Layout className="app-main-layout">
-        <header className="app-topbar app-topbar-editorial">
-          <Link to="/" className="app-header-brand" aria-label="THE LOOKS, về trang chủ"><Brand /><span className="app-header-wordmark">The Looks</span></Link>
-          <nav className="app-header-nav" aria-label="Điều hướng chính">
-            {NAV.map((item) => <Link key={item.to} to={item.to} className={selected === item.to ? 'active' : ''} aria-current={selected === item.to ? 'page' : undefined}>{item.label}</Link>)}
-          </nav>
-          <div className="topbar-actions">
-            {!publicPreview && <>
-              <Input.Search
-                className="topbar-search"
-                prefix={<SearchOutlined />}
-                placeholder="Tìm món đồ trong tủ..."
-                aria-label="Tìm món đồ trong tủ"
-                onSearch={(value) => navigate(`/wardrobe${value.trim() ? `?q=${encodeURIComponent(value.trim())}` : ''}`)}
-              />
-              <Tooltip title="Thông báo"><Link to="/notifications" className="topbar-icon" aria-label="Thông báo"><Badge dot><BellOutlined /></Badge></Link></Tooltip>
-            </>}
-            <button className="topbar-avatar-trigger" type="button" aria-label="Mở menu tài khoản" aria-expanded={menuOpen} aria-controls="account-drawer" onClick={() => setMenuOpen(true)}>
-              <Avatar className="user-avatar">{avatarLetter}</Avatar>
-            </button>
-          </div>
-        </header>
+        <AppHeader selected={selected} publicPreview={publicPreview} avatarLetter={avatarLetter} menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
 
         <main className="app-page"><div key={pathname} className="route-transition">{children ?? <Outlet />}</div></main>
+        <SiteFooter variant={publicPreview ? 'public' : 'app'} />
       </Layout>
 
       <nav className="app-mobile-nav" aria-label="Điều hướng di động">
-        {MOBILE_NAV.map((item) => <Link key={item.to} to={item.to} className={selected === item.to ? 'active' : ''} aria-current={selected === item.to ? 'page' : undefined}>
+        {APP_NAV.map((item) => <Link key={item.to} to={item.to} className={selected === item.to ? 'active' : ''} aria-current={selected === item.to ? 'page' : undefined}>
           {item.icon}<span>{item.to === '/outfits/suggest' ? 'AI phối đồ' : item.to === '/outfits' ? 'Đã lưu' : item.label}</span>
         </Link>)}
       </nav>

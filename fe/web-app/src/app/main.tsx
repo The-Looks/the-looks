@@ -14,6 +14,7 @@ import '../components/shared/theme/guest-figma.css';
 import '../components/shared/theme/home-redesign.css';
 import '../components/shared/theme/route-motion.css';
 import '../components/shared/theme/editorial-pages.css';
+import '../components/shared/theme/site-layout.css';
 import { router } from './router';
 import { Spinner } from '../components/shared/ui/index';
 

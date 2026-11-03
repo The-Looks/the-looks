@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import { formatDateTime } from '../../../services/shared/format';
-import { AssetPlaceholder, Brand, Button, Notice, ProgressBar, Spinner } from '../../../components/shared/ui/index';
+import { AssetPlaceholder, Button, Notice, ProgressBar, Spinner } from '../../../components/shared/ui/index';
+import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
+import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { useCastVote, usePoll } from '../../../hooks/guest/voting/api';
 
 export function PublicPollPage() {
@@ -18,11 +20,7 @@ export function PublicPollPage() {
 
   return (
     <div className="guest-page">
-      <header className="guest-topbar">
-        <Link to="/ask-friends" className="guest-brand"><Brand /></Link>
-        <span className="small muted">Bình chọn cùng bạn bè</span>
-        <Link to="/ask-friends" className="guest-help-link">Tìm hiểu THE LOOKS</Link>
-      </header>
+      <PublicHeader page="vote" />
       <main className="guest-layout">
         <Link className="back guest-vote-back" to="/ask-friends">‹ Quay lại</Link>
         <aside className="guest-side">
@@ -98,6 +96,7 @@ export function PublicPollPage() {
           )}
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }

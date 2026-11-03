@@ -463,7 +463,7 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 .btn-outline { border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
 .btn-sm { min-height: 40px; }
 .brand { display: inline-flex; }
-.brand img { width: 132px; height: 76px; object-fit: contain; mix-blend-mode: multiply; }
+.brand img { width: 132px; height: 76px; object-fit: contain; }
 .brand-mark { display: none; }
 .shell-main { max-width: 1164px; padding: 40px 32px; }
 .nav { background: var(--bg); }
