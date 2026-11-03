@@ -37,13 +37,12 @@ export function HomePage() {
               {featuredPoll ? (
                 <>
                   <h3>{featuredPoll.question ?? 'Set nào đẹp hơn?'}</h3>
-                  <p className="small muted">Đang nhận bình chọn · {featuredPoll.result ? featuredPoll.result.votesA + featuredPoll.result.votesB : 0} lượt bình chọn · kết thúc {formatDate(featuredPoll.expiresAt)}</p>
+                  <p className="small muted">● Đang nhận bình chọn · {featuredPoll.result ? featuredPoll.result.votesA + featuredPoll.result.votesB : 0} lượt bình chọn · kết thúc {formatDate(featuredPoll.expiresAt)}</p>
                   {featuredPoll.result && <ProgressBar percent={featuredPoll.result.percentA} />}
                   <ButtonLink to={`/polls/${featuredPoll.code}`} kind="outline" small>Xem chi tiết ↗</ButtonLink>
                 </>
               ) : (
                 <>
-                  <h3>Chọn cùng bạn bè</h3>
                   <p className="muted">Chưa có bình chọn nào đang mở. Tạo link để bạn bè giúp bạn chọn outfit.</p>
                   <ButtonLink to="/polls/new" kind="outline" small>Tạo bình chọn</ButtonLink>
                 </>

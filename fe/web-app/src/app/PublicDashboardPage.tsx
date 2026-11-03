@@ -27,7 +27,7 @@ export function PublicDashboardPage() {
             <div className="home-hero-stamp" aria-hidden="true">YOUR STYLE<br />YOUR STORY<br />✦</div>
           </Card></div>
           <HomeStoryDivider />
-          <HomeStoryReveal><Card className="home-poll-card"><div className="home-poll-copy"><div className="section-title"><h2>Bình chọn đang mở</h2><Link to="/ask-friends">Xem cách tham gia →</Link></div><h3>Đi hẹn hò tối nay nên mặc bộ nào?</h3><p className="small muted">Đang nhận bình chọn · 18 lượt bình chọn</p><ProgressBar percent={67} /><ButtonLink to="/ask-friends" kind="outline" small>Mở link bạn bè gửi ↗</ButtonLink></div></Card></HomeStoryReveal>
+          <HomeStoryReveal><Card className="home-poll-card"><div className="home-poll-copy"><div className="section-title"><h2>Bình chọn đang mở</h2><Link to="/ask-friends">Xem cách tham gia →</Link></div><h3>Đi hẹn hò tối nay nên mặc bộ nào?</h3><p className="small muted">● Đang nhận bình chọn · 18 lượt bình chọn</p><ProgressBar percent={67} /><ButtonLink to="/ask-friends" kind="outline" small>Mở link bạn bè gửi ↗</ButtonLink></div></Card></HomeStoryReveal>
         </div>
 
         <div className="metric-grid home-metrics" aria-label="Số liệu minh họa">
