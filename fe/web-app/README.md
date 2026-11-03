@@ -6,17 +6,12 @@ App chính cho người dùng: React 18 + Vite + TypeScript, cài được lên 
 
 ```powershell
 npm install
-npm run dev            # http://localhost:5173
+Copy-Item https.env.example .env.https # lần đầu, file local không chứa secret
+npm run dev            # https://localhost:5173, auth-service thật
 ```
 
-Chạy HTTPS để kiểm tra cookie `Secure` và request từ trình duyệt:
-
-```powershell
-Copy-Item https.env.example .env.https # Windows PowerShell, một lần
-npm run dev:https      # https://localhost:5173 (chạy auth-service thật)
-```
-
-Mặc định cả bốn service chạy giả lập (MSW) theo contract — đăng nhập bằng email/mật khẩu bất kỳ.
+`npm run dev:mock` chạy bản demo tại `http://localhost:5173` với các service giả lập
+(MSW). `npm run dev:https` là tên lệnh tương đương `npm run dev`.
 Chế độ mock chỉ giữ danh tính demo trong `sessionStorage`; không tạo JWT. Với backend thật,
 access và refresh token đều ở cookie HttpOnly. JavaScript chỉ giữ thời điểm hết hạn access token.
 `dev:https` dùng chứng chỉ tự ký cho môi trường local; trình duyệt sẽ yêu cầu xác nhận

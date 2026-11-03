@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode https",
+    "dev:mock": "vite --mode development",
     "dev:https": "vite --mode https",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
