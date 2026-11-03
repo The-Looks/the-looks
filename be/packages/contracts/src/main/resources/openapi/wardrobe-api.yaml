@@ -12,6 +12,7 @@ servers:
     description: local
 security:
   - bearerAuth: []
+  - cookieAuth: []
 
 paths:
   /api/app/wardrobe/items:
@@ -133,6 +134,7 @@ paths:
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+    cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
     ItemStatus: { type: string, enum: [PROCESSING, PENDING_REVIEW, CONFIRMED, RECOGNITION_FAILED] }
     Category: { type: string, enum: [TOP, BOTTOM, DRESS, OUTERWEAR, SHOES, BAG, ACCESSORY] }

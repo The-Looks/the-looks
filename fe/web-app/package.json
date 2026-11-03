@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode https",
+    "dev:mock": "vite --mode development",
+    "dev:https": "vite --mode https",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -14,7 +16,9 @@
     "gen:api": "node scripts/gen-api.mjs"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.6.1",
     "@tanstack/react-query": "^5.59.20",
+    "antd": "^5.29.3",
     "openapi-fetch": "^0.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -26,6 +30,7 @@
     "@testing-library/react": "^16.0.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-basic-ssl": "^1.2.0",
     "@vitejs/plugin-react": "^4.3.3",
     "eslint": "^9.14.0",
     "eslint-import-resolver-typescript": "^3.6.3",

@@ -8,7 +8,7 @@ export function GoogleCallbackPage() {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) void session.refresh().then((token) => { if (!token) setFailed(true); });
+    if (!isAuthenticated) void session.refresh().then((active) => { if (!active) setFailed(true); });
   }, [isAuthenticated]);
 
   if (isAuthenticated) return <Navigate to="/" replace />;

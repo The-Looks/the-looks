@@ -1,90 +1,68 @@
 import { useSyncExternalStore } from 'react';
 
+// Remove the token left by the older localStorage-based client. Never read it back.
+function clearLegacyAccessToken() {
+  try { localStorage.removeItem('thelooks.accessToken'); } catch { /* Storage may be unavailable. */ }
+}
+clearLegacyAccessToken();
+
 const listeners = new Set<() => void>();
-let token: string | null = null;
-let refreshing: Promise<string | null> | null = null;
+let expiresAt = 0;
+let refreshing: Promise<boolean> | null = null;
+const emit = () => listeners.forEach((listener) => listener());
 
-function emit() {
-  listeners.forEach((l) => l());
-}
-
-function expiry(jwt: string): number | null {
-  try {
-    const payload = JSON.parse(atob(jwt.split('.')[1]!.replace(/-/g, '+').replace(/_/g, '/')));
-    return typeof payload.exp === 'number' ? payload.exp : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Access token chỉ tồn tại trong bộ nhớ; refresh token ở cookie httpOnly. */
+/** The browser sends HttpOnly access and refresh cookies; JavaScript stores only expiry. */
 export const session = {
-  getToken: () => token,
-  setToken(next: string) {
-    token = next;
+  getExpiry: () => expiresAt,
+  start(nextExpiresAt: string) {
+    const parsed = Date.parse(nextExpiresAt);
+    expiresAt = Number.isFinite(parsed) ? parsed : 0;
     emit();
   },
   clear() {
-    token = null;
+    expiresAt = 0;
+    clearLegacyAccessToken();
     emit();
   },
   subscribe(listener: () => void) {
     listeners.add(listener);
     return () => listeners.delete(listener);
   },
-  isValid(t: string | null = token) {
-    if (!t) return false;
-    const exp = expiry(t);
-    return exp !== null && exp * 1000 > Date.now() + 15_000;
-  },
-  async refresh(): Promise<string | null> {
+  isValid(value = expiresAt) { return value > Date.now() + 15_000; },
+  async refresh(): Promise<boolean> {
     if (refreshing) return refreshing;
-    const request = async (): Promise<string | null> => {
+    const request = async () => {
       try {
         const response = await fetch('/api/public/auth/refresh', { method: 'POST', credentials: 'same-origin' });
-        if (!response.ok) {
-          session.clear();
-          return null;
-        }
-        const body = (await response.json()) as { accessToken?: string };
-        if (!body.accessToken) {
-          session.clear();
-          return null;
-        }
-        session.setToken(body.accessToken);
-        return body.accessToken;
+        if (!response.ok) { session.clear(); return false; }
+        const body = (await response.json()) as { expiresAt?: string };
+        if (!body.expiresAt) { session.clear(); return false; }
+        session.start(body.expiresAt);
+        return session.isValid();
       } catch {
         session.clear();
-        return null;
+        return false;
       }
     };
-    // Các tab dùng chung refresh cookie. Khoá liên tab tránh gửi đồng thời token cũ.
+    // Multiple tabs share the refresh cookie. Serialize refresh to avoid rotating it twice.
     refreshing = (async () => {
       try {
         return navigator.locks
           ? await navigator.locks.request('thelooks-refresh-token', request)
           : await request();
-      } finally {
-        refreshing = null;
-      }
+      } finally { refreshing = null; }
     })();
     return refreshing;
   },
-  async validToken() {
-    return session.isValid() ? token : session.refresh();
-  },
+  async ensureValid() { return session.isValid() || session.refresh(); },
   async logout() {
-    try {
-      await fetch('/api/public/auth/logout', { method: 'POST', credentials: 'same-origin' });
-    } catch {
-      // Mất kết nối vẫn xoá access token khỏi bộ nhớ.
-    } finally {
-      session.clear();
-    }
+    try { await fetch('/api/public/auth/logout', { method: 'POST', credentials: 'same-origin' }); }
+    catch { /* Clear local session state even if the network is down. */ }
+    finally { session.clear(); }
   },
 };
 
 export function useSession() {
-  const current = useSyncExternalStore(session.subscribe, session.getToken);
-  return { token: current, isAuthenticated: session.isValid(current) };
+  const current = useSyncExternalStore(session.subscribe, session.getExpiry);
+  return { isAuthenticated: session.isValid(current) };
 }

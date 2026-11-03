@@ -1,12 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
+import { GoogleOutlined } from '@ant-design/icons';
+import { Divider } from 'antd';
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { authApi, errorMessage, unwrap } from '../../../shared/api/client';
 import { session, useSession } from '../../../shared/lib/session';
-import { Brand, Button, Card, Field, Notice } from '../../../shared/ui';
+import { Brand, Button, Field, Notice } from '../../../shared/ui';
 
 // auth-service — Phát. Contract: auth-api.yaml
 export function LoginPage() {
+  const mockAuth = import.meta.env.VITE_MOCK_SERVICES?.split(',').map((service) => service.trim()).includes('auth') ?? false;
   const { isAuthenticated } = useSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -17,7 +20,15 @@ export function LoginPage() {
   const login = useMutation({
     mutationFn: () => unwrap(authApi.POST('/api/public/auth/login', { body: { email, password } })),
     onSuccess: (res) => {
-      session.setToken(res.accessToken);
+      session.start(res.expiresAt);
+      navigate(from, { replace: true });
+    },
+  });
+
+  const mockGoogleLogin = useMutation({
+    mutationFn: () => unwrap(authApi.POST('/api/public/auth/login', { body: { email: 'google-demo@thelooks.vn', password: 'mock-google-login' } })),
+    onSuccess: (res) => {
+      session.start(res.expiresAt);
       navigate(from, { replace: true });
     },
   });
@@ -30,29 +41,37 @@ export function LoginPage() {
   };
 
   return (
-    <main className="auth-page">
-      <aside className="auth-story"><Brand /><div><h2>Tủ đồ quen. <br />Cảm hứng mới.</h2><p>Mỗi món đồ đều có thêm một cách mặc.<br />Khám phá diện mạo tiếp theo cùng The Looks.</p></div><p>Wear More. Buy Smarter.</p></aside><Card className="auth-card">
+    <main className="login-scene">
+      <div className="login-motion-wall" aria-hidden="true" />
+      <section className="auth-panel login-panel">
         <Brand />
-        <div className="stack">
-          <h1>Chào mừng trở lại</h1>
-          <p className="muted">Đăng nhập để xem tủ đồ và gợi ý phối đồ hôm nay.</p>
-        </div>
+        <div className="stack"><span className="eyebrow">CHÀO MỪNG ĐẾN THE LOOKS</span><h2>Đăng nhập</h2><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           <Field id="login-password" label="Mật khẩu" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           {searchParams.get('google') === 'failed' && <Notice tone="error">Không hoàn tất đăng nhập Google. Vui lòng thử lại.</Notice>}
           {login.isError && <Notice tone="error">{errorMessage(login.error)}</Notice>}
+          {mockGoogleLogin.isError && <Notice tone="error">{errorMessage(mockGoogleLogin.error)}</Notice>}
           <Button type="submit" block disabled={login.isPending}>
             {login.isPending ? 'Đang đăng nhập…' : 'Đăng nhập'}
           </Button>
         </form>
-        <Button kind="outline" block onClick={() => window.location.assign('/api/public/auth/google/start')}>
-          Đăng nhập bằng Google
+        <Divider plain>hoặc tiếp tục với</Divider>
+        <Button kind="outline" block disabled={mockGoogleLogin.isPending} onClick={() => {
+          if (mockAuth) {
+            mockGoogleLogin.mutate();
+            return;
+          }
+          const origin = import.meta.env.VITE_GOOGLE_ORIGIN || window.location.origin;
+          window.location.assign(new URL('/api/public/auth/google/start', origin));
+        }}>
+          <GoogleOutlined /> {mockAuth ? 'Google (mô phỏng)' : 'Đăng nhập bằng Google'}
         </Button>
-        <p className="small muted">
-          Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+        <p className="auth-note">
+          Chưa có tài khoản? <Link to="/register" state={{ fromLogin: true }}>Đăng ký</Link>
         </p>
-      </Card>
+        {import.meta.env.VITE_MOCK_SERVICES?.includes('auth') && <p className="auth-note">Bản demo admin: admin@thelooks.local · nhập mật khẩu bất kỳ.</p>}
+      </section>
     </main>
   );
 }

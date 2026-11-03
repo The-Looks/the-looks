@@ -2,12 +2,9 @@ package vn.thelooks.auth.presentation.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.time.Duration;
-import java.time.Instant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -22,11 +19,13 @@ import vn.thelooks.auth.application.port.in.LoginUseCase;
 import vn.thelooks.auth.application.port.in.RegisterUseCase;
 import vn.thelooks.auth.application.port.in.SessionUseCase;
 import vn.thelooks.auth.domain.exception.InvalidCredentialsException;
+import vn.thelooks.auth.domain.model.PasswordPolicy;
 import vn.thelooks.auth.presentation.advice.ForbiddenOriginException;
 import vn.thelooks.auth.presentation.mapper.UserResponseMapper;
 import vn.thelooks.auth.presentation.request.LoginRequest;
 import vn.thelooks.auth.presentation.request.RegisterRequest;
-import vn.thelooks.auth.presentation.response.AccessTokenResponse;
+import vn.thelooks.auth.presentation.response.SessionResponse;
+import vn.thelooks.auth.presentation.response.PasswordPolicyResponse;
 import vn.thelooks.auth.presentation.response.UserResponse;
 import vn.thelooks.security.CurrentUser;
 
@@ -56,27 +55,34 @@ class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseMapper.from(user));
     }
 
+    @GetMapping("/public/auth/password-policy")
+    PasswordPolicyResponse passwordPolicy() {
+        return new PasswordPolicyResponse(PasswordPolicy.MIN_LENGTH, PasswordPolicy.STRONG_LENGTH,
+                PasswordPolicy.RECOMMENDED_CHARACTER_TYPES);
+    }
+
     @PostMapping("/public/auth/login")
-    ResponseEntity<AccessTokenResponse> login(@Valid @RequestBody LoginRequest body, HttpServletRequest request) {
+    ResponseEntity<SessionResponse> login(@Valid @RequestBody LoginRequest body, HttpServletRequest request) {
         requireOrigin(request);
         return tokenResponse(login.login(body.email(), body.password()), request);
     }
 
     @PostMapping("/public/auth/refresh")
-    ResponseEntity<AccessTokenResponse> refresh(@CookieValue(name = "refresh_token", required = false) String refreshToken,
+    ResponseEntity<SessionResponse> refresh(@CookieValue(name = "refresh_token", required = false) String refreshToken,
             HttpServletRequest request) {
-        requireOrigin(request);
+        requireCookieOrigin(request);
         return tokenResponse(sessions.refresh(refreshToken), request);
     }
 
     @PostMapping("/public/auth/logout")
     ResponseEntity<Void> logout(@CookieValue(name = "refresh_token", required = false) String refreshToken,
             HttpServletRequest request) {
-        requireOrigin(request);
+        requireCookieOrigin(request);
         sessions.logout(refreshToken);
-        return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE,
-                ResponseCookie.from("refresh_token", "").httpOnly(true).secure(request.isSecure())
-                        .sameSite("Lax").path("/api/public/auth").maxAge(Duration.ZERO).build().toString()).build();
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, AuthCookies.clearRefresh(request).toString())
+                .header(HttpHeaders.SET_COOKIE, AuthCookies.clearAccess(request).toString())
+                .header(HttpHeaders.CACHE_CONTROL, "no-store").build();
     }
 
     @GetMapping("/app/me")
@@ -91,20 +97,23 @@ class AuthController {
         return ResponseEntity.noContent().header(HttpHeaders.CACHE_CONTROL, "no-store").build();
     }
 
-    private ResponseEntity<AccessTokenResponse> tokenResponse(LoginUseCase.AuthTokens tokens, HttpServletRequest request) {
-        var maxAge = Duration.between(Instant.now(), tokens.refreshExpiresAt());
-        var cookie = ResponseCookie.from("refresh_token", tokens.refreshToken())
-                .httpOnly(true).secure(request.isSecure()).sameSite("Lax")
-                .path("/api/public/auth").maxAge(maxAge.isNegative() ? Duration.ZERO : maxAge).build();
+    private ResponseEntity<SessionResponse> tokenResponse(LoginUseCase.AuthTokens tokens, HttpServletRequest request) {
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, AuthCookies.refresh(tokens, request).toString())
+                .header(HttpHeaders.SET_COOKIE, AuthCookies.access(tokens, request).toString())
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")
-                .body(new AccessTokenResponse(tokens.accessToken(), tokens.expiresAt()));
+                .body(new SessionResponse(tokens.expiresAt()));
     }
 
     private void requireOrigin(HttpServletRequest request) {
         var origin = request.getHeader(HttpHeaders.ORIGIN);
         if (origin != null && !origin.equals(allowedOrigin)) {
+            throw new ForbiddenOriginException();
+        }
+    }
+
+    private void requireCookieOrigin(HttpServletRequest request) {
+        if (!allowedOrigin.equals(request.getHeader(HttpHeaders.ORIGIN))) {
             throw new ForbiddenOriginException();
         }
     }

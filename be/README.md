@@ -89,7 +89,10 @@ Auth service phát access token ký RS256 và công bố public keys tại
 `JWT_JWK_SET_URI` trỏ tới `http://auth-service:8081/.well-known/jwks.json`.
 Chạy local ngoài Docker thì dùng URI `http://localhost:8081/.well-known/jwks.json`.
 Các service kiểm tra `sid` với auth service qua `SESSION_VALIDATION_URI` trên mỗi request
-có Bearer token; phiên đã thu hồi bị từ chối ngay, kể cả access token chưa hết 30 phút.
+có JWT từ cookie HttpOnly hoặc Bearer token; phiên đã thu hồi bị từ chối ngay,
+kể cả access token chưa hết 30 phút. Web dùng cookie `access_token` trên `/api` và
+`refresh_token` trên `/api/public/auth`; request ghi dữ liệu bằng cookie phải có
+`Origin` trùng `WEB_ORIGIN`. Native và các service nội bộ vẫn có thể gửi Bearer header.
 Tạo khóa một lần bằng `powershell -File scripts/generate-jwt-key.ps1` trước khi
 chạy auth service hoặc Docker Compose. File `.keys/jwt-private.pem` đã được
 gitignore; không đưa private key vào repository. JDK 21 dùng được khi build với
@@ -97,7 +100,10 @@ gitignore; không đưa private key vào repository. JDK 21 dùng được khi b
 
 ## Google đăng nhập và admin đầu tiên
 
-Điền `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` trong `.env`.
+Điền `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` trong
+`be/.env.local`. Khi chạy `mvnw.cmd -pl services/auth-service spring-boot:run`,
+profile `local` tự đọc file này; khởi động lại service sau khi đổi giá trị.
+Biến môi trường đã đặt trong terminal vẫn có ưu tiên cao hơn `.env.local`.
 Trong Google Cloud Console, đăng ký chính xác redirect URI, ví dụ
 `http://localhost:5173/api/public/auth/google/callback` khi chạy web-app qua Vite.
 `ADMIN_BOOTSTRAP_EMAIL` là email admin đầu tiên: tài khoản chỉ được nâng quyền khi

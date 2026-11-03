@@ -61,6 +61,8 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
+      - key: WEB_ORIGIN # cùng origin Vercel đã đặt cho auth-service
+        sync: false
       - key: PUBLIC_BASE_URL # link Vercel (ảnh tủ đồ đi qua web)
         sync: false
       - key: AI_PROVIDER
@@ -83,6 +85,8 @@ services:
       - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_outfit?sslmode=require
         sync: false
       - key: DB_PASSWORD
+        sync: false
+      - key: WEB_ORIGIN # cùng origin Vercel đã đặt cho auth-service
         sync: false
       - key: WARDROBE_SERVICE_URL
         value: https://thelooks-wardrobe.onrender.com
@@ -108,6 +112,8 @@ services:
       - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_voting?sslmode=require
         sync: false
       - key: DB_PASSWORD
+        sync: false
+      - key: WEB_ORIGIN # cùng origin Vercel đã đặt cho auth-service
         sync: false
       - key: SHARE_BASE_URL # link Vercel
         sync: false

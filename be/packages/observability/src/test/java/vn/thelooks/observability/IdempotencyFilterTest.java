@@ -3,6 +3,7 @@ package vn.thelooks.observability;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;
@@ -16,9 +17,14 @@ class IdempotencyFilterTest {
     int status = 201;
 
     MockHttpServletResponse send(String method, String key, String token) throws Exception {
+        return send(method, key, token, null);
+    }
+
+    MockHttpServletResponse send(String method, String key, String token, String accessCookie) throws Exception {
         var request = new MockHttpServletRequest(method, "/api/app/outfits");
         if (key != null) request.addHeader(IdempotencyFilter.HEADER, key);
         if (token != null) request.addHeader("Authorization", "Bearer " + token);
+        if (accessCookie != null) request.setCookies(new Cookie("access_token", accessCookie));
         var response = new MockHttpServletResponse();
         filter.doFilter(request, response, new MockFilterChain(new jakarta.servlet.http.HttpServlet() {
             @Override
@@ -46,6 +52,16 @@ class IdempotencyFilterTest {
     void keyIsScopedToTheCaller() throws Exception {
         send("POST", "key-12345678", "alice");
         assertThat(send("POST", "key-12345678", "bob").getContentAsString()).isEqualTo("{\"run\":2}");
+    }
+
+    @Test
+    void keyIsScopedToTheAccessCookieForBrowserRequests() throws Exception {
+        send("POST", "key-12345678", null, "alice-cookie");
+        assertThat(send("POST", "key-12345678", null, "bob-cookie").getContentAsString())
+                .isEqualTo("{\"run\":2}");
+        assertThat(send("POST", "key-12345678", null, "alice-cookie").getContentAsString())
+                .isEqualTo("{\"run\":1}");
+        assertThat(runs).hasValue(2);
     }
 
     @Test

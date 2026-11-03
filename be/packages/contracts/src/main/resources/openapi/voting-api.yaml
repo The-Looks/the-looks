@@ -12,6 +12,7 @@ servers:
     description: local
 security:
   - bearerAuth: []
+  - cookieAuth: []
 
 paths:
   /api/app/polls:
@@ -93,6 +94,7 @@ paths:
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
+    cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
     PollOption:
       type: object

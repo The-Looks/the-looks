@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -13,7 +14,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,7 +29,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
  * Header {@code Idempotency-Key}: request ghi (POST/PUT/PATCH/DELETE) gửi lại với cùng key thì nhận lại đúng
  * response lần đầu, không chạy lại. Chống tạo trùng khi người dùng bấm 2 lần hoặc mạng/proxy gửi lại.
  * <ul>
- *   <li>Key gắn với người gửi (hash của header Authorization) và method + đường dẫn: không đọc được response của người khác.</li>
+ *   <li>Key gắn với người gửi (hash của Bearer header hoặc access cookie) và method + đường dẫn: không đọc được response của người khác.</li>
  *   <li>Request trùng tới khi lần đầu còn đang chạy thì chờ lần đầu xong rồi trả cùng kết quả.</li>
  *   <li>Lỗi 5xx không được nhớ: gửi lại là chạy lại.</li>
  *   <li>Không có header thì chạy bình thường (webhook SePay, client cũ).</li>
@@ -73,7 +73,7 @@ public class IdempotencyFilter extends OncePerRequestFilter implements Ordered {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, HEADER + " phải gồm 8–100 ký tự chữ, số, - hoặc _");
             return;
         }
-        String slot = sha256(Objects.toString(request.getHeader("Authorization"), "")) + ' ' + request.getMethod() + ' '
+        String slot = sha256(callerCredential(request)) + ' ' + request.getMethod() + ' '
                 + request.getRequestURI() + ' ' + key;
         evictOld();
         var mine = new CompletableFuture<Saved>();
@@ -96,6 +96,18 @@ public class IdempotencyFilter extends OncePerRequestFilter implements Ordered {
         }
         mine.complete(saved);
         wrapper.copyBodyToResponse();
+    }
+
+    private static String callerCredential(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null && !authorization.isBlank()) return authorization;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("access_token".equals(cookie.getName())) return cookie.getValue();
+            }
+        }
+        return "";
     }
 
     private void replay(CompletableFuture<Saved> first, HttpServletResponse response) throws IOException {

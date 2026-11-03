@@ -1,7 +1,6 @@
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 import type { Category, OutfitSuggestion, Poll, SavedOutfit, Scan, WardrobeItem } from '../api/types';
 import { DEMO_USER, sampleCloset } from './data';
-import { makeMockJwt } from './devJwt';
 
 // Giả lập API theo đúng contract trong be/packages/contracts. Dữ liệu chỉ nằm trong bộ nhớ trình duyệt.
 const problem = (status: number, detail: string) =>
@@ -12,9 +11,32 @@ const problem = (status: number, detail: string) =>
 
 // ---------------- auth ----------------
 let refreshActive = false;
+let activeUser = DEMO_USER;
+// MSW handlers are recreated on a full OAuth redirect. Persist only the demo identity,
+// never a token, so the mock callback can restore its session via /refresh.
+const mockSessionKey = 'thelooks:mock-auth-session';
+function rememberMockSession() {
+  sessionStorage.setItem(mockSessionKey, JSON.stringify(activeUser));
+}
+function restoreMockSession() {
+  if (refreshActive) return true;
+  const saved = sessionStorage.getItem(mockSessionKey);
+  if (!saved) return false;
+  try {
+    activeUser = JSON.parse(saved) as typeof DEMO_USER;
+    refreshActive = true;
+    return true;
+  } catch {
+    sessionStorage.removeItem(mockSessionKey);
+    return false;
+  }
+}
 const auth: HttpHandler[] = [
+  http.get('*/api/public/auth/password-policy', () =>
+    HttpResponse.json({ minLength: 8, strongLength: 12, recommendedCharacterTypes: 3 })),
   http.post('*/api/public/auth/register', async ({ request }) => {
-    const body = (await request.json()) as { email: string; username: string };
+    const body = (await request.json()) as { email: string; username: string; password: string };
+    if (body.password.length < 8) return problem(400, 'Mật khẩu phải có ít nhất 8 ký tự');
     return HttpResponse.json({ ...DEMO_USER, email: body.email, username: body.username }, { status: 201 });
   }),
   http.post('*/api/public/auth/login', async ({ request }) => {
@@ -22,23 +44,29 @@ const auth: HttpHandler[] = [
     await delay(300);
     if (!body.email || !body.password) return problem(401, 'Sai email hoặc mật khẩu');
     refreshActive = true;
-    const { token, expiresAt } = makeMockJwt(DEMO_USER.id, ['USER']);
-    return HttpResponse.json({ accessToken: token, expiresAt });
+    activeUser = body.email.toLowerCase() === 'admin@thelooks.local'
+      ? { ...DEMO_USER, email: body.email, username: 'Quản trị viên', roles: ['USER', 'ADMIN'] }
+      : { ...DEMO_USER, email: body.email, roles: ['USER'] };
+    rememberMockSession();
+    return HttpResponse.json({ expiresAt: new Date(Date.now() + 30 * 60_000).toISOString() });
   }),
   http.post('*/api/public/auth/refresh', async () => {
-    if (!refreshActive) return problem(401, 'Chưa có phiên đăng nhập');
-    const { token, expiresAt } = makeMockJwt(DEMO_USER.id, ['USER']);
-    return HttpResponse.json({ accessToken: token, expiresAt });
+    if (!restoreMockSession()) return problem(401, 'Chưa có phiên đăng nhập');
+    return HttpResponse.json({ expiresAt: new Date(Date.now() + 30 * 60_000).toISOString() });
   }),
   http.post('*/api/public/auth/logout', () => {
     refreshActive = false;
+    activeUser = DEMO_USER;
+    sessionStorage.removeItem(mockSessionKey);
     return new HttpResponse(null, { status: 204 });
   }),
   http.get('*/api/public/auth/google/start', ({ request }) => {
     refreshActive = true;
+    activeUser = DEMO_USER;
+    rememberMockSession();
     return HttpResponse.redirect(new URL('/auth/callback', request.url).toString(), 302);
   }),
-  http.get('*/api/app/me', () => HttpResponse.json(DEMO_USER)),
+  http.get('*/api/app/me', () => HttpResponse.json(activeUser)),
 ];
 
 // ---------------- wardrobe ----------------

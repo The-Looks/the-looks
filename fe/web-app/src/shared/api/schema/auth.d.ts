@@ -51,6 +51,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/auth/password-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Quy tắc mật khẩu dùng cho form đăng ký
+         * @description Frontend dùng quy tắc này để hiển thị độ mạnh tại chỗ; không gửi mật khẩu khi người dùng đang nhập.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Quy tắc hiện hành của auth-service */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PasswordPolicy"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/auth/login": {
         parameters: {
             query?: never;
@@ -60,7 +99,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Đăng nhập, nhận JWT */
+        /** Đăng nhập, đặt access và refresh token vào cookie HttpOnly */
         post: {
             parameters: {
                 query?: never;
@@ -78,14 +117,13 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description OK */
+                /** @description Đặt access_token và refresh_token qua Set-Cookie; body chỉ có thời điểm hết hạn access token */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
                         "application/json": {
-                            accessToken: string;
                             /** Format: date-time */
                             expiresAt: string;
                         };
@@ -122,13 +160,13 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Access token mới; Set-Cookie chứa refresh token mới */
+                /** @description Access và refresh cookie mới */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["AccessToken"];
+                        "application/json": components["schemas"]["Session"];
                     };
                 };
                 401: components["responses"]["Problem"];
@@ -149,7 +187,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Thu hồi phiên hiện tại và xoá refresh cookie */
+        /** Thu hồi phiên hiện tại và xoá access cùng refresh cookie */
         post: {
             parameters: {
                 query?: never;
@@ -258,7 +296,7 @@ export interface paths {
         };
         /**
          * Xác thực Google callback rồi chuyển về web-app
-         * @description Server kiểm tra state và nonce; chỉ gộp tài khoản cùng email khi email_verified là true. Thành công đặt refresh cookie rồi chuyển về /auth/callback.
+         * @description Server kiểm tra state và nonce; chỉ gộp tài khoản cùng email khi email_verified là true. Thành công đặt access và refresh cookie rồi chuyển về /auth/callback.
          */
         get: {
             parameters: {
@@ -330,6 +368,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        PasswordPolicy: {
+            /** @example 8 */
+            minLength: number;
+            /** @example 12 */
+            strongLength: number;
+            /** @example 3 */
+            recommendedCharacterTypes: number;
+        };
         User: {
             /** Format: uuid */
             id: string;
@@ -340,8 +386,7 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
-        AccessToken: {
-            accessToken: string;
+        Session: {
             /** Format: date-time */
             expiresAt: string;
         };
