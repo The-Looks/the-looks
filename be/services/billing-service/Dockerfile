@@ -1,9 +1,10 @@
+# syntax=docker/dockerfile:1.7
 # Build context là thư mục be/ (cần pom cha và packages/):
 #   docker build -f services/billing-service/Dockerfile .
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /src
 COPY . .
-RUN sh mvnw -q -B -pl services/billing-service -am package -DskipTests
+RUN --mount=type=cache,target=/root/.m2,sharing=locked sh mvnw -q -B -pl services/billing-service -am package -DskipTests
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app

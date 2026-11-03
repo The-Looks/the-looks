@@ -67,6 +67,27 @@ psql -U postgres -f infrastructure/docker/postgres/init.sql
 ```
 Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
 
+### Chạy toàn bộ backend bằng Docker Compose
+
+Trong `be/`, tạo `.env.local` từ `.env.example` nếu chưa có, điền các khóa cần dùng
+và tạo khóa JWT một lần bằng `powershell -File scripts/generate-jwt-key.ps1`.
+`WEB_ORIGIN`, `SHARE_BASE_URL`, `WEB_APP_URL` và `GOOGLE_REDIRECT_URI` phải dùng
+`https://localhost:5173` khi frontend chạy bằng `npm run dev`.
+
+```powershell
+docker compose --env-file .env.local up -d --build
+docker compose --env-file .env.local ps
+docker compose --env-file .env.local logs -f auth-service
+```
+
+Compose chạy PostgreSQL và năm service trên cổng 8081–8085. `db-setup` chạy một lần
+mỗi lần khởi động để tạo database còn thiếu trong volume PostgreSQL cũ; trạng thái
+`Exited (0)` của container này là bình thường. Ảnh tủ đồ được giữ trong volume
+`wardrobe_images`. Frontend chạy riêng trong `fe/web-app/` bằng `npm run dev`.
+Nếu trước đó đang chạy Java service trực tiếp trên các cổng 8081–8085, dừng chúng
+trước khi chạy Compose. Dùng `docker compose --env-file .env.local down` để dừng;
+volume PostgreSQL và ảnh vẫn được giữ lại.
+
 ## outfit-service: AI và thời tiết
 
 | Biến môi trường | Mặc định | Ý nghĩa |
