@@ -1,5 +1,9 @@
 # Giá trị cho máy dev (Postgres cài trên máy hoặc be/docker-compose.yml). Không dùng ở staging/prod.
 spring:
+  config:
+    import:
+      - optional:file:./.env.local[.properties]
+      - optional:file:../../.env.local[.properties]
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/thelooks_identity}
     username: ${DB_USER:thelooks}

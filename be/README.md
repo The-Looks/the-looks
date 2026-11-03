@@ -100,7 +100,10 @@ gitignore; không đưa private key vào repository. JDK 21 dùng được khi b
 
 ## Google đăng nhập và admin đầu tiên
 
-Điền `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` trong `.env`.
+Điền `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` trong
+`be/.env.local`. Khi chạy `mvnw.cmd -pl services/auth-service spring-boot:run`,
+profile `local` tự đọc file này; khởi động lại service sau khi đổi giá trị.
+Biến môi trường đã đặt trong terminal vẫn có ưu tiên cao hơn `.env.local`.
 Trong Google Cloud Console, đăng ký chính xác redirect URI, ví dụ
 `http://localhost:5173/api/public/auth/google/callback` khi chạy web-app qua Vite.
 `ADMIN_BOOTSTRAP_EMAIL` là email admin đầu tiên: tài khoản chỉ được nâng quyền khi
