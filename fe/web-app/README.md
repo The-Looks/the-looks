@@ -48,22 +48,21 @@ xem log auth-service để biết callback bị từ chối ở bước state, t
 | `npm run gen:api` | Sinh lại kiểu TypeScript khi `be/packages/contracts/.../*-api.yaml` đổi — commit kết quả |
 | `npm run format` | Prettier |
 
-## Cấu trúc (ADR 0002)
+## Cấu trúc (ADR 0005)
 
 ```
 src/
-  app/        router, AppShell (thanh dưới trên điện thoại, sidebar ≥1024px), RequireAuth, HomePage
-  features/
-    auth/       đăng nhập, đăng ký, onboarding        — Phát (auth-service)
-    wardrobe/   tủ đồ, thêm món (camera), chi tiết    — Member 1 (wardrobe-service)
-    outfit/     gợi ý theo dịp, Quick Pick, đã lưu    — Tuấn (outfit-service)
-    voting/     bình chọn của tôi, tạo, kết quả       — Phát (voting-service)
-    profile/    cá nhân, đăng xuất
-  shared/     api (client sinh từ contract), ui, theme, lib, mocks (MSW)
+  app/          điểm vào và router
+  components/   shared/, guest/, user/, admin/ rồi đến feature
+  pages/        guest/, user/, admin/ rồi đến feature
+  services/     shared/, guest/, user/, admin/ rồi đến feature; request tới backend
+  interface/    dto/{guest,user,shared}/<feature>/; chỉ kiểu từ OpenAPI
+  hooks/        guest/, user/ rồi đến feature; TanStack Query và trạng thái UI
 ```
 
-- Feature **không import feature khác** (ESLint báo lỗi). Ghép nhiều feature vào một trang → làm ở `app/` (xem `HomePage`).
-- Mỗi feature có `api.ts` (hook TanStack Query gọi service của mình) và `index.ts` (phần công khai).
+- `brand.json` là nguồn chung cho màu, font, cỡ chữ, nội dung thương hiệu và đường dẫn ảnh. Ảnh và font thật nằm trong `public/`, mobile tham chiếu cùng file.
+- DTO sinh từ `be/packages/contracts/...` bằng `npm run gen:api`. Chỉ dùng `import type`; không implement lại DTO.
+- Trang admin ở `/admin`, trang guest vote ở `/v/:code`; hai bản web cũ lưu trong `docs/archive/frontends/`.
 
 ## Deploy
 

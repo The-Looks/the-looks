@@ -5,15 +5,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import { PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans';
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { colors, fonts } from '../shared/theme';
-import * as auth from '../features/auth/screens';
-import * as wardrobe from '../features/wardrobe/screens';
-import * as outfit from '../features/outfit/screens';
-import * as vote from '../features/voting/screens';
-import * as profile from '../features/profile/screens';
+import { colors, content, fonts } from '../services/shared/theme';
+import { fontAssets } from '../services/shared/assets';
+import * as auth from '../pages/guest/auth/screens';
+import * as wardrobe from '../pages/user/wardrobe/screens';
+import * as outfit from '../pages/user/outfit/screens';
+import * as vote from '../pages/user/voting/screens';
+import * as profile from '../pages/user/profile/screens';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,11 +29,11 @@ function Tabs() {
       tabBarStyle: { backgroundColor: '#fff', borderTopColor: colors.line, height: 70, paddingBottom: 12, paddingTop: 8 },
       tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.55 }}>{tabIcon[route.name]}</Text>,
     })}>
-      <Tab.Screen name="Home" component={wardrobe.Home} options={{ title: 'Trang chủ' }} />
-      <Tab.Screen name="Wardrobe" component={wardrobe.Wardrobe} options={{ title: 'Tủ đồ' }} />
-      <Tab.Screen name="Outfit" component={outfit.AIOutfit} options={{ title: 'Phối đồ' }} />
-      <Tab.Screen name="Vote" component={vote.Vote} options={{ title: 'Bình chọn' }} />
-      <Tab.Screen name="Profile" component={profile.Profile} options={{ title: 'Cá nhân' }} />
+      <Tab.Screen name="Home" component={wardrobe.Home} options={{ title: content.home }} />
+      <Tab.Screen name="Wardrobe" component={wardrobe.Wardrobe} options={{ title: content.wardrobe }} />
+      <Tab.Screen name="Outfit" component={outfit.AIOutfit} options={{ title: content.outfit }} />
+      <Tab.Screen name="Vote" component={vote.Vote} options={{ title: content.voting }} />
+      <Tab.Screen name="Profile" component={profile.Profile} options={{ title: content.profile }} />
     </Tab.Navigator>
   );
 }
@@ -56,7 +55,13 @@ const stackScreens = {
 };
 
 export default function App() {
-  const [loaded] = useFonts({ PlusJakartaSans_600SemiBold, PlusJakartaSans_700Bold, Inter_400Regular, Inter_600SemiBold, Inter_700Bold });
+  const [loaded] = useFonts({
+    [fonts.headSemi]: fontAssets.head600,
+    [fonts.head]: fontAssets.head700,
+    [fonts.body]: fontAssets.body400,
+    [fonts.bodySemi]: fontAssets.body600,
+    [fonts.bodyBold]: fontAssets.body700,
+  });
   if (!loaded) return <View style={{ flex: 1, backgroundColor: colors.bg }} />;
   return (
     <SafeAreaProvider>

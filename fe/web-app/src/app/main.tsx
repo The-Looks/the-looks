@@ -4,15 +4,17 @@ import viVN from 'antd/locale/vi_VN';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { queryClient } from '../shared/api/queryClient';
-import { session } from '../shared/lib/session';
-import '../shared/theme/typography.css';
-import '../shared/theme/styles.css';
-import '../shared/theme/web-app.css';
-import '../shared/theme/experience.css';
-import '../shared/theme/guest-figma.css';
-import '../shared/theme/home-redesign.css';
+import { queryClient } from '../services/shared/api/queryClient';
+import { applyBrandToDocument, brand } from '../services/shared/brand';
+import { session } from '../services/shared/session';
+import '../components/shared/theme/styles.css';
+import '../components/shared/theme/web-app.css';
+import '../components/shared/theme/experience.css';
+import '../components/shared/theme/guest-figma.css';
+import '../components/shared/theme/home-redesign.css';
 import { router } from './router';
+
+applyBrandToDocument();
 
 session.subscribe(() => {
   if (!session.getExpiry()) queryClient.clear();
@@ -28,7 +30,7 @@ async function enableMocks() {
     .map((s: string) => s.trim())
     .filter(Boolean);
   if (services.length === 0) return;
-  const { startMocks } = await import('../shared/mocks/browser');
+  const { startMocks } = await import('../services/shared/mocks/browser');
   await startMocks(services);
 }
 
@@ -40,16 +42,16 @@ enableMocks().then(() => session.refresh()).finally(() => {
           locale={viVN}
           theme={{
             token: {
-              colorPrimary: '#9440DD',
-              colorInfo: '#9440DD',
-              colorSuccess: '#32936F',
-              colorWarning: '#A76B22',
-              colorError: '#DB607E',
-              colorText: '#251D2F',
-              colorTextSecondary: '#786E80',
-              colorBgBase: '#FAF8FC',
-              colorBorder: '#ECE4F3',
-              borderRadius: 14,
+              colorPrimary: brand.colors.purple,
+              colorInfo: brand.colors.purple,
+              colorSuccess: brand.colors.green,
+              colorWarning: brand.colors.amber,
+              colorError: brand.colors.pink,
+              colorText: brand.colors.ink,
+              colorTextSecondary: brand.colors.muted,
+              colorBgBase: brand.colors.bg,
+              colorBorder: brand.colors.line,
+              borderRadius: brand.radius.md,
               fontFamily: 'var(--font-body)',
               fontSize: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--type-14')),
             },

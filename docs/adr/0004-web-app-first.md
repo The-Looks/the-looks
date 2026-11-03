@@ -13,7 +13,7 @@ App mobile (Expo) mới là màn hình dữ liệu mẫu, chưa nối API. Môn 
 - App chính cho người dùng là **`fe/web-app`**: React 18 + Vite + TypeScript, chạy dạng PWA
   (cài lên màn hình chính, chụp ảnh bằng camera qua `<input type="file" capture>`).
 - `fe/mobile` **tạm dừng**, giữ lại để tham khảo giao diện và làm tiếp khi đã có người dùng thật.
-- Theo ADR 0002: `app → features → shared`, ESLint chặn import chéo feature; TanStack Query;
+- Theo ADR 0005: `components/pages/services/interface/hooks` theo role và feature; TanStack Query;
   kiểu dữ liệu sinh từ OpenAPI (`npm run gen:api`), không viết tay.
 - Gọi backend cùng origin: Vite proxy khi dev, `vercel.json` rewrites khi production (đóng vai API gateway).
 - Service nào chưa xong thì giả lập bằng MSW theo đúng contract (`VITE_MOCK_SERVICES`).

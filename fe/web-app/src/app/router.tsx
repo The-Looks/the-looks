@@ -1,20 +1,31 @@
 import { createBrowserRouter } from 'react-router-dom';
-import { GoogleCallbackPage, LoginPage, RegisterPage } from '../features/auth';
-import { AdminDashboardPage } from '../features/admin/AdminDashboardPage';
-import { BillingResultPage, PlansPage } from '../features/billing';
-import { OutfitDetailPage, SavedOutfitsPage, StylePreferencesPage, SuggestPage } from '../features/outfit';
-import { ProfilePage } from '../features/profile';
-import { NotificationsPage, PremiumPage } from '../features/profile/pages/ExtraPages';
-import { CreatePollPage, MyPollsPage, PollDetailPage, PublicPollPage } from '../features/voting';
-import { GuestLandingPage } from '../features/voting/pages/GuestLandingPage';
-import { AddItemPage, ItemDetailPage, WardrobePage } from '../features/wardrobe';
-import { ButtonLink, EmptyState } from '../shared/ui';
-import { AppShell } from './AppShell';
-import { HomePage } from './HomePage';
+import { GoogleCallbackPage } from '../pages/guest/auth/GoogleCallbackPage';
+import { LoginPage } from '../pages/guest/auth/LoginPage';
+import { RegisterPage } from '../pages/guest/auth/RegisterPage';
+import { AdminDashboardPage } from '../pages/admin/dashboard/AdminDashboardPage';
+import { BillingResultPage } from '../pages/user/billing/BillingResultPage';
+import { PlansPage } from '../pages/user/billing/PlansPage';
+import { OutfitDetailPage } from '../pages/user/outfit/OutfitDetailPage';
+import { SavedOutfitsPage } from '../pages/user/outfit/SavedOutfitsPage';
+import { StylePreferencesPage } from '../pages/user/outfit/StylePreferencesPage';
+import { SuggestPage } from '../pages/user/outfit/SuggestPage';
+import { ProfilePage } from '../pages/user/profile/ProfilePage';
+import { NotificationsPage, PremiumPage } from '../pages/user/profile/ExtraPages';
+import { CreatePollPage } from '../pages/user/voting/CreatePollPage';
+import { MyPollsPage } from '../pages/user/voting/MyPollsPage';
+import { PollDetailPage } from '../pages/user/voting/PollDetailPage';
+import { PublicPollPage } from '../pages/guest/voting/PublicPollPage';
+import { GuestLandingPage } from '../pages/guest/voting/GuestLandingPage';
+import { AddItemPage } from '../pages/user/wardrobe/AddItemPage';
+import { ItemDetailPage } from '../pages/user/wardrobe/ItemDetailPage';
+import { WardrobePage } from '../pages/user/wardrobe/WardrobePage';
+import { ButtonLink, EmptyState } from '../components/shared/ui/index';
+import { AppShell } from '../components/shared/routing/AppShell';
+import { HomePage } from '../pages/user/home/HomePage';
 import { HomeEntry } from './HomeEntry';
-import { PublicHomePage } from './PublicHomePage';
-import { RequireAuth } from './RequireAuth';
-import { RequireAdmin } from './RequireAdmin';
+import { PublicHomePage } from '../pages/guest/home/PublicHomePage';
+import { RequireAuth } from '../components/shared/routing/RequireAuth';
+import { RequireAdmin } from '../components/shared/routing/RequireAdmin';
 
 function NotFound() {
   return (

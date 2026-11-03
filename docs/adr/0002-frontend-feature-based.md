@@ -1,6 +1,6 @@
 # ADR 0002: Frontend theo kiến trúc feature-based, TypeScript, client sinh từ OpenAPI
 
-- Trạng thái: Đã chấp nhận
+- Trạng thái: Được thay thế bởi ADR 0005
 - Ngày: 2026-10-21
 
 ## Quyết định
