@@ -1,20 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
-import { Avatar, Drawer, Layout } from 'antd';
-import {
-  AppstoreOutlined,
-  CrownOutlined,
-  LogoutOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Layout } from 'antd';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { authRequests } from '../../../services/guest/auth/requests';
-import { session } from '../../../services/shared/session';
 import { APP_NAV, AppHeader, currentAppNav } from '../layout/AppHeader';
+import { AccountDrawer } from '../layout/AccountDrawer';
 import { SiteFooter } from '../layout/SiteFooter';
 
 export function AppShell({ children, publicPreview = false }: { children?: ReactNode; publicPreview?: boolean }) {
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me, enabled: !publicPreview });
@@ -38,15 +31,7 @@ export function AppShell({ children, publicPreview = false }: { children?: React
         </Link>)}
       </nav>
 
-      <Drawer id="account-drawer" title="Tài khoản" placement="right" open={menuOpen} onClose={closeMenu} width={320} className="app-account-drawer">
-        <div className="drawer-identity"><Avatar size={48} className="user-avatar">{avatarLetter}</Avatar><div><strong>{publicPreview ? 'Khách' : me.data?.username ?? 'Tài khoản'}</strong><span>{publicPreview ? 'Khám phá THE LOOKS' : me.data?.email ?? ''}</span></div></div>
-        <nav className="drawer-navigation" aria-label="Menu tài khoản">
-          <Link to={publicPreview ? '/login' : '/profile'} onClick={closeMenu} className={pathname.startsWith('/profile') ? 'active' : ''}><UserOutlined /><span>{publicPreview ? 'Đăng nhập' : 'Hồ sơ'}</span></Link>
-          <Link to={publicPreview ? '/register' : '/plans'} onClick={closeMenu} className={pathname.startsWith('/plans') ? 'active' : ''}><CrownOutlined /><span>{publicPreview ? 'Tạo tài khoản' : 'THE LOOKS Premium'}</span></Link>
-          {isAdmin && <Link to="/admin" onClick={closeMenu}><AppstoreOutlined /><span>Quản trị hệ thống</span></Link>}
-        </nav>
-        {!publicPreview && <button className="drawer-logout" type="button" onClick={() => { closeMenu(); void session.logout().then(() => navigate('/')); }}><LogoutOutlined /> Đăng xuất</button>}
-      </Drawer>
+      <AccountDrawer open={menuOpen} onClose={closeMenu} account={me.data} isAdmin={isAdmin} publicPreview={publicPreview} />
     </Layout>
   );
 }
