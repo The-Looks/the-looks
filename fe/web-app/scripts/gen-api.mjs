@@ -3,8 +3,12 @@
 import { execSync } from 'node:child_process';
 
 const contracts = '../../be/packages/contracts/src/main/resources/openapi';
+const destinations = {
+  auth: 'guest/auth', wardrobe: 'user/wardrobe', outfit: 'user/outfit',
+  voting: 'shared/voting', billing: 'user/billing',
+};
 for (const service of ['auth', 'wardrobe', 'outfit', 'voting', 'billing']) {
-  execSync(`npx openapi-typescript "${contracts}/${service}-api.yaml" -o "src/shared/api/schema/${service}.d.ts"`, {
+  execSync(`npx openapi-typescript "${contracts}/${service}-api.yaml" -o "src/interface/dto/${destinations[service]}/${service}.d.ts"`, {
     stdio: 'inherit',
   });
 }

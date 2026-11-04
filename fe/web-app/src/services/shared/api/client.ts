@@ -1,0 +1,99 @@
+import createClient, { type Middleware } from 'openapi-fetch';
+import { session } from '../session';
+import type { paths as AuthPaths } from '../../../interface/dto/guest/auth/auth';
+import type { paths as BillingPaths } from '../../../interface/dto/user/billing/billing';
+import type { paths as OutfitPaths } from '../../../interface/dto/user/outfit/outfit';
+import type { paths as VotingPaths } from '../../../interface/dto/shared/voting/voting';
+import type { paths as WardrobePaths } from '../../../interface/dto/user/wardrobe/wardrobe';
+
+const retryCopies = new Map<string, Request>();
+
+/** Refreshes the HttpOnly access cookie before protected API calls. */
+const auth: Middleware = {
+  async onRequest({ request, id }) {
+    const path = new URL(request.url).pathname;
+    if (!path.startsWith('/api/app/') && !path.startsWith('/api/admin/')) return request;
+    await session.ensureValid();
+    retryCopies.set(id, request.clone());
+    return request;
+  },
+  async onResponse({ request, response, id }) {
+    const retry = retryCopies.get(id);
+    retryCopies.delete(id);
+    const path = new URL(request.url).pathname;
+    if (response.status === 401 && retry && (path.startsWith('/api/app/') || path.startsWith('/api/admin/'))) {
+      if (await session.refresh()) return fetch(retry);
+    }
+    return response;
+  },
+  onError({ id }) { retryCopies.delete(id); },
+};
+
+/**
+ * Mỗi request ghi một Idempotency-Key riêng: nếu mạng/proxy gửi lại cùng request, backend trả lại kết quả
+ * lần đầu thay vì làm lại (IdempotencyFilter trong be/packages/observability).
+ */
+const idempotency: Middleware = {
+  onRequest({ request }) {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      request.headers.set('Idempotency-Key', crypto.randomUUID());
+    }
+    return request;
+  },
+};
+
+// Cùng origin: Vite proxy (dev) / Vercel rewrites (prod) chuyển /api/... tới đúng service.
+function client<Paths extends object>() {
+  const c = createClient<Paths>({ baseUrl: globalThis.location?.origin ?? 'http://localhost', credentials: 'same-origin' });
+  c.use(idempotency, auth);
+  return c;
+}
+
+export const authApi = client<AuthPaths>();
+export const wardrobeApi = client<WardrobePaths>();
+export const outfitApi = client<OutfitPaths>();
+export const votingApi = client<VotingPaths>();
+export const billingApi = client<BillingPaths>();
+
+const DEFAULT_MESSAGE: Record<number, string> = {
+  400: 'Dữ liệu chưa hợp lệ.',
+  401: 'Phiên đăng nhập đã hết, vui lòng đăng nhập lại.',
+  403: 'Bạn không có quyền làm việc này.',
+  404: 'Không tìm thấy dữ liệu.',
+  409: 'Dữ liệu bị trùng.',
+  410: 'Link đã hết hạn.',
+  429: 'Bạn thao tác quá nhanh, thử lại sau ít phút.',
+  503: 'Dịch vụ tạm thời không khả dụng, thử lại sau.',
+};
+
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+type FetchResult<T> = { data?: T; error?: unknown; response: Response };
+
+/** Lấy data hoặc ném ApiError (thông điệp lấy từ "detail" của Problem nếu có). 204 → undefined. */
+export async function unwrap<T>(request: Promise<FetchResult<T>>): Promise<T> {
+  let result: FetchResult<T>;
+  try {
+    result = await request;
+  } catch {
+    throw new ApiError(0, 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.');
+  }
+  const { data, error, response } = result;
+  if (!response.ok || error !== undefined) {
+    const detail = (error as { detail?: unknown } | undefined)?.detail;
+    const message =
+      typeof detail === 'string' && detail ? detail : (DEFAULT_MESSAGE[response.status] ?? 'Có lỗi xảy ra.');
+    throw new ApiError(response.status, message);
+  }
+  return data as T;
+}
+
+export const errorMessage = (e: unknown) => (e instanceof Error ? e.message : 'Có lỗi xảy ra.');

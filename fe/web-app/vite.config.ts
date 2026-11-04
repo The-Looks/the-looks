@@ -70,6 +70,8 @@ export default defineConfig(({ mode }) => {
         '/api/public/polls': proxyTo(services.voting),
         '/api/app/billing': proxyTo(services.billing),
         '/api/public/billing': proxyTo(services.billing),
+        '/api/admin/outfits': proxyTo(services.outfit),
+        '/api/admin/auth': proxyTo(services.auth),
       },
     },
     test: {

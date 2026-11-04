@@ -10,7 +10,7 @@ import vn.thelooks.outfit.domain.model.ClosetItem;
 
 /**
  * Tủ đồ mẫu cho demo/dev khi wardrobe-service chưa sẵn sàng. Bật bằng profile "demo"
- * (thelooks.services.wardrobe-fake=true). ID trùng với fe/web-app/src/shared/mocks/data.ts.
+ * (thelooks.services.wardrobe-fake=true). ID trùng với fe/web-app/src/services/shared/mocks/data.ts.
  *
  * <p>Mọi người dùng thấy chung một tủ đồ — chỉ dùng để demo, không dùng ở production.
  */

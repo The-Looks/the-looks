@@ -1,6 +1,6 @@
 # Chạy cả hệ thống bằng Docker (Dockerfile tự build jar).
-#   cp .env.example .env && docker compose up -d --build
-# Chỉ cần database: docker compose up -d postgres
+#   docker compose --env-file .env up -d --build
+# Chỉ cần database: docker compose --env-file .env up -d postgres
 services:
   postgres:
     image: postgres:18
@@ -14,6 +14,18 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
+
+  db-setup:
+    image: postgres:18
+    entrypoint: ["psql", "-h", "postgres", "-U", "postgres", "-v", "ON_ERROR_STOP=1", "-f", "/bootstrap/init.sql"]
+    environment:
+      PGPASSWORD: postgres
+    volumes:
+      - ./infrastructure/docker/postgres/init.sql:/bootstrap/init.sql:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
 
   auth-service:
     build: { context: ., dockerfile: services/auth-service/Dockerfile }
@@ -35,8 +47,8 @@ services:
       - ./.keys/jwt-private.pem:/run/secrets/jwt-private.pem:ro
     ports: ["8081:8081"]
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-setup:
+        condition: service_completed_successfully
 
   wardrobe-service:
     build: { context: ., dockerfile: services/wardrobe-service/Dockerfile }
@@ -44,7 +56,8 @@ services:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_wardrobe
       BILLING_SERVICE_URL: http://billing-service:8085
-      AI_PROVIDER: ${WARDROBE_AI_PROVIDER:-none}
+      AI_PROVIDER: ${WARDROBE_AI_PROVIDER:-auto}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       IMAGE_STORAGE: ${IMAGE_STORAGE:-local}
       PUBLIC_BASE_URL: ${WEB_APP_URL:-http://localhost:5173}
@@ -58,9 +71,11 @@ services:
       JWT_JWK_SET_URI: http://auth-service:8081/.well-known/jwks.json
       SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active
     ports: ["8082:8082"]
+    volumes:
+      - wardrobe_images:/app/data/wardrobe-images
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-setup:
+        condition: service_completed_successfully
 
   outfit-service:
     build: { context: ., dockerfile: services/outfit-service/Dockerfile }
@@ -75,10 +90,13 @@ services:
       WARDROBE_SERVICE_URL: http://wardrobe-service:8082
       BILLING_SERVICE_URL: http://billing-service:8085
       SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active
+      AI_PROVIDER: ${OUTFIT_AI_PROVIDER:-auto}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports: ["8083:8083"]
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-setup:
+        condition: service_completed_successfully
 
   voting-service:
     build: { context: ., dockerfile: services/voting-service/Dockerfile }
@@ -96,8 +114,8 @@ services:
       VOTER_KEY_SECRET: ${VOTER_KEY_SECRET}
     ports: ["8084:8084"]
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-setup:
+        condition: service_completed_successfully
 
   billing-service:
     build: { context: ., dockerfile: services/billing-service/Dockerfile }
@@ -107,6 +125,7 @@ services:
       DB_USER: thelooks
       DB_PASSWORD: thelooks
       JWT_ISSUER: ${JWT_ISSUER}
+      WEB_ORIGIN: ${WEB_ORIGIN}
       JWT_JWK_SET_URI: http://auth-service:8081/.well-known/jwks.json
       SESSION_VALIDATION_URI: http://auth-service:8081/api/public/auth/session/active
       PAYMENT_GATEWAY: ${PAYMENT_GATEWAY:-fake}
@@ -117,8 +136,9 @@ services:
       PAYOS_CHECKSUM_KEY: ${PAYOS_CHECKSUM_KEY:-}
     ports: ["8085:8085"]
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-setup:
+        condition: service_completed_successfully
 
 volumes:
   pgdata:
+  wardrobe_images:

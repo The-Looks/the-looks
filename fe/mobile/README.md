@@ -11,13 +11,15 @@ npx expo start        # quét QR bằng Expo Go, hoặc nhấn w để mở bả
 ```
 
 ## Cấu trúc
-- `src/app/App.js` – điều hướng (Stack + 5 tab: Trang chủ, Tủ đồ, Phối đồ, Bình chọn, Cá nhân)
-- `src/shared/theme.js` – màu / font thương hiệu (Plus Jakarta Sans + Inter)
-- `src/shared/ui.js` – component dùng chung
-- `src/shared/mock.js` – dữ liệu mẫu (Thảo Nguyên, 68 món đồ, bình chọn 18 lượt…)
-- `src/features/<tính năng>/screens.js` – auth (01,19–23), wardrobe (02–05,24,25,31), outfit (06–09,26–30,35–37), voting (10–13,32,33), profile (14–18,34)
+- `src/app/App.js` – điều hướng (Stack + 5 tab).
+- `src/components/shared/` – component dùng chung.
+- `src/pages/{guest,user}/<feature>/` – các màn theo vai trò và tính năng.
+- `src/services/shared/` – theme, asset registry và dữ liệu mẫu.
+- `src/interface/dto/` – chỉ re-export type từ OpenAPI backend, không implement DTO.
+- `src/hooks/{guest,user}/<feature>/` – trạng thái tương tác của màn hình.
+- `../web-app/brand.json` và `../web-app/public/` – màu, nội dung, logo, ảnh, font chung; Metro được cấu hình để đọc asset ngoài thư mục mobile.
 
 ## Lưu ý
 - Ảnh sản phẩm đang là ô màu + emoji (chưa tải được ảnh từ Figma) – thay bằng ảnh thật khi có.
 - Thử đồ 3D, AI phối đồ, đồng bộ Shopee/TikTok là giao diện mẫu, chưa có logic thật.
-- Trang bình chọn dành cho bạn bè (màn 39) nằm ở dự án `the-looks-voting-web`.
+- Trang bình chọn dành cho bạn bè nằm trong `fe/web-app` tại route `/v/:code`.

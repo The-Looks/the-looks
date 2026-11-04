@@ -54,7 +54,7 @@ Cần dữ liệu service khác → gọi REST API của nó (JWT được chuy�
 
 ## Chạy local
 
-Yêu cầu: JDK 25, PostgreSQL 18. Không cần cài Maven (dùng `mvnw`).
+Yêu cầu: JDK 25 (hoặc JDK 21 với `-Djava.version=21`), PostgreSQL 18. Không cần cài Maven (dùng `mvnw`).
 
 ```bash
 # 1 lần: tạo database (Postgres cài trên máy)
@@ -67,17 +67,42 @@ psql -U postgres -f infrastructure/docker/postgres/init.sql
 ```
 Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
 
+### Chạy toàn bộ backend bằng Docker Compose
+
+Trong `be/`, tạo `.env` từ `.env.example` nếu chưa có, điền các khóa cần dùng
+và tạo khóa JWT một lần bằng `powershell -File scripts/generate-jwt-key.ps1`.
+`WEB_ORIGIN`, `SHARE_BASE_URL`, `WEB_APP_URL` và `GOOGLE_REDIRECT_URI` phải dùng
+`https://localhost:5173` khi frontend chạy bằng `npm run dev`.
+
+```powershell
+docker compose up -d --build
+docker compose ps
+docker compose logs -f auth-service
+```
+
+Compose chạy PostgreSQL và năm service trên cổng 8081–8085. `db-setup` chạy một lần
+mỗi lần khởi động để tạo database còn thiếu trong volume PostgreSQL cũ; trạng thái
+`Exited (0)` của container này là bình thường. Ảnh tủ đồ được giữ trong volume
+`wardrobe_images`. Frontend chạy riêng trong `fe/web-app/` bằng `npm run dev`.
+Nếu trước đó đang chạy Java service trực tiếp trên các cổng 8081–8085, dừng chúng
+trước khi chạy Compose. Dùng `docker compose down` để dừng;
+volume PostgreSQL và ảnh vẫn được giữ lại.
+
 ## outfit-service: AI và thời tiết
 
 | Biến môi trường | Mặc định | Ý nghĩa |
 |---|---|---|
-| `AI_PROVIDER` | `none` | `claude` để bật AI chọn/xếp hạng gợi ý (cần `ANTHROPIC_API_KEY`); `none` = xếp theo điểm thuật toán |
+| `AI_PROVIDER` | `auto` | Gemini chính, Gemini Flash Lite/Claude dự phòng; `none` chỉ dùng khi thử thuật toán không AI |
+| `GEMINI_API_KEY` | trống | API key Gemini trên máy chủ, không đưa vào frontend |
+| `ANTHROPIC_API_KEY` | trống | Tùy chọn để dùng Claude làm nguồn dự phòng |
 | `AI_MODEL` | `claude-haiku-5-5` | Model Claude. `claude-opus-5-5` chọn tinh tế hơn nhưng đắt hơn ~40 lần |
 | `BILLING_SERVICE_URL` | | Số lượt AI/ngày lấy theo gói từ billing-service (Free 3, Plus 20, Pro 100); billing lỗi → dùng mức Free. Hết lượt vẫn có gợi ý theo điểm |
 | `AI_MONTHLY_BUDGET_USD` | `25` | Tổng chi phí AI mỗi tháng; chạm ngưỡng thì tự ngừng gọi AI |
 | `WEATHER_LAT`, `WEATHER_LON` | TP.HCM | Vị trí lấy thời tiết (Open-Meteo, miễn phí, không cần key) |
 
 Admin xem chi phí: `GET /api/admin/outfits/ai-usage` (cần JWT role ADMIN).
+Admin xem danh sách người dùng thật qua `GET /api/admin/auth/users?page=0&size=20&search=...` (cần quyền `ADMIN_ACCESS`; không trả password hash).
+Web dashboard hiện chỉ có API cho hai mục này; các mục quản trị còn lại hiển thị trạng thái chưa có dữ liệu thay vì số liệu giả.
 
 **Cá nhân hoá:** `StyleProfile` học gu từng người từ 👍/👎, outfit đã lưu và số lần mặc mỗi món (cần ≥ 3 hành vi). Gu được cộng vào điểm thuật toán và gửi kèm cho Claude dưới dạng tóm tắt. Không huấn luyện lại model, không gửi dữ liệu người dùng khác.
 
@@ -116,8 +141,8 @@ admin, biến môi trường không cấp thêm quyền cho tài khoản khác.
 | Gói | Giá | Tủ đồ | AI gợi ý/ngày | Riêng Pro |
 |---|---|---|---|---|
 | Free | 0đ | 50 món | 3 | |
-| Plus | 39.000đ/tháng · 390.000đ/năm | 300 món | 20 | |
-| Pro | 79.000đ/tháng · 790.000đ/năm | không giới hạn | 100 | thống kê tủ đồ, chi phí mỗi lần mặc, lịch mặc, thử đồ 3D |
+| Plus | 49.000đ/tháng · 490.000đ/năm | 300 món | 20 | |
+| Pro | 89.000đ/tháng · 890.000đ/năm | không giới hạn | 100 | thống kê tủ đồ, chi phí mỗi lần mặc, lịch mặc, thử đồ 3D |
 
 Giá và quyền lợi nằm trong `billing-service/.../domain/model/Plan.java`.
 
@@ -137,7 +162,9 @@ Giá và quyền lợi nằm trong `billing-service/.../domain/model/Plan.java`.
 
 | Biến môi trường | Mặc định | Ý nghĩa |
 |---|---|---|
-| `AI_PROVIDER` | `none` | `claude` để dùng Claude vision (cần `ANTHROPIC_API_KEY`); `none` = nhận diện giả: mỗi ảnh tách đôi áo (trên) / quần (dưới) |
+| `AI_PROVIDER` | `auto` | Gemini vision chính, Gemini Flash Lite/Claude dự phòng; `none` chỉ dùng thử với dữ liệu giả |
+| `GEMINI_API_KEY` | trống | Cần để nhận diện ảnh thật bằng Gemini |
+| `ANTHROPIC_API_KEY` | trống | Tùy chọn để dùng Claude khi Gemini không khả dụng |
 | `AI_MODEL` | `claude-haiku-5-5` | Model Claude |
 | `IMAGE_STORAGE` | `local` | `cloudinary` khi deploy (cần `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`) |
 | `IMAGE_DIR` | `./data/wardrobe-images` | Thư mục ảnh khi lưu local |

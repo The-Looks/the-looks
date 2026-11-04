@@ -59,8 +59,8 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
         this.model = model;
         this.client = AnthropicOkHttpClient.builder()
                 .fromEnv() // đọc ANTHROPIC_API_KEY
-                .timeout(Duration.ofSeconds(20))
-                .maxRetries(1)
+                .timeout(Duration.ofSeconds(12))
+                .maxRetries(0)
                 .build();
     }
 
@@ -79,7 +79,7 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
         }
         StructuredMessageCreateParams<Picks> params = MessageCreateParams.builder()
                 .model(model)
-                .maxTokens(4000L)
+                .maxTokens(900L)
                 .system(SYSTEM)
                 .outputConfig(Picks.class)
                 .addUserMessage(prompt(occasion, candidates, taste, limit))

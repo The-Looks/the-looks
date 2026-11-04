@@ -65,9 +65,11 @@ services:
         sync: false
       - key: PUBLIC_BASE_URL # link Vercel (ảnh tủ đồ đi qua web)
         sync: false
-      - key: AI_PROVIDER
-        value: claude
-      - key: ANTHROPIC_API_KEY
+      - key: AI_PROVIDER # auto = Gemini chính, Gemini Flash Lite rồi Claude dự phòng
+        value: auto
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY # dự phòng khi Gemini lỗi; để trống thì bỏ qua
         sync: false
 
   - type: web
@@ -90,9 +92,11 @@ services:
         sync: false
       - key: WARDROBE_SERVICE_URL
         value: https://thelooks-wardrobe.onrender.com
-      - key: AI_PROVIDER
-        value: claude
-      - key: ANTHROPIC_API_KEY
+      - key: AI_PROVIDER # auto = Gemini chính, Gemini Flash Lite rồi Claude dự phòng
+        value: auto
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY # dự phòng khi Gemini lỗi; để trống thì bỏ qua
         sync: false
       - key: ACCESSTRADE_API_KEY # "Gợi ý mua thêm" (TikTok Shop); để trống = tắt
         sync: false

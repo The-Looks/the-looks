@@ -11,8 +11,8 @@ import java.util.Set;
 // ponytail: bảng giá nằm trong code; chuyển vào DB + màn admin khi cần đổi giá mà không deploy lại
 public enum Plan {
     FREE("Free", 0, 0, 50, 3, Set.of()),
-    PLUS("Plus", 39_000, 390_000, 300, 20, Set.of()),
-    PRO("Pro", 79_000, 790_000, null, 100, Set.of(Feature.values()));
+    PLUS("Plus", 49_000, 490_000, 300, 20, Set.of()),
+    PRO("Pro", 89_000, 890_000, null, 100, Set.of(Feature.values()));
 
     private final String displayName;
     private final long monthlyPriceVnd;

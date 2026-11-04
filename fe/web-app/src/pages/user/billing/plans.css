@@ -1,0 +1,28 @@
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 460px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.plan-card-pro {
+  border: 2px solid var(--purple);
+  background: var(--lav-soft);
+}
+.plan-card .spread { min-height: 36px; }
+.plan-card h2 { font-size: var(--type-20); }
+.plan-price { min-height: 80px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px; }
+.plan-price strong { color: var(--ink); white-space: nowrap; }
+.plan-features { display: grid; gap: 10px; margin: 0; padding-left: 20px; color: var(--ink); }
+.plan-features li::marker { color: var(--purple); }
+.plan-footer { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
+.plan-free-note { display: block; min-height: 44px; padding: 12px 0; color: var(--muted); font-size: var(--type-13); text-align: center; }
+@media (max-width: 900px) { .plans-grid { grid-template-columns: 1fr; } .plan-card { min-height: 0; } }
