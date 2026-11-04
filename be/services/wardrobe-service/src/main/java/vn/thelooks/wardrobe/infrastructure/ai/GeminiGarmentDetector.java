@@ -1,7 +1,5 @@
 package vn.thelooks.wardrobe.infrastructure.ai;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import vn.thelooks.wardrobe.application.port.out.GarmentDetector;
 import vn.thelooks.wardrobe.domain.model.DetectedGarment;
 
@@ -75,7 +75,7 @@ class GeminiGarmentDetector implements GarmentDetector {
         JsonNode parts = mapper.readTree(response.body()).path("candidates").path(0).path("content").path("parts");
         if (!parts.isArray()) throw new IllegalStateException("Gemini returned no candidates");
         for (JsonNode part : parts) if (part.hasNonNull("text"))
-            return ClaudeGarmentDetector.toDomain(mapper.readValue(part.path("text").asText(), ClaudeGarmentDetector.Detections.class));
+            return ClaudeGarmentDetector.toDomain(mapper.readValue(part.path("text").asString(), ClaudeGarmentDetector.Detections.class));
         throw new IllegalStateException("Gemini returned no JSON text");
     }
 }

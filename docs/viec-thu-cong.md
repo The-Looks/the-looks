@@ -33,7 +33,12 @@ Cập nhật lần cuối: 01/11/2026 (sau review toàn bộ PR)
 
 Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên máy dev, file này không commit).
 
-- [ ] **Anthropic (AI gợi ý outfit)** · Tuấn · khi muốn bật AI thật
+- [ ] **Gemini (AI chính: gợi ý outfit + nhận diện quần áo)** · Tuấn · trước khi deploy bản có Gemini
+  1. Tạo key ở https://aistudio.google.com → Get API key. Bật thanh toán / đặt hạn mức chi tiêu trong Google Cloud.
+  2. Render → `thelooks-wardrobe` và `thelooks-outfit` → Environment: `GEMINI_API_KEY` (chung một key), `AI_PROVIDER=auto`.
+  3. Kiểm tra tên model trong `thelooks.ai.gemini-model` / `gemini-backup-model` còn đúng với danh sách model của Google;
+     sai tên thì mọi lần gọi lỗi rồi mới chuyển sang Claude (chậm thêm vài giây).
+- [ ] **Anthropic (AI dự phòng khi Gemini lỗi)** · Tuấn · tuỳ chọn
   1. Tạo key ở https://console.anthropic.com → API Keys. Đặt **giới hạn chi tiêu tháng** ngay trong console.
   2. Biến môi trường outfit-service: `AI_PROVIDER=claude`, `ANTHROPIC_API_KEY=...`
      (model mặc định `claude-haiku-5-5`; ngân sách app tự giới hạn bằng `AI_MONTHLY_BUDGET_USD`, mặc định 25).
@@ -100,8 +105,8 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
     Cài đặt `GarmentDetector` (đề xuất Claude Haiku 5.5 vision), `ImageCropper`, lưu Cloudinary; không lưu ảnh gốc.
 - [ ] **Báo Phát các điểm review PR #2, #3** · Tuấn
   Chống spam bình chọn (thêm IP vào voter key + giới hạn tần suất), cache kiểm tra phiên ~30 giây, thêm test đăng nhập/refresh/bình chọn.
-- [ ] **Chốt giá gói** · nhóm · trước khi bật PayOS
-  Đang đề xuất: Plus 39.000đ/tháng · 390.000đ/năm, Pro 79.000đ/tháng · 790.000đ/năm (sửa trong `Plan.java`).
+- [x] **Chốt giá gói** · nhóm · 04/11
+  Plus 49.000đ/tháng · 490.000đ/năm, Pro 89.000đ/tháng · 890.000đ/năm (trong `Plan.java`).
 - [x] **Chọn nền tảng affiliate** (luồng doanh thu 2) · 02/11: AccessTrade (tài khoản publisher của Tuấn)
   Đã duyệt: TikTok Shop, Adidas, ALDO, ANTA, Aristino, Shondo, Hoàng Phúc, Bảo Tín Mạnh Hải. Chờ duyệt: Shopee, Shein.
 - [ ] **Bật "Gợi ý mua thêm" (TikTok Shop)** · Tuấn · sau khi merge PR affiliate

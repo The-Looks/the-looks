@@ -1,7 +1,5 @@
 package vn.thelooks.outfit.infrastructure.ai;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import vn.thelooks.outfit.application.port.out.OutfitAiAdvisor;
 import vn.thelooks.outfit.domain.model.AiUsage;
 import vn.thelooks.outfit.domain.model.Occasion;
@@ -72,7 +72,7 @@ class GeminiOutfitAdvisor implements OutfitAiAdvisor {
         JsonNode parts = root.path("candidates").path(0).path("content").path("parts");
         if (!parts.isArray()) throw new IllegalStateException("Gemini returned no candidates");
         for (JsonNode part : parts) if (part.hasNonNull("text")) {
-            ClaudeOutfitAdvisor.Picks picks = mapper.readValue(part.path("text").asText(), ClaudeOutfitAdvisor.Picks.class);
+            ClaudeOutfitAdvisor.Picks picks = mapper.readValue(part.path("text").asString(), ClaudeOutfitAdvisor.Picks.class);
             JsonNode usage = root.path("usageMetadata");
             long inputTokens = usage.path("promptTokenCount").asLong();
             long outputTokens = Math.max(usage.path("candidatesTokenCount").asLong(),
