@@ -3,6 +3,7 @@ import { brand } from '../../../services/shared/brand';
 import { Button, ButtonLink, Card, Notice } from '../../shared/ui/index';
 import { useQuickPick } from '../../../hooks/user/outfit/api';
 import { OutfitCard } from './OutfitCard';
+import { FeedbackButtons } from './FeedbackButtons';
 import { SaveButton } from './SaveButton';
 
 /** Thẻ Quick Pick trên trang chủ: một chạm, ưu tiên món lâu chưa mặc. */
@@ -18,10 +19,16 @@ export function QuickPickCard() {
           <h2>{brand.content.quickPickTitle}</h2>
           <p>{brand.content.quickPickDescription}</p>
           <Button kind="ghost" onClick={() => pick.mutate()} disabled={pick.isPending}>
-            {pick.isPending ? 'Đang chọn…' : pick.data ? 'Chọn bộ khác' : 'Gợi ý cho tôi'} <span aria-hidden="true">→</span>
+            {pick.isPending ? 'Đang chọn…' : pick.data ? 'Chọn bộ khác' : 'Gợi ý cho tôi'}{' '}
+            <span aria-hidden="true">→</span>
           </Button>
         </div>
-        <div className="home-hero-stamp" aria-hidden="true">YOUR STYLE<br />YOUR STORY<br />✦</div>
+        <div className="home-hero-stamp" aria-hidden="true">
+          YOUR STYLE
+          <br />
+          YOUR STORY
+          <br />✦
+        </div>
       </Card>
 
       {pick.isError && (
@@ -37,7 +44,17 @@ export function QuickPickCard() {
           </ButtonLink>
         </Notice>
       )}
-      {pick.data && <OutfitCard suggestion={pick.data} actions={<SaveButton suggestion={pick.data} />} />}
+      {pick.data && (
+        <OutfitCard
+          suggestion={pick.data}
+          actions={
+            <>
+              <SaveButton suggestion={pick.data} />
+              <FeedbackButtons suggestion={pick.data} onDisliked={() => pick.mutate()} />
+            </>
+          }
+        />
+      )}
     </div>
   );
 }

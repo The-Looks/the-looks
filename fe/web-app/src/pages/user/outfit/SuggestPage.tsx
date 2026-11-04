@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AppstoreOutlined, BookOutlined, CoffeeOutlined, HeartOutlined, LaptopOutlined } from '@ant-design/icons';
 import { ApiError, errorMessage } from '../../../services/shared/api/client';
 import type { Occasion } from '../../../interface/dto/types';
 import { ButtonLink, EmptyState, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { useSuggestions } from '../../../hooks/user/outfit/api';
+import { FeedbackButtons } from '../../../components/user/outfit/FeedbackButtons';
 import { OutfitCard } from '../../../components/user/outfit/OutfitCard';
 import { SaveButton } from '../../../components/user/outfit/SaveButton';
+import { ShoppingCard } from '../../../components/user/outfit/ShoppingCard';
 import { OCCASIONS, occasionLabel } from '../../../services/user/outfit/occasions';
 import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 
@@ -17,7 +19,10 @@ const occasionIcons = {
 } as const;
 
 export function SuggestPage() {
-  const [occasion, setOccasion] = useState<Occasion | null>(null);
+  // Dịp nằm trên URL (/outfits/suggest?occasion=WORK) để link từ trang chủ mở thẳng đúng dịp
+  const [params, setParams] = useSearchParams();
+  const occasion: Occasion | null = OCCASIONS.find((o) => o.value === params.get('occasion'))?.value ?? null;
+  const setOccasion = (value: Occasion) => setParams({ occasion: value });
   const suggestions = useSuggestions(occasion);
 
   return (
@@ -62,9 +67,7 @@ export function SuggestPage() {
           <h2>Gợi ý cho {occasionLabel(occasion)?.toLowerCase()}</h2>
           {suggestions.isPending && <Spinner label="AI đang phối đồ…" />}
           {suggestions.isError && (
-            <Notice
-              tone={suggestions.error instanceof ApiError && suggestions.error.status === 503 ? 'warn' : 'error'}
-            >
+            <Notice tone={suggestions.error instanceof ApiError && suggestions.error.status === 503 ? 'warn' : 'error'}>
               {errorMessage(suggestions.error)}
             </Notice>
           )}
@@ -78,11 +81,22 @@ export function SuggestPage() {
           )}
           <ScrollReveal><div className="grid-cards suggestion-results reveal-list">
             {suggestions.data?.map((s) => (
-              <OutfitCard key={s.items.map((i) => i.id).join('-')} suggestion={s} actions={<SaveButton suggestion={s} />} />
+              <OutfitCard
+                key={s.items.map((i) => i.id).join('-')}
+                suggestion={s}
+                actions={
+                  <>
+                    <SaveButton suggestion={s} />
+                    <FeedbackButtons suggestion={s} />
+                  </>
+                }
+              />
             ))}
           </div></ScrollReveal>
         </section>
       )}
+
+      {occasion && <ShoppingCard occasion={occasion} />}
     </div>
   );
 }
