@@ -137,6 +137,17 @@ paths:
       responses:
         '204': { description: Đã ghi }
         '400': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/admin/outfits/affiliate-stats:
+    get:
+      summary: (ADMIN) Lượt bấm Gợi ý mua thêm theo ngày, số người bấm, 5 sản phẩm được bấm nhiều nhất
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 30 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AffiliateStats' }
   /api/admin/outfits/ai-usage:
     get:
       summary: (ADMIN) Chi phí gọi AI tháng này so với ngân sách, 10 người dùng tốn nhiều nhất
@@ -188,6 +199,31 @@ components:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
     cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
+    AffiliateStats:
+      type: object
+      required: [clicks, users, daily, top]
+      properties:
+        clicks: { type: integer, format: int64 }
+        users: { type: integer, format: int64 }
+        daily:
+          type: array
+          items:
+            type: object
+            required: [date, clicks, users]
+            properties:
+              date: { type: string, format: date }
+              clicks: { type: integer, format: int64 }
+              users: { type: integer, format: int64 }
+        top:
+          type: array
+          items:
+            type: object
+            required: [source, productId, title, clicks]
+            properties:
+              source: { type: string }
+              productId: { type: string }
+              title: { type: string }
+              clicks: { type: integer, format: int64 }
     StylePreferences:
       type: object
       properties:

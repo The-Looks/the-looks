@@ -142,6 +142,19 @@ paths:
               schema: { $ref: '#/components/schemas/AdminUsersPage' }
         '403': { $ref: 'common.yaml#/components/responses/Problem' }
 
+  /api/admin/auth/stats:
+    get:
+      summary: (ADMIN) Người dùng mới và người dùng hoạt động theo ngày (giờ Việt Nam)
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 30 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserStats' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
@@ -150,6 +163,21 @@ components:
       in: cookie
       name: access_token
   schemas:
+    DailyCount:
+      type: object
+      required: [date, count]
+      properties:
+        date: { type: string, format: date }
+        count: { type: integer, format: int64 }
+    UserStats:
+      type: object
+      required: [totalUsers, newLast7Days, activeLast7Days, newUsers, activeUsers]
+      properties:
+        totalUsers: { type: integer, format: int64 }
+        newLast7Days: { type: integer, format: int64 }
+        activeLast7Days: { type: integer, format: int64, description: Số người khác nhau mở app trong 7 ngày }
+        newUsers: { type: array, items: { $ref: '#/components/schemas/DailyCount' } }
+        activeUsers: { type: array, items: { $ref: '#/components/schemas/DailyCount' }, description: Người mở app trong ngày (DAU) }
     PasswordPolicy:
       type: object
       required: [minLength, strongLength, recommendedCharacterTypes]
