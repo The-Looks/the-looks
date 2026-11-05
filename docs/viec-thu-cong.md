@@ -109,7 +109,7 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
 - [ ] **Báo Phát các điểm review PR #2, #3** · Tuấn
   Chống spam bình chọn (thêm IP vào voter key + giới hạn tần suất), cache kiểm tra phiên ~30 giây, thêm test đăng nhập/refresh/bình chọn.
 - [x] **Chốt giá gói** · nhóm · 04/11
-  Plus 49.000đ/tháng · 490.000đ/năm, Pro 89.000đ/tháng · 890.000đ/năm (trong `Plan.java`).
+  Plus 49.000đ/tháng · 499.000đ/năm, Pro 79.000đ/tháng · 799.000đ/năm (trong `Plan.java`).
 - [x] **Chọn nền tảng affiliate** (luồng doanh thu 2) · 02/11: AccessTrade (tài khoản publisher của Tuấn)
   Đã duyệt: TikTok Shop, Adidas, ALDO, ANTA, Aristino, Shondo, Hoàng Phúc, Bảo Tín Mạnh Hải. Chờ duyệt: Shopee, Shein.
 - [ ] **Bật "Gợi ý mua thêm" (TikTok Shop)** · Tuấn · sau khi merge PR affiliate
