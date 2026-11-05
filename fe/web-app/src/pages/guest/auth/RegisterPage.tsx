@@ -14,6 +14,7 @@ export function RegisterPage() {
   const location = useLocation();
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [accepted, setAccepted] = useState(false);
   const set = (k: keyof typeof form) => (e: { target: { value: string } }) => setForm({ ...form, [k]: e.target.value });
   const policy = usePasswordPolicy();
   const strength = policy.data && assessPasswordStrength(form.password, policy.data);
@@ -22,7 +23,7 @@ export function RegisterPage() {
 
   const register = useMutation({
     mutationFn: async () => {
-      await authRequests.register(form);
+      await authRequests.register({ ...form, acceptedTerms: accepted });
       return authRequests.login(form.email, form.password);
     },
     onSuccess: (res) => {
@@ -33,7 +34,7 @@ export function RegisterPage() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (!strength?.meetsMinimum || !passwordsMatch) return;
+    if (!strength?.meetsMinimum || !passwordsMatch || !accepted) return;
     register.mutate();
   };
 
@@ -57,8 +58,16 @@ export function RegisterPage() {
           {policy.data && <PasswordStrengthMeter password={form.password} policy={policy.data} />}
           <Field id="reg-confirm" label="Xác nhận mật khẩu" type="password" autoComplete="new-password" required aria-invalid={!!confirmPassword && !passwordsMatch} aria-describedby={confirmPassword && !passwordsMatch ? 'confirm-password-error' : undefined} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           {confirmPassword && !passwordsMatch && <p id="confirm-password-error" className="small register-error" role="alert">Mật khẩu xác nhận không khớp.</p>}
+          <label className="row small" htmlFor="reg-terms" style={{ alignItems: 'flex-start', gap: 8 }}>
+            <input id="reg-terms" type="checkbox" required checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
+            <span>
+              Tôi đã đọc và đồng ý với <Link to="/terms" target="_blank">Điều khoản sử dụng</Link> và{' '}
+              <Link to="/privacy" target="_blank">Chính sách quyền riêng tư</Link>, bao gồm việc ảnh tủ đồ được xử lý bằng dịch vụ AI
+              và lưu trữ trên máy chủ ngoài Việt Nam.
+            </span>
+          </label>
           {register.isError && <Notice tone="error">{errorMessage(register.error)}</Notice>}
-          <Button type="submit" block disabled={register.isPending || !strength?.meetsMinimum || !passwordsMatch || !confirmPassword}>
+          <Button type="submit" block disabled={register.isPending || !strength?.meetsMinimum || !passwordsMatch || !confirmPassword || !accepted}>
             {register.isPending ? 'Đang tạo…' : 'Đăng ký'}
           </Button>
         </form>

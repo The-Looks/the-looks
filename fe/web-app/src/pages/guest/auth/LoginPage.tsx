@@ -68,6 +68,10 @@ export function LoginPage() {
         }}>
           <GoogleOutlined /> {mockAuth ? 'Google (mô phỏng)' : 'Đăng nhập bằng Google'}
         </Button>
+        <p className="small muted">
+          Tiếp tục với Google nghĩa là bạn đồng ý với <Link to="/terms">Điều khoản sử dụng</Link> và{' '}
+          <Link to="/privacy">Chính sách quyền riêng tư</Link>.
+        </p>
         <p className="auth-note">
           Chưa có tài khoản? <Link to="/register" state={{ fromLogin: true }}>Đăng ký</Link>
         </p>

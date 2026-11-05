@@ -29,7 +29,9 @@ export function SiteFooter({ variant = 'public' }: { variant?: 'app' | 'public' 
           {links.map((link) => <Link key={link.to} to={link.to}>{link.label}<ArrowRightOutlined /></Link>)}
         </nav>
       </div>
-      <div className="site-footer-bottom"><span>© {new Date().getFullYear()} THE LOOKS</span><span>Phong cách của bạn, theo cách của bạn.</span></div>
+      <div className="site-footer-bottom"><span>© {new Date().getFullYear()} THE LOOKS</span>
+        <span><Link to="/terms">Điều khoản</Link> · <Link to="/privacy">Quyền riêng tư</Link> · <Link to="/refund">Thanh toán và hoàn tiền</Link></span>
+        <span>Phong cách của bạn, theo cách của bạn.</span></div>
     </div>
   </footer>;
 }

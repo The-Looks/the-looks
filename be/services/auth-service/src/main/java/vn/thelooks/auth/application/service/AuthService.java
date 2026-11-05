@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import vn.thelooks.auth.application.port.out.ConsentStore;
 import vn.thelooks.auth.application.port.out.PasswordHasher;
 import vn.thelooks.auth.application.port.out.RefreshTokenSessionStore;
 import vn.thelooks.auth.application.port.out.TokenIssuer;
@@ -27,15 +28,17 @@ class AuthService implements RegisterUseCase, LoginUseCase, SessionUseCase {
     private final PasswordHasher passwords;
     private final RefreshTokenSessionStore sessions;
     private final TokenIssuer tokens;
+    private final ConsentStore consents;
     private final Clock clock;
     private final String dummyHash;
 
     AuthService(UserPersistencePort users, PasswordHasher passwords, RefreshTokenSessionStore sessions,
-            TokenIssuer tokens, Clock clock) {
+            TokenIssuer tokens, ConsentStore consents, Clock clock) {
         this.users = users;
         this.passwords = passwords;
         this.sessions = sessions;
         this.tokens = tokens;
+        this.consents = consents;
         this.clock = clock;
         this.dummyHash = passwords.hash(UUID.randomUUID().toString());
     }
@@ -45,8 +48,10 @@ class AuthService implements RegisterUseCase, LoginUseCase, SessionUseCase {
         var email = command.email().trim().toLowerCase(Locale.ROOT);
         if (users.existsByEmail(email)) throw new UserAlreadyExistsException("Email đã được sử dụng");
         var now = Instant.now(clock);
-        return users.save(new User(UUID.randomUUID(), email, passwords.hash(command.password()),
+        var user = users.save(new User(UUID.randomUUID(), email, passwords.hash(command.password()),
                 command.username().trim(), false, Set.of(RoleCodes.USER), Set.of(), UserStatus.ACTIVE, now, now));
+        consents.record(user.id(), TERMS_VERSION, now); // request đã bắt buộc acceptedTerms = true
+        return user;
     }
 
     @Override
