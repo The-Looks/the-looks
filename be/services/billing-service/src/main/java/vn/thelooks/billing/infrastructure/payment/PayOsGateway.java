@@ -32,6 +32,7 @@ class PayOsGateway implements PaymentGateway {
 
     private final RestClient http;
     private final String checksumKey;
+    private final boolean enabled;
     private final String returnUrl;
     private final String cancelUrl;
     private final Clock clock;
@@ -44,8 +45,11 @@ class PayOsGateway implements PaymentGateway {
             @Value("${thelooks.billing.return-url}") String returnUrl,
             @Value("${thelooks.billing.cancel-url}") String cancelUrl,
             Clock clock) {
-        if (clientId.isBlank() || apiKey.isBlank() || checksumKey.isBlank()) {
-            throw new IllegalStateException("Thiếu PAYOS_CLIENT_ID / PAYOS_API_KEY / PAYOS_CHECKSUM_KEY");
+        // Chưa có key: service vẫn chạy (bảng giá, gói hiện tại, thống kê) nhưng không bán được gói. An toàn vì
+        // không có thanh toán giả: không ai lên gói trả phí khi chưa trả tiền thật.
+        this.enabled = !clientId.isBlank() && !apiKey.isBlank() && !checksumKey.isBlank();
+        if (!enabled) {
+            log.warn("Chưa có PAYOS_CLIENT_ID / PAYOS_API_KEY / PAYOS_CHECKSUM_KEY: tạm khoá thanh toán, bấm mua gói sẽ trả 503");
         }
         var requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(3));
@@ -64,6 +68,9 @@ class PayOsGateway implements PaymentGateway {
 
     @Override
     public String createCheckoutUrl(Order order) {
+        if (!enabled) {
+            throw new PaymentGatewayException("Chưa cấu hình PayOS", null);
+        }
         // Ngân hàng không liên kết PayOS chỉ nhận nội dung tối đa 9 ký tự
         String description = "TL" + order.orderCode();
         Map<String, Object> signed = Map.of(
@@ -88,6 +95,9 @@ class PayOsGateway implements PaymentGateway {
 
     @Override
     public boolean isPaid(long orderCode, long amountVnd) {
+        if (!enabled) {
+            return false;
+        }
         try {
             StatusResponse response = http.get().uri("/v2/payment-requests/{orderCode}", orderCode).retrieve().body(StatusResponse.class);
             return response != null && response.data() != null
@@ -102,7 +112,7 @@ class PayOsGateway implements PaymentGateway {
     @Override
     @SuppressWarnings("unchecked")
     public Optional<PaidNotice> verifyWebhook(Map<String, Object> body) {
-        if (!(body.get("data") instanceof Map<?, ?> raw)) {
+        if (!enabled || !(body.get("data") instanceof Map<?, ?> raw)) {
             return Optional.empty();
         }
         Map<String, Object> data = (Map<String, Object>) raw;
