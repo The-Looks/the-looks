@@ -8,6 +8,10 @@ import { RequireAdmin } from '../components/shared/routing/RequireAdmin';
 
 const GoogleCallbackPage = lazy(() => import('../pages/guest/auth/GoogleCallbackPage').then((m) => ({ default: m.GoogleCallbackPage })));
 const AppShell = lazy(() => import('../components/shared/routing/AppShell').then((m) => ({ default: m.AppShell })));
+const legal = () => import('../pages/guest/legal/LegalPages');
+const TermsPage = lazy(() => legal().then((m) => ({ default: m.TermsPage })));
+const PrivacyPage = lazy(() => legal().then((m) => ({ default: m.PrivacyPage })));
+const RefundPage = lazy(() => legal().then((m) => ({ default: m.RefundPage })));
 const LoginPage = lazy(() => import('../pages/guest/auth/LoginPage').then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('../pages/guest/auth/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const AdminDashboardPage = lazy(() => import('../pages/admin/dashboard/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })));
@@ -45,6 +49,9 @@ export const router = createBrowserRouter([
   { path: '/', element: <HomeEntry />, children: [{ element: <AppShell />, children: [{ index: true, element: <HomePage /> }] }] },
   { path: '/login', element: <LoginPage /> },
   { path: '/about', element: <PublicHomePage /> },
+  { path: '/terms', element: <TermsPage /> },
+  { path: '/privacy', element: <PrivacyPage /> },
+  { path: '/refund', element: <RefundPage /> },
   { path: '/register', element: <RegisterPage /> },
   { path: '/auth/callback', element: <GoogleCallbackPage /> },
   { path: '/ask-friends', element: <GuestLandingPage /> },

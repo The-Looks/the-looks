@@ -28,6 +28,8 @@ export interface paths {
                         email: string;
                         password: string;
                         username: string;
+                        /** @description Phải là true. Server lưu thời điểm đồng ý kèm phiên bản Điều khoản / Chính sách quyền riêng tư */
+                        acceptedTerms: boolean;
                     };
                 };
             };

@@ -24,11 +24,14 @@ paths:
           application/json:
             schema:
               type: object
-              required: [email, password, username]
+              required: [email, password, username, acceptedTerms]
               properties:
                 email: { type: string, format: email }
                 password: { type: string, minLength: 8 }
                 username: { type: string, maxLength: 60 }
+                acceptedTerms:
+                  type: boolean
+                  description: Phải là true. Server lưu thời điểm đồng ý kèm phiên bản Điều khoản / Chính sách quyền riêng tư
       responses:
         '201':
           description: Đã tạo tài khoản
