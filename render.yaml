@@ -12,6 +12,8 @@ envVarGroups:
         value: prod
       - key: DB_USER
         value: neondb_owner
+      - key: WEB_ORIGIN # link web (không bí mật). Ghi bằng cookie chỉ nhận request từ đúng origin này
+        value: https://the-looks.vercel.app
       - key: JWT_ISSUER
         value: https://thelooks-auth.onrender.com
       - key: JWT_JWK_SET_URI
@@ -38,8 +40,6 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
-      - key: WEB_ORIGIN # link Vercel, vd https://the-looks.vercel.app
-        sync: false
       - key: PASSWORD_PEPPER # không được đổi sau khi có người dùng
         generateValue: true
       - key: JWT_PRIVATE_KEY_PATH # thêm Secret File tên jwt-private.pem trong dashboard
@@ -60,8 +60,6 @@ services:
       - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_wardrobe?sslmode=require
         sync: false
       - key: DB_PASSWORD
-        sync: false
-      - key: WEB_ORIGIN # cùng origin Vercel đã đặt cho auth-service
         sync: false
       - key: PUBLIC_BASE_URL # link Vercel (ảnh tủ đồ đi qua web)
         sync: false
@@ -87,8 +85,6 @@ services:
       - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_outfit?sslmode=require
         sync: false
       - key: DB_PASSWORD
-        sync: false
-      - key: WEB_ORIGIN # cùng origin Vercel đã đặt cho auth-service
         sync: false
       - key: WARDROBE_SERVICE_URL
         value: https://thelooks-wardrobe.onrender.com
@@ -116,8 +112,6 @@ services:
       - key: DB_URL # jdbc:postgresql://<host Neon>/thelooks_voting?sslmode=require
         sync: false
       - key: DB_PASSWORD
-        sync: false
-      - key: WEB_ORIGIN # cùng origin Vercel đã đặt cho auth-service
         sync: false
       - key: SHARE_BASE_URL # link Vercel
         sync: false
