@@ -33,7 +33,7 @@ export function PlansPage() {
           Theo tháng
         </Chip>
         <Chip active={period === 'YEARLY'} onClick={() => setPeriod('YEARLY')}>
-          Theo năm · tiết kiệm 2 tháng
+          Theo năm · tiết kiệm ~15%
         </Chip>
       </div>
 

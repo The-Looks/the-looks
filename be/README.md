@@ -141,8 +141,8 @@ admin, biến môi trường không cấp thêm quyền cho tài khoản khác.
 | Gói | Giá | Tủ đồ | AI gợi ý/ngày | Riêng Pro |
 |---|---|---|---|---|
 | Free | 0đ | 50 món | 3 | |
-| Plus | 49.000đ/tháng · 490.000đ/năm | 300 món | 20 | |
-| Pro | 89.000đ/tháng · 890.000đ/năm | không giới hạn | 100 | thống kê tủ đồ, chi phí mỗi lần mặc, lịch mặc, thử đồ 3D |
+| Plus | 49.000đ/tháng · 499.000đ/năm | 300 món | 20 | |
+| Pro | 79.000đ/tháng · 799.000đ/năm | không giới hạn | 100 | thống kê tủ đồ, chi phí mỗi lần mặc, lịch mặc, thử đồ 3D |
 
 Giá và quyền lợi nằm trong `billing-service/.../domain/model/Plan.java`.
 

@@ -45,11 +45,11 @@ class SubscriptionCalculatorTest {
 
     @Test
     void upgradingConvertsRemainingPlusTimeIntoProTime() {
-        // Còn 30 ngày Plus (49.000đ) → đổi sang Pro (89.000đ) được 30 × 49/89 ≈ 16,5 ngày cộng thêm
+        // Còn 30 ngày Plus (49.000đ) → đổi sang Pro (79.000đ) được 30 × 49/79 ≈ 18,6 ngày cộng thêm
         var current = sub(Plan.PLUS, NOW.plus(Duration.ofDays(30)));
         Instant expiry = SubscriptionCalculator.newExpiry(current, Plan.PRO, BillingPeriod.MONTHLY, NOW);
         Duration bonus = Duration.between(Instant.parse("2026-12-01T03:00:00Z"), expiry);
-        assertThat(bonus.toHours()).isBetween(396L, 397L);
+        assertThat(bonus.toHours()).isBetween(446L, 447L);
     }
 
     @Test
@@ -57,7 +57,7 @@ class SubscriptionCalculatorTest {
         var current = sub(Plan.PRO, NOW.plus(Duration.ofDays(10)));
         Instant expiry = SubscriptionCalculator.newExpiry(current, Plan.PLUS, BillingPeriod.MONTHLY, NOW);
         Duration bonus = Duration.between(Instant.parse("2026-12-01T03:00:00Z"), expiry);
-        assertThat(bonus.toDays()).isEqualTo(18); // 10 × 89/49 ≈ 18,2 ngày
+        assertThat(bonus.toDays()).isEqualTo(16); // 10 × 79/49 ≈ 16,1 ngày
     }
 
     @Test
