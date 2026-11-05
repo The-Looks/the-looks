@@ -76,6 +76,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/billing/me/auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Bật / tắt tự gia hạn gói đang dùng */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description Gói sau khi đổi */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Entitlements"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/billing/checkout": {
         parameters: {
             query?: never;
@@ -236,8 +279,18 @@ export interface components {
         };
         Entitlements: {
             plan: components["schemas"]["Plan"];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Ngày hết kỳ đã trả (null với FREE)
+             */
             expiresAt?: string | null;
+            period?: components["schemas"]["BillingPeriod"] | null;
+            autoRenew: boolean;
+            /**
+             * @description RENEWAL_DUE = còn ≤ 3 ngày; GRACE = đã quá hạn, còn trong 3 ngày ân hạn. null với FREE
+             * @enum {string|null}
+             */
+            status?: "ACTIVE" | "RENEWAL_DUE" | "GRACE" | null;
             limits: components["schemas"]["Limits"];
             features: components["schemas"]["Feature"][];
         };

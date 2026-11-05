@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import vn.thelooks.billing.api.dto.AutoRenewRequest;
 import vn.thelooks.billing.api.dto.CheckoutRequest;
 import vn.thelooks.billing.api.dto.EntitlementsResponse;
 import vn.thelooks.billing.api.dto.OrderResponse;
@@ -20,6 +22,7 @@ import vn.thelooks.billing.application.port.out.PaymentGatewayException;
 import vn.thelooks.billing.application.usecase.CheckoutUseCase;
 import vn.thelooks.billing.application.usecase.ConfirmPaymentUseCase;
 import vn.thelooks.billing.application.usecase.GetEntitlementsQuery;
+import vn.thelooks.billing.application.usecase.SetAutoRenewUseCase;
 import vn.thelooks.billing.domain.exception.InvalidPlanException;
 import vn.thelooks.billing.domain.exception.OrderNotFoundException;
 import vn.thelooks.security.CurrentUser;
@@ -31,17 +34,26 @@ class BillingController {
     private final GetEntitlementsQuery entitlements;
     private final CheckoutUseCase checkout;
     private final ConfirmPaymentUseCase confirm;
+    private final SetAutoRenewUseCase autoRenew;
 
-    BillingController(GetEntitlementsQuery entitlements, CheckoutUseCase checkout, ConfirmPaymentUseCase confirm) {
+    BillingController(GetEntitlementsQuery entitlements, CheckoutUseCase checkout, ConfirmPaymentUseCase confirm,
+            SetAutoRenewUseCase autoRenew) {
         this.entitlements = entitlements;
         this.checkout = checkout;
         this.confirm = confirm;
+        this.autoRenew = autoRenew;
     }
 
     /** Gói và giới hạn hiện tại. Service khác (outfit, wardrobe) gọi endpoint này với JWT được chuyển tiếp. */
     @GetMapping("/me")
     EntitlementsResponse me(@AuthenticationPrincipal Jwt jwt) {
         return EntitlementsResponse.from(entitlements.entitlements(CurrentUser.id(jwt)));
+    }
+
+    /** Bật / tắt tự gia hạn gói đang dùng. */
+    @PutMapping("/me/auto-renew")
+    EntitlementsResponse autoRenew(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AutoRenewRequest request) {
+        return EntitlementsResponse.from(autoRenew.setAutoRenew(CurrentUser.id(jwt), request.enabled()));
     }
 
     /** Tạo đơn và link thanh toán; web-app chuyển người dùng tới checkoutUrl. */

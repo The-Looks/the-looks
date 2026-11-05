@@ -31,14 +31,14 @@ class SubscriptionCalculatorTest {
 
     @Test
     void renewingSamePlanExtendsFromCurrentExpiry() {
-        var current = new Subscription(USER, Plan.PLUS, Instant.parse("2026-11-20T03:00:00Z"));
+        var current = sub(Plan.PLUS, Instant.parse("2026-11-20T03:00:00Z"));
         assertThat(SubscriptionCalculator.newExpiry(current, Plan.PLUS, BillingPeriod.MONTHLY, NOW))
                 .isEqualTo(Instant.parse("2026-12-20T03:00:00Z"));
     }
 
     @Test
-    void expiredPlanStartsFromNow() {
-        var expired = new Subscription(USER, Plan.PLUS, NOW.minus(Duration.ofDays(3)));
+    void planExpiredPastGraceStartsFromNow() {
+        var expired = sub(Plan.PLUS, NOW.minus(Duration.ofDays(4)));
         assertThat(SubscriptionCalculator.newExpiry(expired, Plan.PLUS, BillingPeriod.MONTHLY, NOW))
                 .isEqualTo(Instant.parse("2026-12-01T03:00:00Z"));
     }
@@ -46,7 +46,7 @@ class SubscriptionCalculatorTest {
     @Test
     void upgradingConvertsRemainingPlusTimeIntoProTime() {
         // Còn 30 ngày Plus (49.000đ) → đổi sang Pro (89.000đ) được 30 × 49/89 ≈ 16,5 ngày cộng thêm
-        var current = new Subscription(USER, Plan.PLUS, NOW.plus(Duration.ofDays(30)));
+        var current = sub(Plan.PLUS, NOW.plus(Duration.ofDays(30)));
         Instant expiry = SubscriptionCalculator.newExpiry(current, Plan.PRO, BillingPeriod.MONTHLY, NOW);
         Duration bonus = Duration.between(Instant.parse("2026-12-01T03:00:00Z"), expiry);
         assertThat(bonus.toHours()).isBetween(396L, 397L);
@@ -54,15 +54,33 @@ class SubscriptionCalculatorTest {
 
     @Test
     void downgradingGivesMoreTime() {
-        var current = new Subscription(USER, Plan.PRO, NOW.plus(Duration.ofDays(10)));
+        var current = sub(Plan.PRO, NOW.plus(Duration.ofDays(10)));
         Instant expiry = SubscriptionCalculator.newExpiry(current, Plan.PLUS, BillingPeriod.MONTHLY, NOW);
         Duration bonus = Duration.between(Instant.parse("2026-12-01T03:00:00Z"), expiry);
         assertThat(bonus.toDays()).isEqualTo(18); // 10 × 89/49 ≈ 18,2 ngày
     }
 
     @Test
+    void renewingDuringGraceExtendsFromOldExpirySoGraceIsNotFree() {
+        var inGrace = sub(Plan.PLUS, NOW.minus(Duration.ofDays(1)));
+        assertThat(SubscriptionCalculator.newExpiry(inGrace, Plan.PLUS, BillingPeriod.MONTHLY, NOW))
+                .isEqualTo(Instant.parse("2026-11-30T03:00:00Z"));
+    }
+
+    @Test
+    void switchingPlanDuringGraceGivesNoNegativeCredit() {
+        var inGrace = sub(Plan.PRO, NOW.minus(Duration.ofDays(1)));
+        assertThat(SubscriptionCalculator.newExpiry(inGrace, Plan.PLUS, BillingPeriod.MONTHLY, NOW))
+                .isEqualTo(Instant.parse("2026-12-01T03:00:00Z"));
+    }
+
+    @Test
     void freePlanCannotBeBought() {
         assertThatThrownBy(() -> SubscriptionCalculator.newExpiry(null, Plan.FREE, BillingPeriod.MONTHLY, NOW))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private static Subscription sub(Plan plan, Instant expiresAt) {
+        return new Subscription(USER, plan, BillingPeriod.MONTHLY, expiresAt, true);
     }
 }

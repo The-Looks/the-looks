@@ -316,7 +316,13 @@ const PLANS = [
     features: ['WARDROBE_STATS', 'COST_PER_WEAR', 'WEAR_CALENDAR', 'TRY_ON_3D'],
   },
 ] as const;
-let myPlan: { plan: 'FREE' | 'PLUS' | 'PRO'; expiresAt: string | null } = { plan: 'FREE', expiresAt: null };
+let myPlan: {
+  plan: 'FREE' | 'PLUS' | 'PRO';
+  expiresAt: string | null;
+  period: 'MONTHLY' | 'YEARLY' | null;
+  autoRenew: boolean;
+  status: 'ACTIVE' | null;
+} = { plan: 'FREE', expiresAt: null, period: null, autoRenew: false, status: null };
 const orders = new Map<
   number,
   { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY'; amountVnd: number; status: string; createdAt: string }
@@ -330,6 +336,11 @@ const entitlements = () => {
 const billing: HttpHandler[] = [
   http.get('*/api/public/billing/plans', () => HttpResponse.json(PLANS)),
   http.get('*/api/app/billing/me', () => HttpResponse.json(entitlements())),
+  http.put('*/api/app/billing/me/auto-renew', async ({ request }) => {
+    if (myPlan.plan === 'FREE') return problem(400, 'Bạn đang dùng gói Free, không có gì để gia hạn');
+    myPlan.autoRenew = ((await request.json()) as { enabled: boolean }).enabled;
+    return HttpResponse.json(entitlements());
+  }),
   http.post('*/api/app/billing/checkout', async ({ request }) => {
     const body = (await request.json()) as { plan: 'PLUS' | 'PRO'; period: 'MONTHLY' | 'YEARLY' };
     const p = PLANS.find((x) => x.plan === body.plan)!;
@@ -354,7 +365,13 @@ const billing: HttpHandler[] = [
       const months = order.period === 'MONTHLY' ? 1 : 12;
       const expires = new Date();
       expires.setMonth(expires.getMonth() + months);
-      myPlan = { plan: order.plan, expiresAt: expires.toISOString() };
+      myPlan = {
+        plan: order.plan,
+        expiresAt: expires.toISOString(),
+        period: order.period,
+        autoRenew: true,
+        status: 'ACTIVE',
+      };
     }
     return HttpResponse.json({ orderCode: code, ...order });
   }),
