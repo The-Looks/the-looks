@@ -4,6 +4,7 @@ info:
   version: 0.1.0
   description: |
     Gói thuê bao Free / Plus / Pro (Plus, Pro trả theo tháng hoặc năm), thanh toán qua PayOS (VietQR, MoMo, ngân hàng).
+    Tự gia hạn (mặc định bật): nhắc trước 3 ngày, giữ quyền lợi thêm 3 ngày ân hạn sau ngày hết hạn.
     Service khác lấy giới hạn của người dùng qua GET /api/app/billing/me (chuyển tiếp JWT).
     Quy ước: `/api/app/**` cần JWT, `/api/public/**` không cần đăng nhập.
 servers:
@@ -31,6 +32,25 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Entitlements' }
+  /api/app/billing/me/auto-renew:
+    put:
+      summary: Bật / tắt tự gia hạn gói đang dùng
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enabled]
+              properties:
+                enabled: { type: boolean }
+      responses:
+        '200':
+          description: Gói sau khi đổi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Entitlements' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/billing/checkout:
     post:
       summary: Tạo đơn mua / gia hạn gói và link thanh toán. Đổi gói khi còn hạn thì thời gian còn lại được quy đổi, không mất tiền.
@@ -104,10 +124,16 @@ components:
         features: { type: array, items: { $ref: '#/components/schemas/Feature' } }
     Entitlements:
       type: object
-      required: [plan, limits, features]
+      required: [plan, autoRenew, limits, features]
       properties:
         plan: { $ref: '#/components/schemas/Plan' }
-        expiresAt: { type: [string, 'null'], format: date-time }
+        expiresAt: { type: [string, 'null'], format: date-time, description: Ngày hết kỳ đã trả (null với FREE) }
+        period: { oneOf: [{ $ref: '#/components/schemas/BillingPeriod' }, { type: 'null' }] }
+        autoRenew: { type: boolean }
+        status:
+          type: [string, 'null']
+          enum: [ACTIVE, RENEWAL_DUE, GRACE, null]
+          description: RENEWAL_DUE = còn ≤ 3 ngày; GRACE = đã quá hạn, còn trong 3 ngày ân hạn. null với FREE
         limits: { $ref: '#/components/schemas/Limits' }
         features: { type: array, items: { $ref: '#/components/schemas/Feature' } }
     Order:

@@ -23,6 +23,14 @@ export function useMyPlan() {
   });
 }
 
+export function useSetAutoRenew() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: billingRequests.setAutoRenew,
+    onSuccess: (me) => qc.setQueryData(billingKeys.me, me),
+  });
+}
+
 /** Tạo đơn rồi chuyển sang trang thanh toán của PayOS. */
 export function useCheckout() {
   return useMutation({

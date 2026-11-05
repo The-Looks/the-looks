@@ -16,6 +16,7 @@ import vn.thelooks.billing.application.port.out.SubscriptionRepository;
 import vn.thelooks.billing.application.usecase.CheckoutUseCase;
 import vn.thelooks.billing.application.usecase.ConfirmPaymentUseCase;
 import vn.thelooks.billing.application.usecase.GetEntitlementsQuery;
+import vn.thelooks.billing.application.usecase.SetAutoRenewUseCase;
 import vn.thelooks.billing.domain.exception.InvalidPlanException;
 import vn.thelooks.billing.domain.exception.OrderNotFoundException;
 import vn.thelooks.billing.domain.model.BillingPeriod;
@@ -27,7 +28,7 @@ import vn.thelooks.billing.domain.model.Subscription;
 import vn.thelooks.billing.domain.service.SubscriptionCalculator;
 
 @Service
-class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPaymentUseCase {
+class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPaymentUseCase, SetAutoRenewUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(BillingService.class);
 
@@ -50,6 +51,19 @@ class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPa
     @Transactional(readOnly = true)
     public Entitlements entitlements(UUID ownerId) {
         return Entitlements.of(subscriptions.find(ownerId).orElse(null), clock.instant());
+    }
+
+    @Override
+    public Entitlements setAutoRenew(UUID ownerId, boolean enabled) {
+        return tx.execute(status -> {
+            Instant now = clock.instant();
+            Subscription current = subscriptions.findForUpdate(ownerId)
+                    .filter(s -> s.activeAt(now))
+                    .orElseThrow(() -> new InvalidPlanException("Bạn đang dùng gói Free, không có gì để gia hạn"));
+            Subscription updated = current.withAutoRenew(enabled);
+            subscriptions.save(updated);
+            return Entitlements.of(updated, now);
+        });
     }
 
     /** Không bọc transaction: gọi cổng thanh toán qua mạng, không giữ kết nối DB. */
@@ -109,7 +123,8 @@ class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPa
             Order order = orders.find(orderCode).orElseThrow();
             Subscription current = subscriptions.findForUpdate(order.ownerId()).orElse(null);
             Instant expiry = SubscriptionCalculator.newExpiry(current, order.plan(), order.period(), now);
-            subscriptions.save(new Subscription(order.ownerId(), order.plan(), expiry));
+            // Trả tiền (mua mới hoặc gia hạn) thì bật lại tự gia hạn và nhớ kỳ để lần sau gia hạn đúng kỳ
+            subscriptions.save(new Subscription(order.ownerId(), order.plan(), order.period(), expiry, true));
             log.info("Kích hoạt gói {} cho {} tới {} (đơn {})", order.plan(), order.ownerId(), expiry, orderCode);
         });
     }

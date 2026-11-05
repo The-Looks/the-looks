@@ -42,11 +42,14 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   1. Tạo key ở https://console.anthropic.com → API Keys. Đặt **giới hạn chi tiêu tháng** ngay trong console.
   2. Biến môi trường outfit-service: `AI_PROVIDER=claude`, `ANTHROPIC_API_KEY=...`
      (model mặc định `claude-haiku-5-5`; ngân sách app tự giới hạn bằng `AI_MONTHLY_BUDGET_USD`, mặc định 25).
-- [ ] **PayOS (thanh toán gói)** · Tuấn · trước khi bán gói thật
+- [ ] **PayOS (thanh toán gói, nhóm đã chốt 05/11)** · Tuấn · trước khi bán gói thật
   1. Đăng ký https://my.payos.vn bằng tài khoản ngân hàng của nhóm, tạo kênh thanh toán.
-  2. Lấy `Client ID`, `API Key`, `Checksum Key` → biến `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY`, và `PAYMENT_GATEWAY=payos`.
-  3. Khai báo webhook: `https://<tên-miền>/api/public/billing/payos/webhook`.
-  4. Mua thử 1 gói Plus tháng bằng tiền thật để kiểm tra trọn luồng.
+  2. Render → Blueprint → **Manual Sync** để tạo `thelooks-billing`, điền: `DB_URL` (database `thelooks_billing`), `DB_PASSWORD`,
+     `PAYOS_CLIENT_ID`, `PAYOS_API_KEY`, `PAYOS_CHECKSUM_KEY` (lấy trong kênh thanh toán PayOS). Thiếu key PayOS thì billing không khởi động.
+  3. Khai báo webhook trong PayOS: `https://the-looks.vercel.app/api/public/billing/payos/webhook`.
+  4. Mua thử 1 gói Plus tháng (49.000đ) bằng tiền thật để kiểm tra trọn luồng.
+  Tự gia hạn: chưa trừ tiền tự động; app nhắc trước 3 ngày, giữ gói thêm 3 ngày ân hạn, người dùng bấm "Thanh toán gia hạn".
+- [ ] **Trừ tiền tự động thật (VNPay token / liên kết MoMo)** · nhóm · khi có hộ kinh doanh hoặc công ty
 - [ ] **Cloudinary (lưu ảnh tủ đồ)** · Tuấn hoặc Thạch · trước khi deploy
   Đăng ký https://cloudinary.com (gói Free) → Dashboard lấy Cloud name, API Key, API Secret.
   Biến môi trường wardrobe-service: `IMAGE_STORAGE=cloudinary`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
@@ -86,7 +89,7 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   6. Mở `https://thelooks-auth.onrender.com/actuator/health` thấy `UP` là chạy.
   7. Vercel: đổi `VITE_MOCK_SERVICES=billing` (chỉ billing còn giả) → Redeploy.
   Gói free: service ngủ sau 15 phút không dùng, lần mở đầu chờ khoảng 1 phút. Ảnh tủ đồ mất khi service khởi động lại
-  cho tới khi bật Cloudinary. billing-service deploy sau khi có PayOS.
+  cho tới khi bật Cloudinary. `thelooks-billing` cần 3 key PayOS (mục 2).
 - [ ] **Mua tên miền** · nhóm · trước khi ra mắt T1/2027 (ngân sách 500.000đ)
 
 ## 4. Máy dev của Tuấn
