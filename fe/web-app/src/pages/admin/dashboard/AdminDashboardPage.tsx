@@ -12,6 +12,7 @@ import { AccountDrawer } from '../../../components/shared/layout/AccountDrawer';
 import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { useAiUsage } from '../../../hooks/admin/dashboard/useAiUsage';
+import { useAffiliateStats, useBillingStats, useUserStats } from '../../../hooks/admin/dashboard/useStats';
 import { listAdminUsers } from '../../../services/admin/dashboard/users';
 import type { AdminUser } from '../../../interface/dto/admin/auth/AdminUsers';
 import './admin-dashboard.css';
@@ -50,6 +51,58 @@ function AiUsagePanel() {
   </Card>;
 }
 
+/** Biểu đồ cột theo ngày (date = yyyy-mm-dd từ backend, đã tính theo giờ Việt Nam). */
+function DailyChart({ points, unit, format = (n: number) => n.toLocaleString('vi-VN') }: {
+  points: { date: string; value: number }[]; unit: string; format?: (n: number) => string;
+}) {
+  const max = Math.max(1, ...points.map((p) => p.value));
+  const label = (date: string) => { const [, m, d] = date.split('-'); return `${d}/${m}`; };
+  if (!points.some((p) => p.value > 0)) return <div className="admin-empty">Chưa có {unit} trong khoảng này.</div>;
+  return <div className="admin-chart-wrap"><div className="admin-chart" role="img" aria-label={points.map((p) => `${label(p.date)}: ${format(p.value)} ${unit}`).join(', ')}>
+    {points.map((p) => <div className="admin-chart-column" key={p.date} title={`${label(p.date)}: ${format(p.value)} ${unit}`}><span style={{ height: `${p.value / max * 100}%` }} /><small>{label(p.date)}</small></div>)}
+  </div></div>;
+}
+
+const vnd = (n: number) => `${n.toLocaleString('vi-VN')}đ`;
+
+function RevenuePanel() {
+  const stats = useBillingStats(30);
+  const data = stats.data;
+  return <div className="admin-overview">
+    {stats.isError && <Card className="admin-panel"><p role="alert">Không tải được doanh thu: {errorMessage(stats.error)}</p></Card>}
+    <div className="admin-metrics">
+      <AdminMetric icon={<UserAddOutlined />} label="Đang dùng Plus" value={data?.plusSubscribers ?? null} note="Gói còn hạn" tone="admin-tone-green" />
+      <AdminMetric icon={<TeamOutlined />} label="Đang dùng Pro" value={data?.proSubscribers ?? null} note="Gói còn hạn" tone="admin-tone-pink" />
+      <AdminMetric icon={<BarChartOutlined />} label="Đơn đã thanh toán" value={data?.paidOrders ?? null} note="30 ngày qua" />
+      <Card className="admin-metric admin-tone-amber"><span className="admin-metric-icon"><ShoppingOutlined /></span>
+        <strong>{data ? vnd(data.revenueVnd) : '—'}</strong><span>Doanh thu gói</span><small>30 ngày qua</small></Card>
+    </div>
+    <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Doanh thu theo ngày</h2><p>Đơn PayOS đã thanh toán, 30 ngày qua</p></div></div>
+      {stats.isPending ? <Skeleton active paragraph={{ rows: 5 }} /> : data && <DailyChart unit="doanh thu" format={vnd} points={data.daily.map((d) => ({ date: d.date, value: d.revenueVnd }))} />}
+    </Card>
+  </div>;
+}
+
+function AffiliatePanel() {
+  const stats = useAffiliateStats(30);
+  const data = stats.data;
+  return <div className="admin-overview">
+    {stats.isError && <Card className="admin-panel"><p role="alert">Không tải được số liệu affiliate: {errorMessage(stats.error)}</p></Card>}
+    <div className="admin-metrics">
+      <AdminMetric icon={<LinkOutlined />} label="Lượt bấm mua" value={data?.clicks ?? null} note="30 ngày qua" />
+      <AdminMetric icon={<TeamOutlined />} label="Người đã bấm" value={data?.users ?? null} note="30 ngày qua" tone="admin-tone-green" />
+    </div>
+    <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Lượt bấm theo ngày</h2><p>Gợi ý mua thêm (TikTok Shop qua AccessTrade). Hoa hồng xem trên AccessTrade, đối chiếu theo sub1.</p></div></div>
+      {stats.isPending ? <Skeleton active paragraph={{ rows: 5 }} /> : data && <DailyChart unit="lượt bấm" points={data.daily.map((d) => ({ date: d.date, value: d.clicks }))} />}
+    </Card>
+    <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Sản phẩm được bấm nhiều nhất</h2><p>30 ngày qua</p></div></div>
+      <Table rowKey={(row) => `${row.source}-${row.productId}`} loading={stats.isPending} dataSource={data?.top ?? []} pagination={false} scroll={{ x: 650 }}
+        columns={[{ title: 'Sản phẩm', dataIndex: 'title' }, { title: 'Sàn', dataIndex: 'source' }, { title: 'Lượt bấm', dataIndex: 'clicks' }]}
+        locale={{ emptyText: 'Chưa có lượt bấm nào' }} />
+    </Card>
+  </div>;
+}
+
 function AdminMetric({ icon, label, value, note, tone = '' }: { icon: ReactNode; label: string; value: number | null; note: string; tone?: string }) {
   return <Card className={`admin-metric ${tone}`}>
     <span className="admin-metric-icon">{icon}</span>
@@ -81,25 +134,31 @@ function OverviewPanel({ onOpenUsers }: { onOpenUsers: () => void }) {
     };
   });
   const newThisWeek = days.reduce((sum, day) => sum + day.count, 0);
-  const maxDaily = Math.max(1, ...days.map((day) => day.count));
   const activePercent = sample.length ? Math.round(active / sample.length * 100) : null;
   const sampleNote = page ? `Trong ${sample.length} tài khoản gần nhất` : 'Chờ dữ liệu từ auth-service';
+  const stats = useUserStats(14);
+  const activeToday = stats.data?.activeUsers.at(-1)?.count ?? null;
 
   return <div className="admin-overview">
     {users.isError && <Card className="admin-panel"><p role="alert">Không tải được dữ liệu người dùng: {errorMessage(users.error)}</p></Card>}
     {users.isPending ? <div className="admin-metrics">{Array.from({ length: 4 }, (_, index) => <Card key={index} className="admin-metric"><Skeleton active paragraph={{ rows: 2 }} title={false} /></Card>)}</div> : <div className="admin-metrics">
-      <AdminMetric icon={<TeamOutlined />} label="Tổng người dùng" value={page?.total ?? null} note="Toàn hệ thống" />
-      <AdminMetric icon={<AppstoreOutlined />} label="Đang hoạt động" value={page ? active : null} note={sampleNote} tone="admin-tone-green" />
-      <AdminMetric icon={<UserAddOutlined />} label="Mới trong 7 ngày" value={page ? newThisWeek : null} note={sampleNote} tone="admin-tone-pink" />
-      <AdminMetric icon={<LockOutlined />} label="Tạm khóa" value={page ? locked : null} note={sampleNote} tone="admin-tone-amber" />
+      <AdminMetric icon={<TeamOutlined />} label="Tổng người dùng" value={stats.data?.totalUsers ?? page?.total ?? null} note="Toàn hệ thống" />
+      <AdminMetric icon={<UserAddOutlined />} label="Mới trong 7 ngày" value={stats.data?.newLast7Days ?? (page ? newThisWeek : null)} note={stats.data ? 'Toàn hệ thống' : sampleNote} tone="admin-tone-pink" />
+      <AdminMetric icon={<AppstoreOutlined />} label="Mở app trong 7 ngày" value={stats.data?.activeLast7Days ?? null} note="Người dùng hoạt động (WAU)" tone="admin-tone-green" />
+      <AdminMetric icon={<LockOutlined />} label="Mở app hôm nay" value={activeToday} note={`DAU · ${locked} tài khoản tạm khóa`} tone="admin-tone-amber" />
     </div>}
 
     <div className="admin-two-col">
-      <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Tăng trưởng người dùng</h2><p>Số tài khoản mới trong 7 ngày · {sampleNote.toLowerCase()}</p></div></div>
-        {users.isPending ? <Skeleton active paragraph={{ rows: 5 }} /> : sample.length ? <div className="admin-chart-wrap"><div className="admin-chart" role="img" aria-label={`Người dùng mới trong 7 ngày: ${days.map((day) => `${day.date}: ${day.count}`).join(', ')}`}>
-          {days.map((day) => <div className="admin-chart-column" key={day.date} title={`${day.date}: ${day.count} người dùng`}><span style={{ height: `${day.count / maxDaily * 100}%` }} /><small>{day.label}</small></div>)}
-        </div></div> : <div className="admin-empty">Chưa có tài khoản để hiển thị biểu đồ.</div>}
+      <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Người dùng mới</h2><p>Tài khoản đăng ký mỗi ngày, 14 ngày qua</p></div></div>
+        {stats.isError && <p role="alert">{errorMessage(stats.error)}</p>}
+        {stats.isPending ? <Skeleton active paragraph={{ rows: 5 }} /> : stats.data && <DailyChart unit="người đăng ký" points={stats.data.newUsers.map((d) => ({ date: d.date, value: d.count }))} />}
       </Card>
+      <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Người dùng hoạt động</h2><p>Số người mở app mỗi ngày (DAU), 14 ngày qua</p></div></div>
+        {stats.isPending ? <Skeleton active paragraph={{ rows: 5 }} /> : stats.data && <DailyChart unit="người dùng" points={stats.data.activeUsers.map((d) => ({ date: d.date, value: d.count }))} />}
+      </Card>
+    </div>
+
+    <div className="admin-two-col">
       <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Trạng thái tài khoản</h2><p>{sampleNote}</p></div></div>
         {users.isPending ? <Skeleton active paragraph={{ rows: 5 }} /> : sample.length ? <>
           <div className="admin-donut" role="img" aria-label={`${activePercent}% hoạt động, ${100 - (activePercent ?? 0)}% tạm khóa`} style={{ background: `conic-gradient(var(--purple) 0 ${activePercent}%, var(--pink) ${activePercent}% 100%)` }}><div><strong>{activePercent}%</strong><small>Hoạt động</small></div></div>
@@ -174,7 +233,9 @@ export function AdminDashboardPage() {
         <div className="admin-view-content" key={view}>
           {view === 'overview' && <OverviewPanel onOpenUsers={() => choose('users')} />}
           {view === 'users' && <UsersPanel />}
-          {view !== 'overview' && view !== 'users' && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
+          {view === 'revenue' && <RevenuePanel />}
+          {view === 'affiliate' && <AffiliatePanel />}
+          {!['overview', 'users', 'revenue', 'affiliate'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
         </div>
       </main>
     </div>

@@ -96,10 +96,39 @@ paths:
       responses:
         '200': { description: Đã nhận }
         '400': { description: Sai chữ ký }
+  /api/admin/billing/stats:
+    get:
+      summary: (ADMIN) Người đang dùng gói, đơn đã thanh toán và doanh thu theo ngày (giờ Việt Nam)
+      parameters:
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 90, default: 30 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BillingStats' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
   schemas:
+    BillingStats:
+      type: object
+      required: [plusSubscribers, proSubscribers, paidOrders, revenueVnd, daily]
+      properties:
+        plusSubscribers: { type: integer, format: int64 }
+        proSubscribers: { type: integer, format: int64 }
+        paidOrders: { type: integer, format: int64 }
+        revenueVnd: { type: integer, format: int64 }
+        daily:
+          type: array
+          items:
+            type: object
+            required: [date, paidOrders, revenueVnd]
+            properties:
+              date: { type: string, format: date }
+              paidOrders: { type: integer, format: int64 }
+              revenueVnd: { type: integer, format: int64 }
     Plan: { type: string, enum: [FREE, PLUS, PRO] }
     BillingPeriod: { type: string, enum: [MONTHLY, YEARLY] }
     Feature:
