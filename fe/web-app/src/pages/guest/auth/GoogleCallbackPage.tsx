@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { session, useSession } from '../../../services/shared/session';
-import { Brand, Card, Notice, Spinner } from '../../../components/shared/ui/index';
+import { BackLink, Brand, Card, Notice, Spinner } from '../../../components/shared/ui/index';
 
 export function GoogleCallbackPage() {
   const { isAuthenticated } = useSession();
@@ -19,7 +19,7 @@ export function GoogleCallbackPage() {
         {failed ? (
           <div className="stack">
             <Notice tone="error">Không hoàn tất đăng nhập Google. Vui lòng thử lại.</Notice>
-            <Link to="/login">Quay lại đăng nhập</Link>
+            <BackLink to="/login">Quay lại đăng nhập</BackLink>
           </div>
         ) : <Spinner label="Đang hoàn tất đăng nhập Google…" />}
       </Card>

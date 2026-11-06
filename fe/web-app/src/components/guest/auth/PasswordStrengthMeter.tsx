@@ -14,7 +14,7 @@ export function PasswordStrengthMeter({ password, policy }: { password: string; 
       <div className={`password-strength-track level-${strength.level}`} role="meter" aria-label="Độ mạnh mật khẩu" aria-valuemin={0} aria-valuemax={100} aria-valuenow={strength.percent} aria-valuetext={labels[strength.level]}>
         <span style={{ width: `${strength.percent}%` }} />
       </div>
-      <p className="small muted">Tối thiểu {policy.minLength} ký tự. Nên dùng {policy.strongLength} ký tự và {policy.recommendedCharacterTypes} loại ký tự.</p>
+      <p className="small muted">Tối thiểu {policy.minLength} ký tự. Để đạt mức mạnh: từ {policy.strongLength} ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
     </div>
   );
 }

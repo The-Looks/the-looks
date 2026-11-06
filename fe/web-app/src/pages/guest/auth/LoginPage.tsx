@@ -2,11 +2,14 @@ import { useMutation } from '@tanstack/react-query';
 import { GoogleOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { session, useSession } from '../../../services/shared/session';
-import { Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
+import { BackLink, Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
+import { AuthMotionBackground } from '../../../components/guest/auth/AuthMotionBackground';
+import { PasswordField } from '../../../components/guest/auth/PasswordField';
+import type { AuthTransitionContext } from '../../../components/guest/auth/AuthTransitionLayout';
 
 // auth-service — Phát. Contract: auth-api.yaml
 export function LoginPage() {
@@ -14,7 +17,10 @@ export function LoginPage() {
   const { isAuthenticated } = useSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const from = (useLocation().state as { from?: string } | null)?.from ?? '/';
+  const location = useLocation();
+  const { previousPath } = useOutletContext<AuthTransitionContext>();
+  const from = (location.state as { from?: string } | null)?.from ?? '/';
+  const fromRegister = (location.state as { fromRegister?: boolean } | null)?.fromRegister === true || previousPath === '/register';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -43,14 +49,14 @@ export function LoginPage() {
 
   return (
     <main className="login-scene">
-      <div className="login-motion-wall" aria-hidden="true" />
-      <section className="auth-panel login-panel">
-        <Link className="back" to="/">‹ Trang chủ</Link>
+      <AuthMotionBackground />
+      <section className={`auth-panel login-panel${fromRegister ? ' login-panel-return' : ''}`}>
+        <BackLink to="/">Trang chủ</BackLink>
         <Brand />
         <div className="stack"><span className="eyebrow">CHÀO MỪNG ĐẾN THE LOOKS</span><h2>Đăng nhập</h2><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Field id="login-password" label="Mật khẩu" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordField id="login-password" label="Mật khẩu" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           {searchParams.get('google') === 'failed' && <Notice tone="error">Không hoàn tất đăng nhập Google. Vui lòng thử lại.</Notice>}
           {login.isError && <Notice tone="error">{errorMessage(login.error)}</Notice>}
           {mockGoogleLogin.isError && <Notice tone="error">{errorMessage(mockGoogleLogin.error)}</Notice>}

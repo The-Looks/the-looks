@@ -8,7 +8,14 @@ describe('password strength follows backend policy', () => {
     expect(assessPasswordStrength('Abc123!xy', policy).meetsMinimum).toBe(false);
   });
 
-  it('rates a long password with three character types as strong', () => {
-    expect(assessPasswordStrength('LongPassword123', policy).level).toBe('strong');
+  it('keeps a long password without a special character below full strength', () => {
+    const strength = assessPasswordStrength('Truongphat6789', policy);
+    expect(strength.level).toBe('medium');
+    expect(strength.percent).toBeLessThan(100);
+    expect(assessPasswordStrength('Truongphat678', { ...policy, strongLength: 12 }).level).toBe('medium');
+  });
+
+  it('fills the meter only when all four character types are present', () => {
+    expect(assessPasswordStrength('Truongphat678!', policy)).toMatchObject({ level: 'strong', percent: 100 });
   });
 });
