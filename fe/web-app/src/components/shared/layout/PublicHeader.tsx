@@ -19,10 +19,11 @@ export function PublicHeader({ page }: { page: 'home' | 'friends' | 'vote' }) {
   }
 
   return <header className="guest-topbar">
-    <Link to="/ask-friends" className="guest-brand" aria-label="THE LOOKS, bình chọn cùng bạn bè"><Brand /></Link>
+    <Link to="/" className="guest-brand" aria-label="THE LOOKS, trang chủ"><Brand /><strong>THE LOOKS</strong></Link>
     {page === 'friends' ? <>
       <nav className="guest-landing-nav" aria-label="Điều hướng trang giới thiệu">
-        <Link to="/ask-friends" className="active">Trang chủ</Link>
+        <Link to="/">Trang chủ</Link>
+        <Link to="/ask-friends" className="active" aria-current="page">Hỏi bạn bè</Link>
         <a href="#how-it-works">Cách hoạt động</a>
         <a href="#open-poll">Mở link bình chọn</a>
       </nav>

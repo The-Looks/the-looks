@@ -1,7 +1,7 @@
 import { ArrowRightOutlined, HeartOutlined, LinkOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AssetPlaceholder, BackLink, Button, ButtonLink, Notice } from '../../../components/shared/ui/index';
+import { BackLink, Button, ButtonLink, Notice } from '../../../components/shared/ui/index';
 import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 
@@ -47,12 +47,10 @@ export function GuestLandingPage() {
             </div>
             <div className="guest-share-note"><ShareAltOutlined /> Link Zalo mở thẳng màn bình chọn cho khách.</div>
           </div>
-          <div className="guest-landing-art">
-            <AssetPlaceholder label="Ảnh outfit giới thiệu" assetPath="assets/landing/hero-outfit.jpg" animated />
-            <div className="guest-floating-note"><HeartOutlined /><span><strong>18 bạn đã chọn giúp</strong><small>Hỏi nhanh, mặc đẹp tự tin</small></span></div>
-          </div>
+          <div className="guest-landing-art" aria-hidden="true" />
         </section>
-        <section id="open-poll" className="guest-landing-steps">
+        <section id="open-poll" className="guest-landing-steps guest-open-poll">
+          <span className="eyebrow">LỜI MỜI TỪ BẠN BÈ</span>
           <h2>Mở bình chọn từ bạn bè</h2>
           <p>Dán link được chia sẻ qua Zalo hoặc nhập mã bình chọn để xem hai outfit.</p>
           <form className="row" onSubmit={openPoll}>
@@ -61,7 +59,8 @@ export function GuestLandingPage() {
           </form>
           {invalidLink && <Notice tone="error">Link không đúng định dạng bình chọn.</Notice>}
         </section>
-        <section id="how-it-works" className="guest-landing-steps">
+        <section id="how-it-works" className="guest-landing-steps guest-how-it-works">
+          <span className="eyebrow">CHIA SẺ PHONG CÁCH</span>
           <h2>Chia sẻ trong 3 bước</h2>
           <div className="guest-step-grid">
             {steps.map((step) => <div className="guest-step" key={step.number}><span>{step.number}</span><div><h3>{step.title}</h3><p>{step.detail}</p></div></div>)}

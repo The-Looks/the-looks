@@ -19,7 +19,7 @@ export function PublicPollPage() {
   const hoursLeft = poll.data ? Math.max(0, Math.ceil((Date.parse(poll.data.expiresAt) - Date.now()) / 3_600_000)) : 0;
 
   return (
-    <div className="guest-page">
+    <div className={`guest-page${showResult ? ' guest-page--result' : ''}`}>
       <PublicHeader page="vote" />
       <main className="guest-layout">
         <BackLink className="guest-vote-back" to="/ask-friends">Quay lại</BackLink>
@@ -45,6 +45,7 @@ export function PublicPollPage() {
             <>
               {!showResult ? (
                 <>
+                  <span className="eyebrow">CÙNG BẠN BÈ CHỌN MỘT SET</span>
                   <h1>{poll.data.question ?? 'Set nào hợp với mình hơn?'}</h1>
                   <p className="muted">Chạm vào một set để chọn rồi gửi bình chọn của bạn.</p>
                   <div className="guest-options" role="radiogroup" aria-label="Chọn outfit">
@@ -78,8 +79,10 @@ export function PublicPollPage() {
               ) : (
                 <div className="guest-result">
                   <CheckCircleFilled />
+                  <span className="eyebrow">KẾT QUẢ BÌNH CHỌN</span>
                   <h2>{expired && !vote.isSuccess ? 'Bình chọn đã kết thúc' : 'Cảm ơn bạn đã bình chọn!'}</h2>
                   <p className="muted">{expired && !vote.isSuccess ? 'Bạn có thể xem kết quả bên dưới.' : 'Phiếu của bạn đã được ghi nhận. Cùng xem bạn bè đã chọn set nào.'}</p>
+                  {result && <p className="guest-result-total">{result.votesA + result.votesB} lượt bình chọn</p>}
                   {result ? (['A', 'B'] as const).map((value) => (
                     <div className="guest-result-row" key={value}>
                       <div><strong>Set {value}</strong><strong>{value === 'A' ? result.percentA : result.percentB}%</strong></div>
