@@ -7,7 +7,6 @@ import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { session, useSession } from '../../../services/shared/session';
 import { BackLink, Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
-import { AuthMotionBackground } from '../../../components/guest/auth/AuthMotionBackground';
 import { PasswordField } from '../../../components/guest/auth/PasswordField';
 import type { AuthTransitionContext } from '../../../components/guest/auth/AuthTransitionLayout';
 
@@ -49,7 +48,6 @@ export function LoginPage() {
 
   return (
     <main className="login-scene">
-      <AuthMotionBackground />
       <section className={`auth-panel login-panel${fromRegister ? ' login-panel-return' : ''}`}>
         <BackLink to="/">Trang chủ</BackLink>
         <Brand />

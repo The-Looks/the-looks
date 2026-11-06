@@ -1,22 +1,50 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { brand } from '../../../services/shared/brand';
 
 /** Show the light still image first, then fade in the slow, silent loop when motion is allowed. */
 export function AuthMotionBackground() {
   const [playVideo, setPlayVideo] = useState(false);
   const [ready, setReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const smallScreen = window.matchMedia('(max-width: 700px)');
     const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
-    if (!reducedMotion && !saveData) setPlayVideo(true);
+    const update = () => {
+      const allowed = !reducedMotion.matches && !smallScreen.matches && !saveData;
+      if (!allowed) setReady(false);
+      setPlayVideo(allowed);
+    };
+    const start = window.setTimeout(update, 250);
+    reducedMotion.addEventListener('change', update);
+    smallScreen.addEventListener('change', update);
+    return () => {
+      window.clearTimeout(start);
+      reducedMotion.removeEventListener('change', update);
+      smallScreen.removeEventListener('change', update);
+    };
   }, []);
 
-  return <div className={`login-motion-wall${playVideo ? ' has-video' : ''}`} aria-hidden="true">
+  useEffect(() => {
+    if (!playVideo) return;
+    const video = videoRef.current;
+    if (!video) return;
+    const syncPlayback = () => {
+      if (document.hidden) video.pause();
+      else void video.play().catch(() => setPlayVideo(false));
+    };
+    document.addEventListener('visibilitychange', syncPlayback);
+    syncPlayback();
+    return () => document.removeEventListener('visibilitychange', syncPlayback);
+  }, [playVideo]);
+
+  return <div className={`login-motion-wall${playVideo && ready ? ' has-video' : ''}`} aria-hidden="true">
     {playVideo && <video
+      ref={videoRef}
       className={`auth-motion-video${ready ? ' is-ready' : ''}`}
       autoPlay muted loop playsInline preload="none" poster={brand.assets.authWall}
-      onCanPlay={() => setReady(true)} onError={() => setPlayVideo(false)}
+      onCanPlay={() => setReady(true)} onError={() => { setReady(false); setPlayVideo(false); }}
     >
       <source src={brand.assets.authMotion} type="video/mp4" />
     </video>}

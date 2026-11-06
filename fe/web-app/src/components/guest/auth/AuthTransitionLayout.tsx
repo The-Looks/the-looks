@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { AuthMotionBackground } from './AuthMotionBackground';
 
 export type AuthTransitionContext = { previousPath: '/login' | '/register' | null };
 
@@ -15,5 +16,5 @@ export function AuthTransitionLayout() {
     }
   }, [location.pathname]);
 
-  return <Outlet context={context} />;
+  return <div className="auth-route-stage"><AuthMotionBackground /><Outlet context={context} /></div>;
 }

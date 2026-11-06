@@ -6,7 +6,6 @@ import { authRequests } from '../../../services/guest/auth/requests';
 import { session } from '../../../services/shared/session';
 import { BackLink, Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
 import { PasswordStrengthMeter } from '../../../components/guest/auth/PasswordStrengthMeter';
-import { AuthMotionBackground } from '../../../components/guest/auth/AuthMotionBackground';
 import { PasswordField } from '../../../components/guest/auth/PasswordField';
 import type { AuthTransitionContext } from '../../../components/guest/auth/AuthTransitionLayout';
 import { assessPasswordStrength } from '../../../services/guest/auth/passwordStrength';
@@ -44,7 +43,6 @@ export function RegisterPage() {
 
   return (
     <main className="auth-scene register-scene">
-      <AuthMotionBackground />
       <aside className="auth-story register-story">
         <Brand />
         <h1>Bắt đầu phong cách <em>của riêng bạn.</em></h1>
