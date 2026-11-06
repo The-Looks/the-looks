@@ -4,6 +4,8 @@ import type { WardrobeFilters } from './filters';
 import { normalizeUpload } from './normalizeUpload';
 
 export const wardrobeRequests = {
+  costSummary: (signal?: AbortSignal) => unwrap(wardrobeApi.GET('/api/app/wardrobe/cost-per-wear', { signal })),
+  itemCost: (id: string, signal?: AbortSignal) => unwrap(wardrobeApi.GET('/api/app/wardrobe/items/{itemId}/cost-per-wear', { params: { path: { itemId: id } }, signal })),
   stats: (signal?: AbortSignal) => unwrap(wardrobeApi.GET('/api/app/wardrobe/stats', { signal })),
   search: (filters: WardrobeFilters, signal?: AbortSignal) =>
     unwrap(wardrobeApi.GET('/api/app/wardrobe/items/search', { params: { query: filters }, signal })),

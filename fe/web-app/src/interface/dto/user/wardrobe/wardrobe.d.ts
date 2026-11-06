@@ -43,6 +43,89 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/wardrobe/cost-per-wear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Chi phí mỗi lần mặc của các món đã xác nhận (Pro)
+         * @description Cần COST_PER_WEAR; giá mua chia số lần mặc, HALF_UP 2 số thập phân VND. Tối đa 10 món, ưu tiên chi phí cao nhất rồi món thiếu dữ liệu. totalItems là toàn bộ món đã xác nhận. Chỉ 1 lần đọc lịch sử cho cả danh sách.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Số liệu của chủ JWT, không cache */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CostPerWearSummary"];
+                    };
+                };
+                403: components["responses"]["Problem"];
+                503: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/app/wardrobe/items/{itemId}/cost-per-wear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Chi phí mỗi lần mặc của một món đã xác nhận (Pro) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    itemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Chi phí hoặc trạng thái chưa tính được */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CostPerWearItem"];
+                    };
+                };
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+                503: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/wardrobe/stats": {
         parameters: {
             query?: never;
@@ -446,6 +529,20 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        CostPerWearItem: {
+            item: components["schemas"]["WardrobeItem"];
+            /** Format: int64 */
+            wearCount: number;
+            /** @description VND mỗi lần mặc */
+            costPerWear: number | null;
+            /** @enum {string} */
+            status: "CALCULATED" | "MISSING_PRICE" | "NEVER_WORN";
+        };
+        CostPerWearSummary: {
+            items: components["schemas"]["CostPerWearItem"][];
+            /** Format: int64 */
+            totalItems: number;
+        };
         StatsCount: {
             /** @description Loại đồ hoặc nhãn màu; UNKNOWN nếu thiếu */
             key: string;

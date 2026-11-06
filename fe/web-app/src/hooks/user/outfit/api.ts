@@ -104,6 +104,11 @@ export function useWearOutfit() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: outfitRequests.wearOutfit,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['outfits', 'suggestions'] }),
+    onSuccess: () => Promise.all([
+      qc.invalidateQueries({ queryKey: ['outfits', 'suggestions'] }),
+      qc.invalidateQueries({ queryKey: ['wardrobe', 'cost-per-wear'] }),
+      qc.invalidateQueries({ queryKey: ['wardrobe', 'stats'] }),
+      qc.invalidateQueries({ queryKey: ['wardrobe', 'list'] }),
+    ]),
   });
 }

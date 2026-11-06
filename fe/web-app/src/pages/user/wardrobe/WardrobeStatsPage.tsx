@@ -1,5 +1,7 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Button, ButtonLink, EmptyState, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { CostPerWearSection } from '../../../components/user/wardrobe/CostPerWearSection';
 import { useMyPlan } from '../../../hooks/user/billing/api';
 import { useWardrobeStats } from '../../../hooks/user/wardrobe/api';
 import { ApiError, errorMessage } from '../../../services/shared/api/client';
@@ -20,6 +22,7 @@ function Distribution({ title, rows, total, category = false }: { title: string;
 }
 
 export function WardrobeStatsPage() {
+  const qc = useQueryClient();
   const plan = useMyPlan();
   const allowed = plan.data?.features.includes('WARDROBE_STATS') ?? false;
   const stats = useWardrobeStats(allowed);
@@ -51,6 +54,7 @@ export function WardrobeStatsPage() {
           <Distribution title="Theo loại đồ" rows={s.byCategory} total={s.totalItems} category />
           <Distribution title="Theo màu sắc" rows={s.byColor} total={s.totalItems} />
         </div>
+        <CostPerWearSection />
         <section className="wardrobe-stats-panel" aria-label="Món ít dùng">
           <h2>Chưa mặc hoặc lâu chưa mặc</h2>
           <p className="muted">{s.inactiveCount} món chưa từng mặc hoặc ít nhất {s.inactiveAfterDays} ngày chưa mặc. Hiện {s.unusedItems.length} món đầu tiên.</p>
@@ -72,7 +76,7 @@ export function WardrobeStatsPage() {
   }
   return <div className="stack-lg wardrobe-stats">
     <PageHeader title="Thống kê tủ đồ" sub="Mặc nhiều hơn từ những món bạn đã có." back={{ to: '/wardrobe', label: 'Tủ đồ' }}
-      action={allowed ? <Button kind="outline" disabled={stats.isFetching || plan.isFetching} onClick={() => { void plan.refetch(); void stats.refetch(); }}>Làm mới</Button> : undefined} />
+      action={allowed ? <Button kind="outline" disabled={stats.isFetching || plan.isFetching} onClick={() => { void plan.refetch(); void stats.refetch(); void qc.invalidateQueries({ queryKey: ['wardrobe', 'cost-per-wear'] }); }}>Làm mới</Button> : undefined} />
     {content}
   </div>;
 }

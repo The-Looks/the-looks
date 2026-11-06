@@ -3,6 +3,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ItemDetailPage } from './ItemDetailPage';
 
+vi.mock('../../../components/user/wardrobe/CostPerWearSection', () => ({ CostPerWearSection: () => null }));
+
 const mocks = vi.hoisted(() => ({
   data: { id: 'item-1', status: 'CONFIRMED', category: 'TOP', colors: ['white'], material: 'cotton', seasons: [], styleTags: ['casual'],
     createdAt: '2026-11-06T00:00:00Z', purchasePrice: 300000 as number | null, purchaseDate: '2026-11-06' as string | null, brand: 'Uniqlo' as string | null },

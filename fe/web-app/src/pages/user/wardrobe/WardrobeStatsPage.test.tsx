@@ -1,8 +1,12 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { ApiError } from '../../../services/shared/api/client';
 import { WardrobeStatsPage } from './WardrobeStatsPage';
+
+vi.mock('../../../components/user/wardrobe/CostPerWearSection', () => ({ CostPerWearSection: () => null }));
 
 const mocks = vi.hoisted(() => ({
   features: ['WARDROBE_STATS'], planError: false, planPending: false,
@@ -18,7 +22,12 @@ vi.mock('../../../hooks/user/billing/api', () => ({ useMyPlan: () => ({ data: { 
 vi.mock('../../../hooks/user/wardrobe/api', () => ({ useWardrobeStats: (enabled: boolean) => {
   mocks.enabled(enabled); return { data: mocks.data, isError: !!mocks.statsError, error: mocks.statsError, isPending: mocks.statsPending, refetch: mocks.retry };
 } }));
-const show = () => render(<MemoryRouter><WardrobeStatsPage /></MemoryRouter>);
+const show = () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(<MemoryRouter><WardrobeStatsPage /></MemoryRouter>, {
+    wrapper: ({ children }: { children: ReactNode }) => <QueryClientProvider client={client}>{children}</QueryClientProvider>,
+  });
+};
 const initial = structuredClone(mocks.data);
 afterEach(cleanup);
 beforeEach(() => { vi.clearAllMocks(); mocks.features = ['WARDROBE_STATS']; mocks.planError = false; mocks.planPending = false; mocks.statsPending = false; mocks.statsError = null; mocks.data = structuredClone(initial); });

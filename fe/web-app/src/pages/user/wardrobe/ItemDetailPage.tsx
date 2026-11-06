@@ -4,6 +4,7 @@ import { errorMessage } from '../../../services/shared/api/client';
 import type { ClothingAttributes } from '../../../interface/dto/types';
 import { CATEGORY_LABEL, categoryLabel } from '../../../services/shared/labels';
 import { Button, Card, Chip, Field, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { CostPerWearSection } from '../../../components/user/wardrobe/CostPerWearSection';
 import { useConfirm, useDelete, useItem, useUpdateItem } from '../../../hooks/user/wardrobe/api';
 
 type Season = NonNullable<ClothingAttributes['seasons']>[number];
@@ -87,5 +88,6 @@ export function ItemDetailPage() {
         <Button kind="outline" onClick={() => remove.mutate(id, { onSuccess: () => navigate('/wardrobe') })} disabled={remove.isPending}>Xoá món này</Button>
       </div>
     </Card>}
+    {item.data?.status === 'CONFIRMED' && <CostPerWearSection itemId={id} />}
   </div>;
 }

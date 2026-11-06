@@ -1,0 +1,7 @@
+.cost-per-wear-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px; min-width: 0; }
+.cost-per-wear-list { list-style: none; margin: 0; padding: 0; }
+.cost-per-wear-list li + li { border-top: 1px solid var(--line); }
+.cost-per-wear-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: start; padding: 16px 0; }
+.cost-per-wear-row > .muted { grid-column: 1 / -1; }
+.cost-per-wear-value { font-variant-numeric: tabular-nums; text-align: right; }
+@media (max-width: 480px) { .cost-per-wear-panel { padding: 16px; } .cost-per-wear-row { grid-template-columns: minmax(0, 1fr); } .cost-per-wear-value { text-align: left; } }

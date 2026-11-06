@@ -11,6 +11,16 @@ export const wardrobeKeys = {
   item: (id: string) => ['wardrobe', 'item', id] as const,
 };
 
+export function useCostPerWear(itemId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ['wardrobe', 'cost-per-wear', itemId ?? 'summary'],
+    queryFn: async ({ signal }) => itemId
+      ? { items: [await wardrobeRequests.itemCost(itemId, signal)], totalItems: 1 }
+      : wardrobeRequests.costSummary(signal),
+    enabled, gcTime: 0, retry: false,
+  });
+}
+
 export function useWardrobeStats(enabled: boolean) {
   return useQuery({
     queryKey: ['wardrobe', 'stats'],

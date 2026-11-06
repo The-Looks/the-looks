@@ -76,7 +76,26 @@ const scans = new Map<string, Scan>();
 const guessCategories: Category[] = ['TOP', 'BOTTOM', 'DRESS', 'SHOES'];
 
 const wearHistory = new Map<string, { wearCount: number; lastWornAt: string }>();
+const mockItemCost = (item: WardrobeItem) => {
+  const wearCount = wearHistory.get(item.id)?.wearCount ?? 0;
+  const price = item.purchasePrice;
+  return { item, wearCount, costPerWear: price == null || wearCount === 0 ? null : Math.round((price / wearCount + Number.EPSILON) * 100) / 100,
+    status: price == null ? 'MISSING_PRICE' : wearCount === 0 ? 'NEVER_WORN' : 'CALCULATED' };
+};
 const wardrobe: HttpHandler[] = [
+  http.get('*/api/app/wardrobe/cost-per-wear', () => {
+    if (!([...entitlements().features] as readonly string[]).includes('COST_PER_WEAR')) return problem(403, 'Chi phí mỗi lần mặc cần gói Pro');
+    const all = closet.filter((item) => item.status === 'CONFIRMED').map(mockItemCost)
+      .sort((a, b) => (b.costPerWear ?? -1) - (a.costPerWear ?? -1) || b.item.createdAt.localeCompare(a.item.createdAt) || a.item.id.localeCompare(b.item.id));
+    return HttpResponse.json({ items: all.slice(0, 10), totalItems: all.length });
+  }),
+  http.get('*/api/app/wardrobe/items/:id/cost-per-wear', ({ params }) => {
+    if (!([...entitlements().features] as readonly string[]).includes('COST_PER_WEAR')) return problem(403, 'Chi phí mỗi lần mặc cần gói Pro');
+    const item = closet.find((i) => i.id === params.id);
+    if (!item) return problem(404, 'Không tìm thấy món đồ');
+    if (item.status !== 'CONFIRMED') return problem(409, 'Xác nhận món đồ trước khi xem chi phí');
+    return HttpResponse.json(mockItemCost(item));
+  }),
   http.get('*/api/app/wardrobe/stats', () => {
     if (!([...entitlements().features] as readonly string[]).includes('WARDROBE_STATS')) return problem(403, 'Thống kê tủ đồ cần gói Pro');
     const all = closet.filter((item) => item.status === 'CONFIRMED');
