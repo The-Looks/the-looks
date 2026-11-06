@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { wardrobeRequests } from '../../../services/user/wardrobe/requests';
+import type { WardrobeFilters } from '../../../services/user/wardrobe/filters';
 import type { Category, ClothingAttributes, ItemStatus } from '../../../interface/dto/types';
 
 // wardrobe-service — Member 1. Contract: wardrobe-api.yaml
@@ -9,6 +10,13 @@ export const wardrobeKeys = {
   list: (status?: ItemStatus, category?: Category) => ['wardrobe', 'list', status, category] as const,
   item: (id: string) => ['wardrobe', 'item', id] as const,
 };
+
+export function useWardrobeSearch(filters: WardrobeFilters) {
+  return useQuery({
+    queryKey: ['wardrobe', 'list', 'search', filters],
+    queryFn: ({ signal }) => wardrobeRequests.search(filters, signal),
+  });
+}
 
 export function useWardrobe(status?: ItemStatus, category?: Category) {
   return useQuery({

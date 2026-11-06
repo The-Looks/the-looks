@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 import type { Category, OutfitSuggestion, Poll, SavedOutfit, Scan, WardrobeItem } from '../../../interface/dto/types';
+import { readWardrobeFilters } from '../../user/wardrobe/filters';
 import { DEMO_USER, sampleCloset } from './data';
 
 // Giả lập API theo đúng contract trong be/packages/contracts. Dữ liệu chỉ nằm trong bộ nhớ trình duyệt.
@@ -74,7 +75,22 @@ let closet: WardrobeItem[] = structuredClone(sampleCloset);
 const scans = new Map<string, Scan>();
 const guessCategories: Category[] = ['TOP', 'BOTTOM', 'DRESS', 'SHOES'];
 
+const wearHistory = new Map<string, { wearCount: number; lastWornAt: string }>();
 const wardrobe: HttpHandler[] = [
+  http.get('*/api/app/wardrobe/items/search', ({ request }) => {
+    const f = readWardrobeFilters(new URL(request.url).searchParams);
+    const labels: Record<string, string> = { TOP: 'áo', BOTTOM: 'quần', DRESS: 'váy', OUTERWEAR: 'áo khoác', SHOES: 'giày', BAG: 'túi', ACCESSORY: 'phụ kiện' };
+    const matches = closet.filter((item) => (!f.status || item.status === f.status)
+      && (!f.category || item.category === f.category)
+      && (!f.color?.trim() || item.colors?.some((color) => color.toLowerCase() === f.color?.trim().toLowerCase()))
+      && (!f.season || !item.seasons?.length || item.seasons.includes(f.season))
+      && (!f.style?.trim() || item.styleTags?.some((style) => style.toLowerCase() === f.style?.trim().toLowerCase()))
+      && (!f.q?.trim() || [item.category, labels[item.category ?? ''], item.material, item.colors?.join(' '), item.styleTags?.join(' ')].join(' ').toLowerCase().includes(f.q.trim().toLowerCase())))
+      .sort((a, b) => f.sort === 'NEWEST'
+        ? b.createdAt.localeCompare(a.createdAt) || a.id.localeCompare(b.id)
+        : (wearHistory.get(a.id)?.lastWornAt ?? '').localeCompare(wearHistory.get(b.id)?.lastWornAt ?? '') || a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
+    return HttpResponse.json({ items: matches.slice(f.page * f.size, (f.page + 1) * f.size), total: matches.length, page: f.page, size: f.size });
+  }),
   http.get('*/api/app/wardrobe/items', ({ request }) => {
     const url = new URL(request.url);
     const status = url.searchParams.get('status');
@@ -172,6 +188,7 @@ let preferences: { gender?: string | null; styles?: string[]; budget?: string | 
 };
 
 const outfit: HttpHandler[] = [
+  http.get('*/api/app/outfits/wear-summary', () => HttpResponse.json([...wearHistory].map(([itemId, history]) => ({ itemId, ...history })))),
   http.get('*/api/app/outfits/suggestions', ({ request }) =>
     HttpResponse.json(mockSuggestions(new URL(request.url).searchParams.get('occasion') ?? undefined)),
   ),
@@ -222,7 +239,12 @@ const outfit: HttpHandler[] = [
     if (body.vote === 'DISLIKE') disliked.add(comboKey(body.itemIds));
     return new HttpResponse(null, { status: 204 });
   }),
-  http.post('*/api/app/outfits/:id/wear', () => new HttpResponse(null, { status: 204 })),
+  http.post('*/api/app/outfits/:id/wear', ({ params }) => {
+    const outfit = savedOutfits.find((item) => item.id === params.id);
+    if (!outfit) return problem(404, 'Không tìm thấy outfit');
+    outfit.itemIds.forEach((id) => wearHistory.set(id, { wearCount: (wearHistory.get(id)?.wearCount ?? 0) + 1, lastWornAt: new Date().toISOString() }));
+    return new HttpResponse(null, { status: 204 });
+  }),
 ];
 
 // ---------------- voting ----------------

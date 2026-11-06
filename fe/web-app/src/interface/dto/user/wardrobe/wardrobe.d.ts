@@ -43,6 +43,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/wardrobe/items/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Tìm và lọc tủ đồ có phân trang (API /items cũ vẫn trả mảng cho outfit-service)
+         * @description Màu và phong cách khớp nhãn đầy đủ, không phân biệt hoa thường. Mùa bao gồm món mặc mọi mùa. Lâu chưa mặc xếp món chưa mặc trước, rồi lần mặc cũ nhất; thứ tự ổn định giữa các trang.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    status?: components["schemas"]["ItemStatus"];
+                    category?: components["schemas"]["Category"];
+                    color?: string;
+                    season?: components["schemas"]["Season"];
+                    style?: string;
+                    q?: string;
+                    sort?: "NEWEST" | "LEAST_RECENTLY_WORN";
+                    page?: number;
+                    size?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Trang kết quả */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WardrobePage"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                503: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/wardrobe/scans": {
         parameters: {
             query?: never;
@@ -353,6 +404,13 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        WardrobePage: {
+            items: components["schemas"]["WardrobeItem"][];
+            /** Format: int64 */
+            total: number;
+            page: number;
+            size: number;
+        };
         /** @enum {string} */
         ItemStatus: "PROCESSING" | "PENDING_REVIEW" | "CONFIRMED" | "RECOGNITION_FAILED";
         /** @enum {string} */

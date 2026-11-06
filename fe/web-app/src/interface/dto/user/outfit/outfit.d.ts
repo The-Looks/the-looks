@@ -4,6 +4,52 @@
  */
 
 export interface paths {
+    "/api/app/outfits/wear-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Số lần mặc và lần mặc gần nhất theo món của người dùng hiện tại
+         * @description Chỉ tổng hợp WearLog của chủ JWT, không gọi wardrobe-service. Món chưa mặc không có trong kết quả.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Lịch sử theo món */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            itemId: string;
+                            /** Format: int64 */
+                            wearCount: number;
+                            /** Format: date-time */
+                            lastWornAt: string;
+                        }[];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/outfits/suggestions": {
         parameters: {
             query?: never;
