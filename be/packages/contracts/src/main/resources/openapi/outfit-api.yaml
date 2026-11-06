@@ -15,6 +15,24 @@ security:
   - cookieAuth: []
 
 paths:
+  /api/app/outfits/wear-summary:
+    get:
+      summary: Số lần mặc và lần mặc gần nhất theo món của người dùng hiện tại
+      description: Chỉ tổng hợp WearLog của chủ JWT, không gọi wardrobe-service. Món chưa mặc không có trong kết quả.
+      responses:
+        '200':
+          description: Lịch sử theo món
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [itemId, wearCount, lastWornAt]
+                  properties:
+                    itemId: { type: string, format: uuid }
+                    wearCount: { type: integer, format: int64 }
+                    lastWornAt: { type: string, format: date-time }
   /api/app/outfits/suggestions:
     get:
       summary: AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ, lọc theo thời tiết hiện tại

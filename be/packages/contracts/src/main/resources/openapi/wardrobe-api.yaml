@@ -27,6 +27,28 @@ paths:
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+  /api/app/wardrobe/items/search:
+    get:
+      summary: Tìm và lọc tủ đồ có phân trang (API /items cũ vẫn trả mảng cho outfit-service)
+      description: Màu và phong cách khớp nhãn đầy đủ, không phân biệt hoa thường. Mùa bao gồm món mặc mọi mùa. Lâu chưa mặc xếp món chưa mặc trước, rồi lần mặc cũ nhất; thứ tự ổn định giữa các trang.
+      parameters:
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/ItemStatus' } }
+        - { name: category, in: query, schema: { $ref: '#/components/schemas/Category' } }
+        - { name: color, in: query, schema: { type: string, maxLength: 30 } }
+        - { name: season, in: query, schema: { $ref: '#/components/schemas/Season' } }
+        - { name: style, in: query, schema: { type: string, maxLength: 30 } }
+        - { name: q, in: query, schema: { type: string, maxLength: 100 } }
+        - { name: sort, in: query, schema: { type: string, enum: [NEWEST, LEAST_RECENTLY_WORN], default: NEWEST } }
+        - { name: page, in: query, schema: { type: integer, minimum: 0, maximum: 1000000, default: 0 } }
+        - { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 24 } }
+      responses:
+        '200':
+          description: Trang kết quả
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobePage' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/wardrobe/scans:
     post:
       summary: >-
@@ -153,6 +175,14 @@ components:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
     cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
+    WardrobePage:
+      type: object
+      required: [items, total, page, size]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+        total: { type: integer, format: int64 }
+        page: { type: integer }
+        size: { type: integer }
     ItemStatus: { type: string, enum: [PROCESSING, PENDING_REVIEW, CONFIRMED, RECOGNITION_FAILED] }
     Category: { type: string, enum: [TOP, BOTTOM, DRESS, OUTERWEAR, SHOES, BAG, ACCESSORY] }
     Season: { type: string, enum: [SPRING, SUMMER, AUTUMN, WINTER] }

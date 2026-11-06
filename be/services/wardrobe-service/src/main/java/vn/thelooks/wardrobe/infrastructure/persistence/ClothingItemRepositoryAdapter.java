@@ -101,7 +101,7 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
         return value == null || value.isBlank() ? List.of() : Arrays.stream(value.split(",")).map(String::trim).toList();
     }
 
-    private static ClothingItem map(ResultSet rs, int row) throws SQLException {
+    static ClothingItem map(ResultSet rs, int row) throws SQLException {
         String category = rs.getString("category");
         Set<Season> seasons = EnumSet.noneOf(Season.class);
         split(rs.getString("seasons")).forEach(s -> seasons.add(Season.valueOf(s)));

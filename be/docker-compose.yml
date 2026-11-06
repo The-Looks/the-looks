@@ -56,6 +56,7 @@ services:
       SPRING_PROFILES_ACTIVE: compose
       DB_URL: jdbc:postgresql://postgres:5432/thelooks_wardrobe
       BILLING_SERVICE_URL: http://billing-service:8085
+      OUTFIT_SERVICE_URL: http://outfit-service:8083
       AI_PROVIDER: ${WARDROBE_AI_PROVIDER:-auto}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
