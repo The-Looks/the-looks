@@ -9,7 +9,7 @@ import './batch-review.css';
 
 const pending = (item: WardrobeItem) => item.status === 'PENDING_REVIEW' || item.status === 'RECOGNITION_FAILED';
 
-export function BatchReview({ items }: { items: WardrobeItem[] }) {
+export function BatchReview({ items, onConfirmed, guided = false }: { items: WardrobeItem[]; onConfirmed?: () => void; guided?: boolean }) {
   const confirm = useConfirmAll();
   const [selected, setSelected] = useState(() => new Set(items.filter(pending).map((item) => item.id)));
   const [edits, setEdits] = useState<Record<string, Partial<ClothingAttributes>>>({});
@@ -35,6 +35,7 @@ export function BatchReview({ items }: { items: WardrobeItem[] }) {
       setConfirmed((current) => new Set([...current, ...saved.map((item) => item.id)]));
       setSelected((current) => new Set([...current].filter((id) => !saved.some((item) => item.id === id))));
       setSavedCount(saved.length);
+      onConfirmed?.();
     },
   });
 
@@ -66,7 +67,7 @@ export function BatchReview({ items }: { items: WardrobeItem[] }) {
             <Field id={`colors-${item.id}`} label={`Màu món ${index + 1} (cách nhau bằng dấu phẩy)`} value={attrs.colors?.join(', ') ?? ''} disabled={confirm.isPending}
               onChange={(event) => edit(item.id, { colors: event.target.value.split(',').map((color) => color.trim()) })} />
             {edits[item.id] && <small className="muted">Đã chỉnh sửa so với AI</small>}
-            <Link to={`/wardrobe/${item.id}`}>Xem chi tiết</Link>
+            {!guided && <Link to={`/wardrobe/${item.id}`}>Xem chi tiết</Link>}
           </> : <><strong>{categoryLabel(attrs.category)}</strong><span>{done ? 'Đã xác nhận' : 'Chưa thể xác nhận'}</span></>}
         </article>;
       })}
@@ -75,6 +76,6 @@ export function BatchReview({ items }: { items: WardrobeItem[] }) {
       {confirm.isPending ? 'Đang xác nhận…' : `Xác nhận ${chosen.length} món đã chọn`}
     </Button>}
     {chosen.length > 100 && <Notice tone="warn">Chọn tối đa 100 món mỗi lần xác nhận.</Notice>}
-    <Link to="/wardrobe">Về tủ đồ</Link>
+    {!guided && <Link to="/wardrobe">Về tủ đồ</Link>}
   </section>;
 }
