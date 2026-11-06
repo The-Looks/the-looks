@@ -9,7 +9,7 @@ export function AuthMotionBackground() {
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const smallScreen = window.matchMedia('(max-width: 700px)');
+    const smallScreen = window.matchMedia('(max-width: 900px), (pointer: coarse)');
     const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
     const update = () => {
       const allowed = !reducedMotion.matches && !smallScreen.matches && !saveData;
@@ -39,14 +39,19 @@ export function AuthMotionBackground() {
     return () => document.removeEventListener('visibilitychange', syncPlayback);
   }, [playVideo]);
 
-  return <div className={`login-motion-wall${playVideo && ready ? ' has-video' : ''}`} aria-hidden="true">
-    {playVideo && <video
-      ref={videoRef}
-      className={`auth-motion-video${ready ? ' is-ready' : ''}`}
-      autoPlay muted loop playsInline preload="none" poster={brand.assets.authWall}
-      onCanPlay={() => setReady(true)} onError={() => { setReady(false); setPlayVideo(false); }}
-    >
-      <source src={brand.assets.authMotion} type="video/mp4" />
-    </video>}
+  return <div className="login-motion-wall" aria-hidden="true">
+    <div className="auth-motion-pan-x">
+      <div className="auth-motion-pan-y">
+        <div className="auth-motion-still" />
+        {playVideo && <video
+          ref={videoRef}
+          className={`auth-motion-video${ready ? ' is-ready' : ''}`}
+          autoPlay muted loop playsInline preload="none" poster={brand.assets.authWall}
+          onCanPlay={() => setReady(true)} onError={() => { setReady(false); setPlayVideo(false); }}
+        >
+          <source src={brand.assets.authMotion} type="video/mp4" />
+        </video>}
+      </div>
+    </div>
   </div>;
 }
