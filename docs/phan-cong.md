@@ -17,14 +17,20 @@ Mỗi người sở hữu trọn phần của mình: backend, màn hình web và
 
 ## Thạch (Member 1) · Tủ đồ số
 
-| # | Việc | Hạn | Ghi chú |
+Cập nhật 06/11. Chủ phần: `be/services/wardrobe-service`, `fe/web-app/src/**/wardrobe/**`.
+Mỗi việc làm trên nhánh riêng `feature/<tên>` → PR → nhờ Tuấn review → merge. Có test cho phần logic mới.
+
+| # | Việc | Hạn | Xong khi |
 |---|---|---|---|
-| 1.1 | **Review và nhận lại wardrobe-service** (PR #8, #10) | 08/11 | Code đã chạy được; đọc hiểu, sửa theo ý mình, từ giờ là chủ phần này |
-| 1.2 | Tạo tài khoản **Cloudinary**, thử upload thật | 15/11 | Xem `docs/viec-thu-cong.md` |
-| 1.3 | Thử **AI nhận diện** với 300–500 ảnh quần áo thật, ghi tỉ lệ nhận đúng / cắt đúng | 22/11 | Cần key Anthropic (`AI_PROVIDER=claude`); chỉnh prompt nếu sai nhiều |
-| 1.4 | **Onboarding**: chọn phong cách, màu yêu thích, thêm 3–5 món đầu, có outfit đầu tiên ngay | 29/11 | Theo kế hoạch xử lý rủi ro số 3 (nhập tủ đồ mất công) |
-| 1.5 | Thêm **giá mua** cho món đồ (API + màn sửa món) | 06/12 | Tuấn dùng để tính chi phí mỗi lần mặc (việc 2.4) |
-| 1.6 | **Affiliate** (doanh thu luồng 2): danh mục sản phẩm chọn lọc, link mua có mã affiliate, đếm lượt bấm, nhập hoa hồng | 20/12 | Cả nhóm chọn nền tảng affiliate trước (việc 4.3) |
+| 1.1 | **Cloudinary (GẤP)**: hiện ảnh tủ đồ lưu trên ổ đĩa Render nên **mất mỗi lần service khởi động lại**. Tạo tài khoản Cloudinary (gói Free), điền `IMAGE_STORAGE=cloudinary`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` cho `thelooks-wardrobe` trên Render; thêm 4 biến này vào `render.yaml` (key bí mật để `sync: false`) | 10/11 | Tải ảnh trên web thật → ảnh có link `res.cloudinary.com`; khởi động lại service ảnh vẫn còn; xoá món thì ảnh trên Cloudinary bị xoá |
+| 1.2 | **Đọc hiểu wardrobe-service** (quét nhiều món/ảnh, cắt ảnh, chống quét trùng #16) và sửa 1 lỗi / điểm chưa ổn bạn tìm được | 10/11 | 1 PR nhỏ đã merge, ghi trong PR bạn đã hiểu luồng nào |
+| 1.3 | **Thử AI nhận diện** (Gemini, `AI_PROVIDER=auto`) với 100–300 ảnh quần áo thật: ảnh treo, ảnh mặc trên người, ảnh nhiều món | 22/11 | Bảng kết quả trong `docs/ai-nhan-dien.md`: tỉ lệ nhận đúng loại / màu / cắt đúng khung; chỉnh prompt trong `GeminiGarmentDetector` / `ClaudeGarmentDetector` nếu sai nhiều. Số liệu này đưa vào báo cáo EXE |
+| 1.4 | **Giá mua + ngày mua** cho món đồ: Flyway V3, API (contract `wardrobe-api.yaml`), ô nhập ở màn sửa món | 29/11 | Lưu / sửa được, có test; Tuấn dùng để tính chi phí mỗi lần mặc (2.4) |
+| 1.5 | **Onboarding phần tủ đồ**: sau trang chọn phong cách (`/onboarding`, đã có) hướng dẫn thêm 3–5 món đầu, xác nhận xong hiện ngay outfit đầu tiên | 29/11 | Người dùng mới đi hết luồng đăng ký → có outfit đầu tiên không cần mò menu |
+| 1.6 | **Xoá dữ liệu người dùng** (quyền riêng tư, phối hợp Phát việc 3.7): API xoá toàn bộ món + ảnh + lượt quét của một người | 06/12 | Gọi API xong không còn dữ liệu / ảnh của người đó; có test |
+| 1.7 | **Affiliate nguồn Shopee** (khi AccessTrade duyệt chiến dịch Shopee): thêm nguồn `ProductCatalog` thứ hai bên cạnh TikTok Shop, đọc datafeed Shopee | 20/12 | Gợi ý mua thêm có cả sản phẩm Shopee; xem `AccessTradeTikTokCatalog` làm mẫu |
+
+Đã xong thay Thạch (không cần làm lại): chọn phong cách khi đăng ký (`/onboarding`, PR #19), Gợi ý mua thêm TikTok Shop (PR #18).
 
 ## Tuấn (Member 2) · Gợi ý outfit, gói thuê bao, deploy
 
