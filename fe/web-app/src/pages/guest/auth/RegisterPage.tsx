@@ -40,6 +40,7 @@ export function RegisterPage() {
 
   return (
     <main className="auth-scene register-scene">
+      <div className="login-motion-wall" aria-hidden="true" />
       <aside className="auth-story register-story">
         <Brand />
         <h1>Bắt đầu phong cách <em>của riêng bạn.</em></h1>
