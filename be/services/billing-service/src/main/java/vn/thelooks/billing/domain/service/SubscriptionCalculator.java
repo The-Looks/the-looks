@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import vn.thelooks.billing.domain.model.BillingPeriod;
 import vn.thelooks.billing.domain.model.Plan;
 import vn.thelooks.billing.domain.model.Subscription;
@@ -43,6 +44,19 @@ public final class SubscriptionCalculator {
         double creditVnd = remainingSeconds * (double) current.plan().monthlyPriceVnd() / SECONDS_PER_MONTH;
         long creditSeconds = Math.round(creditVnd * SECONDS_PER_MONTH / plan.monthlyPriceVnd());
         return base.plusSeconds(creditSeconds);
+    }
+
+    /**
+     * Hạn gói sau khi hoàn tiền một đơn: trừ lại đúng số tháng của đơn đó. Trừ xong mà đã qua thì gói kết thúc ngay
+     * (trả {@code now}). Rỗng khi gói hiện tại khác gói của đơn (người dùng đã đổi gói sau đó): admin xử lý tay.
+     */
+    // ponytail: không quy đổi ngược khi đã đổi gói sau đơn bị hoàn; thêm khi có ca thật cần
+    public static Optional<Instant> expiryAfterRefund(Subscription current, Plan plan, BillingPeriod period, Instant now) {
+        if (current == null || current.plan() != plan) {
+            return Optional.empty();
+        }
+        Instant reduced = addMonths(current.expiresAt(), -period.months());
+        return Optional.of(reduced.isAfter(now) ? reduced : now);
     }
 
     private static Instant addMonths(Instant from, int months) {

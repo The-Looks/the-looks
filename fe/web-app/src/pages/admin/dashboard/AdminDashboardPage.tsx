@@ -4,7 +4,7 @@ import {
   SettingOutlined, ShoppingOutlined, TeamOutlined, UserAddOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Avatar, Button, Card, Input, Skeleton, Table, Tag } from 'antd';
+import { Avatar, Button, Card, Input, Modal, Select, Skeleton, Table, Tag } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BackLink, Brand } from '../../../components/shared/ui/index';
@@ -13,6 +13,8 @@ import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { useAiUsage } from '../../../hooks/admin/dashboard/useAiUsage';
 import { useAffiliateStats, useBillingStats, useUserStats } from '../../../hooks/admin/dashboard/useStats';
+import { useAffiliateBlocks, useOrders, useRefund, useSystemStatus, useToggleBlock } from '../../../hooks/admin/dashboard/useAdminOps';
+import type { OrderStatus } from '../../../services/admin/dashboard/requests';
 import { listAdminUsers } from '../../../services/admin/dashboard/users';
 import type { AdminUser } from '../../../interface/dto/admin/auth/AdminUsers';
 import './admin-dashboard.css';
@@ -100,6 +102,134 @@ function AffiliatePanel() {
         columns={[{ title: 'Sản phẩm', dataIndex: 'title' }, { title: 'Sàn', dataIndex: 'source' }, { title: 'Lượt bấm', dataIndex: 'clicks' }]}
         locale={{ emptyText: 'Chưa có lượt bấm nào' }} />
     </Card>
+  </div>;
+}
+
+const ORDER_STATUS: Record<OrderStatus, { label: string; color: string }> = {
+  PENDING: { label: 'Chờ thanh toán', color: 'gold' },
+  PAID: { label: 'Đã thanh toán', color: 'green' },
+  CANCELLED: { label: 'Đã huỷ', color: 'default' },
+  REFUNDED: { label: 'Đã hoàn tiền', color: 'purple' },
+};
+const dateTime = (iso?: string | null) => (iso ? new Date(iso).toLocaleString('vi-VN') : '—');
+
+/** Đơn thanh toán: lọc theo trạng thái, tìm theo mã đơn hoặc email; hoàn tiền đơn đã thanh toán. */
+function OrdersPanel() {
+  const [status, setStatus] = useState<OrderStatus | undefined>();
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<{ ownerId?: string; orderCode?: number }>({});
+  const [searchError, setSearchError] = useState('');
+  const [page, setPage] = useState(0);
+  const [target, setTarget] = useState<{ orderCode: number; amountVnd: number } | null>(null);
+  const [reason, setReason] = useState('');
+  const orders = useOrders({ status, ...filter, page, size: 10 });
+  const refund = useRefund();
+
+  const applySearch = async () => {
+    const q = search.trim();
+    setSearchError('');
+    setPage(0);
+    if (!q) return setFilter({});
+    if (/^\d+$/.test(q)) return setFilter({ orderCode: Number(q) });
+    // Billing không biết email: tìm người dùng ở auth-service rồi lọc theo id
+    const found = await listAdminUsers(0, q, 1).catch(() => null);
+    const user = found?.items[0];
+    if (!user) return setSearchError(`Không tìm thấy người dùng "${q}"`);
+    setFilter({ ownerId: user.id });
+  };
+
+  const confirmRefund = () => target && refund.mutate({ orderCode: target.orderCode, reason: reason.trim() }, {
+    onSuccess: () => { setTarget(null); setReason(''); },
+  });
+
+  return <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Đơn thanh toán</h2><p>Mới nhất trước. Tìm theo mã đơn hoặc email người mua.</p></div></div>
+    <div className="row" style={{ gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+      <Select allowClear placeholder="Mọi trạng thái" style={{ minWidth: 180 }} value={status} onChange={(v) => { setStatus(v); setPage(0); }}
+        options={(Object.keys(ORDER_STATUS) as OrderStatus[]).map((k) => ({ value: k, label: ORDER_STATUS[k].label }))} />
+      <Input.Search allowClear placeholder="Mã đơn hoặc email" style={{ maxWidth: 320 }} value={search}
+        onChange={(e) => setSearch(e.target.value)} onSearch={() => void applySearch()} />
+    </div>
+    {searchError && <p role="alert">{searchError}</p>}
+    {orders.isError && <p role="alert">{errorMessage(orders.error)}</p>}
+    {refund.isSuccess && <p className="small">Đã hoàn tiền đơn #{refund.data.order.orderCode}. {refund.data.newExpiry
+      ? `Gói của người dùng còn tới ${dateTime(refund.data.newExpiry)}.`
+      : 'Người dùng đã đổi gói sau đơn này: kiểm tra và chỉnh gói tay nếu cần.'}</p>}
+    <Table rowKey="orderCode" loading={orders.isPending} dataSource={orders.data?.items ?? []} scroll={{ x: 900 }}
+      pagination={{ current: page + 1, pageSize: 10, total: orders.data?.total ?? 0, onChange: (next) => setPage(next - 1) }}
+      locale={{ emptyText: 'Chưa có đơn nào' }}
+      columns={[
+        { title: 'Mã đơn', dataIndex: 'orderCode' },
+        { title: 'Gói', render: (_, o) => `${o.plan === 'PRO' ? 'Pro' : 'Plus'} · ${o.period === 'YEARLY' ? 'năm' : 'tháng'}` },
+        { title: 'Số tiền', dataIndex: 'amountVnd', render: (v: number) => vnd(v) },
+        { title: 'Trạng thái', dataIndex: 'status', render: (v: OrderStatus, o) => <Tag color={ORDER_STATUS[v].color} title={o.refundReason ?? undefined}>{ORDER_STATUS[v].label}</Tag> },
+        { title: 'Tạo lúc', dataIndex: 'createdAt', render: dateTime },
+        { title: 'Thanh toán lúc', dataIndex: 'paidAt', render: dateTime },
+        { title: '', render: (_, o) => o.status === 'PAID'
+          ? <Button size="small" danger onClick={() => { refund.reset(); setTarget({ orderCode: o.orderCode, amountVnd: o.amountVnd }); }}>Hoàn tiền</Button>
+          : o.status === 'REFUNDED' ? <small className="muted">{o.refundReason}</small> : null },
+      ]} />
+    <Modal open={!!target} title={`Hoàn tiền đơn #${target?.orderCode ?? ''}`} okText="Xác nhận đã hoàn tiền" okButtonProps={{ danger: true, disabled: !reason.trim(), loading: refund.isPending }}
+      cancelText="Huỷ" onOk={confirmRefund} onCancel={() => { setTarget(null); setReason(''); }}>
+      <p>Chuyển trả {target ? vnd(target.amountVnd) : ''} cho người mua trước (bằng app ngân hàng), rồi mới xác nhận ở đây.
+        Thời gian gói của đơn này sẽ bị trừ lại; hết thời gian thì người dùng về gói Free.</p>
+      <Input.TextArea rows={3} maxLength={300} placeholder="Lý do (vd: chuyển khoản trùng, gói không kích hoạt)" value={reason} onChange={(e) => setReason(e.target.value)} />
+      {refund.isError && <p role="alert">{errorMessage(refund.error)}</p>}
+    </Modal>
+  </Card>;
+}
+
+/** Sản phẩm affiliate: chặn món xấu (hàng giả, shop kém) khỏi Gợi ý mua thêm. */
+function ProductsPanel() {
+  const stats = useAffiliateStats(30);
+  const blocks = useAffiliateBlocks();
+  const toggle = useToggleBlock();
+  const blockedKeys = new Set((blocks.data ?? []).map((b) => `${b.source}:${b.productId}`));
+  return <div className="admin-overview">
+    {(blocks.isError || toggle.isError) && <Card className="admin-panel"><p role="alert">{errorMessage(blocks.error ?? toggle.error)}</p></Card>}
+    <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Được bấm nhiều nhất</h2><p>30 ngày qua. Chặn thì sản phẩm không còn xuất hiện trong Gợi ý mua thêm.</p></div></div>
+      <Table rowKey={(row) => `${row.source}-${row.productId}`} loading={stats.isPending} dataSource={stats.data?.top ?? []} pagination={false} scroll={{ x: 650 }}
+        locale={{ emptyText: 'Chưa có lượt bấm nào' }}
+        columns={[{ title: 'Sản phẩm', dataIndex: 'title' }, { title: 'Sàn', dataIndex: 'source' }, { title: 'Lượt bấm', dataIndex: 'clicks' },
+          { title: '', render: (_, row) => {
+            const blocked = blockedKeys.has(`${row.source}:${row.productId}`);
+            return <Button size="small" danger={!blocked} loading={toggle.isPending && toggle.variables?.productId === row.productId}
+              onClick={() => toggle.mutate({ source: row.source, productId: row.productId, title: row.title, blocked })}>{blocked ? 'Bỏ chặn' : 'Chặn'}</Button>;
+          } }]} />
+    </Card>
+    <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Đã chặn</h2><p>{blocks.data ? `${blocks.data.length} sản phẩm` : 'Đang tải…'}</p></div></div>
+      <Table rowKey={(row) => `${row.source}-${row.productId}`} loading={blocks.isPending} dataSource={blocks.data ?? []} pagination={false} scroll={{ x: 650 }}
+        locale={{ emptyText: 'Chưa chặn sản phẩm nào' }}
+        columns={[{ title: 'Sản phẩm', dataIndex: 'title', render: (t: string, row) => t || row.productId }, { title: 'Sàn', dataIndex: 'source' },
+          { title: 'Chặn lúc', dataIndex: 'blockedAt', render: dateTime },
+          { title: '', render: (_, row) => <Button size="small" onClick={() => toggle.mutate({ ...row, blocked: true })}>Bỏ chặn</Button> }]} />
+    </Card>
+  </div>;
+}
+
+/** Trạng thái hệ thống: dịch vụ ngoài đã cấu hình đủ chưa. Chỉ biết có / không có key, không xem được key. */
+function SystemStatusPanel() {
+  const { billing, outfit, wardrobe } = useSystemStatus();
+  const b = billing.data, o = outfit.data, w = wardrobe.data;
+  const rows: { name: string; ok: boolean | null; detail: string }[] = [
+    { name: 'Thanh toán PayOS', ok: b ? b.paymentGateway === 'payos' && b.payosConfigured : null,
+      detail: !b ? 'billing-service chưa trả lời' : b.payosConfigured ? 'Đã có key, bán gói được' : 'Thiếu key PayOS: bấm mua gói sẽ báo lỗi 503' },
+    { name: 'AI gợi ý outfit (Gemini)', ok: o ? o.geminiConfigured || o.anthropicConfigured : null,
+      detail: !o ? 'outfit-service chưa trả lời' : `Chế độ ${o.aiProvider}; Gemini ${o.geminiConfigured ? 'có' : 'chưa có'} key, Claude dự phòng ${o.anthropicConfigured ? 'có' : 'chưa có'} key` },
+    { name: 'AI nhận diện quần áo', ok: w ? w.geminiConfigured || w.anthropicConfigured : null,
+      detail: !w ? 'wardrobe-service chưa trả lời' : `Chế độ ${w.aiProvider}; Gemini ${w.geminiConfigured ? 'có' : 'chưa có'} key, Claude ${w.anthropicConfigured ? 'có' : 'chưa có'} key` },
+    { name: 'Lưu ảnh tủ đồ', ok: w ? w.imageStorage === 'cloudinary' && w.cloudinaryConfigured : null,
+      detail: !w ? 'wardrobe-service chưa trả lời' : w.imageStorage === 'cloudinary' ? 'Cloudinary' : 'Ổ đĩa máy chủ: ảnh mất mỗi lần service khởi động lại, cần bật Cloudinary' },
+    { name: 'Affiliate (AccessTrade)', ok: o ? o.accessTradeConfigured : null,
+      detail: !o ? 'outfit-service chưa trả lời' : o.accessTradeConfigured ? 'Đã có key, Gợi ý mua thêm đang chạy' : 'Thiếu ACCESSTRADE_API_KEY: Gợi ý mua thêm đang tắt' },
+  ];
+  return <div className="admin-overview">
+    <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Dịch vụ bên ngoài</h2><p>Chỉ cho biết đã có key hay chưa; key được đặt trên Render, không hiện ở đây.</p></div></div>
+      <Table rowKey="name" dataSource={rows} pagination={false} scroll={{ x: 650 }}
+        columns={[{ title: 'Dịch vụ', dataIndex: 'name' },
+          { title: 'Trạng thái', dataIndex: 'ok', render: (ok: boolean | null) => ok === null ? <Tag>Không rõ</Tag> : <Tag color={ok ? 'green' : 'red'}>{ok ? 'Sẵn sàng' : 'Cần cấu hình'}</Tag> },
+          { title: 'Chi tiết', dataIndex: 'detail' }]} />
+    </Card>
+    <AiUsagePanel />
   </div>;
 }
 
@@ -233,9 +363,11 @@ export function AdminDashboardPage() {
         <div className="admin-view-content" key={view}>
           {view === 'overview' && <OverviewPanel onOpenUsers={() => choose('users')} />}
           {view === 'users' && <UsersPanel />}
-          {view === 'revenue' && <RevenuePanel />}
+          {view === 'revenue' && <><RevenuePanel /><OrdersPanel /></>}
+          {view === 'products' && <ProductsPanel />}
+          {view === 'settings' && <SystemStatusPanel />}
           {view === 'affiliate' && <AffiliatePanel />}
-          {!['overview', 'users', 'revenue', 'affiliate'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
+          {!['overview', 'users', 'revenue', 'affiliate', 'products', 'settings'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
         </div>
       </main>
     </div>

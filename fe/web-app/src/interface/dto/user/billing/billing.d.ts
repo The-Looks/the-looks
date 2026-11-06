@@ -288,10 +288,166 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/billing/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Danh sách đơn, mới nhất trước; lọc theo trạng thái, người dùng, mã đơn */
+        get: {
+            parameters: {
+                query?: {
+                    status?: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED";
+                    ownerId?: string;
+                    orderCode?: number;
+                    page?: number;
+                    size?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminOrderPage"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/billing/orders/{orderCode}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** (ADMIN) Ghi nhận đã hoàn tiền (chuyển trả bằng tay) và trừ lại thời gian gói của đơn */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderCode: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Đã hoàn tiền. newExpiry null khi người dùng đã đổi gói khác sau đơn này (admin chỉnh tay) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            order: components["schemas"]["Order"];
+                            /** Format: date-time */
+                            newExpiry?: string | null;
+                        };
+                    };
+                };
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/billing/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Cổng thanh toán đang dùng và đã có key PayOS chưa (không trả giá trị key) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            paymentGateway: string;
+                            payosConfigured: boolean;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AdminOrderPage: {
+            /** Format: int64 */
+            total: number;
+            page: number;
+            size: number;
+            items: {
+                /** Format: int64 */
+                orderCode: number;
+                /** Format: uuid */
+                ownerId: string;
+                plan: components["schemas"]["Plan"];
+                period: components["schemas"]["BillingPeriod"];
+                /** Format: int64 */
+                amountVnd: number;
+                /** @enum {string} */
+                status: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED";
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                paidAt?: string | null;
+                /** Format: date-time */
+                refundedAt?: string | null;
+                refundReason?: string | null;
+            }[];
+        };
         BillingStats: {
             /** Format: int64 */
             plusSubscribers: number;
@@ -359,7 +515,7 @@ export interface components {
             /** Format: int64 */
             amountVnd: number;
             /** @enum {string} */
-            status: "PENDING" | "PAID" | "CANCELLED";
+            status: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED";
             /** Format: uri */
             checkoutUrl?: string;
             /** Format: date-time */

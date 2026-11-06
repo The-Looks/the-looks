@@ -307,6 +307,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/wardrobe/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Cấu hình lưu ảnh và AI nhận diện (chỉ báo có / không có key) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            aiProvider: string;
+                            geminiConfigured: boolean;
+                            anthropicConfigured: boolean;
+                            imageStorage: string;
+                            cloudinaryConfigured: boolean;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {

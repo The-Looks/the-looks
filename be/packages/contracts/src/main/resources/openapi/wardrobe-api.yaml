@@ -131,6 +131,23 @@ paths:
               schema: { $ref: '#/components/schemas/WardrobeItem' }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
 
+  /api/admin/wardrobe/status:
+    get:
+      summary: (ADMIN) Cấu hình lưu ảnh và AI nhận diện (chỉ báo có / không có key)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [aiProvider, geminiConfigured, anthropicConfigured, imageStorage, cloudinaryConfigured]
+                properties:
+                  aiProvider: { type: string }
+                  geminiConfigured: { type: boolean }
+                  anthropicConfigured: { type: boolean }
+                  imageStorage: { type: string }
+                  cloudinaryConfigured: { type: boolean }
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }

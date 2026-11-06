@@ -384,6 +384,139 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/outfits/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Cấu hình AI và affiliate (chỉ báo có / không có key) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            aiProvider: string;
+                            geminiConfigured: boolean;
+                            anthropicConfigured: boolean;
+                            accessTradeConfigured: boolean;
+                            aiBudgetUsd: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/outfits/affiliate-blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Sản phẩm bị chặn khỏi Gợi ý mua thêm */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            source: string;
+                            productId: string;
+                            title: string;
+                            /** Format: uuid */
+                            blockedBy: string;
+                            /** Format: date-time */
+                            blockedAt: string;
+                        }[];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** (ADMIN) Chặn một sản phẩm */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        source: string;
+                        productId: string;
+                        title?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Đã chặn */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        /** (ADMIN) Bỏ chặn */
+        delete: {
+            parameters: {
+                query: {
+                    source: string;
+                    productId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Đã bỏ chặn */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/outfits/ai-usage": {
         parameters: {
             query?: never;

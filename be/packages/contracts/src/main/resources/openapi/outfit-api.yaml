@@ -148,6 +148,64 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/AffiliateStats' }
+  /api/admin/outfits/status:
+    get:
+      summary: (ADMIN) Cấu hình AI và affiliate (chỉ báo có / không có key)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [aiProvider, geminiConfigured, anthropicConfigured, accessTradeConfigured, aiBudgetUsd]
+                properties:
+                  aiProvider: { type: string }
+                  geminiConfigured: { type: boolean }
+                  anthropicConfigured: { type: boolean }
+                  accessTradeConfigured: { type: boolean }
+                  aiBudgetUsd: { type: number }
+  /api/admin/outfits/affiliate-blocks:
+    get:
+      summary: (ADMIN) Sản phẩm bị chặn khỏi Gợi ý mua thêm
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [source, productId, title, blockedBy, blockedAt]
+                  properties:
+                    source: { type: string }
+                    productId: { type: string }
+                    title: { type: string }
+                    blockedBy: { type: string, format: uuid }
+                    blockedAt: { type: string, format: date-time }
+    post:
+      summary: (ADMIN) Chặn một sản phẩm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [source, productId]
+              properties:
+                source: { type: string, maxLength: 30 }
+                productId: { type: string, maxLength: 64 }
+                title: { type: string, maxLength: 300 }
+      responses:
+        '204': { description: Đã chặn }
+    delete:
+      summary: (ADMIN) Bỏ chặn
+      parameters:
+        - { name: source, in: query, required: true, schema: { type: string } }
+        - { name: productId, in: query, required: true, schema: { type: string } }
+      responses:
+        '204': { description: Đã bỏ chặn }
   /api/admin/outfits/ai-usage:
     get:
       summary: (ADMIN) Chi phí gọi AI tháng này so với ngân sách, 10 người dùng tốn nhiều nhất

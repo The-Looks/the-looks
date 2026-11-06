@@ -108,10 +108,89 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/BillingStats' }
         '403': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/admin/billing/orders:
+    get:
+      summary: (ADMIN) Danh sách đơn, mới nhất trước; lọc theo trạng thái, người dùng, mã đơn
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [PENDING, PAID, CANCELLED, REFUNDED] } }
+        - { name: ownerId, in: query, schema: { type: string, format: uuid } }
+        - { name: orderCode, in: query, schema: { type: integer, format: int64 } }
+        - { name: page, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+        - { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminOrderPage' }
+  /api/admin/billing/orders/{orderCode}/refund:
+    post:
+      summary: (ADMIN) Ghi nhận đã hoàn tiền (chuyển trả bằng tay) và trừ lại thời gian gói của đơn
+      parameters:
+        - { name: orderCode, in: path, required: true, schema: { type: integer, format: int64 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, maxLength: 300 }
+      responses:
+        '200':
+          description: Đã hoàn tiền. newExpiry null khi người dùng đã đổi gói khác sau đơn này (admin chỉnh tay)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [order]
+                properties:
+                  order: { $ref: '#/components/schemas/Order' }
+                  newExpiry: { type: [string, 'null'], format: date-time }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/admin/billing/status:
+    get:
+      summary: (ADMIN) Cổng thanh toán đang dùng và đã có key PayOS chưa (không trả giá trị key)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [paymentGateway, payosConfigured]
+                properties:
+                  paymentGateway: { type: string }
+                  payosConfigured: { type: boolean }
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
   schemas:
+    AdminOrderPage:
+      type: object
+      required: [items, total, page, size]
+      properties:
+        total: { type: integer, format: int64 }
+        page: { type: integer }
+        size: { type: integer }
+        items:
+          type: array
+          items:
+            type: object
+            required: [orderCode, ownerId, plan, period, amountVnd, status, createdAt]
+            properties:
+              orderCode: { type: integer, format: int64 }
+              ownerId: { type: string, format: uuid }
+              plan: { $ref: '#/components/schemas/Plan' }
+              period: { $ref: '#/components/schemas/BillingPeriod' }
+              amountVnd: { type: integer, format: int64 }
+              status: { type: string, enum: [PENDING, PAID, CANCELLED, REFUNDED] }
+              createdAt: { type: string, format: date-time }
+              paidAt: { type: [string, 'null'], format: date-time }
+              refundedAt: { type: [string, 'null'], format: date-time }
+              refundReason: { type: [string, 'null'] }
     BillingStats:
       type: object
       required: [plusSubscribers, proSubscribers, paidOrders, revenueVnd, daily]
@@ -173,7 +252,7 @@ components:
         plan: { $ref: '#/components/schemas/Plan' }
         period: { $ref: '#/components/schemas/BillingPeriod' }
         amountVnd: { type: integer, format: int64 }
-        status: { type: string, enum: [PENDING, PAID, CANCELLED] }
+        status: { type: string, enum: [PENDING, PAID, CANCELLED, REFUNDED] }
         checkoutUrl: { type: string, format: uri }
         createdAt: { type: string, format: date-time }
         paidAt: { type: [string, 'null'], format: date-time }
