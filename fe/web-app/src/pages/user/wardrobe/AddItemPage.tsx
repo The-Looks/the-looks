@@ -1,18 +1,20 @@
 import { useState, type ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
-import { Card, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { BatchReview } from '../../../components/user/wardrobe/BatchReview';
 import { useScan, useStartScan } from '../../../hooks/user/wardrobe/api';
 
 const MAX_IMAGES = 10;
 
 /**
  * Chụp hoặc chọn tối đa 10 ảnh. Mỗi ảnh có thể có nhiều món: AI tách từng món, cắt ảnh riêng,
- * người dùng xác nhận từng món. Trên điện thoại ô chọn ảnh mở thẳng camera sau.
+ * người dùng chọn và xác nhận nhiều món cùng lúc. Trên điện thoại ô chọn ảnh mở thẳng camera sau.
  */
-export function AddItemPage() {
+export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean; onConfirmed?: () => void } = {}) {
   const start = useStartScan();
-  const [scanId, setScanId] = useState<string | null>(null);
+  const [params, setParams] = useSearchParams();
+  const [scanId, setScanId] = useState<string | null>(() => guided ? params.get('scan') : null);
   const [tooMany, setTooMany] = useState(false);
   const scan = useScan(scanId);
 
@@ -21,7 +23,10 @@ export function AddItemPage() {
     e.target.value = '';
     if (files.length === 0) return;
     setTooMany(files.length > MAX_IMAGES);
-    start.mutate(files.slice(0, MAX_IMAGES), { onSuccess: (s) => setScanId(s.id) });
+    start.mutate(files.slice(0, MAX_IMAGES), { onSuccess: (s) => {
+      setScanId(s.id);
+      if (guided) setParams((current) => { const next = new URLSearchParams(current); next.set('scan', s.id); return next; }, { replace: true });
+    } });
   };
 
   const processing = start.isPending || scan.data?.status === 'PROCESSING';
@@ -29,11 +34,11 @@ export function AddItemPage() {
 
   return (
     <div className="stack-lg">
-      <PageHeader
+      {!guided && <PageHeader
         title="Thêm món đồ"
         back={{ to: '/wardrobe', label: 'Tủ đồ' }}
         sub="Chụp cả bộ đang mặc hoặc trải nhiều món ra chụp một lần: AI tự tách từng món, bạn chỉ cần kiểm tra lại."
-      />
+      />}
       <Card>
         <div className="row">
           <label htmlFor="add-photos" className="btn" style={{ cursor: processing ? 'wait' : 'pointer' }}>
@@ -77,18 +82,7 @@ export function AddItemPage() {
         </Notice>
       )}
 
-      {items.length > 0 && (
-        <section className="stack">
-          <h2>Tìm thấy {items.length} món · bấm từng món để xác nhận</h2>
-          <div className="grid-tiles">
-            {items.map((item) => (
-              <Link key={item.id} to={`/wardrobe/${item.id}`}>
-                <ItemTile category={item.category} imageUrl={item.imageUrl} label="Xem và xác nhận" />
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      {scan.data?.status === 'DONE' && items.length > 0 && <BatchReview key={scanId} items={items} onConfirmed={onConfirmed} guided={guided} />}
     </div>
   );
 }

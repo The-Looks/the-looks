@@ -69,7 +69,8 @@ export function useScan(scanId: string | null) {
     enabled: scanId !== null,
     queryFn: async () => {
       const scan = await wardrobeRequests.scan(scanId!);
-      if (scan.status !== 'PROCESSING') qc.invalidateQueries({ queryKey: wardrobeKeys.all });
+      // Chỉ làm mới danh sách: invalidate cả scan đang chạy sẽ tự huỷ/refetch liên tục.
+      if (scan.status !== 'PROCESSING') void qc.invalidateQueries({ queryKey: ['wardrobe', 'list'] });
       return scan;
     },
     refetchInterval: (q) => (q.state.data?.status === 'PROCESSING' ? 2000 : false),
@@ -96,6 +97,14 @@ export function useDelete() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: wardrobeRequests.remove,
+    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+  });
+}
+
+export function useConfirmAll() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: wardrobeRequests.confirmAll,
     onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
   });
 }

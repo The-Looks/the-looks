@@ -7,6 +7,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HexFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.thelooks.wardrobe.application.port.out.ClothingItemRepository;
 import vn.thelooks.wardrobe.application.port.out.GarmentDetector;
 import vn.thelooks.wardrobe.application.port.out.ImageCropper;
@@ -160,6 +162,27 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
     @Override
     public Optional<ClothingItem> get(UUID ownerId, UUID itemId) {
         return items.findById(itemId).filter(i -> i.ownerId().equals(ownerId));
+    }
+
+    @Override
+    @Transactional
+    public List<ClothingItem> confirmAll(UUID ownerId, List<Confirmation> confirmations) {
+        if (confirmations == null || confirmations.isEmpty() || confirmations.size() > 100) {
+            throw new InvalidItemStateException("Chọn từ 1 đến 100 món mỗi lần xác nhận");
+        }
+        Set<UUID> ids = new HashSet<>();
+        List<ClothingItem> reviewed = new ArrayList<>();
+        for (Confirmation confirmation : confirmations) {
+            if (confirmation == null || confirmation.itemId() == null || !ids.add(confirmation.itemId())) {
+                throw new InvalidItemStateException("Danh sách món đồ không hợp lệ hoặc bị trùng");
+            }
+            ClothingItem item = owned(ownerId, confirmation.itemId());
+            if (item.status() != ItemStatus.PENDING_REVIEW && item.status() != ItemStatus.RECOGNITION_FAILED) {
+                throw new InvalidItemStateException("Có món không còn ở trạng thái chờ xác nhận. Hãy tải lại danh sách.");
+            }
+            reviewed.add(item.withStatus(ItemStatus.CONFIRMED, requireCategory(confirmation.attributes())));
+        }
+        return reviewed.stream().map(items::save).toList();
     }
 
     @Override

@@ -175,6 +175,24 @@ paths:
       responses:
         '204': { description: Đã xoá }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/confirm:
+    post:
+      summary: Xác nhận 1–100 món cùng lúc, kèm chỉnh sửa thuộc tính
+      description: Kiểm tra quyền sở hữu và trạng thái mọi món trước khi lưu. Lỗi bất kỳ món nào thì không lưu món nào. ID trùng hoặc trạng thái không hợp lệ trả 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmItemsRequest' }
+      responses:
+        '200':
+          description: Các món đã xác nhận, theo thứ tự request
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/wardrobe/items/{itemId}/confirm:
     parameters:
       - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
@@ -269,6 +287,20 @@ components:
     ItemStatus: { type: string, enum: [PROCESSING, PENDING_REVIEW, CONFIRMED, RECOGNITION_FAILED] }
     Category: { type: string, enum: [TOP, BOTTOM, DRESS, OUTERWEAR, SHOES, BAG, ACCESSORY] }
     Season: { type: string, enum: [SPRING, SUMMER, AUTUMN, WINTER] }
+    ConfirmItemsRequest:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: object
+            required: [itemId, attributes]
+            properties:
+              itemId: { type: string, format: uuid }
+              attributes: { $ref: '#/components/schemas/ClothingAttributes' }
     ClothingAttributes:
       type: object
       properties:

@@ -34,6 +34,7 @@ const GuestLandingPage = lazy(() => import('../pages/guest/voting/GuestLandingPa
 const WardrobeStatsPage = lazy(() => import('../pages/user/wardrobe/WardrobeStatsPage').then((m) => ({ default: m.WardrobeStatsPage })));
 const AddItemPage = lazy(() => import('../pages/user/wardrobe/AddItemPage').then((m) => ({ default: m.AddItemPage })));
 const ItemDetailPage = lazy(() => import('../pages/user/wardrobe/ItemDetailPage').then((m) => ({ default: m.ItemDetailPage })));
+const OnboardingWardrobePage = lazy(() => import('../pages/user/wardrobe/OnboardingWardrobePage').then((m) => ({ default: m.OnboardingWardrobePage })));
 const WardrobePage = lazy(() => import('../pages/user/wardrobe/WardrobePage').then((m) => ({ default: m.WardrobePage })));
 const HomePage = lazy(() => import('../pages/user/home/HomePage').then((m) => ({ default: m.HomePage })));
 const PublicHomePage = lazy(() => import('../pages/guest/home/PublicHomePage').then((m) => ({ default: m.PublicHomePage })));
@@ -69,6 +70,7 @@ export const router = createBrowserRouter([{ element: <RouteMotionLayout />, chi
         element: <AppShell />,
         children: [
           { path: 'onboarding', element: <StylePreferencesPage /> },
+          { path: 'onboarding/wardrobe', element: <OnboardingWardrobePage /> },
           { path: 'wardrobe', element: <WardrobePage /> },
           { path: 'wardrobe/stats', element: <WardrobeStatsPage /> },
           { path: 'wardrobe/add', element: <AddItemPage /> },
