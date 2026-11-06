@@ -43,6 +43,9 @@ thelooks:
     # auto = Gemini chính, Gemini model dự phòng rồi Claude; none = chỉ xếp theo điểm (dev)
     provider: ${AI_PROVIDER:auto}
     model: ${AI_MODEL:claude-haiku-5-5}
+    # Gemini: model nhanh nhất làm chính (đổi trên Render bằng GEMINI_MODEL / GEMINI_BACKUP_MODEL, không cần sửa code)
+    gemini-model: ${GEMINI_MODEL:gemini-3.5-flash-lite}
+    gemini-backup-model: ${GEMINI_BACKUP_MODEL:gemini-3.1-flash-lite}
     monthly-budget-usd: ${AI_MONTHLY_BUDGET_USD:25}
   affiliate:
     # "Gợi ý mua thêm" trên TikTok Shop qua AccessTrade. Để trống = tắt tính năng

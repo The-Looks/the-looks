@@ -31,8 +31,8 @@ class GeminiGarmentDetector implements GarmentDetector {
     private final GarmentDetector claude;
 
     GeminiGarmentDetector(ObjectMapper mapper, @Value("${GEMINI_API_KEY:}") String key,
-            @Value("${thelooks.ai.gemini-model:gemini-3.8-flash}") String primary,
-            @Value("${thelooks.ai.gemini-backup-model:gemini-3.5-flash-lite}") String backup,
+            @Value("${thelooks.ai.gemini-model:gemini-3.5-flash-lite}") String primary,
+            @Value("${thelooks.ai.gemini-backup-model:gemini-3.1-flash-lite}") String backup,
             @Value("${ANTHROPIC_API_KEY:}") String claudeKey,
             @Value("${thelooks.ai.model}") String claudeModel) {
         this.mapper = mapper;

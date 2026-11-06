@@ -33,8 +33,8 @@ class GeminiOutfitAdvisor implements OutfitAiAdvisor {
     private final OutfitAiAdvisor claude;
 
     GeminiOutfitAdvisor(ObjectMapper mapper, @Value("${GEMINI_API_KEY:}") String key,
-            @Value("${thelooks.ai.gemini-model:gemini-3.8-flash}") String primary,
-            @Value("${thelooks.ai.gemini-backup-model:gemini-3.5-flash-lite}") String backup,
+            @Value("${thelooks.ai.gemini-model:gemini-3.5-flash-lite}") String primary,
+            @Value("${thelooks.ai.gemini-backup-model:gemini-3.1-flash-lite}") String backup,
             @Value("${ANTHROPIC_API_KEY:}") String claudeKey,
             @Value("${thelooks.ai.model}") String claudeModel) {
         this.mapper = mapper;
@@ -77,13 +77,21 @@ class GeminiOutfitAdvisor implements OutfitAiAdvisor {
             long inputTokens = usage.path("promptTokenCount").asLong();
             long outputTokens = Math.max(usage.path("candidatesTokenCount").asLong(),
                     usage.path("totalTokenCount").asLong() - inputTokens);
-            // Standard paid-tier estimate as of Nov 2026; includes thinking tokens.
-            double inputRate = model.equals(backup) ? 0.30 : 0.75;
-            double outputRate = model.equals(backup) ? 2.50 : 3.75;
-            double costUsd = (inputTokens * inputRate + outputTokens * outputRate) / 1_000_000.0;
+            double[] rate = pricePerMillion(model);
+            double costUsd = (inputTokens * rate[0] + outputTokens * rate[1]) / 1_000_000.0;
             return new Advice(ClaudeOutfitAdvisor.apply(picks, candidates.stream().limit(12).toList(), limit),
                     new AiUsage(model, inputTokens, outputTokens, costUsd));
         }
         throw new IllegalStateException("Gemini returned no JSON text");
+    }
+
+    /**
+     * USD / 1 triệu token [input, output], giá Standard trả phí (aistudio.google.com/docs/pricing, 11/2026), gồm cả token suy nghĩ.
+     * Model lạ tính theo giá Flash (cao hơn) để ngân sách AI không bị đếm thiếu.
+     */
+    static double[] pricePerMillion(String model) {
+        if (model.contains("3.1-flash-lite")) return new double[] {0.25, 1.50};
+        if (model.contains("flash-lite")) return new double[] {0.30, 2.50};
+        return new double[] {0.75, 3.75};
     }
 }
