@@ -34,4 +34,23 @@ class OutfitWearHistoryReaderTest {
         server.expect(requestTo("http://outfit/api/app/outfits/wear-summary")).andRespond(withSuccess("[]", MediaType.APPLICATION_JSON));
         assertThat(reader.lastWornAt(UUID.randomUUID())).isEmpty();
     }
+    @Test
+    void exposesActualCountsForCostCalculation() {
+        UUID id = UUID.randomUUID();
+        server.expect(requestTo("http://outfit/api/app/outfits/wear-summary")).andRespond(withSuccess(
+                "[{\"itemId\":\"" + id + "\",\"wearCount\":10,\"lastWornAt\":\"2026-11-01T00:00:00Z\"}]", MediaType.APPLICATION_JSON));
+        assertThat(reader.wearCounts(UUID.randomUUID())).containsEntry(id, 10L);
+    }
+    @Test
+    void rejectsMissingCountsRatherThanDefaultingToNeverWorn() {
+        server.expect(requestTo("http://outfit/api/app/outfits/wear-summary")).andRespond(withSuccess(
+                "[{\"itemId\":\"" + UUID.randomUUID() + "\",\"lastWornAt\":\"2026-11-01T00:00:00Z\"}]", MediaType.APPLICATION_JSON));
+        assertThatThrownBy(() -> reader.wearCounts(UUID.randomUUID())).isInstanceOf(WearHistoryUnavailableException.class);
+    }
+    @Test
+    void rejectsNegativeCounts() {
+        server.expect(requestTo("http://outfit/api/app/outfits/wear-summary")).andRespond(withSuccess(
+                "[{\"itemId\":\"" + UUID.randomUUID() + "\",\"wearCount\":-1}]", MediaType.APPLICATION_JSON));
+        assertThatThrownBy(() -> reader.wearCounts(UUID.randomUUID())).isInstanceOf(WearHistoryUnavailableException.class);
+    }
 }

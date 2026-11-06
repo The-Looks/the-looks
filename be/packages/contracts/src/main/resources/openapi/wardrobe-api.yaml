@@ -27,6 +27,33 @@ paths:
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+  /api/app/wardrobe/cost-per-wear:
+    get:
+      summary: Chi phí mỗi lần mặc của các món đã xác nhận (Pro)
+      description: Cần COST_PER_WEAR; giá mua chia số lần mặc, HALF_UP 2 số thập phân VND. Tối đa 10 món, ưu tiên chi phí cao nhất rồi món thiếu dữ liệu. totalItems là toàn bộ món đã xác nhận. Chỉ 1 lần đọc lịch sử cho cả danh sách.
+      responses:
+        '200':
+          description: Số liệu của chủ JWT, không cache
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CostPerWearSummary' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/{itemId}/cost-per-wear:
+    get:
+      summary: Chi phí mỗi lần mặc của một món đã xác nhận (Pro)
+      parameters:
+        - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Chi phí hoặc trạng thái chưa tính được
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CostPerWearItem' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/wardrobe/stats:
     get:
       summary: Thống kê tủ đồ Pro của chủ JWT
@@ -188,6 +215,20 @@ components:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
     cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
+    CostPerWearItem:
+      type: object
+      required: [item, wearCount, costPerWear, status]
+      properties:
+        item: { $ref: '#/components/schemas/WardrobeItem' }
+        wearCount: { type: integer, format: int64, minimum: 0 }
+        costPerWear: { type: [number, 'null'], minimum: 0, description: VND mỗi lần mặc, 2 số thập phân; null khi thiếu giá hoặc chưa mặc }
+        status: { type: string, enum: [CALCULATED, MISSING_PRICE, NEVER_WORN] }
+    CostPerWearSummary:
+      type: object
+      required: [items, totalItems]
+      properties:
+        items: { type: array, maxItems: 10, items: { $ref: '#/components/schemas/CostPerWearItem' } }
+        totalItems: { type: integer, format: int64 }
     StatsCount:
       type: object
       required: [key, count]

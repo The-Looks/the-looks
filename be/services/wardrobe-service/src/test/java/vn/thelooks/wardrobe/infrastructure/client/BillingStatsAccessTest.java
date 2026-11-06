@@ -34,4 +34,14 @@ class BillingStatsAccessTest {
         server.expect(requestTo("http://billing/api/app/billing/me")).andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
         assertThatThrownBy(access::requireAccess).isInstanceOf(StatsAccessUnavailableException.class);
     }
+    @Test
+    void costFeatureIsCheckedIndependentlyOfWardrobeStats() {
+        server.expect(requestTo("http://billing/api/app/billing/me")).andRespond(withSuccess("{\"features\":[\"WARDROBE_STATS\"]}", MediaType.APPLICATION_JSON));
+        assertThatThrownBy(access::requireCostAccess).isInstanceOf(vn.thelooks.wardrobe.application.port.out.CostPerWearAccessDeniedException.class);
+    }
+    @Test
+    void grantsCostAccessForTheCostFeature() {
+        server.expect(requestTo("http://billing/api/app/billing/me")).andRespond(withSuccess("{\"features\":[\"COST_PER_WEAR\"]}", MediaType.APPLICATION_JSON));
+        assertThatCode(access::requireCostAccess).doesNotThrowAnyException();
+    }
 }
