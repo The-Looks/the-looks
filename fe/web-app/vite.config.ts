@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
         // Bản demo dùng service worker của MSW; hai service worker cùng scope sẽ đè nhau.
         disable: !!env.VITE_MOCK_SERVICES,
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.svg', 'assets/animations/looksy-hanger.gif', 'assets/animations/looksy-hanger.png'],
+        includeAssets: ['favicon.svg', 'assets/animations/looksy-hanger.webp', 'assets/animations/looksy-hanger.png'],
         manifest: {
           name: 'The Looks',
           short_name: 'The Looks',
@@ -54,6 +54,15 @@ export default defineConfig(({ mode }) => {
         workbox: {
           navigateFallbackDenylist: [/^\/api\//],
           globIgnores: ['**/mockServiceWorker.js'],
+          runtimeCaching: [{
+            urlPattern: /\/(?:assets\/.*\.(?:webp|png|jpe?g|gif)|the-looks-logo\.webp)(?:\?.*)?$/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'thelooks-images',
+              expiration: { maxEntries: 80, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          }],
         },
       }),
     ],

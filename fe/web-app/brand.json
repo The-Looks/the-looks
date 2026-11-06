@@ -26,23 +26,23 @@
     "head": "Plus Jakarta Sans",
     "body": "Inter",
     "files": {
-      "head600": "/assets/fonts/head-600.ttf",
-      "head700": "/assets/fonts/head-700.ttf",
-      "head800": "/assets/fonts/head-800.ttf",
-      "body400": "/assets/fonts/body-400.ttf",
-      "body500": "/assets/fonts/body-500.ttf",
-      "body600": "/assets/fonts/body-600.ttf",
-      "body700": "/assets/fonts/body-700.ttf"
+      "head600": "/assets/fonts/head-600.woff2",
+      "head700": "/assets/fonts/head-700.woff2",
+      "head800": "/assets/fonts/head-800.woff2",
+      "body400": "/assets/fonts/body-400.woff2",
+      "body500": "/assets/fonts/body-500.woff2",
+      "body600": "/assets/fonts/body-600.woff2",
+      "body700": "/assets/fonts/body-700.woff2"
     },
     "sizes": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 34, 35, 36, 38, 48, 52, 54, 57],
     "weights": { "regular": 400, "medium": 500, "semibold": 600, "bold": 700, "extrabold": 800 }
   },
   "radius": { "sm": 10, "md": 14, "lg": 20, "pill": 999 },
   "assets": {
-    "logo": "/the-looks-logo.png",
-    "quickPick": "/assets/home/quick-pick-editorial.png",
-    "authWall": "/assets/auth/clothing-wall.png",
-    "hangerMotion": "/assets/animations/looksy-hanger.gif",
+    "logo": "/the-looks-logo.webp",
+    "quickPick": "/assets/home/quick-pick-editorial.webp",
+    "authWall": "/assets/auth/clothing-wall.webp",
+    "hangerMotion": "/assets/animations/looksy-hanger.webp",
     "hangerStill": "/assets/animations/looksy-hanger.png"
   },
   "content": {

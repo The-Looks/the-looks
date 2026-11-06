@@ -36,7 +36,7 @@ export function applyBrandToDocument() {
   const style = document.createElement('style');
   style.dataset.brandFonts = 'true';
   style.textContent = fontFaces.map(([family, weight, file]) =>
-    `@font-face { font-family: '${family}'; src: url('${file}') format('truetype'); font-style: normal; font-weight: ${weight}; font-display: swap; }`,
+    `@font-face { font-family: '${family}'; src: url('${file}') format('woff2'); font-style: normal; font-weight: ${weight}; font-display: swap; }`,
   ).join('\n');
   document.head.appendChild(style);
 }
