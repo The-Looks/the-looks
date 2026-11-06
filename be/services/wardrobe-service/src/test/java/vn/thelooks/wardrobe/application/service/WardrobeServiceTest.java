@@ -20,6 +20,8 @@ import vn.thelooks.wardrobe.application.port.out.ImageCropper;
 import vn.thelooks.wardrobe.application.port.out.ImageStorage;
 import vn.thelooks.wardrobe.application.port.out.ScanRepository;
 import vn.thelooks.wardrobe.application.usecase.GetWardrobeQuery.Filter;
+import vn.thelooks.wardrobe.application.usecase.ReviewClothingItemUseCase.Confirmation;
+import vn.thelooks.wardrobe.domain.exception.ClothingItemNotFoundException;
 import vn.thelooks.wardrobe.application.usecase.ScanClothingUseCase.UploadedImage;
 import vn.thelooks.wardrobe.domain.exception.InvalidImageException;
 import vn.thelooks.wardrobe.domain.exception.InvalidItemStateException;
@@ -149,6 +151,55 @@ class WardrobeServiceTest {
         service.delete(USER, item.id());
         assertThat(service.get(USER, item.id())).isEmpty();
         assertThat(deletedImages).containsExactly(item.imageKey());
+    }
+
+    @Test
+    void confirmsMultipleItemsWithTheirEditedAttributesInRequestOrder() {
+        var scanned = service.scan(USER, service.start(USER, photos(1)).id()).orElseThrow().items();
+        var edits = new ClothingAttributes(Category.OUTERWEAR, List.of("black"), "cotton", Set.of(), Set.of());
+        var saved = service.confirmAll(USER, List.of(new Confirmation(scanned.get(1).id(), edits),
+                new Confirmation(scanned.get(0).id(), scanned.get(0).attributes())));
+        assertThat(saved).extracting(ClothingItem::id).containsExactly(scanned.get(1).id(), scanned.get(0).id());
+        assertThat(saved).allMatch(item -> item.status() == ItemStatus.CONFIRMED);
+        assertThat(service.get(USER, scanned.get(1).id()).orElseThrow().attributes()).isEqualTo(edits);
+    }
+
+    @Test
+    void batchRejectsForeignOrMissingItemsWithoutSavingAnyItem() {
+        var scanned = service.scan(USER, service.start(USER, photos(1)).id()).orElseThrow().items();
+        var first = new Confirmation(scanned.get(0).id(), scanned.get(0).attributes());
+        var foreign = scanned.get(1);
+        itemStore.put(foreign.id(), new ClothingItem(foreign.id(), UUID.randomUUID(), foreign.imageKey(),
+                foreign.status(), foreign.attributes(), foreign.scanId(), foreign.confidence(), foreign.createdAt()));
+        assertThatThrownBy(() -> service.confirmAll(USER, List.of(first, new Confirmation(foreign.id(), foreign.attributes()))))
+                .isInstanceOf(ClothingItemNotFoundException.class);
+        assertThatThrownBy(() -> service.confirmAll(USER, List.of(first, new Confirmation(UUID.randomUUID(), foreign.attributes()))))
+                .isInstanceOf(ClothingItemNotFoundException.class);
+        assertThat(itemStore.get(first.itemId()).status()).isEqualTo(ItemStatus.PENDING_REVIEW);
+    }
+
+    @Test
+    void batchRejectsDuplicatesInvalidAttributesAndStaleStatesWithoutPartialSaves() {
+        var scanned = service.scan(USER, service.start(USER, photos(1)).id()).orElseThrow().items();
+        var first = new Confirmation(scanned.get(0).id(), scanned.get(0).attributes());
+        var second = new Confirmation(scanned.get(1).id(), scanned.get(1).attributes());
+        assertThatThrownBy(() -> service.confirmAll(USER, List.of(first, first))).isInstanceOf(InvalidItemStateException.class);
+        assertThatThrownBy(() -> service.confirmAll(USER, List.of(first, new Confirmation(second.itemId(), null))))
+                .isInstanceOf(InvalidItemStateException.class);
+        service.confirm(USER, second.itemId(), second.attributes());
+        assertThatThrownBy(() -> service.confirmAll(USER, List.of(first, second))).isInstanceOf(InvalidItemStateException.class);
+        assertThat(itemStore.get(first.itemId()).status()).isEqualTo(ItemStatus.PENDING_REVIEW);
+    }
+
+    @Test
+    void batchValidatesSizeAndAcceptsRecognitionFailedItems() {
+        assertThatThrownBy(() -> service.confirmAll(USER, List.of())).isInstanceOf(InvalidItemStateException.class);
+        var item = service.scan(USER, service.start(USER, photos(1)).id()).orElseThrow().items().getFirst();
+        var entry = new Confirmation(item.id(), item.attributes());
+        assertThatThrownBy(() -> service.confirmAll(USER, java.util.Collections.nCopies(101, entry)))
+                .isInstanceOf(InvalidItemStateException.class);
+        itemStore.put(item.id(), item.withStatus(ItemStatus.RECOGNITION_FAILED, item.attributes()));
+        assertThat(service.confirmAll(USER, List.of(entry)).getFirst().status()).isEqualTo(ItemStatus.CONFIRMED);
     }
 
     class ItemRepo implements ClothingItemRepository {
