@@ -4,6 +4,7 @@ import type { WardrobeFilters } from './filters';
 import { normalizeUpload } from './normalizeUpload';
 
 export const wardrobeRequests = {
+  stats: (signal?: AbortSignal) => unwrap(wardrobeApi.GET('/api/app/wardrobe/stats', { signal })),
   search: (filters: WardrobeFilters, signal?: AbortSignal) =>
     unwrap(wardrobeApi.GET('/api/app/wardrobe/items/search', { params: { query: filters }, signal })),
   items: (status?: ItemStatus, category?: Category) =>

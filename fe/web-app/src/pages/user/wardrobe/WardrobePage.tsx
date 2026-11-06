@@ -29,7 +29,7 @@ export function WardrobePage() {
   const pages = data ? Math.ceil(data.total / filters.size) : 0;
   return <div className="stack-lg">
     <PageHeader title="Tủ đồ của tôi" sub={data ? `${data.total} món${active ? ' phù hợp' : ''}` : undefined}
-      action={<ButtonLink to="/wardrobe/add" small>+ Thêm món</ButtonLink>} />
+      action={<div className="row"><ButtonLink to="/wardrobe/stats" kind="outline" small>Thống kê Pro</ButtonLink><ButtonLink to="/wardrobe/add" small>+ Thêm món</ButtonLink></div>} />
     <section className="wardrobe-filters" aria-label="Tìm và lọc tủ đồ">
       <Field id="filter-q" label="Tìm món đồ" type="search" maxLength={100} value={filters.q ?? ''} onChange={(event) => change('q', event.target.value)} placeholder="Loại đồ, màu, chất liệu, phong cách…" />
       {select('category', 'Loại đồ', CATEGORY_LABEL)}

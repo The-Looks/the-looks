@@ -11,6 +11,16 @@ export const wardrobeKeys = {
   item: (id: string) => ['wardrobe', 'item', id] as const,
 };
 
+export function useWardrobeStats(enabled: boolean) {
+  return useQuery({
+    queryKey: ['wardrobe', 'stats'],
+    queryFn: ({ signal }) => wardrobeRequests.stats(signal),
+    enabled,
+    gcTime: 0,
+    retry: false,
+  });
+}
+
 export function useWardrobeSearch(filters: WardrobeFilters) {
   return useQuery({
     queryKey: ['wardrobe', 'list', 'search', filters],

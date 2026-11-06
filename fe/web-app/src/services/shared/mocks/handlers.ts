@@ -77,6 +77,28 @@ const guessCategories: Category[] = ['TOP', 'BOTTOM', 'DRESS', 'SHOES'];
 
 const wearHistory = new Map<string, { wearCount: number; lastWornAt: string }>();
 const wardrobe: HttpHandler[] = [
+  http.get('*/api/app/wardrobe/stats', () => {
+    if (!([...entitlements().features] as readonly string[]).includes('WARDROBE_STATS')) return problem(403, 'Thống kê tủ đồ cần gói Pro');
+    const all = closet.filter((item) => item.status === 'CONFIRMED');
+    const groups = (category: boolean) => {
+      const counts = new Map<string, number>();
+      all.forEach((item) => {
+        const values = category ? [item.category ?? 'UNKNOWN'] : [...new Set(item.colors?.map((color) => color.trim().toLowerCase()).filter(Boolean))];
+        (values.length ? values : ['UNKNOWN']).forEach((key) => counts.set(key, (counts.get(key) ?? 0) + 1));
+      });
+      return [...counts].map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count || a.key.localeCompare(b.key));
+    };
+    const now = Date.now();
+    const wornItems = all.filter((item) => wearHistory.has(item.id)).length;
+    const unused = all.map((item) => {
+      const lastWornAt = wearHistory.get(item.id)?.lastWornAt ?? null;
+      return { item, lastWornAt, daysSinceWear: lastWornAt ? Math.max(0, Math.floor((now - Date.parse(lastWornAt)) / 86400000)) : null };
+    }).filter((entry) => entry.daysSinceWear === null || entry.daysSinceWear >= 30)
+      .sort((a, b) => (a.lastWornAt ?? '').localeCompare(b.lastWornAt ?? '') || a.item.createdAt.localeCompare(b.item.createdAt) || a.item.id.localeCompare(b.item.id));
+    return HttpResponse.json({ totalItems: all.length, wornItems, neverWornItems: all.length - wornItems,
+      wearRatePercent: all.length ? Math.round(1000 * wornItems / all.length) / 10 : 0,
+      byCategory: groups(true), byColor: groups(false), inactiveCount: unused.length, inactiveAfterDays: 30, unusedItems: unused.slice(0, 10), asOf: new Date(now).toISOString() });
+  }),
   http.get('*/api/app/wardrobe/items/search', ({ request }) => {
     const f = readWardrobeFilters(new URL(request.url).searchParams);
     const labels: Record<string, string> = { TOP: 'áo', BOTTOM: 'quần', DRESS: 'váy', OUTERWEAR: 'áo khoác', SHOES: 'giày', BAG: 'túi', ACCESSORY: 'phụ kiện' };
