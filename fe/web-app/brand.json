@@ -42,7 +42,6 @@
     "logo": "/the-looks-logo.webp",
     "quickPick": "/assets/home/quick-pick-editorial.webp",
     "authWall": "/assets/auth/clothing-wall.webp",
-    "authMotion": "/assets/auth/clothing-wall-motion-smooth.mp4",
     "hangerMotion": "/assets/animations/looksy-hanger.webp",
     "hangerStill": "/assets/animations/looksy-hanger.png"
   },
