@@ -4,7 +4,9 @@ import { Link, useLocation, useNavigate, useOutletContext } from 'react-router-d
 import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { session } from '../../../services/shared/session';
-import { BackLink, Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
+import { Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
+import { AuthHeader } from '../../../components/guest/auth/AuthHeader';
+import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { PasswordStrengthMeter } from '../../../components/guest/auth/PasswordStrengthMeter';
 import { PasswordField } from '../../../components/guest/auth/PasswordField';
 import type { AuthTransitionContext } from '../../../components/guest/auth/AuthTransitionLayout';
@@ -49,8 +51,7 @@ export function RegisterPage() {
         <p>Lưu tủ đồ, khám phá bộ phối mới và hỏi bạn bè chỉ bằng một đường link.</p>
       </aside>
       <section className={`auth-panel register-panel${animateFromLogin ? ' register-panel-enter' : ''}`}>
-        <BackLink to="/login" state={{ fromRegister: true }}>Đăng nhập</BackLink>
-        <Brand />
+        <AuthHeader to="/login" label="Đăng nhập" state={{ fromRegister: true }} />
         <div className="stack"><span className="eyebrow">BẮT ĐẦU CÙNG THE LOOKS</span><h2>Tạo tài khoản</h2><p className="muted">Chỉ mất một phút để bắt đầu.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="reg-name" label="Tên người dùng" required maxLength={60} value={form.username} onChange={set('username')} />
@@ -77,6 +78,7 @@ export function RegisterPage() {
         <p className="auth-note">
           Đã có tài khoản? <Link to="/login" state={{ fromRegister: true, backNavigation: true }}>Đăng nhập</Link>
         </p>
+        <SiteFooter variant="auth" />
       </section>
     </main>
   );

@@ -6,7 +6,9 @@ import { Link, Navigate, useLocation, useNavigate, useOutletContext, useSearchPa
 import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { session, useSession } from '../../../services/shared/session';
-import { BackLink, Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
+import { Button, Field, Notice } from '../../../components/shared/ui/index';
+import { AuthHeader } from '../../../components/guest/auth/AuthHeader';
+import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { PasswordField } from '../../../components/guest/auth/PasswordField';
 import type { AuthTransitionContext } from '../../../components/guest/auth/AuthTransitionLayout';
 
@@ -49,8 +51,7 @@ export function LoginPage() {
   return (
     <main className="login-scene">
       <section className={`auth-panel login-panel${fromRegister ? ' login-panel-return' : ''}`}>
-        <BackLink to="/">Trang chủ</BackLink>
-        <Brand />
+        <AuthHeader to="/" label="Trang chủ" />
         <div className="stack"><span className="eyebrow">CHÀO MỪNG ĐẾN THE LOOKS</span><h2>Đăng nhập</h2><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -80,6 +81,7 @@ export function LoginPage() {
           Chưa có tài khoản? <Link to="/register" state={{ fromLogin: true }}>Đăng ký</Link>
         </p>
         {mockAuth && <p className="auth-note">Bản demo admin: admin@thelooks.local · nhập mật khẩu bất kỳ.</p>}
+        <SiteFooter variant="auth" />
       </section>
     </main>
   );

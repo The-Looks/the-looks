@@ -121,9 +121,9 @@ body { background: var(--bg); }
 .auth-panel .auth-note { color: var(--muted); font-size: var(--type-12); text-align: center; }
 .auth-panel .btn { width: 100%; }
 .register-panel { position: relative; z-index: 1; align-self: center; align-content: start; grid-template-columns: minmax(0, 1fr) auto; width: min(100% - 38px, 500px); min-height: 0; max-height: calc(100dvh - 24px); margin: 0; padding: 18px 30px; gap: 6px; overflow-y: auto; scrollbar-width: thin; border: 1px solid #fffffff0; border-radius: 30px; background: linear-gradient(145deg, #faf8fcdf, #f1e7fadd); box-shadow: 0 28px 75px #251d2f22, 0 0 0 1px #ffffff55, inset 0 1px #ffffffd9; }
-.register-panel > .back-link { grid-column: 1; grid-row: 1; align-self: start; }
-.register-panel > .brand { grid-column: 2; grid-row: 1; justify-self: end; }
-.register-panel > .stack, .register-panel > form, .register-panel > .auth-note { grid-column: 1 / -1; }
+.auth-panel-header { grid-column: 1 / -1; display: flex; align-items: flex-start; justify-content: space-between; min-width: 0; }
+.login-panel .auth-panel-header { display: grid; justify-items: start; }
+.register-panel > .stack, .register-panel > form, .register-panel > .auth-note, .register-panel > .auth-footer { grid-column: 1 / -1; }
 .register-panel form.stack { gap: 6px; }
 .auth-panel .stack { gap: 8px; }
 .auth-panel .field { gap: 4px; }
@@ -401,7 +401,8 @@ body { background: var(--bg); }
   .auth-panel { min-height: 0; align-content: center; }
   .auth-panel .brand { display: flex; margin-bottom: 2px; }
   .register-scene { grid-template-columns: minmax(0, 1fr); width: 100%; padding: 12px 14px; place-items: center; }
-  .register-panel { min-width: 0; min-height: 0; width: 100%; max-width: 100%; max-height: calc(100dvh - 24px); margin: 0; padding: 20px 22px; border-radius: 24px; }
+  .register-panel { min-width: 0; min-height: 0; width: 100%; max-width: 100%; max-height: calc(100dvh - 24px); margin: 0; padding: 8px 22px; gap: 4px; border-radius: 24px; }
+  .register-panel form.stack { gap: 5px; }
   .register-panel .brand { margin-bottom: 0; }
   .register-panel-enter { animation-name: register-panel-mobile; }
   .login-panel-return { animation-name: login-panel-return-mobile; }
