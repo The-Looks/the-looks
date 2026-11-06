@@ -19,7 +19,7 @@ export function PremiumPage() {
     <PageHeader eyebrow="THE LOOKS PREMIUM" title="Nâng tầm phong cách mỗi ngày" sub="Khám phá thêm các khả năng dành cho tủ đồ của bạn." />
     <Card hero className="premium-hero"><CrownOutlined /><h2>Phong cách của bạn, nhiều lựa chọn hơn.</h2><p className="muted">Tính năng và giá gói Premium sẽ được công bố sau.</p></Card>
     <div className="grid-cards">
-      <Card><ExperimentOutlined className="premium-feature-icon" /><h2>LOOKSY AI</h2><p className="muted">Ý tưởng phối đồ theo dịp và gu cá nhân.</p></Card>
+      <Card><ExperimentOutlined className="premium-feature-icon" /><h2>THE LOOKS AI</h2><p className="muted">Ý tưởng phối đồ theo dịp và gu cá nhân.</p></Card>
       <Card><SkinOutlined className="premium-feature-icon" /><h2>Tủ đồ thông minh</h2><p className="muted">Tìm lại và kết hợp những món bạn đang có.</p></Card>
       <Card><PieChartOutlined className="premium-feature-icon" /><h2>Thống kê phong cách</h2><p className="muted">Hiểu cách bạn sử dụng tủ đồ.</p></Card>
     </div>
