@@ -27,6 +27,18 @@ paths:
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+  /api/app/wardrobe/stats:
+    get:
+      summary: Thống kê tủ đồ Pro của chủ JWT
+      description: Cần quyền WARDROBE_STATS từ billing. Chỉ tính món CONFIRMED; màu đa nhãn được tính một lần/màu/món. Món chưa mặc hoặc ít nhất 30 ngày chưa mặc được xếp chưa mặc trước, rồi lần mặc cũ nhất; trả tối đa 10 món. Lỗi billing hoặc lịch sử mặc trả 503, không giả số liệu bằng 0.
+      responses:
+        '200':
+          description: Số liệu tại asOf
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobeStats' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/wardrobe/items/search:
     get:
       summary: Tìm và lọc tủ đồ có phân trang (API /items cũ vẫn trả mảng cho outfit-service)
@@ -175,6 +187,35 @@ components:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
     cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
+    StatsCount:
+      type: object
+      required: [key, count]
+      properties:
+        key: { type: string, description: Loại đồ hoặc nhãn màu; UNKNOWN nếu thiếu }
+        count: { type: integer, format: int64, minimum: 0 }
+    WardrobeStats:
+      type: object
+      required: [totalItems, wornItems, neverWornItems, wearRatePercent, byCategory, byColor, inactiveCount, inactiveAfterDays, unusedItems, asOf]
+      properties:
+        totalItems: { type: integer, format: int64 }
+        wornItems: { type: integer, format: int64 }
+        neverWornItems: { type: integer, format: int64 }
+        wearRatePercent: { type: number, minimum: 0, maximum: 100, description: Tỉ lệ món từng được mặc, làm tròn 1 số thập phân; 0 khi tủ trống }
+        byCategory: { type: array, items: { $ref: '#/components/schemas/StatsCount' } }
+        byColor: { type: array, items: { $ref: '#/components/schemas/StatsCount' } }
+        inactiveCount: { type: integer, format: int64, description: Tổng số món chưa mặc hoặc lâu chưa mặc }
+        inactiveAfterDays: { type: integer, description: Ngưỡng ngày không mặc, hiện tại 30 }
+        unusedItems:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            required: [item, lastWornAt, daysSinceWear]
+            properties:
+              item: { $ref: '#/components/schemas/WardrobeItem' }
+              lastWornAt: { type: [string, 'null'], format: date-time }
+              daysSinceWear: { type: [integer, 'null'], description: null nếu chưa từng mặc }
+        asOf: { type: string, format: date-time }
     WardrobePage:
       type: object
       required: [items, total, page, size]
