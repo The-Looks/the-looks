@@ -75,7 +75,7 @@ export function HomePage() {
                 </Link>
               );
             })}
-            {outfits.data?.length === 0 && <Card><p className="muted">Bạn chưa lưu outfit nào.</p><ButtonLink to="/outfits/suggest" kind="ghost" small>Khám phá LOOKSY AI</ButtonLink></Card>}
+            {outfits.data?.length === 0 && <Card><p className="muted">Bạn chưa lưu outfit nào.</p><ButtonLink to="/outfits/suggest" kind="ghost" small>Khám phá THE LOOKS AI</ButtonLink></Card>}
           </div>
         </section>
         <section className="home-wardrobe-section">
