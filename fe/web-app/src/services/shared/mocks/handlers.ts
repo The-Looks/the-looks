@@ -166,11 +166,15 @@ const wardrobe: HttpHandler[] = [
   }),
   http.post('*/api/app/wardrobe/items/:id/confirm', async ({ params, request }) => {
     const attrs = (await request.json()) as Partial<WardrobeItem>;
+    if (attrs.purchasePrice != null && (attrs.purchasePrice < 0 || !Number.isFinite(attrs.purchasePrice))) return problem(400, 'Giá mua phải không âm');
+    if ((attrs.brand?.length ?? 0) > 100) return problem(400, 'Thương hiệu tối đa 100 ký tự');
     closet = closet.map((i) => (i.id === params.id ? { ...i, ...attrs, status: 'CONFIRMED' } : i));
     return HttpResponse.json(closet.find((i) => i.id === params.id));
   }),
   http.put('*/api/app/wardrobe/items/:id', async ({ params, request }) => {
     const attrs = (await request.json()) as Partial<WardrobeItem>;
+    if (attrs.purchasePrice != null && (attrs.purchasePrice < 0 || !Number.isFinite(attrs.purchasePrice))) return problem(400, 'Giá mua phải không âm');
+    if ((attrs.brand?.length ?? 0) > 100) return problem(400, 'Thương hiệu tối đa 100 ký tự');
     closet = closet.map((i) => (i.id === params.id ? { ...i, ...attrs } : i));
     return HttpResponse.json(closet.find((i) => i.id === params.id));
   }),

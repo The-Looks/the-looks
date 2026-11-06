@@ -35,11 +35,12 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
         ClothingAttributes a = i.attributes();
         jdbc.sql("""
                 insert into wardrobe_item (id, owner_id, image_key, status, category, colors, material, seasons, style_tags,
-                                           confidence, scan_id, created_at)
-                values (:id, :owner, :key, :status, :category, :colors, :material, :seasons, :tags, :confidence, :scan, :at)
+                                           confidence, scan_id, created_at, purchase_price, purchase_date, brand)
+                values (:id, :owner, :key, :status, :category, :colors, :material, :seasons, :tags, :confidence, :scan, :at, :price, :purchaseDate, :brand)
                 on conflict (id) do update set status = excluded.status, category = excluded.category,
                     colors = excluded.colors, material = excluded.material, seasons = excluded.seasons,
-                    style_tags = excluded.style_tags
+                    style_tags = excluded.style_tags, purchase_price = excluded.purchase_price,
+                    purchase_date = excluded.purchase_date, brand = excluded.brand
                 """)
                 .param("id", i.id())
                 .param("owner", i.ownerId())
@@ -53,6 +54,9 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
                 .param("confidence", i.confidence())
                 .param("scan", i.scanId())
                 .param("at", Timestamp.from(i.createdAt()))
+                .param("price", a == null ? null : a.purchasePrice())
+                .param("purchaseDate", a == null ? null : a.purchaseDate(), java.sql.Types.DATE)
+                .param("brand", a == null ? null : a.brand())
                 .update();
         return i;
     }
@@ -110,8 +114,9 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
                 split(rs.getString("colors")),
                 rs.getString("material"),
                 seasons,
-                new LinkedHashSet<>(split(rs.getString("style_tags"))));
-        double confidence = rs.getDouble("confidence");
+                new LinkedHashSet<>(split(rs.getString("style_tags"))),
+                rs.getBigDecimal("purchase_price"), rs.getObject("purchase_date", java.time.LocalDate.class), rs.getString("brand"));
+        Double confidence = rs.getObject("confidence", Double.class);
         return new ClothingItem(
                 rs.getObject("id", UUID.class),
                 rs.getObject("owner_id", UUID.class),
@@ -119,7 +124,7 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
                 ItemStatus.valueOf(rs.getString("status")),
                 attributes,
                 rs.getObject("scan_id", UUID.class),
-                rs.wasNull() ? null : confidence,
+                confidence,
                 rs.getTimestamp("created_at").toInstant());
     }
 }

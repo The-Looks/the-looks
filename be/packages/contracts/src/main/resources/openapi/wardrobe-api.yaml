@@ -141,6 +141,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WardrobeItem' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
     delete:
       summary: Xoá món đồ và ảnh
@@ -233,6 +234,9 @@ components:
         category: { $ref: '#/components/schemas/Category' }
         colors: { type: array, items: { type: string } }
         material: { type: string }
+        purchasePrice: { type: [number, 'null'], minimum: 0, maximum: 999999999999.99, multipleOf: 0.01, description: Giá mua bằng VND; null nếu chưa biết, 0 nếu được tặng }
+        purchaseDate: { type: [string, 'null'], format: date, description: Ngày mua theo YYYY-MM-DD }
+        brand: { type: [string, 'null'], maxLength: 100, description: Thương hiệu; để trống để xoá }
         seasons: { type: array, items: { $ref: '#/components/schemas/Season' }, description: rỗng = mặc được mọi mùa }
         styleTags: { type: array, items: { type: string }, example: [casual, office] }
     WardrobeItem:
@@ -244,6 +248,9 @@ components:
         category: { $ref: '#/components/schemas/Category' }
         colors: { type: array, items: { type: string } }
         material: { type: string }
+        purchasePrice: { type: [number, 'null'], minimum: 0, maximum: 999999999999.99, multipleOf: 0.01, description: Giá mua bằng VND; null nếu chưa biết, 0 nếu được tặng }
+        purchaseDate: { type: [string, 'null'], format: date, description: Ngày mua theo YYYY-MM-DD }
+        brand: { type: [string, 'null'], maxLength: 100, description: Thương hiệu; để trống để xoá }
         seasons: { type: array, items: { $ref: '#/components/schemas/Season' } }
         styleTags: { type: array, items: { type: string } }
         imageUrl: { type: string, format: uri, description: Ảnh đã cắt của riêng món này }
