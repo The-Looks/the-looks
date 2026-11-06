@@ -120,11 +120,25 @@ const wardrobe: HttpHandler[] = [
   }),
   http.get('*/api/app/wardrobe/scans/:id', ({ params }) => {
     const scan = scans.get(String(params.id));
-    return scan ? HttpResponse.json(scan) : problem(404, 'Không tìm thấy lần quét');
+    return scan ? HttpResponse.json({ ...scan, items: scan.items.map((item) => closet.find((current) => current.id === item.id)).filter(Boolean) }) : problem(404, 'Không tìm thấy lần quét');
   }),
   http.get('*/api/app/wardrobe/items/:id', ({ params }) => {
     const item = closet.find((i) => i.id === params.id);
     return item ? HttpResponse.json(item) : problem(404, 'Không tìm thấy món đồ');
+  }),
+  http.post('*/api/app/wardrobe/items/confirm', async ({ request }) => {
+    const body = await request.json() as { items?: { itemId: string; attributes: Partial<WardrobeItem> }[] };
+    if (!body.items?.length || body.items.length > 100) return problem(400, 'Chọn từ 1 đến 100 món');
+    if (new Set(body.items.map((item) => item.itemId)).size !== body.items.length) return problem(409, 'Món bị trùng');
+    for (const entry of body.items) {
+      const item = closet.find((i) => i.id === entry.itemId);
+      if (!item) return problem(404, 'Không tìm thấy món đồ');
+      if (!['PENDING_REVIEW', 'RECOGNITION_FAILED'].includes(item.status)) return problem(409, 'Món không còn chờ xác nhận');
+      if (!entry.attributes?.category) return problem(400, 'Cần chọn loại đồ');
+    }
+    const saved = body.items.map((entry) => ({ ...closet.find((i) => i.id === entry.itemId)!, ...entry.attributes, status: 'CONFIRMED' as const }));
+    closet = closet.map((item) => saved.find((s) => s.id === item.id) ?? item);
+    return HttpResponse.json(saved);
   }),
   http.post('*/api/app/wardrobe/items/:id/confirm', async ({ params, request }) => {
     const attrs = (await request.json()) as Partial<WardrobeItem>;

@@ -262,6 +262,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/wardrobe/items/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Xác nhận 1–100 món cùng lúc, kèm chỉnh sửa thuộc tính
+         * @description Kiểm tra quyền sở hữu và trạng thái mọi món trước khi lưu. Lỗi bất kỳ món nào thì không lưu món nào. ID trùng hoặc trạng thái không hợp lệ trả 409.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConfirmItemsRequest"];
+                };
+            };
+            responses: {
+                /** @description Các món đã xác nhận, theo thứ tự request */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WardrobeItem"][];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/wardrobe/items/{itemId}/confirm": {
         parameters: {
             query?: never;
@@ -359,6 +405,13 @@ export interface components {
         Category: "TOP" | "BOTTOM" | "DRESS" | "OUTERWEAR" | "SHOES" | "BAG" | "ACCESSORY";
         /** @enum {string} */
         Season: "SPRING" | "SUMMER" | "AUTUMN" | "WINTER";
+        ConfirmItemsRequest: {
+            items: {
+                /** Format: uuid */
+                itemId: string;
+                attributes: components["schemas"]["ClothingAttributes"];
+            }[];
+        };
         ClothingAttributes: {
             category?: components["schemas"]["Category"];
             colors?: string[];

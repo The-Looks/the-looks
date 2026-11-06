@@ -1,14 +1,14 @@
 import { useState, type ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
-import { Card, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { BatchReview } from '../../../components/user/wardrobe/BatchReview';
 import { useScan, useStartScan } from '../../../hooks/user/wardrobe/api';
 
 const MAX_IMAGES = 10;
 
 /**
  * Chụp hoặc chọn tối đa 10 ảnh. Mỗi ảnh có thể có nhiều món: AI tách từng món, cắt ảnh riêng,
- * người dùng xác nhận từng món. Trên điện thoại ô chọn ảnh mở thẳng camera sau.
+ * người dùng chọn và xác nhận nhiều món cùng lúc. Trên điện thoại ô chọn ảnh mở thẳng camera sau.
  */
 export function AddItemPage() {
   const start = useStartScan();
@@ -77,18 +77,7 @@ export function AddItemPage() {
         </Notice>
       )}
 
-      {items.length > 0 && (
-        <section className="stack">
-          <h2>Tìm thấy {items.length} món · bấm từng món để xác nhận</h2>
-          <div className="grid-tiles">
-            {items.map((item) => (
-              <Link key={item.id} to={`/wardrobe/${item.id}`}>
-                <ItemTile category={item.category} imageUrl={item.imageUrl} label="Xem và xác nhận" />
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      {scan.data?.status === 'DONE' && items.length > 0 && <BatchReview key={scanId} items={items} />}
     </div>
   );
 }

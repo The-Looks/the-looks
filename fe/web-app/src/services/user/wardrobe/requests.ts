@@ -22,6 +22,8 @@ export const wardrobeRequests = {
     unwrap(wardrobeApi.GET('/api/app/wardrobe/scans/{scanId}', { params: { path: { scanId } } })),
   confirm: (id: string, attrs: ClothingAttributes) =>
     unwrap(wardrobeApi.POST('/api/app/wardrobe/items/{itemId}/confirm', { params: { path: { itemId: id } }, body: attrs })),
+  confirmAll: (items: { itemId: string; attributes: ClothingAttributes }[]) =>
+    unwrap(wardrobeApi.POST('/api/app/wardrobe/items/confirm', { body: { items } })),
   update: (id: string, attrs: ClothingAttributes) =>
     unwrap(wardrobeApi.PUT('/api/app/wardrobe/items/{itemId}', { params: { path: { itemId: id } }, body: attrs })),
   remove: (id: string) =>
