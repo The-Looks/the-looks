@@ -231,6 +231,7 @@ export interface paths {
                         "application/json": components["schemas"]["WardrobeItem"];
                     };
                 };
+                400: components["responses"]["Problem"];
                 404: components["responses"]["Problem"];
             };
         };
@@ -363,6 +364,15 @@ export interface components {
             category?: components["schemas"]["Category"];
             colors?: string[];
             material?: string;
+            /** @description Giá mua bằng VND; null nếu chưa biết */
+            purchasePrice?: number | null;
+            /**
+             * Format: date
+             * @description Ngày mua theo YYYY-MM-DD
+             */
+            purchaseDate?: string | null;
+            /** @description Thương hiệu; để trống để xoá */
+            brand?: string | null;
             /** @description rỗng = mặc được mọi mùa */
             seasons?: components["schemas"]["Season"][];
             /**
@@ -380,6 +390,15 @@ export interface components {
             category?: components["schemas"]["Category"];
             colors?: string[];
             material?: string;
+            /** @description Giá mua bằng VND; null nếu chưa biết */
+            purchasePrice?: number | null;
+            /**
+             * Format: date
+             * @description Ngày mua theo YYYY-MM-DD
+             */
+            purchaseDate?: string | null;
+            /** @description Thương hiệu; để trống để xoá */
+            brand?: string | null;
             seasons?: components["schemas"]["Season"][];
             styleTags?: string[];
             /**
