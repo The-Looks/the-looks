@@ -1,5 +1,5 @@
 import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
-import { LeftCircleTwoTone, PictureOutlined } from '@ant-design/icons';
+import { DoubleLeftOutlined, PictureOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate, type LinkProps } from 'react-router-dom';
 import { categoryLabel } from '../../../services/shared/labels';
 import { brand } from '../../../services/shared/brand';
@@ -12,7 +12,7 @@ export function BackLink({ children, className = '', state, ...props }: LinkProp
     : { backNavigation: true };
   return (
     <Link {...props} state={backState} className={['back', 'back-link', className].filter(Boolean).join(' ')}>
-      <LeftCircleTwoTone twoToneColor={brand.colors.purple} aria-hidden="true" />
+      <DoubleLeftOutlined aria-hidden="true" />
       <span>{children}</span>
     </Link>
   );
@@ -148,7 +148,7 @@ export function PageHeader({
           else if (window.history.state?.idx > 0) navigate(-1);
           else navigate('/', { state: { backNavigation: true } });
         }}>
-          <LeftCircleTwoTone twoToneColor={brand.colors.purple} aria-hidden="true" />
+          <DoubleLeftOutlined aria-hidden="true" />
           <span>{showBack.label}</span>
         </button>
       )}

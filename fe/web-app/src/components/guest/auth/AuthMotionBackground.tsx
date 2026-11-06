@@ -1,57 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
-import { brand } from '../../../services/shared/brand';
+import { memo } from 'react';
 
-/** Show the light still image first, then fade in the slow, silent loop when motion is allowed. */
-export function AuthMotionBackground() {
-  const [playVideo, setPlayVideo] = useState(false);
-  const [ready, setReady] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+const lanes = ['-8%', '17%', '42%', '67%', '92%'] as const;
+const garments = ['blazer', 'bag', 'dress', 'blouse', 'sneaker', 'trousers'] as const;
 
-  useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const smallScreen = window.matchMedia('(max-width: 900px), (pointer: coarse)');
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
-    const update = () => {
-      const allowed = !reducedMotion.matches && !smallScreen.matches && !saveData;
-      if (!allowed) setReady(false);
-      setPlayVideo(allowed);
-    };
-    const start = window.setTimeout(update, 250);
-    reducedMotion.addEventListener('change', update);
-    smallScreen.addEventListener('change', update);
-    return () => {
-      window.clearTimeout(start);
-      reducedMotion.removeEventListener('change', update);
-      smallScreen.removeEventListener('change', update);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!playVideo) return;
-    const video = videoRef.current;
-    if (!video) return;
-    const syncPlayback = () => {
-      if (document.hidden) video.pause();
-      else void video.play().catch(() => setPlayVideo(false));
-    };
-    document.addEventListener('visibilitychange', syncPlayback);
-    syncPlayback();
-    return () => document.removeEventListener('visibilitychange', syncPlayback);
-  }, [playVideo]);
-
+/** Garment cards travel in one direction and restart only after leaving the screen. */
+export const AuthMotionBackground = memo(function AuthMotionBackground() {
   return <div className="login-motion-wall" aria-hidden="true">
-    <div className="auth-motion-pan-x">
-      <div className="auth-motion-pan-y">
-        <div className="auth-motion-still" />
-        {playVideo && <video
-          ref={videoRef}
-          className={`auth-motion-video${ready ? ' is-ready' : ''}`}
-          autoPlay muted loop playsInline preload="none" poster={brand.assets.authWall}
-          onCanPlay={() => setReady(true)} onError={() => { setReady(false); setPlayVideo(false); }}
-        >
-          <source src={brand.assets.authMotion} type="video/mp4" />
-        </video>}
-      </div>
-    </div>
+    {lanes.flatMap((left, lane) => {
+      const duration = 39 + lane * 2;
+      return [0, 1, 2].map((phase) => (
+        <span
+          key={`${lane}-${phase}`}
+          className={`auth-fashion-item auth-fashion-item--${garments[(lane * 3 + phase) % garments.length]}`}
+          data-lane={lane}
+          style={{ left, animationDuration: `${duration}s`, animationDelay: `-${(phase * duration / 3 + lane * 2) % duration}s` }}
+        />
+      ));
+    })}
   </div>;
-}
+});
