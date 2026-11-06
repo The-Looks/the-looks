@@ -65,6 +65,19 @@ class OrderRepositoryAdapter implements OrderRepository {
                 .update() == 1;
     }
 
+    @Override
+    public boolean markRefunded(long orderCode, Instant refundedAt, String reason, UUID adminId) {
+        return jdbc.sql("""
+                update billing_order set status = 'REFUNDED', refunded_at = :at, refund_reason = :reason, refunded_by = :admin
+                where order_code = :code and status = 'PAID'
+                """)
+                .param("at", Timestamp.from(refundedAt))
+                .param("reason", reason)
+                .param("admin", adminId)
+                .param("code", orderCode)
+                .update() == 1;
+    }
+
     private static Order map(ResultSet rs, int row) throws SQLException {
         Timestamp paid = rs.getTimestamp("paid_at");
         return new Order(

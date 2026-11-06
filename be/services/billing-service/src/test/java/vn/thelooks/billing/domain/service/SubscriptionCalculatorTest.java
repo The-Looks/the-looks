@@ -80,6 +80,27 @@ class SubscriptionCalculatorTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    void refundRemovesTheMonthsOfThatOrder() {
+        // Mua 2 tháng Plus liên tiếp → hết hạn 01/01/2027; hoàn 1 đơn → còn tới 01/12/2026
+        var twoMonths = sub(Plan.PLUS, Instant.parse("2027-01-01T03:00:00Z"));
+        assertThat(SubscriptionCalculator.expiryAfterRefund(twoMonths, Plan.PLUS, BillingPeriod.MONTHLY, NOW))
+                .contains(Instant.parse("2026-12-01T03:00:00Z"));
+    }
+
+    @Test
+    void refundingTheOnlyOrderEndsThePlanNow() {
+        var oneMonth = sub(Plan.PLUS, Instant.parse("2026-11-20T03:00:00Z"));
+        assertThat(SubscriptionCalculator.expiryAfterRefund(oneMonth, Plan.PLUS, BillingPeriod.MONTHLY, NOW)).contains(NOW);
+    }
+
+    @Test
+    void refundAfterSwitchingPlanIsLeftToTheAdmin() {
+        var pro = sub(Plan.PRO, Instant.parse("2026-12-20T03:00:00Z"));
+        assertThat(SubscriptionCalculator.expiryAfterRefund(pro, Plan.PLUS, BillingPeriod.MONTHLY, NOW)).isEmpty();
+        assertThat(SubscriptionCalculator.expiryAfterRefund(null, Plan.PLUS, BillingPeriod.MONTHLY, NOW)).isEmpty();
+    }
+
     private static Subscription sub(Plan plan, Instant expiresAt) {
         return new Subscription(USER, plan, BillingPeriod.MONTHLY, expiresAt, true);
     }

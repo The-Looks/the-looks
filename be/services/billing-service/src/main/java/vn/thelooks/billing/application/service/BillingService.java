@@ -16,9 +16,11 @@ import vn.thelooks.billing.application.port.out.SubscriptionRepository;
 import vn.thelooks.billing.application.usecase.CheckoutUseCase;
 import vn.thelooks.billing.application.usecase.ConfirmPaymentUseCase;
 import vn.thelooks.billing.application.usecase.GetEntitlementsQuery;
+import vn.thelooks.billing.application.usecase.RefundOrderUseCase;
 import vn.thelooks.billing.application.usecase.SetAutoRenewUseCase;
 import vn.thelooks.billing.domain.exception.InvalidPlanException;
 import vn.thelooks.billing.domain.exception.OrderNotFoundException;
+import vn.thelooks.billing.domain.exception.OrderNotRefundableException;
 import vn.thelooks.billing.domain.model.BillingPeriod;
 import vn.thelooks.billing.domain.model.Entitlements;
 import vn.thelooks.billing.domain.model.Order;
@@ -28,7 +30,8 @@ import vn.thelooks.billing.domain.model.Subscription;
 import vn.thelooks.billing.domain.service.SubscriptionCalculator;
 
 @Service
-class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPaymentUseCase, SetAutoRenewUseCase {
+class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPaymentUseCase, SetAutoRenewUseCase,
+        RefundOrderUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(BillingService.class);
 
@@ -114,6 +117,30 @@ class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPa
      * có thể tới cùng lúc: markPaid chỉ thành công một lần nên gói không bị cộng hai lần.
      * Dùng TransactionTemplate vì @Transactional không có tác dụng khi gọi hàm trong cùng class.
      */
+    /** Một transaction: đổi trạng thái đơn và trừ hạn gói cùng lúc, khoá dòng gói như khi kích hoạt. */
+    @Override
+    public RefundResult refund(long orderCode, String reason, UUID adminId) {
+        return tx.execute(status -> {
+            Order order = orders.find(orderCode).orElseThrow(() -> new OrderNotFoundException("Không tìm thấy đơn " + orderCode));
+            Instant now = clock.instant();
+            if (!orders.markRefunded(orderCode, now, reason, adminId)) {
+                throw new OrderNotRefundableException("Chỉ hoàn tiền được đơn đã thanh toán (đơn " + orderCode + " đang "
+                        + order.status() + ")");
+            }
+            Subscription current = subscriptions.findForUpdate(order.ownerId()).orElse(null);
+            Instant newExpiry = SubscriptionCalculator.expiryAfterRefund(current, order.plan(), order.period(), now).orElse(null);
+            if (newExpiry != null) {
+                // Hoàn hết thời gian thì tắt tự gia hạn để không còn ân hạn 3 ngày
+                subscriptions.save(new Subscription(current.ownerId(), current.plan(), current.period(), newExpiry,
+                        current.autoRenew() && newExpiry.isAfter(now)));
+            } else {
+                log.warn("Đơn {} hoàn tiền nhưng gói hiện tại khác gói của đơn: admin cần chỉnh gói tay", orderCode);
+            }
+            log.info("Admin {} hoàn tiền đơn {} ({}đ): {}", adminId, orderCode, order.amountVnd(), reason);
+            return new RefundResult(orders.find(orderCode).orElseThrow(), newExpiry);
+        });
+    }
+
     void activate(long orderCode) {
         tx.executeWithoutResult(status -> {
             Instant now = clock.instant();
