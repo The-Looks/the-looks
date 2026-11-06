@@ -5,6 +5,7 @@ import { ButtonLink, EmptyState } from '../components/shared/ui/index';
 import { HomeEntry } from './HomeEntry';
 import { RequireAuth } from '../components/shared/routing/RequireAuth';
 import { RequireAdmin } from '../components/shared/routing/RequireAdmin';
+import { AuthTransitionLayout } from '../components/guest/auth/AuthTransitionLayout';
 
 const GoogleCallbackPage = lazy(() => import('../pages/guest/auth/GoogleCallbackPage').then((m) => ({ default: m.GoogleCallbackPage })));
 const AppShell = lazy(() => import('../components/shared/routing/AppShell').then((m) => ({ default: m.AppShell })));
@@ -47,12 +48,14 @@ function NotFound() {
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomeEntry />, children: [{ element: <AppShell />, children: [{ index: true, element: <HomePage /> }] }] },
-  { path: '/login', element: <LoginPage /> },
+  { element: <AuthTransitionLayout />, children: [
+    { path: '/login', element: <LoginPage /> },
+    { path: '/register', element: <RegisterPage /> },
+  ] },
   { path: '/about', element: <PublicHomePage /> },
   { path: '/terms', element: <TermsPage /> },
   { path: '/privacy', element: <PrivacyPage /> },
   { path: '/refund', element: <RefundPage /> },
-  { path: '/register', element: <RegisterPage /> },
   { path: '/auth/callback', element: <GoogleCallbackPage /> },
   { path: '/ask-friends', element: <GuestLandingPage /> },
   { path: '/v/:code', element: <PublicPollPage /> },

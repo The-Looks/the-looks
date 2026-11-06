@@ -140,7 +140,7 @@ body { background: var(--bg); }
 .password-strength-track { height: 7px; overflow: hidden; border-radius: 999px; background: #ffffffa8; border: 1px solid var(--line); }
 .password-strength-track span { display: block; height: 100%; border-radius: inherit; transition: width .25s ease; }
 .password-strength-track.level-weak span { background: var(--pink); }
-.password-strength-track.level-medium span { background: var(--lavender); }
+.password-strength-track.level-medium span { background: var(--green); }
 .password-strength-track.level-strong span { background: var(--purple); }
 .password-strength p { line-height: 1.4; }
 .register-error { color: var(--pink); }
@@ -148,9 +148,14 @@ body { background: var(--bg); }
 @keyframes register-panel-slide { from { opacity: .45; transform: translateX(-26vw) scale(.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
 .login-scene { position: relative; isolation: isolate; height: 100dvh; min-height: 100dvh; padding: 12px 16px; display: grid; place-items: center; overflow: hidden; background: var(--lav-soft); }
 .login-motion-wall { position: absolute; inset: -4%; z-index: -2; background-image: var(--asset-auth-wall); background-repeat: no-repeat; background-size: cover; background-position: center; animation: login-wall-drift 34s ease-in-out infinite alternate; pointer-events: none; }
+.login-motion-wall.has-video { inset: 0; transform: none; animation: none; }
+.auth-motion-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .8s ease; pointer-events: none; }
+.auth-motion-video.is-ready { opacity: 1; }
 .login-scene::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #251d2f55 0%, #251d2f15 24%, #faf8fc19 50%, #251d2f15 76%, #251d2f55 100%); pointer-events: none; }
 .login-panel { position: relative; z-index: 1; align-content: start; justify-self: center; width: min(100%, 440px); min-height: 0; max-height: calc(100dvh - 24px); padding: 26px 32px; gap: 11px; overflow-y: auto; scrollbar-width: thin; border: 1px solid #fffffff0; border-radius: 30px; background: linear-gradient(145deg, #faf8fca8, #f1e7faad); box-shadow: 0 32px 90px #251d2f70, 0 0 0 1px #ffffff55, inset 0 1px #ffffffd9; backdrop-filter: blur(32px) saturate(1.15); -webkit-backdrop-filter: blur(32px) saturate(1.15); animation: login-card-enter .7s cubic-bezier(.2, .8, .2, 1) both; }
+.login-panel-return { animation: login-panel-return .72s cubic-bezier(.18, .8, .22, 1) both; }
 .login-panel .brand { display: flex; justify-content: flex-start; margin-bottom: 3px; font-size: var(--type-19); }
+.login-panel .brand img { width: 190px; height: 104px; }
 .login-panel .brand-mark { width: 36px; height: 36px; border-radius: 11px; }
 .login-panel > .stack:first-of-type { text-align: left; }
 .login-panel h2 { font-size: var(--type-30); }
@@ -167,9 +172,11 @@ body { background: var(--bg); }
 }
 @keyframes login-wall-drift { from { transform: translate3d(-2%, 0, 0) scale(1.06); } to { transform: translate3d(2%, 0, 0) scale(1.06); } }
 @keyframes login-card-enter { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes login-panel-return { from { opacity: .45; transform: translateX(26vw) scale(.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
 @media (max-height: 800px) {
   .auth-panel .stack { gap: 6px; }
   .auth-panel .brand img { width: 88px; height: 48px; }
+  .login-panel .brand img { width: 160px; height: 88px; }
   .auth-panel .field input { min-height: 38px; padding-block: 7px; }
   .register-panel { padding-block: 14px; gap: 6px; }
   .register-panel h2 { font-size: var(--type-24); }
@@ -378,6 +385,7 @@ body { background: var(--bg); }
   .register-panel { min-width: 0; min-height: 0; width: 100%; max-width: 100%; max-height: calc(100dvh - 24px); margin: 0; padding: 20px 22px; border-radius: 24px; }
   .register-panel .brand { margin-bottom: 2px; }
   .register-panel-enter { animation-name: register-panel-mobile; }
+  .login-panel-return { animation-name: login-panel-return-mobile; }
   .login-scene { padding: 12px 14px; }
   .login-panel { min-height: 0; max-height: calc(100dvh - 24px); padding: 22px 24px; border-radius: 24px; }
   .login-panel .brand { margin-bottom: 2px; }
@@ -397,6 +405,7 @@ body { background: var(--bg); }
   .admin-section-grid { grid-template-columns: 1fr; }
 }
 @keyframes register-panel-mobile { from { opacity: .45; transform: translateY(24px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes login-panel-return-mobile { from { opacity: .45; transform: translateY(-24px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) {
   .brand-mark, .brand-mark::after, .home-page > .page-header, .home-editorial-grid, .home-metrics, .home-content-grid, .guest-option.selected, .guest-result > .anticon, .admin-chart span, .login-motion-wall, .login-panel, .register-panel-enter { animation: none !important; }
   .brand-mark, .app-page .btn, .guest-landing .btn, .auth-panel .btn, .app-page a.card, .wardrobe-item-card, .guest-option, .home-poll-card .bar span, .guest-result-row .bar span { transition: none !important; }
