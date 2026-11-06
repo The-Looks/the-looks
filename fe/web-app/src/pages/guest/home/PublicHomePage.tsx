@@ -1,6 +1,6 @@
 import { ArrowRightOutlined, AppstoreOutlined, HeartOutlined, SkinOutlined, StarOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { ButtonLink } from '../../../components/shared/ui/index';
+import { BackLink, ButtonLink } from '../../../components/shared/ui/index';
 import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 
@@ -16,7 +16,7 @@ export function PublicHomePage() {
       <PublicHeader page="home" />
 
       <main>
-        <Link className="back" to="/">‹ Về trang chủ</Link>
+        <BackLink to="/">Về trang chủ</BackLink>
         <section className="public-home-hero" aria-labelledby="public-home-title">
           <div className="public-home-hero-copy">
             <span className="eyebrow">WEAR MORE. BUY SMARTER.</span>

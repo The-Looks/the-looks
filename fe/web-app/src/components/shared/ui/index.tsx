@@ -1,10 +1,22 @@
 import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
-import { PictureOutlined } from '@ant-design/icons';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LeftCircleTwoTone, PictureOutlined } from '@ant-design/icons';
+import { Link, useLocation, useNavigate, type LinkProps } from 'react-router-dom';
 import { categoryLabel } from '../../../services/shared/labels';
 import { brand } from '../../../services/shared/brand';
 
 type ButtonKind = 'primary' | 'ghost' | 'outline' | 'pink';
+
+export function BackLink({ children, className = '', state, ...props }: LinkProps) {
+  const backState = state && typeof state === 'object' && !Array.isArray(state)
+    ? { ...state, backNavigation: true }
+    : { backNavigation: true };
+  return (
+    <Link {...props} state={backState} className={['back', 'back-link', className].filter(Boolean).join(' ')}>
+      <LeftCircleTwoTone twoToneColor={brand.colors.purple} aria-hidden="true" />
+      <span>{children}</span>
+    </Link>
+  );
+}
 
 export function Button({
   kind = 'primary',
@@ -132,11 +144,12 @@ export function PageHeader({
     <header className="page-header">
       {showBack && (
         <button className="back page-back-button" type="button" onClick={() => {
-          if (back) navigate(back.to);
+          if (back) navigate(back.to, { state: { backNavigation: true } });
           else if (window.history.state?.idx > 0) navigate(-1);
-          else navigate('/');
+          else navigate('/', { state: { backNavigation: true } });
         }}>
-          ‹ {showBack.label}
+          <LeftCircleTwoTone twoToneColor={brand.colors.purple} aria-hidden="true" />
+          <span>{showBack.label}</span>
         </button>
       )}
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}

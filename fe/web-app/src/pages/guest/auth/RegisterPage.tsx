@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate, useOutletContext } from 'react-router-d
 import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { session } from '../../../services/shared/session';
-import { Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
+import { BackLink, Brand, Button, Field, Notice } from '../../../components/shared/ui/index';
 import { PasswordStrengthMeter } from '../../../components/guest/auth/PasswordStrengthMeter';
 import { AuthMotionBackground } from '../../../components/guest/auth/AuthMotionBackground';
 import { PasswordField } from '../../../components/guest/auth/PasswordField';
@@ -51,7 +51,7 @@ export function RegisterPage() {
         <p>Lưu tủ đồ, khám phá bộ phối mới và hỏi bạn bè chỉ bằng một đường link.</p>
       </aside>
       <section className={`auth-panel register-panel${animateFromLogin ? ' register-panel-enter' : ''}`}>
-        <Link className="back" to="/login" state={{ fromRegister: true }}>‹ Đăng nhập</Link>
+        <BackLink to="/login" state={{ fromRegister: true }}>Đăng nhập</BackLink>
         <Brand />
         <div className="stack"><span className="eyebrow">BẮT ĐẦU CÙNG THE LOOKS</span><h2>Tạo tài khoản</h2><p className="muted">Chỉ mất một phút để bắt đầu.</p></div>
         <form className="stack" onSubmit={submit}>
@@ -77,7 +77,7 @@ export function RegisterPage() {
           </Button>
         </form>
         <p className="auth-note">
-          Đã có tài khoản? <Link to="/login" state={{ fromRegister: true }}>Đăng nhập</Link>
+          Đã có tài khoản? <Link to="/login" state={{ fromRegister: true, backNavigation: true }}>Đăng nhập</Link>
         </p>
       </section>
     </main>

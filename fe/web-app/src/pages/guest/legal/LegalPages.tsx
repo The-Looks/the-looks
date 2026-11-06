@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { BackLink } from '../../../components/shared/ui/index';
 import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { LEGAL_CONTACT_EMAIL, LEGAL_OPERATOR, LEGAL_UPDATED } from '../../../services/shared/legal';
@@ -17,7 +18,7 @@ function LegalLayout({ title, children }: { title: string; children: ReactNode }
     <div className="public-home">
       <PublicHeader page="home" />
       <main className="stack-lg" style={{ maxWidth: 760, margin: '0 auto', padding: '24px 16px 48px' }}>
-        <Link className="back" to="/">‹ Về trang chủ</Link>
+        <BackLink to="/">Về trang chủ</BackLink>
         <article className="stack">
           <h1>{title}</h1>
           <p className="small muted">Cập nhật lần cuối: {LEGAL_UPDATED} · Đơn vị vận hành: {LEGAL_OPERATOR}</p>

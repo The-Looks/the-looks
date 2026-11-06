@@ -1,6 +1,5 @@
 import { BellOutlined, CrownOutlined, ExperimentOutlined, PieChartOutlined, SkinOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-import { AssetPlaceholder, ButtonLink, Card, PageHeader } from '../../../components/shared/ui/index';
+import { AssetPlaceholder, BackLink, ButtonLink, Card, PageHeader } from '../../../components/shared/ui/index';
 
 export function NotificationsPage() {
   return <div className="stack-lg">
@@ -24,6 +23,6 @@ export function PremiumPage() {
       <Card><PieChartOutlined className="premium-feature-icon" /><h2>Thống kê phong cách</h2><p className="muted">Hiểu cách bạn sử dụng tủ đồ.</p></Card>
     </div>
     <div className="premium-preview"><AssetPlaceholder label="Ảnh giới thiệu Premium" assetPath="assets/premium/hero.jpg" /><p className="small muted">Logo và ảnh sẽ được bổ sung vào assets sau.</p></div>
-    <Link to="/profile">← Về hồ sơ</Link>
+    <BackLink to="/profile">Về hồ sơ</BackLink>
   </div>;
 }
