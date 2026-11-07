@@ -11,7 +11,7 @@ class DeleteUserAccountService implements DeleteUserAccountUseCase {
     private final AccountDeletionCoordinatorPort coordinator;
     DeleteUserAccountService(AccountDeletionCoordinatorPort coordinator) { this.coordinator = coordinator; }
     public AccountDeletionJob get(UUID targetId) { return coordinator.get(targetId); }
-    public AccountDeletionJob startOrRetry(UUID actorId, UUID targetId, String bearerToken) {
-        return coordinator.startOrRetry(actorId, targetId, bearerToken);
+    public AccountDeletionJob startOrRetry(UUID actorId, UUID targetId) {
+        return coordinator.startOrRetry(actorId, targetId);
     }
 }

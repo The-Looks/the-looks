@@ -130,6 +130,55 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/User' }
+  /api/app/me/profile:
+    get:
+      summary: Hồ sơ của tài khoản hiện tại
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/UserProfile' } } } }
+    put:
+      summary: Đổi tên và thành phố của tài khoản hiện tại
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username]
+              properties:
+                username: { type: string, minLength: 1, maxLength: 60 }
+                city: { type: [string, 'null'], maxLength: 120 }
+      responses:
+        '200': { description: Đã cập nhật, content: { application/json: { schema: { $ref: '#/components/schemas/UserProfile' } } } }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/me/avatar:
+    get:
+      summary: Ảnh đại diện của tài khoản hiện tại
+      responses:
+        '200': { description: Ảnh PNG hoặc JPEG, content: { image/png: { schema: { type: string, format: binary } }, image/jpeg: { schema: { type: string, format: binary } } } }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+    post:
+      summary: Tải ảnh đại diện PNG/JPEG, tối đa 2 MB
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200': { description: Đã cập nhật, content: { application/json: { schema: { $ref: '#/components/schemas/UserProfile' } } } }
+    delete:
+      summary: Xóa ảnh đại diện
+      responses:
+        '200': { description: Đã xóa, content: { application/json: { schema: { $ref: '#/components/schemas/UserProfile' } } } }
+  /api/app/me/deletion:
+    post:
+      summary: Tự xóa tài khoản và toàn bộ dữ liệu liên quan; công việc lỗi được hệ thống thử lại
+      responses:
+        '200': { description: Tiến độ xóa, content: { application/json: { schema: { $ref: '#/components/schemas/AccountDeletion' } } } }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/admin/auth/users:
     get:
       summary: Danh sách tài khoản cho quản trị viên (cần ADMIN_ACCESS)
@@ -282,6 +331,14 @@ components:
       in: cookie
       name: access_token
   schemas:
+    UserProfile:
+      type: object
+      required: [username, hasAvatar]
+      properties:
+        username: { type: string }
+        city: { type: [string, 'null'] }
+        hasAvatar: { type: boolean }
+        avatarUpdatedAt: { type: [string, 'null'], format: date-time }
     DailyCount:
       type: object
       required: [date, count]

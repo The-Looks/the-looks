@@ -5,5 +5,6 @@ import vn.thelooks.auth.domain.model.AccountDeletionJob;
 
 public interface AccountDeletionCoordinatorPort {
     AccountDeletionJob get(UUID targetId);
-    AccountDeletionJob startOrRetry(UUID actorId, UUID targetId, String bearerToken);
+    AccountDeletionJob startOrRetry(UUID actorId, UUID targetId);
+    void retryOutstanding();
 }

@@ -102,7 +102,8 @@ volume PostgreSQL và ảnh vẫn được giữ lại.
 | `AI_MODEL` | `claude-haiku-5-5` | Model Claude. `claude-opus-5-5` chọn tinh tế hơn nhưng đắt hơn ~40 lần |
 | `BILLING_SERVICE_URL` | | Số lượt AI/ngày lấy theo gói từ billing-service (Free 3, Plus 20, Pro 100); billing lỗi → dùng mức Free. Hết lượt vẫn có gợi ý theo điểm |
 | `AI_MONTHLY_BUDGET_USD` | `25` | Tổng chi phí AI mỗi tháng; chạm ngưỡng thì tự ngừng gọi AI |
-| `WEATHER_LAT`, `WEATHER_LON` | TP.HCM | Vị trí lấy thời tiết (Open-Meteo, miễn phí, không cần key) |
+| `AUTH_SERVICE_URL` | `http://localhost:8081` | Outfit đọc thành phố từ hồ sơ người dùng bằng JWT chuyển tiếp |
+| `WEATHER_LAT`, `WEATHER_LON` | TP.HCM | Vị trí dự phòng khi người dùng chưa chọn thành phố; thành phố đã chọn được tìm tọa độ qua Open-Meteo |
 
 Admin xem chi phí: `GET /api/admin/outfits/ai-usage` (cần `ADMIN_ACCESS` và `AI_USAGE_READ`).
 Admin xem danh sách người dùng thật qua `GET /api/admin/auth/users?page=0&size=20&search=...` (cần `ADMIN_ACCESS` và `USER_MANAGE`; không trả password hash).
@@ -110,6 +111,8 @@ Admin xem danh sách người dùng thật qua `GET /api/admin/auth/users?page=0
 ## Quản trị tài khoản, quyền và báo cáo
 
 - Auth service quản lý role/permission, cấp role, khóa/mở tài khoản và nhật ký tại `/api/admin/auth/**`. Mã permission dùng trong code không thể đổi tên; quyền tự tạo chỉ có hiệu lực khi một API kiểm tra mã đó. Đổi role/quyền hoặc khóa tài khoản thu hồi các phiên liên quan.
+- Người dùng đổi tên, thành phố và ảnh đại diện tại `/api/app/me/profile` và `/api/app/me/avatar`. Ảnh PNG/JPEG tối đa 2 MB được lưu trong auth DB và tự xóa theo tài khoản.
+- `POST /api/app/me/deletion` cho phép tự xóa qua cùng các bước voting → wardrobe → outfit → billing → auth. Auth phát token nội bộ ngắn hạn chỉ xóa được đúng tài khoản, khóa phiên ngay, và thử lại job lỗi định kỳ. `ACCOUNT_DELETION_RETRY_DELAY_MS` mặc định 300000 ms; `ACCOUNT_DELETION_RETRY_AFTER_SECONDS` mặc định 300 giây.
 - Các chức năng mới đi qua `application/port/in/*UseCase`, service ứng dụng, `application/port/out/*Port` và `infrastructure/persistence/*Adapter`. Domain model là Java thuần.
 - Tài khoản mới luôn có `USER`. Tài khoản Google mới không có mật khẩu; người dùng có thể đặt mật khẩu trong 10 phút sau khi đăng nhập Google tại `POST /api/app/me/password`, rồi dùng được cả hai cách đăng nhập.
 - Voting service nhận báo cáo công khai tại `POST /api/public/polls/{code}/reports`; admin xem và xử lý tại `/api/admin/polls/reports`. Bình chọn bị ẩn không thể xem hoặc bỏ phiếu qua link.

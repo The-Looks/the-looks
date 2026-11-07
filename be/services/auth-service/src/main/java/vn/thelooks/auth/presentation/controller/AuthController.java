@@ -2,6 +2,9 @@ package vn.thelooks.auth.presentation.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,11 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.thelooks.auth.application.port.out.UserPersistencePort;
+import vn.thelooks.auth.application.port.out.RefreshTokenSessionStore;
 import vn.thelooks.auth.application.port.in.LoginUseCase;
 import vn.thelooks.auth.application.port.in.RegisterUseCase;
 import vn.thelooks.auth.application.port.in.SessionUseCase;
 import vn.thelooks.auth.domain.exception.InvalidCredentialsException;
 import vn.thelooks.auth.domain.model.PasswordPolicy;
+import vn.thelooks.auth.domain.enums.UserStatus;
 import vn.thelooks.auth.presentation.advice.ForbiddenOriginException;
 import vn.thelooks.auth.presentation.mapper.UserResponseMapper;
 import vn.thelooks.auth.presentation.request.LoginRequest;
@@ -37,14 +42,19 @@ class AuthController {
     private final LoginUseCase login;
     private final SessionUseCase sessions;
     private final UserPersistencePort users;
+    private final RefreshTokenSessionStore refreshSessions;
+    private final Clock clock;
     private final String allowedOrigin;
 
     AuthController(RegisterUseCase register, LoginUseCase login, SessionUseCase sessions, UserPersistencePort users,
+            RefreshTokenSessionStore refreshSessions, Clock clock,
             @Value("${thelooks.security.web-origin}") String allowedOrigin) {
         this.register = register;
         this.login = login;
         this.sessions = sessions;
         this.users = users;
+        this.refreshSessions = refreshSessions;
+        this.clock = clock;
         this.allowedOrigin = allowedOrigin;
     }
 
@@ -87,13 +97,23 @@ class AuthController {
 
     @GetMapping("/app/me")
     UserResponse me(@AuthenticationPrincipal Jwt jwt) {
-        return users.findById(CurrentUser.id(jwt)).map(UserResponseMapper::from)
+        return users.findById(CurrentUser.id(jwt)).filter(user -> user.status() == UserStatus.ACTIVE)
+                .map(UserResponseMapper::from)
                 .orElseThrow(() -> new InvalidCredentialsException("Tài khoản không tồn tại"));
     }
 
     @GetMapping("/public/auth/session/active")
     ResponseEntity<Void> activeSession(@AuthenticationPrincipal Jwt jwt) {
         if (jwt == null) throw new InvalidCredentialsException("Phiên đăng nhập không hợp lệ");
+        try {
+            var userId = CurrentUser.id(jwt);
+            var sessionId = UUID.fromString(jwt.getClaimAsString("sid"));
+            if (!refreshSessions.isActive(sessionId, userId, Instant.now(clock))
+                    || users.findById(userId).filter(user -> user.status() == UserStatus.ACTIVE).isEmpty())
+                throw new InvalidCredentialsException("Phiên đăng nhập không hợp lệ");
+        } catch (IllegalArgumentException | NullPointerException invalid) {
+            throw new InvalidCredentialsException("Phiên đăng nhập không hợp lệ");
+        }
         return ResponseEntity.noContent().header(HttpHeaders.CACHE_CONTROL, "no-store").build();
     }
 

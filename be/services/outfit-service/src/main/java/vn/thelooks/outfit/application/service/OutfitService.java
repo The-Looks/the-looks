@@ -146,7 +146,7 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
 
     private Prepared prepare(UUID ownerId, Occasion occasion) {
         Instant now = clock.instant();
-        Optional<Weather> today = weather.current();
+        Optional<Weather> today = weather.current(ownerId);
         Set<String> seasons = today
                 .map(w -> OutfitRecommender.seasonsFor(w.temperatureC()))
                 .orElseGet(() -> Set.of(OutfitRecommender.seasonOf(LocalDate.ofInstant(now, VIETNAM).getMonth())));

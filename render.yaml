@@ -104,6 +104,8 @@ services:
         sync: false
       - key: WARDROBE_SERVICE_URL
         value: https://thelooks-wardrobe.onrender.com
+      - key: AUTH_SERVICE_URL
+        value: https://thelooks-auth.onrender.com
       - key: AI_PROVIDER # auto = Gemini chính, Gemini Flash Lite rồi Claude dự phòng
         value: auto
       - key: GEMINI_API_KEY

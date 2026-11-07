@@ -1,6 +1,5 @@
 package vn.thelooks.auth.infrastructure.persistence.adapter;
 
-import java.util.List;
 import java.util.UUID;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,22 +12,28 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
 import vn.thelooks.auth.application.port.out.AccountDeletionCoordinatorPort;
+import vn.thelooks.auth.application.port.out.AccountDeletionTokenPort;
 import vn.thelooks.auth.domain.model.AccountDeletionJob;
+import vn.thelooks.auth.domain.model.AccountDeletionWorkflow;
 
 @Component
 class AccountDeletionCoordinatorAdapter implements AccountDeletionCoordinatorPort {
-    private static final List<String> STEPS = List.of("VOTING", "WARDROBE", "OUTFIT", "BILLING", "AUTH");
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
     private final RestClient http;
+    private final AccountDeletionTokenPort tokens;
+    private final int retryAfterSeconds;
     private final String voting, wardrobe, outfit, billing;
 
     AccountDeletionCoordinatorAdapter(JdbcTemplate jdbc, PlatformTransactionManager transactions,
+            AccountDeletionTokenPort tokens,
+            @Value("${ACCOUNT_DELETION_RETRY_AFTER_SECONDS:300}") int retryAfterSeconds,
             @Value("${thelooks.services.voting:http://localhost:8084}") String voting,
             @Value("${thelooks.services.wardrobe:http://localhost:8082}") String wardrobe,
             @Value("${thelooks.services.outfit:http://localhost:8083}") String outfit,
             @Value("${thelooks.services.billing:http://localhost:8085}") String billing) {
-        this.jdbc=jdbc; this.tx=new TransactionTemplate(transactions);
+        this.jdbc=jdbc; this.tx=new TransactionTemplate(transactions); this.tokens=tokens;
+        this.retryAfterSeconds=Math.max(1,retryAfterSeconds);
         var requests=new SimpleClientHttpRequestFactory();
         requests.setConnectTimeout(Duration.ofSeconds(5));
         requests.setReadTimeout(Duration.ofSeconds(30));
@@ -46,9 +51,7 @@ class AccountDeletionCoordinatorAdapter implements AccountDeletionCoordinatorPor
     }
 
     @Override
-    public synchronized AccountDeletionJob startOrRetry(UUID actorId, UUID targetId, String bearerToken) {
-        if (actorId.equals(targetId)) throw new ResponseStatusException(HttpStatus.CONFLICT,"Không thể tự xóa tài khoản quản trị");
-        if (bearerToken == null || bearerToken.isBlank()) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    public synchronized AccountDeletionJob startOrRetry(UUID actorId, UUID targetId) {
         AccountDeletionJob job=tx.execute(status -> {
             jdbc.execute("SELECT pg_advisory_xact_lock(83104212)");
             var exists = jdbc.query("SELECT id FROM users WHERE id=?",(rs,row)->rs.getObject(1,UUID.class),targetId);
@@ -83,18 +86,16 @@ class AccountDeletionCoordinatorAdapter implements AccountDeletionCoordinatorPor
                     OR (status='RUNNING' AND updated_at < now() - interval '5 minutes'))
                 """, targetId);
         if (acquired == 0) return get(targetId);
-        int index=STEPS.indexOf(job.step());
-        if (index<0) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Bước xóa không hợp lệ");
-        for (int i=index;i<STEPS.size();i++) {
-            String step=STEPS.get(i);
-            try {
+        AccountDeletionWorkflow.Result result;
+        try {
+            result = AccountDeletionWorkflow.run(job.step(), (step, nextStep) -> {
                 if (step.equals("AUTH")) {
                     tx.executeWithoutResult(status -> {
                         jdbc.update("DELETE FROM users WHERE id=?",targetId);
                         jdbc.update("UPDATE account_deletions SET step='DONE',status='DONE',updated_at=now() WHERE target_id=?",targetId);
                         audit(actorId,targetId,"USER_DELETE_COMPLETED",null);
                     });
-                    return get(targetId);
+                    return;
                 }
                 String base=switch(step) {
                     case "VOTING" -> voting;
@@ -108,17 +109,31 @@ class AccountDeletionCoordinatorAdapter implements AccountDeletionCoordinatorPor
                     case "OUTFIT" -> "/api/admin/outfits/users/"+targetId+"/data";
                     default -> "/api/admin/billing/users/"+targetId+"/data";
                 };
-                http.delete().uri(base+path).header("Authorization","Bearer "+bearerToken).retrieve().toBodilessEntity();
-                jdbc.update("UPDATE account_deletions SET step=?,updated_at=now() WHERE target_id=?",STEPS.get(i+1),targetId);
-            } catch (RuntimeException e) {
-                String error=step+": "+e.getMessage();
-                jdbc.update("UPDATE account_deletions SET status='FAILED',last_error=?,updated_at=now() WHERE target_id=?",
-                        error.substring(0,Math.min(500,error.length())),targetId);
-                audit(actorId,targetId,"USER_DELETE_FAILED",step,"FAILED");
-                return get(targetId);
-            }
+                http.delete().uri(base+path).header("Authorization","Bearer "+tokens.issue(targetId)).retrieve().toBodilessEntity();
+                jdbc.update("UPDATE account_deletions SET step=?,updated_at=now() WHERE target_id=?",nextStep,targetId);
+            });
+        } catch (IllegalArgumentException invalidStep) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Bước xóa không hợp lệ", invalidStep);
+        }
+        if (!result.completed()) {
+            String error=result.step()+": "+result.failure().getMessage();
+            jdbc.update("UPDATE account_deletions SET status='FAILED',last_error=?,updated_at=now() WHERE target_id=?",
+                    error.substring(0,Math.min(500,error.length())),targetId);
+            audit(actorId,targetId,"USER_DELETE_FAILED",result.step(),"FAILED");
         }
         return get(targetId);
+    }
+
+    public void retryOutstanding() {
+        var jobs = jdbc.query("""
+                SELECT actor_id,target_id FROM account_deletions
+                WHERE status IN ('PENDING','FAILED','RUNNING') AND updated_at < now() - (? * interval '1 second')
+                ORDER BY updated_at LIMIT 20
+                """, (rs, row) -> new UUID[] { rs.getObject(1, UUID.class), rs.getObject(2, UUID.class) }, retryAfterSeconds);
+        for (var job : jobs) {
+            try { startOrRetry(job[0], job[1]); }
+            catch (RuntimeException ignored) { /* The job stays visible as FAILED for the next retry. */ }
+        }
     }
 
     private void audit(UUID actor,UUID target,String action,String detail) {

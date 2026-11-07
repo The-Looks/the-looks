@@ -57,6 +57,8 @@ export function LoginPage() {
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           <PasswordField id="login-password" label="Mật khẩu" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           {searchParams.get('google') === 'failed' && <Notice tone="error">Không hoàn tất đăng nhập Google. Vui lòng thử lại.</Notice>}
+          {searchParams.get('account-deletion') === 'done' && <p role="status">Tài khoản và dữ liệu của bạn đã được xóa.</p>}
+          {searchParams.get('account-deletion') === 'pending' && <Notice tone="error">Yêu cầu xóa đã tiếp nhận nhưng một bước chưa hoàn tất. Hệ thống sẽ thử lại; vui lòng liên hệ hỗ trợ nếu cần đối soát thanh toán.</Notice>}
           {login.isError && <Notice tone="error">{errorMessage(login.error)}</Notice>}
           {mockGoogleLogin.isError && <Notice tone="error">{errorMessage(mockGoogleLogin.error)}</Notice>}
           <Button type="submit" block disabled={login.isPending}>
