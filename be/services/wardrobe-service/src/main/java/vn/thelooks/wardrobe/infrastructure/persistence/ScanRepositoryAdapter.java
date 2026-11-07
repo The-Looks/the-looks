@@ -31,6 +31,9 @@ class ScanRepositoryAdapter implements ScanRepository {
         return tx.execute(status -> {
             jdbc.sql("select count(*) from (select pg_advisory_xact_lock(hashtextextended(:owner, 0))) l")
                     .param("owner", s.ownerId().toString()).query(Long.class).single();
+            boolean deleted = jdbc.sql("select exists(select 1 from wardrobe_deleted_owner where owner_id=:owner)")
+                    .param("owner",s.ownerId()).query(Boolean.class).single();
+            if (deleted) throw new IllegalStateException("Tài khoản đang được xóa");
             Optional<UUID> existing = jdbc.sql("""
                     select id from wardrobe_scan
                     where owner_id = :owner and content_hash = :hash and created_at > :since

@@ -45,8 +45,8 @@ const auth: HttpHandler[] = [
     if (!body.email || !body.password) return problem(401, 'Sai email hoặc mật khẩu');
     refreshActive = true;
     activeUser = body.email.toLowerCase() === 'admin@thelooks.local'
-      ? { ...DEMO_USER, email: body.email, username: 'Quản trị viên', roles: ['USER', 'ADMIN'] }
-      : { ...DEMO_USER, email: body.email, roles: ['USER'] };
+      ? { ...DEMO_USER, email: body.email, username: 'Quản trị viên', roles: ['USER', 'ADMIN'], permissions: ['ACCOUNT_READ_SELF', 'ADMIN_ACCESS', 'USER_MANAGE', 'ROLE_MANAGE', 'AUDIT_READ', 'REPORT_MODERATE', 'USER_DELETE', 'BILLING_STATS_READ', 'AI_USAGE_READ', 'AFFILIATE_STATS_READ'] }
+      : { ...DEMO_USER, email: body.email, roles: ['USER'], permissions: ['ACCOUNT_READ_SELF'] };
     rememberMockSession();
     return HttpResponse.json({ expiresAt: new Date(Date.now() + 30 * 60_000).toISOString() });
   }),
@@ -67,6 +67,7 @@ const auth: HttpHandler[] = [
     return HttpResponse.redirect(new URL('/auth/callback', request.url).toString(), 302);
   }),
   http.get('*/api/app/me', () => HttpResponse.json(activeUser)),
+  http.get('*/api/app/me/auth-methods', () => HttpResponse.json({ hasPassword: true })),
 ];
 
 // ---------------- wardrobe ----------------
@@ -376,5 +377,142 @@ const billing: HttpHandler[] = [
     return HttpResponse.json({ orderCode: code, ...order });
   }),
 ];
+
+// Các màn quản trị dùng chung dữ liệu mẫu trong dev:mock để thử luồng mà không cần PostgreSQL.
+const managedUser = {
+  id: '22222222-2222-4222-8222-222222222222', username: 'Người dùng thử', email: 'user@thelooks.local',
+  status: 'ACTIVE', emailVerified: true, createdAt: new Date().toISOString(), roles: ['USER'],
+  permissions: ['ACCOUNT_READ_SELF'],
+};
+const adminRoles = [
+  { code: 'USER', name: 'Người dùng', permissions: ['ACCOUNT_READ_SELF'], system: true },
+  { code: 'ADMIN', name: 'Quản trị viên', permissions: ['ACCOUNT_READ_SELF', 'ADMIN_ACCESS', 'USER_MANAGE', 'ROLE_MANAGE', 'AUDIT_READ', 'REPORT_MODERATE', 'USER_DELETE', 'BILLING_STATS_READ', 'AI_USAGE_READ', 'AFFILIATE_STATS_READ'], system: true },
+];
+const adminPermissions = adminRoles[1]!.permissions.map((code) => ({ code, description: code, system: true }));
+let managedDeleted = false;
+const adminLog: { id: string; actorId: string; targetId: string; action: string; detail: string | null; outcome: 'SUCCESS' | 'FAILED'; createdAt: string }[] = [];
+const deletionJobs = new Map<string, { targetId: string; actorId: string; step: string; status: string; lastError: null; createdAt: string; updatedAt: string }>();
+const demoReports: { id: string; pollCode: string; question: string | undefined; reason: string; status: string; createdAt: string }[] = [];
+const logAdmin = (targetId: string, action: string, detail: string | null = null) => adminLog.unshift({
+  id: crypto.randomUUID(), actorId: activeUser.id, targetId, action, detail, outcome: 'SUCCESS', createdAt: new Date().toISOString(),
+});
+const detail = (id: string) => id === managedUser.id && !managedDeleted ? managedUser : id === activeUser.id
+  ? { ...activeUser, status: 'ACTIVE', emailVerified: true } : null;
+
+auth.push(
+  http.get('*/api/admin/auth/users', ({ request }) => {
+    const url = new URL(request.url);
+    const search = (url.searchParams.get('search') ?? '').toLowerCase();
+    const items = [detail(activeUser.id)!, ...(managedDeleted ? [] : [managedUser])].filter((u) =>
+      !search || u.username.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
+    return HttpResponse.json({ items, total: items.length, page: 0, size: 10 });
+  }),
+  http.get('*/api/admin/auth/users/:id', ({ params }) => {
+    const user = detail(String(params.id)); return user ? HttpResponse.json(user) : problem(404, 'Không tìm thấy tài khoản');
+  }),
+  http.put('*/api/admin/auth/users/:id/status', async ({ params, request }) => {
+    if (params.id !== managedUser.id) return problem(409, 'Không thể tự khóa tài khoản');
+    managedUser.status = ((await request.json()) as { status: string }).status;
+    logAdmin(managedUser.id, managedUser.status === 'LOCKED' ? 'USER_LOCK' : 'USER_UNLOCK');
+    return HttpResponse.json(managedUser);
+  }),
+  http.put('*/api/admin/auth/users/:id/roles/:role', ({ params }) => {
+    if (params.id !== managedUser.id) return problem(409, 'Không thể tự đổi vai trò');
+    const role = String(params.role);
+    if (!adminRoles.some((r) => r.code === role)) return problem(404, 'Không tìm thấy vai trò');
+    if (!managedUser.roles.includes(role)) managedUser.roles.push(role);
+    managedUser.permissions = [...new Set(managedUser.roles.flatMap((r) => adminRoles.find((x) => x.code === r)?.permissions ?? []))];
+    logAdmin(managedUser.id, 'USER_ROLE_GRANT', role);
+    return HttpResponse.json(managedUser);
+  }),
+  http.delete('*/api/admin/auth/users/:id/roles/:role', ({ params }) => {
+    const role = String(params.role);
+    if (params.id !== managedUser.id || role === 'USER') return problem(409, 'Không thể gỡ vai trò');
+    managedUser.roles = managedUser.roles.filter((r) => r !== role);
+    managedUser.permissions = [...new Set(managedUser.roles.flatMap((r) => adminRoles.find((x) => x.code === r)?.permissions ?? []))];
+    logAdmin(managedUser.id, 'USER_ROLE_REVOKE', role);
+    return HttpResponse.json(managedUser);
+  }),
+  http.get('*/api/admin/auth/roles', () => HttpResponse.json(adminRoles)),
+  http.post('*/api/admin/auth/roles', async ({ request }) => {
+    const body = (await request.json()) as { code: string; name: string };
+    if (adminRoles.some((r) => r.code === body.code)) return problem(409, 'Mã vai trò đã tồn tại');
+    const role = { ...body, permissions: [] as string[], system: false }; adminRoles.push(role);
+    logAdmin(body.code, 'ROLE_CREATE', body.name); return HttpResponse.json(role, { status: 201 });
+  }),
+  http.put('*/api/admin/auth/roles/:code', async ({ params, request }) => {
+    const role = adminRoles.find((r) => r.code === params.code); if (!role) return problem(404, 'Không tìm thấy vai trò');
+    role.name = ((await request.json()) as { name: string }).name; logAdmin(role.code, 'ROLE_UPDATE', role.name);
+    return HttpResponse.json(role);
+  }),
+  http.put('*/api/admin/auth/roles/:code/permissions', async ({ params, request }) => {
+    const role = adminRoles.find((r) => r.code === params.code); if (!role) return problem(404, 'Không tìm thấy vai trò');
+    role.permissions = ((await request.json()) as { permissions: string[] }).permissions;
+    logAdmin(role.code, 'ROLE_PERMISSIONS', role.permissions.join(',')); return HttpResponse.json(role);
+  }),
+  http.delete('*/api/admin/auth/roles/:code', ({ params }) => {
+    const index = adminRoles.findIndex((r) => r.code === params.code && !r.system);
+    if (index < 0) return problem(409, 'Không thể xóa vai trò');
+    adminRoles.splice(index, 1); logAdmin(String(params.code), 'ROLE_DELETE'); return new HttpResponse(null, { status: 204 });
+  }),
+  http.get('*/api/admin/auth/permissions', () => HttpResponse.json(adminPermissions)),
+  http.post('*/api/admin/auth/permissions', async ({ request }) => {
+    const body = (await request.json()) as { code: string; description: string };
+    if (adminPermissions.some((p) => p.code === body.code)) return problem(409, 'Mã quyền đã tồn tại');
+    const permission = { ...body, system: false }; adminPermissions.push(permission);
+    logAdmin(body.code, 'PERMISSION_CREATE', body.description); return HttpResponse.json(permission, { status: 201 });
+  }),
+  http.put('*/api/admin/auth/permissions/:code', async ({ params, request }) => {
+    const permission = adminPermissions.find((p) => p.code === params.code);
+    if (!permission) return problem(404, 'Không tìm thấy quyền');
+    permission.description = ((await request.json()) as { description: string }).description;
+    logAdmin(permission.code, 'PERMISSION_UPDATE', permission.description); return HttpResponse.json(permission);
+  }),
+  http.delete('*/api/admin/auth/permissions/:code', ({ params }) => {
+    const index = adminPermissions.findIndex((p) => p.code === params.code && !p.system);
+    if (index < 0) return problem(409, 'Không thể xóa quyền');
+    adminPermissions.splice(index, 1); logAdmin(String(params.code), 'PERMISSION_DELETE'); return new HttpResponse(null, { status: 204 });
+  }),
+  http.get('*/api/admin/auth/audit', ({ request }) => {
+    const query = new URL(request.url).searchParams;
+    const outcome = query.get('outcome') ?? 'ALL';
+    const search = (query.get('search') ?? '').toLowerCase();
+    return HttpResponse.json(adminLog.filter((entry) => (outcome === 'ALL' || entry.outcome === outcome)
+      && (!search || [entry.action, entry.targetId, entry.detail ?? ''].some((value) => value.toLowerCase().includes(search)))));
+  }),
+  http.get('*/api/admin/auth/users/:id/deletion', ({ params }) => {
+    const job = deletionJobs.get(String(params.id)); return job ? HttpResponse.json(job) : problem(404, 'Chưa có yêu cầu xóa');
+  }),
+  http.post('*/api/admin/auth/users/:id/deletion', ({ params }) => {
+    if (params.id !== managedUser.id) return problem(409, 'Không thể tự xóa');
+    const at = new Date().toISOString();
+    const job = { targetId: managedUser.id, actorId: activeUser.id, step: 'DONE', status: 'DONE', lastError: null, createdAt: at, updatedAt: at };
+    deletionJobs.set(managedUser.id, job); managedDeleted = true;
+    logAdmin(managedUser.id, 'USER_DELETE_COMPLETED'); return HttpResponse.json(job);
+  }),
+);
+wardrobe.push(http.get('*/api/admin/wardrobe/users/:id/data', () => HttpResponse.json({ itemCount: closet.length })));
+outfit.push(http.get('*/api/admin/outfits/users/:id/data', () => HttpResponse.json({ savedOutfitCount: 0 })));
+billing.push(http.get('*/api/admin/billing/users/:id/data', () => HttpResponse.json({ plan: myPlan.plan, expiresAt: myPlan.expiresAt })));
+voting.push(
+  http.get('*/api/admin/polls/users/:id/data', () => HttpResponse.json({ pollCount: polls.length })),
+  http.post('*/api/public/polls/:code/reports', async ({ params, request }) => {
+    const poll = polls.find((p) => p.code === params.code); if (!poll) return problem(404, 'Không tìm thấy bình chọn');
+    const reason = ((await request.json()) as { reason: string }).reason;
+    demoReports.unshift({ id: crypto.randomUUID(), pollCode: poll.code, question: poll.question, reason, status: 'OPEN', createdAt: new Date().toISOString() });
+    return new HttpResponse(null, { status: 201 });
+  }),
+  http.get('*/api/admin/polls/reports', ({ request }) => {
+    const status = new URL(request.url).searchParams.get('status') ?? 'OPEN';
+    return HttpResponse.json(demoReports.filter((r) => status === 'ALL' || r.status === status));
+  }),
+  http.put('*/api/admin/polls/reports/:id', async ({ params, request }) => {
+    const report = demoReports.find((r) => r.id === params.id); if (!report) return problem(404, 'Không tìm thấy báo cáo');
+    report.status = ((await request.json()) as { status: string }).status;
+    if (report.status === 'HIDDEN') polls = polls.filter((p) => p.code !== report.pollCode);
+    logAdmin(report.pollCode, `POLL_${report.status}`); return HttpResponse.json(report);
+  }),
+  http.get('*/api/admin/polls/audit', () => HttpResponse.json([])),
+);
 
 export const handlersByService: Record<string, HttpHandler[]> = { auth, wardrobe, outfit, voting, billing };

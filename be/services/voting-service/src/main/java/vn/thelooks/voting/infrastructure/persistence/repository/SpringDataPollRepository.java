@@ -10,5 +10,7 @@ public interface SpringDataPollRepository extends JpaRepository<PollJpaEntity, U
 
     Optional<PollJpaEntity> findByCode(String code);
 
+    Optional<PollJpaEntity> findByCodeAndHiddenFalse(String code);
+
     List<PollJpaEntity> findByOwnerIdOrderByCreatedAtDesc(UUID ownerId);
 }

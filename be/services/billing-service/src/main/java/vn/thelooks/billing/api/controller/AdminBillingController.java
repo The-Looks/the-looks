@@ -4,9 +4,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 import vn.thelooks.billing.application.port.out.BillingStatsQuery;
 
-/** Chỉ ADMIN (quy tắc chung cho /api/admin/** trong packages/security). */
 @RestController
 @RequestMapping("/api/admin/billing/stats")
 class AdminBillingController {
@@ -18,6 +18,7 @@ class AdminBillingController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('PERMISSION_BILLING_STATS_READ')")
     BillingStatsQuery.BillingStats stats(@RequestParam(defaultValue = "30") int days) {
         return stats.stats(Math.max(1, Math.min(90, days)));
     }

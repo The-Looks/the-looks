@@ -131,6 +131,17 @@ paths:
               schema: { $ref: '#/components/schemas/WardrobeItem' }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
 
+  /api/admin/wardrobe/users/{id}/data:
+    parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+    get:
+      summary: Số món trong tủ của người dùng
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object, required: [itemCount], properties: { itemCount: { type: integer } } } } } }
+    delete:
+      summary: Xóa tủ đồ và ảnh của người dùng theo yêu cầu xóa tài khoản
+      responses:
+        '204': { description: Đã xóa }
+
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }

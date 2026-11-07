@@ -13,6 +13,7 @@
   "rewrites": [
     { "source": "/api/public/auth/:path*", "destination": "https://thelooks-auth.onrender.com/api/public/auth/:path*" },
     { "source": "/api/app/me", "destination": "https://thelooks-auth.onrender.com/api/app/me" },
+    { "source": "/api/app/me/:path*", "destination": "https://thelooks-auth.onrender.com/api/app/me/:path*" },
     { "source": "/api/app/wardrobe/:path*", "destination": "https://thelooks-wardrobe.onrender.com/api/app/wardrobe/:path*" },
     { "source": "/api/public/wardrobe/:path*", "destination": "https://thelooks-wardrobe.onrender.com/api/public/wardrobe/:path*" },
     { "source": "/api/app/outfits", "destination": "https://thelooks-outfit.onrender.com/api/app/outfits" },
@@ -23,6 +24,8 @@
     { "source": "/api/app/billing/:path*", "destination": "https://thelooks-billing.onrender.com/api/app/billing/:path*" },
     { "source": "/api/public/billing/:path*", "destination": "https://thelooks-billing.onrender.com/api/public/billing/:path*" },
     { "source": "/api/admin/outfits/:path*", "destination": "https://thelooks-outfit.onrender.com/api/admin/outfits/:path*" },
+    { "source": "/api/admin/wardrobe/:path*", "destination": "https://thelooks-wardrobe.onrender.com/api/admin/wardrobe/:path*" },
+    { "source": "/api/admin/polls/:path*", "destination": "https://thelooks-voting.onrender.com/api/admin/polls/:path*" },
     { "source": "/api/admin/billing/:path*", "destination": "https://thelooks-billing.onrender.com/api/admin/billing/:path*" },
     { "source": "/api/admin/auth/:path*", "destination": "https://thelooks-auth.onrender.com/api/admin/auth/:path*" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }

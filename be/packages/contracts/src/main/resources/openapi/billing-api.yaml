@@ -108,6 +108,17 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/BillingStats' }
         '403': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/admin/billing/users/{id}/data:
+    parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+    get:
+      summary: Gói còn hạn của người dùng
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object, required: [plan], properties: { plan: { type: string }, expiresAt: { type: [string, 'null'], format: date-time } } } } } }
+    delete:
+      summary: Xóa gói và tách mã người dùng khỏi đơn thanh toán
+      responses:
+        '204': { description: Đã xử lý }
+
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }

@@ -194,6 +194,17 @@ paths:
         '204': { description: Đã ghi }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
 
+  /api/admin/outfits/users/{id}/data:
+    parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+    get:
+      summary: Số outfit đã lưu của người dùng
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object, required: [savedOutfitCount], properties: { savedOutfitCount: { type: integer } } } } } }
+    delete:
+      summary: Xóa outfit, sở thích và dữ liệu phát sinh của người dùng
+      responses:
+        '204': { description: Đã xóa }
+
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }

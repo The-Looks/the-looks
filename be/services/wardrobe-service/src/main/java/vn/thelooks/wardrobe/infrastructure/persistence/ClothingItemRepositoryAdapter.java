@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import vn.thelooks.wardrobe.application.port.out.ClothingItemRepository;
 import vn.thelooks.wardrobe.domain.model.Category;
 import vn.thelooks.wardrobe.domain.model.ClothingAttributes;
@@ -31,7 +32,13 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
     }
 
     @Override
+    @Transactional
     public ClothingItem save(ClothingItem i) {
+        jdbc.sql("select count(*) from (select pg_advisory_xact_lock(hashtextextended(:owner, 0))) l")
+                .param("owner",i.ownerId().toString()).query(Long.class).single();
+        boolean deleted = jdbc.sql("select exists(select 1 from wardrobe_deleted_owner where owner_id=:owner)")
+                .param("owner",i.ownerId()).query(Boolean.class).single();
+        if (deleted) throw new IllegalStateException("Tài khoản đang được xóa");
         ClothingAttributes a = i.attributes();
         jdbc.sql("""
                 insert into wardrobe_item (id, owner_id, image_key, status, category, colors, material, seasons, style_tags,

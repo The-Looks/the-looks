@@ -28,13 +28,15 @@ class JwtSecurityAutoConfigurationTest {
     void mapsDatabaseBackedPermissionsAndRolesToAuthorities() {
         var jwt = Jwt.withTokenValue("token").header("alg", "RS256")
                 .claim("roles", List.of("USER", "ADMIN"))
-                .claim("permissions", List.of("ACCOUNT_READ_SELF", "ADMIN_ACCESS"))
+                .claim("permissions", List.of("ACCOUNT_READ_SELF", "ADMIN_ACCESS", "ROLE_MANAGE"))
                 .build();
         var authentication = new JwtSecurityAutoConfiguration().jwtAuthenticationConverter().convert(jwt);
 
         assertTrue(authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
         assertTrue(authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("PERMISSION_ADMIN_ACCESS")));
+        assertTrue(authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("PERMISSION_ROLE_MANAGE")));
     }
 
     @Test

@@ -25,7 +25,7 @@ class PollRepositoryAdapter implements PollRepository {
 
     @Override
     public Optional<Poll> findByCode(String code) {
-        return repository.findByCode(code).map(PollPersistenceMapper::toDomain);
+        return repository.findByCodeAndHiddenFalse(code).map(PollPersistenceMapper::toDomain);
     }
 
     @Override
