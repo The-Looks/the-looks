@@ -19,6 +19,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import vn.thelooks.auth.application.port.in.RegisterUseCase;
+import vn.thelooks.auth.application.port.out.ConsentStore;
 import vn.thelooks.auth.application.port.out.FirstAdminRoleAssigner;
 import vn.thelooks.auth.application.port.out.GoogleOAuthFlowStore;
 import vn.thelooks.auth.application.port.out.GoogleAccountLinkStore;
@@ -41,11 +43,12 @@ class GoogleOidcServiceTest {
     private final FirstAdminRoleAssigner admins = mock(FirstAdminRoleAssigner.class);
     private final RefreshTokenSessionStore sessions = mock(RefreshTokenSessionStore.class);
     private final TokenIssuer tokens = mock(TokenIssuer.class);
+    private final ConsentStore consents = mock(ConsentStore.class);
     private GoogleOidcService service;
 
     @BeforeEach
     void setUp() {
-        service = new GoogleOidcService(flows, identities, verifier, users, admins, sessions, tokens,
+        service = new GoogleOidcService(flows, identities, verifier, users, admins, sessions, tokens, consents,
                 Clock.fixed(NOW, ZoneOffset.UTC), "client-id", "http://localhost/callback", "admin@gmail.com");
     }
 
@@ -78,6 +81,7 @@ class GoogleOidcServiceTest {
         assertTrue(issuedUser.getValue().roles().contains(RoleCodes.ADMIN));
         assertTrue(issuedUser.getValue().permissions().contains("ADMIN_ACCESS"));
         assertEquals("password-hash", issuedUser.getValue().passwordHash());
+        verify(consents, never()).record(any(), any(), any());
     }
 
     @Test
@@ -125,5 +129,25 @@ class GoogleOidcServiceTest {
         when(flows.consume(hash.getValue())).thenReturn(Optional.of(
                 new GoogleOAuthFlowStore.Flow(nonce.getValue(), verifierValue.getValue(), NOW.plusSeconds(600))));
         return state;
+    }
+
+    @Test
+    void newGoogleAccountRecordsTermsConsent() {
+        var state = arrangeFlow();
+        when(verifier.exchangeAndVerify(eq("code"), any(), any())).thenReturn(
+                new GoogleTokenVerifier.Profile("new-sub", "new@gmail.com", true, "New", true));
+        when(identities.findUserId("new-sub")).thenReturn(Optional.empty());
+        when(users.findByEmail("new@gmail.com")).thenReturn(Optional.empty());
+        when(users.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(sessions.create(any(UUID.class), eq(NOW), any()))
+                .thenReturn(new RefreshTokenSessionStore.Session(UUID.randomUUID(), "refresh", NOW.plusSeconds(604800)));
+        when(tokens.issue(any(User.class), any(UUID.class)))
+                .thenReturn(new TokenIssuer.IssuedToken("access", NOW.plusSeconds(1800)));
+
+        service.complete("code", state, state);
+
+        var created = ArgumentCaptor.forClass(User.class);
+        verify(users).save(created.capture());
+        verify(consents).record(created.getValue().id(), RegisterUseCase.TERMS_VERSION, NOW);
     }
 }

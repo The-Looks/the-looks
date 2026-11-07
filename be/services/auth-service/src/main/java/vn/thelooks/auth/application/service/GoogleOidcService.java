@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
+import vn.thelooks.auth.application.port.in.RegisterUseCase;
+import vn.thelooks.auth.application.port.out.ConsentStore;
 import vn.thelooks.auth.application.port.out.FirstAdminRoleAssigner;
 import vn.thelooks.auth.application.port.out.GoogleOAuthFlowStore;
 import vn.thelooks.auth.application.port.out.GoogleAccountLinkStore;
@@ -44,6 +46,7 @@ class GoogleOidcService implements GoogleLoginUseCase {
     private final FirstAdminRoleAssigner admins;
     private final RefreshTokenSessionStore sessions;
     private final TokenIssuer tokens;
+    private final ConsentStore consents;
     private final Clock clock;
     private final String clientId;
     private final String redirectUri;
@@ -51,7 +54,7 @@ class GoogleOidcService implements GoogleLoginUseCase {
 
     GoogleOidcService(GoogleOAuthFlowStore flows, GoogleAccountLinkStore identities, GoogleTokenVerifier google,
             UserPersistencePort users, FirstAdminRoleAssigner admins, RefreshTokenSessionStore sessions, TokenIssuer tokens,
-            Clock clock, @Value("${thelooks.google.client-id:}") String clientId,
+            ConsentStore consents, Clock clock, @Value("${thelooks.google.client-id:}") String clientId,
             @Value("${thelooks.google.redirect-uri:}") String redirectUri,
             @Value("${thelooks.admin.bootstrap-email:}") String adminEmail) {
         this.flows = flows;
@@ -61,6 +64,7 @@ class GoogleOidcService implements GoogleLoginUseCase {
         this.admins = admins;
         this.sessions = sessions;
         this.tokens = tokens;
+        this.consents = consents;
         this.clock = clock;
         this.clientId = clientId;
         this.redirectUri = redirectUri;
@@ -128,6 +132,8 @@ class GoogleOidcService implements GoogleLoginUseCase {
                 if (name.length() > 60) name = name.substring(0, 60);
                 user = users.save(new User(UUID.randomUUID(), email, null, name, true,
                         Set.of(RoleCodes.USER), Set.of(), UserStatus.ACTIVE, now, now));
+                // Nút Google ở trang đăng nhập ghi rõ "tiếp tục nghĩa là đồng ý Điều khoản và Chính sách"
+                consents.record(user.id(), RegisterUseCase.TERMS_VERSION, now);
             }
             identities.link(profile.subject(), user.id());
         }
