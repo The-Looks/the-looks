@@ -48,7 +48,7 @@ mở PR, nhờ Tuấn review. Đổi API thì sửa `wardrobe-api.yaml` + chạy
 | 2.2 | ~~CI + bảo vệ nhánh `main`~~ (xong 07/11): mọi PR phải qua 2 job `backend` và `web` mới merge được | | |
 | 2.11 | Kiểm tra luồng xoá tài khoản của #40 trên bản deploy (admin xoá 1 tài khoản thử) | 10/11 | |
 | 2.10 | ~~Đồng ý điều khoản khi đăng ký bằng Google~~ (xong 07/11) | | |
-| 2.12 | **Thời tiết theo thành phố người dùng**: outfit đang cố định TP.HCM (`WEATHER_LAT/LON`); khi 3.8 có thành phố thì lấy theo hồ sơ | 20/12 | Sau 3.8 |
+| 2.12 | ~~Thời tiết theo thành phố~~ (xong 07/11: Phát nối hồ sơ ở PR #52, Tuấn thêm dự phòng thành phố mặc định) | | |
 | 2.9 | **Email nhắc gia hạn** (3 ngày trước khi hết hạn) qua Resend | 13/12 | Hiện chỉ nhắc trong app |
 | 2.6 | ~~Lịch mặc (Pro)~~ (xong 07/11): `/outfits/calendar` | | |
 
@@ -56,9 +56,9 @@ mở PR, nhờ Tuấn review. Đổi API thì sửa `wardrobe-api.yaml` + chạy
 
 | # | Việc | Hạn | Ghi chú |
 |---|---|---|---|
-| 3.3 | Thêm **test cho auth-service** (hiện chỉ có 3 file test): đăng ký trùng, sai mật khẩu, refresh token bị dùng lại, JWT hết hạn, xoá tài khoản lỗi giữa chừng rồi thử lại | 15/11 | |
-| 3.8 | **Hồ sơ cá nhân**: đổi tên hiển thị, ảnh đại diện (hiện chỉ là chữ cái đầu), thành phố | 06/12 | Báo Tuấn khi có thành phố (2.12) |
-| 3.10 | **Tự xoá tài khoản** ở trang Hồ sơ | 13/12 | Luồng xoá của #40 gửi token của người gọi sang các service, mà API xoá dữ liệu cần quyền `PERMISSION_USER_DELETE` (chỉ admin có). Người dùng thường tự xoá sẽ bị 403 → cần cách gọi nội bộ giữa các service (khoá bí mật dùng chung hoặc token riêng của service) |
+| 3.3 | ~~Test auth-service~~ (xong 07/11, PR #52) | | |
+| 3.8 | ~~Hồ sơ: tên, ảnh, thành phố~~ (xong 07/11, PR #52) | | |
+| 3.10 | ~~Tự xoá tài khoản~~ (xong 07/11, PR #52) | | |
 
 **PR #40 / #44 (đã merge 07/11):** Phát đã gỡ xung đột; migration trùng số đã được Tuấn sửa gấp ngay sau đó
 (billing V4/V5, outfit V7, wardrobe V4). Lần sau tạo migration mới: kiểm tra số lớn nhất trên `main` ngay trước khi merge.
