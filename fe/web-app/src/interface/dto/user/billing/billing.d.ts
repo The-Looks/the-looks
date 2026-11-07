@@ -288,6 +288,137 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/billing/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Trạng thái cấu hình cổng thanh toán, không trả về khóa bí mật */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            paymentGateway: string;
+                            payosConfigured: boolean;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/billing/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Danh sách đơn thanh toán */
+        get: {
+            parameters: {
+                query?: {
+                    status?: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED";
+                    ownerId?: string;
+                    orderCode?: number;
+                    page?: number;
+                    size?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminOrderPage"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/billing/orders/{orderCode}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** (ADMIN) Ghi nhận hoàn tiền thủ công và cập nhật thời hạn gói */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    orderCode: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        reason: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Đã ghi nhận hoàn tiền */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            order: components["schemas"]["Order"];
+                            /** Format: date-time */
+                            newExpiry?: string | null;
+                        };
+                    };
+                };
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/billing/users/{id}/data": {
         parameters: {
             query?: never;
@@ -448,7 +579,7 @@ export interface components {
             /** Format: int64 */
             amountVnd: number;
             /** @enum {string} */
-            status: "PENDING" | "PAID" | "CANCELLED";
+            status: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED";
             /** Format: uri */
             checkoutUrl?: string;
             /** Format: date-time */

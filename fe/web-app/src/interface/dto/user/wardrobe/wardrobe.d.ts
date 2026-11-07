@@ -529,6 +529,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/wardrobe/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Trạng thái cấu hình AI và lưu ảnh, không trả về khóa bí mật */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            aiProvider: string;
+                            geminiConfigured: boolean;
+                            anthropicConfigured: boolean;
+                            imageStorage: string;
+                            cloudinaryConfigured: boolean;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/wardrobe/users/{id}/data": {
         parameters: {
             query?: never;

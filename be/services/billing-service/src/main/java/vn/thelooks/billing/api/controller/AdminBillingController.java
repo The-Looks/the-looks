@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,14 +29,19 @@ import vn.thelooks.billing.domain.model.OrderStatus;
 import vn.thelooks.security.CurrentUser;
 
 @RestController
-@RequestMapping("/api/admin/billing/stats")
+@RequestMapping("/api/admin/billing")
 class AdminBillingController {
 
     private final BillingStatsQuery stats;
     private final AdminOrderQuery orders;
     private final RefundOrderUseCase refunds;
+    private final Status status;
 
-    AdminBillingController(BillingStatsQuery stats) {
+    AdminBillingController(BillingStatsQuery stats, AdminOrderQuery orders, RefundOrderUseCase refunds,
+            @Value("${thelooks.billing.gateway}") String gateway,
+            @Value("${thelooks.billing.payos.client-id:}") String clientId,
+            @Value("${thelooks.billing.payos.api-key:}") String apiKey,
+            @Value("${thelooks.billing.payos.checksum-key:}") String checksumKey) {
         this.stats = stats;
         this.orders = orders;
         this.refunds = refunds;
@@ -43,7 +49,14 @@ class AdminBillingController {
         this.status = new Status(gateway, !clientId.isBlank() && !apiKey.isBlank() && !checksumKey.isBlank());
     }
 
-    @GetMapping
+    record Status(String paymentGateway, boolean payosConfigured) {}
+
+    @GetMapping("/status")
+    Status status() {
+        return status;
+    }
+
+    @GetMapping("/stats")
     @PreAuthorize("hasAuthority('PERMISSION_BILLING_STATS_READ')")
     BillingStatsQuery.BillingStats stats(@RequestParam(defaultValue = "30") int days) {
         return stats.stats(Math.max(1, Math.min(90, days)));

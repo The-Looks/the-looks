@@ -4,7 +4,7 @@ import {
   SettingOutlined, ShoppingOutlined, TeamOutlined, UserAddOutlined,
 } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Avatar, Button, Card, Input, Skeleton, Table, Tag } from 'antd';
+import { Avatar, Button, Card, Input, Modal, Select, Skeleton, Table, Tag } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BackLink, Brand } from '../../../components/shared/ui/index';
@@ -393,9 +393,11 @@ export function AdminDashboardPage() {
           {allowed && view === 'permissions' && <PermissionsPanel />}
           {allowed && view === 'content' && <ReportsPanel />}
           {allowed && view === 'audit' && <AuditPanel />}
-          {allowed && view === 'revenue' && <RevenuePanel />}
+          {allowed && view === 'revenue' && <><RevenuePanel /><OrdersPanel /></>}
           {allowed && view === 'affiliate' && <AffiliatePanel />}
-          {allowed && !['overview', 'users', 'roles', 'permissions', 'content', 'audit', 'revenue', 'affiliate'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
+          {allowed && view === 'products' && <ProductsPanel />}
+          {allowed && view === 'settings' && <SystemStatusPanel />}
+          {allowed && !['overview', 'users', 'roles', 'permissions', 'content', 'audit', 'revenue', 'affiliate', 'products', 'settings'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
         </div>
       </main>
       <SiteFooter variant="admin" />

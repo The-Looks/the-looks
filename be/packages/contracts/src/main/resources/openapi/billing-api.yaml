@@ -108,6 +108,62 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/BillingStats' }
         '403': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/admin/billing/status:
+    get:
+      summary: (ADMIN) Trạng thái cấu hình cổng thanh toán, không trả về khóa bí mật
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [paymentGateway, payosConfigured]
+                properties:
+                  paymentGateway: { type: string }
+                  payosConfigured: { type: boolean }
+  /api/admin/billing/orders:
+    get:
+      summary: (ADMIN) Danh sách đơn thanh toán
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [PENDING, PAID, CANCELLED, REFUNDED] } }
+        - { name: ownerId, in: query, schema: { type: string, format: uuid } }
+        - { name: orderCode, in: query, schema: { type: integer, format: int64 } }
+        - { name: page, in: query, schema: { type: integer, default: 0 } }
+        - { name: size, in: query, schema: { type: integer, default: 20 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminOrderPage' }
+  /api/admin/billing/orders/{orderCode}/refund:
+    post:
+      summary: (ADMIN) Ghi nhận hoàn tiền thủ công và cập nhật thời hạn gói
+      parameters:
+        - { name: orderCode, in: path, required: true, schema: { type: integer, format: int64 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 1, maxLength: 300 }
+      responses:
+        '200':
+          description: Đã ghi nhận hoàn tiền
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [order]
+                properties:
+                  order: { $ref: '#/components/schemas/Order' }
+                  newExpiry: { type: [string, 'null'], format: date-time }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/admin/billing/users/{id}/data:
     parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
     get:
