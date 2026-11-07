@@ -9,7 +9,9 @@ export function RequireAdmin() {
   const me = useQuery({ queryKey: ['me'], queryFn: () => unwrap(authApi.GET('/api/app/me')) });
   if (me.isPending) return <main className="admin-page"><Spinner label="Đang kiểm tra quyền quản trị…" /></main>;
   if (me.isError) return <main className="admin-page"><Notice tone="error">{errorMessage(me.error)}</Notice></main>;
-  if (!me.data.permissions?.includes('ADMIN_ACCESS')) {
+  // Nhận cả role ADMIN: auth-service bản cũ (deploy chậm hơn web) chưa trả trường permissions
+  const isAdmin = me.data.permissions?.includes('ADMIN_ACCESS') || me.data.roles?.includes('ADMIN');
+  if (!isAdmin) {
     return <Result status="403" title="Bạn không có quyền quản trị" subTitle="Tài khoản chưa có quyền truy cập quản trị." extra={<Link to="/"><Button type="primary">Về trang chủ</Button></Link>} />;
   }
   return <Outlet />;
