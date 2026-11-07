@@ -28,9 +28,9 @@ nếu thay đổi các giá trị này.
 Ở local, trình duyệt ↔ Vite dùng HTTPS, còn Vite ↔ backend vẫn dùng HTTP trên
 loopback. Bản deploy dùng HTTPS ở cả đường từ trình duyệt tới Vercel và từ
 Vercel tới các service trên Render.
-Trang quản trị hiện chỉ có API thật cho chi phí LOOKSY AI. Các bảng người dùng,
-nội dung, sản phẩm và doanh thu vẫn hiển thị dữ liệu minh họa vì backend chưa có
-endpoint tương ứng; giao diện có nhãn để phân biệt.
+Trang quản trị lấy dữ liệu thật cho người dùng, role/permission, nhật ký, báo cáo bình chọn,
+doanh thu gói và chi phí AI. Các mục chưa có API sẽ hiển thị trạng thái chưa có dữ liệu.
+Trang hồ sơ cho phép người dùng Google đặt mật khẩu để đăng nhập bằng cả Google và email.
 
 Google OAuth thật cần mở web bằng đúng origin trong `WEB_ORIGIN` và
 `GOOGLE_REDIRECT_URI` của auth-service (`https://localhost:5173`,

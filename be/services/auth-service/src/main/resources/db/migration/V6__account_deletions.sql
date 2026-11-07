@@ -1,0 +1,9 @@
+CREATE TABLE account_deletions (
+ target_id UUID PRIMARY KEY,
+ actor_id UUID NOT NULL,
+ step VARCHAR(20) NOT NULL DEFAULT 'VOTING',
+ status VARCHAR(12) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING','RUNNING','FAILED','DONE')),
+ last_error VARCHAR(500),
+ created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

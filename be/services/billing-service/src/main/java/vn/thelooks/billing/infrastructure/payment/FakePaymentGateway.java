@@ -33,6 +33,9 @@ class FakePaymentGateway implements PaymentGateway {
     }
 
     @Override
+    public boolean cancelUnpaid(long orderCode) { return true; }
+
+    @Override
     public Optional<PaidNotice> verifyWebhook(Map<String, Object> body) {
         return Optional.empty();
     }

@@ -85,7 +85,7 @@ class BillingService implements GetEntitlementsQuery, CheckoutUseCase, ConfirmPa
     @Override
     public Order confirm(UUID ownerId, long orderCode) {
         Order order = orders.find(orderCode)
-                .filter(o -> o.ownerId().equals(ownerId))
+                .filter(o -> ownerId.equals(o.ownerId()))
                 .orElseThrow(() -> new OrderNotFoundException("Không tìm thấy đơn " + orderCode));
         if (order.status() == OrderStatus.PENDING && gateway.isPaid(orderCode, order.amountVnd())) {
             activate(orderCode);

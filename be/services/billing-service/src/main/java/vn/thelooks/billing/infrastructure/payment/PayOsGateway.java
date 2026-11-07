@@ -110,6 +110,42 @@ class PayOsGateway implements PaymentGateway {
     }
 
     @Override
+    public boolean cancelUnpaid(long orderCode) {
+        if (!enabled) throw new PaymentGatewayException("Chưa cấu hình PayOS để đối soát đơn", null);
+        try {
+            StatusResponse before = paymentStatus(orderCode);
+            if (cancelledWithoutPayment(before, orderCode)) return true;
+            if (!"PENDING".equals(before.data().status()) || before.data().amountPaid() != 0) return false;
+
+            try {
+                http.post().uri("/v2/payment-requests/{orderCode}/cancel", orderCode)
+                        .body(Map.of("cancellationReason", "Account deletion requested"))
+                        .retrieve().toBodilessEntity();
+            } catch (RestClientException e) {
+                // Kết quả hủy có thể đã được PayOS ghi nhận trước khi kết nối lỗi; đọc lại trạng thái.
+                log.warn("Không nhận được kết quả hủy đơn {} từ PayOS: {}", orderCode, e.getMessage());
+            }
+            return cancelledWithoutPayment(paymentStatus(orderCode), orderCode);
+        } catch (RestClientException e) {
+            throw new PaymentGatewayException("Không đối soát được đơn " + orderCode + " với PayOS", e);
+        }
+    }
+
+    private StatusResponse paymentStatus(long orderCode) {
+        StatusResponse response = http.get().uri("/v2/payment-requests/{orderCode}", orderCode)
+                .retrieve().body(StatusResponse.class);
+        if (response == null || !"00".equals(response.code()) || response.data() == null
+                || response.data().orderCode() != orderCode)
+            throw new PaymentGatewayException("PayOS trả trạng thái đơn không hợp lệ: " + orderCode, null);
+        return response;
+    }
+
+    private static boolean cancelledWithoutPayment(StatusResponse response, long orderCode) {
+        return response.data().orderCode() == orderCode && "CANCELLED".equals(response.data().status())
+                && response.data().amountPaid() == 0;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Optional<PaidNotice> verifyWebhook(Map<String, Object> body) {
         if (!enabled || !(body.get("data") instanceof Map<?, ?> raw)) {
@@ -141,6 +177,6 @@ class PayOsGateway implements PaymentGateway {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    record StatusData(String status, long amountPaid) {
+    record StatusData(long orderCode, String status, long amountPaid) {
     }
 }

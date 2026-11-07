@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,7 +28,6 @@ import vn.thelooks.billing.domain.exception.OrderNotRefundableException;
 import vn.thelooks.billing.domain.model.OrderStatus;
 import vn.thelooks.security.CurrentUser;
 
-/** Chỉ ADMIN (quy tắc chung cho /api/admin/** trong packages/security). */
 @RestController
 @RequestMapping("/api/admin/billing")
 class AdminBillingController {
@@ -35,7 +35,6 @@ class AdminBillingController {
     private final BillingStatsQuery stats;
     private final AdminOrderQuery orders;
     private final RefundOrderUseCase refunds;
-
     private final Status status;
 
     AdminBillingController(BillingStatsQuery stats, AdminOrderQuery orders, RefundOrderUseCase refunds,
@@ -58,6 +57,7 @@ class AdminBillingController {
     }
 
     @GetMapping("/stats")
+    @PreAuthorize("hasAuthority('PERMISSION_BILLING_STATS_READ')")
     BillingStatsQuery.BillingStats stats(@RequestParam(defaultValue = "30") int days) {
         return stats.stats(Math.max(1, Math.min(90, days)));
     }

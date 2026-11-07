@@ -91,11 +91,70 @@ paths:
         '410': { $ref: 'common.yaml#/components/responses/Problem' }
         '429': { $ref: 'common.yaml#/components/responses/Problem' }
 
+  /api/public/polls/{code}/reports:
+    post:
+      summary: Báo cáo bình chọn vi phạm
+      security: []
+      parameters: [ { name: code, in: path, required: true, schema: { type: string } } ]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [reason], properties: { reason: { type: string, minLength: 5, maxLength: 300 } } } } } }
+      responses:
+        '201': { description: Đã nhận báo cáo }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+        '429': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/admin/polls/reports:
+    get:
+      summary: Danh sách báo cáo bình chọn
+      parameters: [ { name: status, in: query, schema: { type: string, enum: [OPEN, IGNORED, HIDDEN, ALL] } } ]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/PollReport' } } } } }
+  /api/admin/polls/reports/{id}:
+    put:
+      summary: Ẩn bình chọn hoặc bỏ qua báo cáo
+      parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [status], properties: { status: { type: string, enum: [IGNORED, HIDDEN] } } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/PollReport' } } } }
+  /api/admin/polls/audit:
+    get:
+      summary: Nhật ký kiểm duyệt bình chọn
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/PollModerationAudit' } } } } }
+  /api/admin/polls/users/{id}/data:
+    parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+    get:
+      summary: Số bình chọn của người dùng
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: object, required: [pollCount], properties: { pollCount: { type: integer } } } } } }
+    delete:
+      summary: Xóa bình chọn của người dùng
+      responses:
+        '204': { description: Đã xóa }
+
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
     cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
+    PollReport:
+      type: object
+      required: [id, pollCode, reason, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        pollCode: { type: string }
+        question: { type: [string, 'null'] }
+        reason: { type: string }
+        status: { type: string, enum: [OPEN, IGNORED, HIDDEN] }
+        createdAt: { type: string, format: date-time }
+    PollModerationAudit:
+      type: object
+      required: [id, actorId, pollCode, action, outcome, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        actorId: { type: string, format: uuid }
+        pollCode: { type: string }
+        action: { type: string }
+        outcome: { type: string, enum: [SUCCESS, FAILED] }
+        createdAt: { type: string, format: date-time }
     PollOption:
       type: object
       required: [outfitId, imageUrls]

@@ -1,5 +1,6 @@
 import { CheckCircleFilled, ClockCircleOutlined, HeartOutlined, LockOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import { Input, Modal } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import { formatDateTime } from '../../../services/shared/format';
@@ -7,12 +8,18 @@ import { AssetPlaceholder, BackLink, Button, Notice, ProgressBar, Spinner } from
 import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { useCastVote, usePoll } from '../../../hooks/guest/voting/api';
+import { votingApi, unwrap } from '../../../services/shared/api/client';
 
 export function PublicPollPage() {
   const { code = '' } = useParams();
   const poll = usePoll(code);
   const vote = useCastVote(code);
   const [choice, setChoice] = useState<'A' | 'B' | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportError, setReportError] = useState('');
+  const [reportSent, setReportSent] = useState(false);
+  const [reporting, setReporting] = useState(false);
   const expired = !!poll.data && Date.parse(poll.data.expiresAt) <= Date.now();
   const showResult = expired || vote.isSuccess;
   const result = vote.data ?? poll.data?.result;
@@ -94,11 +101,23 @@ export function PublicPollPage() {
                   </div>
                 </div>
               )}
-              <div className="guest-footer"><ClockCircleOutlined /> Liên kết riêng tư · Không cần tài khoản để bình chọn</div>
+              <div className="guest-footer"><ClockCircleOutlined /> Liên kết riêng tư · Không cần tài khoản để bình chọn · <button type="button" className="admin-text-button" onClick={() => setReportOpen(true)}>{reportSent ? 'Đã báo cáo' : 'Báo cáo vi phạm'}</button></div>
             </>
           )}
         </section>
       </main>
+      <Modal title="Báo cáo bình chọn" open={reportOpen} onCancel={() => setReportOpen(false)} okText="Gửi báo cáo"
+        okButtonProps={{ disabled: reportReason.trim().length < 5, loading: reporting }} onOk={async () => {
+          setReporting(true); setReportError('');
+          try {
+            await unwrap(votingApi.POST('/api/public/polls/{code}/reports', { params: { path: { code } }, body: { reason: reportReason.trim() } }));
+            setReportSent(true); setReportOpen(false); setReportReason('');
+          } catch (e) { setReportError(errorMessage(e)); } finally { setReporting(false); }
+        }}>
+        <p>Cho quản trị viên biết nội dung nào vi phạm. Báo cáo của bạn không hiển thị trên bình chọn.</p>
+        <Input.TextArea value={reportReason} onChange={(e) => setReportReason(e.target.value)} maxLength={300} rows={4} placeholder="Lý do báo cáo (ít nhất 5 ký tự)" />
+        {reportError && <Notice tone="error">{reportError}</Notice>}
+      </Modal>
       <SiteFooter />
     </div>
   );

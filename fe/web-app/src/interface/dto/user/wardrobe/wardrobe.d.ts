@@ -536,7 +536,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** (ADMIN) Cấu hình lưu ảnh và AI nhận diện (chỉ báo có / không có key) */
+        /** (ADMIN) Trạng thái cấu hình AI và lưu ảnh, không trả về khóa bí mật */
         get: {
             parameters: {
                 query?: never;
@@ -566,6 +566,68 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/wardrobe/users/{id}/data": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** Số món trong tủ của người dùng */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            itemCount: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Xóa tủ đồ và ảnh của người dùng theo yêu cầu xóa tài khoản */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Đã xóa */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;

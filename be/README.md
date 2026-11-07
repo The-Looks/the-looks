@@ -21,7 +21,7 @@ services/auth-service/src/main/java/vn/thelooks/auth/
   application/service/          xử lý nghiệp vụ
   domain/enums/                 UserStatus
   domain/exception/             lỗi nghiệp vụ
-  domain/model/                 User
+  domain/model/                 Java thuần, không phụ thuộc Spring/JPA
   infrastructure/config/       Clock
   infrastructure/crypto/       Argon2 và phát JWT
   infrastructure/external/google/  Google OIDC
@@ -45,7 +45,9 @@ Các nhánh như Kafka, Keycloak, event hoặc filter sẽ được thêm khi c�
 `roles` (mã role), `permissions` (mã quyền), `user_roles` (gán nhiều role cho
 một user), và `role_permissions` (gán nhiều permission cho một role). V3 chuyển
 role cũ sang `user_roles`, sau đó bỏ cột `users.role`; V1/V2 không bị sửa.
-Hiện có role `USER`, `ADMIN` và quyền `ACCOUNT_READ_SELF`, `ADMIN_ACCESS`.
+V5 bổ sung quyền quản trị `USER_MANAGE`, `ROLE_MANAGE`, `AUDIT_READ`,
+`REPORT_MODERATE`, `USER_DELETE` và bảng nhật ký. Role hệ thống là `USER`, `ADMIN`.
+V8 bổ sung quyền đọc thống kê billing, chi phí AI và affiliate cho các API admin cũ.
 Access JWT mang cả `roles` và `permissions`; các route quản trị kiểm tra quyền
 `ADMIN_ACCESS`.
 
@@ -66,6 +68,8 @@ psql -U postgres -f infrastructure/docker/postgres/init.sql
 ./mvnw -pl services/outfit-service -am package           # build riêng 1 service
 ```
 Windows: dùng `mvnw.cmd` thay cho `./mvnw`.
+Nếu JVM trên máy nhận timezone `Asia/Saigon`, PostgreSQL 18 có thể từ chối kết nối;
+chạy Java với `-Duser.timezone=Asia/Ho_Chi_Minh` (ví dụ qua `JAVA_TOOL_OPTIONS`).
 
 ### Chạy toàn bộ backend bằng Docker Compose
 
@@ -100,9 +104,19 @@ volume PostgreSQL và ảnh vẫn được giữ lại.
 | `AI_MONTHLY_BUDGET_USD` | `25` | Tổng chi phí AI mỗi tháng; chạm ngưỡng thì tự ngừng gọi AI |
 | `WEATHER_LAT`, `WEATHER_LON` | TP.HCM | Vị trí lấy thời tiết (Open-Meteo, miễn phí, không cần key) |
 
-Admin xem chi phí: `GET /api/admin/outfits/ai-usage` (cần JWT role ADMIN).
-Admin xem danh sách người dùng thật qua `GET /api/admin/auth/users?page=0&size=20&search=...` (cần quyền `ADMIN_ACCESS`; không trả password hash).
-Web dashboard hiện chỉ có API cho hai mục này; các mục quản trị còn lại hiển thị trạng thái chưa có dữ liệu thay vì số liệu giả.
+Admin xem chi phí: `GET /api/admin/outfits/ai-usage` (cần `ADMIN_ACCESS` và `AI_USAGE_READ`).
+Admin xem danh sách người dùng thật qua `GET /api/admin/auth/users?page=0&size=20&search=...` (cần `ADMIN_ACCESS` và `USER_MANAGE`; không trả password hash).
+
+## Quản trị tài khoản, quyền và báo cáo
+
+- Auth service quản lý role/permission, cấp role, khóa/mở tài khoản và nhật ký tại `/api/admin/auth/**`. Mã permission dùng trong code không thể đổi tên; quyền tự tạo chỉ có hiệu lực khi một API kiểm tra mã đó. Đổi role/quyền hoặc khóa tài khoản thu hồi các phiên liên quan.
+- Các chức năng mới đi qua `application/port/in/*UseCase`, service ứng dụng, `application/port/out/*Port` và `infrastructure/persistence/*Adapter`. Domain model là Java thuần.
+- Tài khoản mới luôn có `USER`. Tài khoản Google mới không có mật khẩu; người dùng có thể đặt mật khẩu trong 10 phút sau khi đăng nhập Google tại `POST /api/app/me/password`, rồi dùng được cả hai cách đăng nhập.
+- Voting service nhận báo cáo công khai tại `POST /api/public/polls/{code}/reports`; admin xem và xử lý tại `/api/admin/polls/reports`. Bình chọn bị ẩn không thể xem hoặc bỏ phiếu qua link.
+- Xóa tài khoản: `POST /api/admin/auth/users/{id}/deletion` khóa tài khoản, rồi xóa dữ liệu lần lượt ở voting, wardrobe, outfit, billing và cuối cùng auth. API trả `FAILED` cùng bước lỗi để admin thử lại. Wardrobe hoãn xóa khi còn lượt quét đang xử lý. Billing yêu cầu PayOS hủy link `PENDING`, đọc lại trạng thái và chỉ xóa khi link đã `CANCELLED` với `amountPaid=0`. Đơn đã trả tiền, trạng thái chưa rõ hoặc lỗi kết nối giữ bước xóa ở `FAILED` để đối soát rồi thử lại. Đơn đã xử lý được tách mã tài khoản khỏi sổ giao dịch.
+- Sổ giao dịch đã xử lý và nhật ký quản trị được giữ lại để đối soát. Đơn hàng mất `owner_id`; nhật ký chỉ giữ UUID người thao tác/đối tượng, hành động, kết quả và thời điểm, không giữ email hay mật khẩu. Bản ghi xóa lưu trạng thái `DONE` để tránh báo hoàn tất khi còn service chưa xử lý.
+- Frontend proxy các API admin tới đúng service. Khi chạy Docker Compose, auth service dùng các biến `WARDROBE_SERVICE_URL`, `OUTFIT_SERVICE_URL`, `VOTING_SERVICE_URL`, `BILLING_SERVICE_URL` để điều phối xóa.
+- Nhật ký ghi các thao tác quản trị đã có trong hệ thống. Chưa có nghiệp vụ hoàn tiền trong billing service nên chưa có sự kiện hoàn tiền để ghi.
 
 **Cá nhân hoá:** `StyleProfile` học gu từng người từ 👍/👎, outfit đã lưu và số lần mặc mỗi món (cần ≥ 3 hành vi). Gu được cộng vào điểm thuật toán và gửi kèm cho Claude dưới dạng tóm tắt. Không huấn luyện lại model, không gửi dữ liệu người dùng khác.
 

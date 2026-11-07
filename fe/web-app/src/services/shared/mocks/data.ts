@@ -23,5 +23,6 @@ export const DEMO_USER = {
   email: 'demo@thelooks.vn',
   username: 'Thảo Nguyên',
   roles: ['USER'],
+  permissions: ['ACCOUNT_READ_SELF'],
   createdAt: '2026-10-01T08:00:00Z',
 };

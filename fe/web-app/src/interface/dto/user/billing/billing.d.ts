@@ -288,6 +288,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/billing/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** (ADMIN) Trạng thái cấu hình cổng thanh toán, không trả về khóa bí mật */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            paymentGateway: string;
+                            payosConfigured: boolean;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/billing/orders": {
         parameters: {
             query?: never;
@@ -295,7 +334,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** (ADMIN) Danh sách đơn, mới nhất trước; lọc theo trạng thái, người dùng, mã đơn */
+        /** (ADMIN) Danh sách đơn thanh toán */
         get: {
             parameters: {
                 query?: {
@@ -339,7 +378,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** (ADMIN) Ghi nhận đã hoàn tiền (chuyển trả bằng tay) và trừ lại thời gian gói của đơn */
+        /** (ADMIN) Ghi nhận hoàn tiền thủ công và cập nhật thời hạn gói */
         post: {
             parameters: {
                 query?: never;
@@ -357,7 +396,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Đã hoàn tiền. newExpiry null khi người dùng đã đổi gói khác sau đơn này (admin chỉnh tay) */
+                /** @description Đã ghi nhận hoàn tiền */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -380,19 +419,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/admin/billing/status": {
+    "/api/admin/billing/users/{id}/data": {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
-        /** (ADMIN) Cổng thanh toán đang dùng và đã có key PayOS chưa (không trả giá trị key) */
+        /** Gói còn hạn của người dùng */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -404,8 +447,9 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            paymentGateway: string;
-                            payosConfigured: boolean;
+                            plan: string;
+                            /** Format: date-time */
+                            expiresAt?: string | null;
                         };
                     };
                 };
@@ -413,7 +457,27 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        delete?: never;
+        /** Xóa gói và tách mã người dùng khỏi đơn thanh toán */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Đã xử lý */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
