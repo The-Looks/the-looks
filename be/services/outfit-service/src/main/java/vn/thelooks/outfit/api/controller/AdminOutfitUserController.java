@@ -24,6 +24,6 @@ class AdminOutfitUserController {
 
     @DeleteMapping("/{id}/data")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('PERMISSION_USER_DELETE')")
+    @PreAuthorize("@accountDeletionAuthorization.canDelete(authentication, #p0)")
     void delete(@PathVariable UUID id) { useCase.delete(id); }
 }

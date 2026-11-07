@@ -32,7 +32,7 @@ class AccountDeletionController {
     @PreAuthorize("hasAuthority('PERMISSION_USER_DELETE')")
     AccountDeletionJob start(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID id) {
         try {
-            return operations.startOrRetry(CurrentUser.id(jwt),id,jwt.getTokenValue());
+            return operations.startOrRetry(CurrentUser.id(jwt),id);
         } catch (RuntimeException failure) {
             failures.record(CurrentUser.id(jwt), id.toString(), "USER_DELETE_REQUESTED", failure);
             throw failure;

@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -46,8 +48,15 @@ public class JwtSecurityAutoConfiguration {
                 .addFilterBefore(new CookieOriginFilter(webOrigin), BearerTokenAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health/**", "/api/public/**", "/.well-known/jwks.json").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/admin/polls/users/*/data",
+                                "/api/admin/wardrobe/users/*/data", "/api/admin/outfits/users/*/data",
+                                "/api/admin/billing/users/*/data")
+                        .hasAnyAuthority("PERMISSION_ADMIN_ACCESS", "PERMISSION_INTERNAL_ACCOUNT_DELETE")
                         .requestMatchers("/api/admin/**").hasAuthority("PERMISSION_ADMIN_ACCESS")
                         .requestMatchers("/api/app/me").hasAuthority("PERMISSION_ACCOUNT_READ_SELF")
+                        .requestMatchers("/api/app/**").access((authentication, context) -> new AuthorizationDecision(
+                                authentication.get().isAuthenticated() && authentication.get().getAuthorities().stream()
+                                        .noneMatch(a -> a.getAuthority().equals("PERMISSION_INTERNAL_ACCOUNT_DELETE"))))
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o.bearerTokenResolver(new CookieBearerTokenResolver())
                         .jwt(Customizer.withDefaults()))
@@ -91,5 +100,10 @@ public class JwtSecurityAutoConfiguration {
     @Bean
     BearerTokenForwardingInterceptor bearerTokenForwardingInterceptor() {
         return new BearerTokenForwardingInterceptor();
+    }
+
+    @Bean
+    AccountDeletionAuthorization accountDeletionAuthorization() {
+        return new AccountDeletionAuthorization();
     }
 }

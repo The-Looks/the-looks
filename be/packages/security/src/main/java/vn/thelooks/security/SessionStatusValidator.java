@@ -23,6 +23,11 @@ final class SessionStatusValidator implements OAuth2TokenValidator<Jwt> {
 
     @Override
     public OAuth2TokenValidatorResult validate(Jwt jwt) {
+        if (Boolean.TRUE.equals(jwt.getClaim("internal_account_deletion"))
+                && jwt.getClaimAsStringList("permissions") != null
+                && jwt.getClaimAsStringList("permissions").contains("INTERNAL_ACCOUNT_DELETE")
+                && jwt.getSubject().equals(jwt.getClaimAsString("deletion_target")))
+            return OAuth2TokenValidatorResult.success();
         if (jwt.getClaimAsString("sid") == null) return invalid();
         var request = HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(3))
                 .header("Authorization", "Bearer " + jwt.getTokenValue()).GET().build();

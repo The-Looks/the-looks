@@ -21,6 +21,10 @@ spring:
   mvc:
     problemdetails:
       enabled: true # lỗi trả về chuẩn RFC 9457
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
 
 management:
   endpoints:
