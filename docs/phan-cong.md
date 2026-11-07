@@ -43,9 +43,9 @@ mở PR, nhờ Tuấn review. Đổi API thì sửa `wardrobe-api.yaml` + chạy
 
 | # | Việc | Hạn | Ghi chú |
 |---|---|---|---|
-| 2.0 | **Điền key Cloudinary** cho `thelooks-wardrobe` trên Render (`IMAGE_STORAGE` + 3 biến `CLOUDINARY_*`), thử thêm món → link `res.cloudinary.com` | 08/11 | Code và `render.yaml` đã xong (PR #43) |
-| 2.8 | Điền key **PayOS**, Gemini, AccessTrade trên Render; theo dõi chi phí AI hằng tuần | 10/11 | Ngân sách AI 25 USD/tháng |
-| 2.2 | **Đẩy file CI** (`.github/workflows/ci.yml` đang nằm ngoài git), bật bảo vệ nhánh `main`; thêm bước `npm run typecheck` cho web-app | 10/11 | Token `gh` thiếu quyền `workflow`: chạy `gh auth refresh -s workflow` |
+| 2.0 | ~~Key Cloudinary trên Render~~ (xong 07/11) | | |
+| 2.8 | ~~Key PayOS, Gemini, AccessTrade trên Render~~ (xong 07/11); theo dõi chi phí AI hằng tuần | Liên tục | Ngân sách AI 25 USD/tháng |
+| 2.2 | ~~CI + bảo vệ nhánh `main`~~ (xong 07/11): mọi PR phải qua 2 job `backend` và `web` mới merge được | | |
 | 2.11 | Kiểm tra luồng xoá tài khoản của #40 trên bản deploy (admin xoá 1 tài khoản thử) | 10/11 | |
 | 2.10 | ~~Đồng ý điều khoản khi đăng ký bằng Google~~ (xong 07/11) | | |
 | 2.12 | **Thời tiết theo thành phố người dùng**: outfit đang cố định TP.HCM (`WEATHER_LAT/LON`); khi 3.8 có thành phố thì lấy theo hồ sơ | 20/12 | Sau 3.8 |
