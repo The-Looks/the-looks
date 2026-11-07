@@ -71,6 +71,14 @@ services:
         sync: false
       - key: ANTHROPIC_API_KEY # dự phòng khi Gemini lỗi; để trống thì bỏ qua
         sync: false
+      - key: IMAGE_STORAGE # ảnh tủ đồ lưu trên Cloudinary (ổ đĩa Render bị xoá mỗi lần khởi động lại)
+        value: cloudinary
+      - key: CLOUDINARY_CLOUD_NAME # cloudinary.com → Dashboard
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
 
   - type: web
     name: thelooks-outfit

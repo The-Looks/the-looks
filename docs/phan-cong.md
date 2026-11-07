@@ -31,7 +31,7 @@ mở PR, nhờ Tuấn review. Đổi API thì sửa `wardrobe-api.yaml` + chạy
 
 | # | Việc | Code | Hạn | Xong khi |
 |---|---|---|---|---|
-| 1.1 | **Cloudinary (GẤP, vẫn chưa làm)**: ảnh tủ đồ trên Render lưu trên ổ đĩa nên **mất mỗi lần service khởi động lại**. Tạo tài khoản Cloudinary, thêm `IMAGE_STORAGE=cloudinary` + 3 biến `CLOUDINARY_*` (dạng `sync: false`) cho `thelooks-wardrobe` trong `render.yaml` và trên Render | Cấu hình | 10/11 | Ảnh mới có link `res.cloudinary.com`, khởi động lại vẫn còn |
+| 1.1 | ~~Cloudinary~~: Tuấn đã thêm biến vào `render.yaml` (07/11), chỉ cần điền key trên Render | | | |
 | 1.8 | **Xoá ảnh khi xoá tài khoản**: PR #40 của Phát chỉ xoá dữ liệu trong DB tủ đồ, ảnh trên kho ảnh vẫn còn. Review phần wardrobe của #40, sau khi #40 merge thì thêm xoá ảnh (local + Cloudinary) trong `ManageWardrobeUserDataService` | BE + test | 15/11 | Xoá tài khoản xong không còn file ảnh nào của người đó |
 | 1.9 | **Affiliate nguồn Shopee** (khi AccessTrade duyệt Shopee): nguồn `ProductCatalog` thứ hai, đồng bộ datafeed Shopee về bảng riêng mỗi ngày rồi tìm trong đó | BE + test | 20/12 | Gợi ý mua thêm có cả sản phẩm Shopee; làm theo mẫu `AccessTradeTikTokCatalog` |
 | 1.10 | **Thử AI nhận diện** (Gemini) với 100–300 ảnh thật, chỉnh prompt nếu sai nhiều | Ít code | 22/11 | Bảng kết quả trong `docs/ai-nhan-dien.md` cho báo cáo EXE |
