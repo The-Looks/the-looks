@@ -220,6 +220,7 @@ const wardrobe: HttpHandler[] = [
 
 // ---------------- outfit (chỉ khi không chạy outfit-service thật) ----------------
 let savedOutfits: SavedOutfit[] = [];
+const wearPlans = new Map<string, string>();
 const disliked = new Set<string>();
 const comboKey = (ids: string[]) => [...ids].sort().join(',');
 const confirmed = () => closet.filter((i) => i.status === 'CONFIRMED');
@@ -277,6 +278,17 @@ const outfit: HttpHandler[] = [
     }),
   ),
   http.post('*/api/app/outfits/shopping/:id/open', () => HttpResponse.json({ url: 'https://shop.tiktok.com/' })),
+  http.get('*/api/app/outfits/calendar', () =>
+    HttpResponse.json([...wearPlans].map(([date, plannedOutfitId]) => ({ date, plannedOutfitId, wornOutfitIds: [] })))),
+  http.put('*/api/app/outfits/calendar/:date', async ({ params, request }) => {
+    const body = await request.json() as { outfitId: string };
+    wearPlans.set(String(params.date), body.outfitId);
+    return new HttpResponse(null, { status: 204 });
+  }),
+  http.delete('*/api/app/outfits/calendar/:date', ({ params }) => {
+    wearPlans.delete(String(params.date));
+    return new HttpResponse(null, { status: 204 });
+  }),
   http.get('*/api/app/outfits', () => HttpResponse.json(savedOutfits)),
   http.post('*/api/app/outfits', async ({ request }) => {
     const body = (await request.json()) as { itemIds: string[]; occasion?: SavedOutfit['occasion'] };

@@ -20,6 +20,7 @@ const AdminDashboardPage = lazy(() => import('../pages/admin/dashboard/AdminDash
 const BillingResultPage = lazy(() => import('../pages/user/billing/BillingResultPage').then((m) => ({ default: m.BillingResultPage })));
 const PlansPage = lazy(() => import('../pages/user/billing/PlansPage').then((m) => ({ default: m.PlansPage })));
 const OutfitDetailPage = lazy(() => import('../pages/user/outfit/OutfitDetailPage').then((m) => ({ default: m.OutfitDetailPage })));
+const WearCalendarPage = lazy(() => import('../pages/user/outfit/WearCalendarPage').then((m) => ({ default: m.WearCalendarPage })));
 const SavedOutfitsPage = lazy(() => import('../pages/user/outfit/SavedOutfitsPage').then((m) => ({ default: m.SavedOutfitsPage })));
 const StylePreferencesPage = lazy(() => import('../pages/user/outfit/StylePreferencesPage').then((m) => ({ default: m.StylePreferencesPage })));
 const SuggestPage = lazy(() => import('../pages/user/outfit/SuggestPage').then((m) => ({ default: m.SuggestPage })));
@@ -77,6 +78,7 @@ export const router = createBrowserRouter([{ element: <RouteMotionLayout />, chi
           { path: 'wardrobe/:id', element: <ItemDetailPage /> },
           { path: 'outfits/suggest', element: <SuggestPage /> },
           { path: 'outfits', element: <SavedOutfitsPage /> },
+          { path: 'outfits/calendar', element: <WearCalendarPage /> },
           { path: 'outfits/:id', element: <OutfitDetailPage /> },
           { path: 'polls', element: <MyPollsPage /> },
           { path: 'polls/new', element: <CreatePollPage /> },

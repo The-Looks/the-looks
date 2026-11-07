@@ -50,7 +50,7 @@ mở PR, nhờ Tuấn review. Đổi API thì sửa `wardrobe-api.yaml` + chạy
 | 2.10 | ~~Đồng ý điều khoản khi đăng ký bằng Google~~ (xong 07/11) | | |
 | 2.12 | **Thời tiết theo thành phố người dùng**: outfit đang cố định TP.HCM (`WEATHER_LAT/LON`); khi 3.8 có thành phố thì lấy theo hồ sơ | 20/12 | Sau 3.8 |
 | 2.9 | **Email nhắc gia hạn** (3 ngày trước khi hết hạn) qua Resend | 13/12 | Hiện chỉ nhắc trong app |
-| 2.6 | **Lịch mặc** (Pro): lên lịch outfit theo ngày, đánh dấu đã mặc | 20/12 | Chưa có code |
+| 2.6 | ~~Lịch mặc (Pro)~~ (xong 07/11): `/outfits/calendar` | | |
 
 ## Phát (Member 3) · Đăng nhập, Ask Friends, admin
 

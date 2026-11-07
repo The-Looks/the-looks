@@ -50,6 +50,121 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/outfits/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lịch mặc (Pro) - ngày có outfit đã lên lịch hoặc đã mặc trong khoảng [from, to]
+         * @description Tối đa 62 ngày. Ngày đã mặc tính theo giờ Việt Nam. Chỉ trả những ngày có dữ liệu.
+         */
+        get: {
+            parameters: {
+                query: {
+                    from: string;
+                    to: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Các ngày, sắp theo ngày */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CalendarDay"][];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                403: components["responses"]["Problem"];
+                503: components["responses"]["Problem"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/app/outfits/calendar/{date}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                date: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Lên lịch một outfit đã lưu cho ngày này (ghi đè lịch cũ) */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    date: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        outfitId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Đã lên lịch */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                403: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                503: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        /** Bỏ lịch của ngày này */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    date: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Đã bỏ lịch */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                403: components["responses"]["Problem"];
+                503: components["responses"]["Problem"];
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/outfits/suggestions": {
         parameters: {
             query?: never;
@@ -753,6 +868,13 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        CalendarDay: {
+            /** Format: date */
+            date: string;
+            /** Format: uuid */
+            plannedOutfitId?: string | null;
+            wornOutfitIds: string[];
+        };
         AffiliateStats: {
             /** Format: int64 */
             clicks: number;

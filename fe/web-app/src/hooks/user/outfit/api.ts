@@ -63,6 +63,32 @@ export function useOpenProduct() {
   });
 }
 
+/** Lịch mặc (Pro). enabled = gói có WEAR_CALENDAR, tránh gọi API khi chắc chắn bị 403. */
+export function useWearCalendar(from: string, to: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ['outfits', 'calendar', from, to],
+    queryFn: () => outfitRequests.calendar(from, to),
+    enabled,
+    retry: false,
+  });
+}
+
+export function usePlanDay() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: outfitRequests.planDay,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outfits', 'calendar'] }),
+  });
+}
+
+export function useUnplanDay() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: outfitRequests.unplanDay,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outfits', 'calendar'] }),
+  });
+}
+
 export function useSavedOutfits() {
   return useQuery({
     queryKey: outfitKeys.saved,
@@ -106,6 +132,7 @@ export function useWearOutfit() {
     mutationFn: outfitRequests.wearOutfit,
     onSuccess: () => Promise.all([
       qc.invalidateQueries({ queryKey: ['outfits', 'suggestions'] }),
+      qc.invalidateQueries({ queryKey: ['outfits', 'calendar'] }),
       qc.invalidateQueries({ queryKey: ['wardrobe', 'cost-per-wear'] }),
       qc.invalidateQueries({ queryKey: ['wardrobe', 'stats'] }),
       qc.invalidateQueries({ queryKey: ['wardrobe', 'list'] }),

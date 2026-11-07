@@ -33,6 +33,47 @@ paths:
                     itemId: { type: string, format: uuid }
                     wearCount: { type: integer, format: int64 }
                     lastWornAt: { type: string, format: date-time }
+  /api/app/outfits/calendar:
+    get:
+      summary: Lịch mặc (Pro) - ngày có outfit đã lên lịch hoặc đã mặc trong khoảng [from, to]
+      description: Tối đa 62 ngày. Ngày đã mặc tính theo giờ Việt Nam. Chỉ trả những ngày có dữ liệu.
+      parameters:
+        - { name: from, in: query, required: true, schema: { type: string, format: date } }
+        - { name: to, in: query, required: true, schema: { type: string, format: date } }
+      responses:
+        '200':
+          description: Các ngày, sắp theo ngày
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/CalendarDay' } }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/calendar/{date}:
+    parameters:
+      - { name: date, in: path, required: true, schema: { type: string, format: date } }
+    put:
+      summary: Lên lịch một outfit đã lưu cho ngày này (ghi đè lịch cũ)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outfitId]
+              properties:
+                outfitId: { type: string, format: uuid }
+      responses:
+        '204': { description: Đã lên lịch }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+    delete:
+      summary: Bỏ lịch của ngày này
+      responses:
+        '204': { description: Đã bỏ lịch }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/outfits/suggestions:
     get:
       summary: AI gợi ý outfit theo dịp, chỉ dùng đồ đang có trong tủ, lọc theo thời tiết hiện tại
@@ -286,6 +327,13 @@ components:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
     cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
+    CalendarDay:
+      type: object
+      required: [date, wornOutfitIds]
+      properties:
+        date: { type: string, format: date }
+        plannedOutfitId: { type: string, format: uuid, nullable: true }
+        wornOutfitIds: { type: array, items: { type: string, format: uuid } }
     AffiliateStats:
       type: object
       required: [clicks, users, daily, top]

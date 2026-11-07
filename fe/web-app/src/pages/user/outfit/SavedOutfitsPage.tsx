@@ -18,9 +18,14 @@ export function SavedOutfitsPage() {
         title="Outfit đã lưu"
         back={{ to: '/outfits/suggest', label: 'Phối đồ' }}
         action={
-          <ButtonLink to="/outfits/suggest" small>
-            Gợi ý mới
-          </ButtonLink>
+          <div className="row">
+            <ButtonLink to="/outfits/calendar" small>
+              Lịch mặc
+            </ButtonLink>
+            <ButtonLink to="/outfits/suggest" small>
+              Gợi ý mới
+            </ButtonLink>
+          </div>
         }
       />
       {outfits.isPending && <Spinner />}
