@@ -27,6 +27,67 @@ paths:
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+  /api/app/wardrobe/cost-per-wear:
+    get:
+      summary: Chi phí mỗi lần mặc của các món đã xác nhận (Pro)
+      description: Cần COST_PER_WEAR; giá mua chia số lần mặc, HALF_UP 2 số thập phân VND. Tối đa 10 món, ưu tiên chi phí cao nhất rồi món thiếu dữ liệu. totalItems là toàn bộ món đã xác nhận. Chỉ 1 lần đọc lịch sử cho cả danh sách.
+      responses:
+        '200':
+          description: Số liệu của chủ JWT, không cache
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CostPerWearSummary' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/{itemId}/cost-per-wear:
+    get:
+      summary: Chi phí mỗi lần mặc của một món đã xác nhận (Pro)
+      parameters:
+        - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: Chi phí hoặc trạng thái chưa tính được
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CostPerWearItem' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/stats:
+    get:
+      summary: Thống kê tủ đồ Pro của chủ JWT
+      description: Cần quyền WARDROBE_STATS từ billing. Chỉ tính món CONFIRMED; màu đa nhãn được tính một lần/màu/món. Món chưa mặc hoặc ít nhất 30 ngày chưa mặc được xếp chưa mặc trước, rồi lần mặc cũ nhất; trả tối đa 10 món. Lỗi billing hoặc lịch sử mặc trả 503, không giả số liệu bằng 0.
+      responses:
+        '200':
+          description: Số liệu tại asOf
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobeStats' }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/search:
+    get:
+      summary: Tìm và lọc tủ đồ có phân trang (API /items cũ vẫn trả mảng cho outfit-service)
+      description: Màu và phong cách khớp nhãn đầy đủ, không phân biệt hoa thường. Mùa bao gồm món mặc mọi mùa. Lâu chưa mặc xếp món chưa mặc trước, rồi lần mặc cũ nhất; thứ tự ổn định giữa các trang.
+      parameters:
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/ItemStatus' } }
+        - { name: category, in: query, schema: { $ref: '#/components/schemas/Category' } }
+        - { name: color, in: query, schema: { type: string, maxLength: 30 } }
+        - { name: season, in: query, schema: { $ref: '#/components/schemas/Season' } }
+        - { name: style, in: query, schema: { type: string, maxLength: 30 } }
+        - { name: q, in: query, schema: { type: string, maxLength: 100 } }
+        - { name: sort, in: query, schema: { type: string, enum: [NEWEST, LEAST_RECENTLY_WORN], default: NEWEST } }
+        - { name: page, in: query, schema: { type: integer, minimum: 0, maximum: 1000000, default: 0 } }
+        - { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 24 } }
+      responses:
+        '200':
+          description: Trang kết quả
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WardrobePage' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '503': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/wardrobe/scans:
     post:
       summary: >-
@@ -107,12 +168,31 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WardrobeItem' }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
     delete:
       summary: Xoá món đồ và ảnh
       responses:
         '204': { description: Đã xoá }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/confirm:
+    post:
+      summary: Xác nhận 1–100 món cùng lúc, kèm chỉnh sửa thuộc tính
+      description: Kiểm tra quyền sở hữu và trạng thái mọi món trước khi lưu. Lỗi bất kỳ món nào thì không lưu món nào. ID trùng hoặc trạng thái không hợp lệ trả 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmItemsRequest' }
+      responses:
+        '200':
+          description: Các món đã xác nhận, theo thứ tự request
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/wardrobe/items/{itemId}/confirm:
     parameters:
       - { name: itemId, in: path, required: true, schema: { type: string, format: uuid } }
@@ -153,15 +233,83 @@ components:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
     cookieAuth: { type: apiKey, in: cookie, name: access_token }
   schemas:
+    CostPerWearItem:
+      type: object
+      required: [item, wearCount, costPerWear, status]
+      properties:
+        item: { $ref: '#/components/schemas/WardrobeItem' }
+        wearCount: { type: integer, format: int64, minimum: 0 }
+        costPerWear: { type: [number, 'null'], minimum: 0, description: VND mỗi lần mặc, 2 số thập phân; null khi thiếu giá hoặc chưa mặc }
+        status: { type: string, enum: [CALCULATED, MISSING_PRICE, NEVER_WORN] }
+    CostPerWearSummary:
+      type: object
+      required: [items, totalItems]
+      properties:
+        items: { type: array, maxItems: 10, items: { $ref: '#/components/schemas/CostPerWearItem' } }
+        totalItems: { type: integer, format: int64 }
+    StatsCount:
+      type: object
+      required: [key, count]
+      properties:
+        key: { type: string, description: Loại đồ hoặc nhãn màu; UNKNOWN nếu thiếu }
+        count: { type: integer, format: int64, minimum: 0 }
+    WardrobeStats:
+      type: object
+      required: [totalItems, wornItems, neverWornItems, wearRatePercent, byCategory, byColor, inactiveCount, inactiveAfterDays, unusedItems, asOf]
+      properties:
+        totalItems: { type: integer, format: int64 }
+        wornItems: { type: integer, format: int64 }
+        neverWornItems: { type: integer, format: int64 }
+        wearRatePercent: { type: number, minimum: 0, maximum: 100, description: Tỉ lệ món từng được mặc, làm tròn 1 số thập phân; 0 khi tủ trống }
+        byCategory: { type: array, items: { $ref: '#/components/schemas/StatsCount' } }
+        byColor: { type: array, items: { $ref: '#/components/schemas/StatsCount' } }
+        inactiveCount: { type: integer, format: int64, description: Tổng số món chưa mặc hoặc lâu chưa mặc }
+        inactiveAfterDays: { type: integer, description: Ngưỡng ngày không mặc, hiện tại 30 }
+        unusedItems:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            required: [item, lastWornAt, daysSinceWear]
+            properties:
+              item: { $ref: '#/components/schemas/WardrobeItem' }
+              lastWornAt: { type: [string, 'null'], format: date-time }
+              daysSinceWear: { type: [integer, 'null'], description: null nếu chưa từng mặc }
+        asOf: { type: string, format: date-time }
+    WardrobePage:
+      type: object
+      required: [items, total, page, size]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+        total: { type: integer, format: int64 }
+        page: { type: integer }
+        size: { type: integer }
     ItemStatus: { type: string, enum: [PROCESSING, PENDING_REVIEW, CONFIRMED, RECOGNITION_FAILED] }
     Category: { type: string, enum: [TOP, BOTTOM, DRESS, OUTERWEAR, SHOES, BAG, ACCESSORY] }
     Season: { type: string, enum: [SPRING, SUMMER, AUTUMN, WINTER] }
+    ConfirmItemsRequest:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: object
+            required: [itemId, attributes]
+            properties:
+              itemId: { type: string, format: uuid }
+              attributes: { $ref: '#/components/schemas/ClothingAttributes' }
     ClothingAttributes:
       type: object
       properties:
         category: { $ref: '#/components/schemas/Category' }
         colors: { type: array, items: { type: string } }
         material: { type: string }
+        purchasePrice: { type: [number, 'null'], minimum: 0, maximum: 999999999999.99, multipleOf: 0.01, description: Giá mua bằng VND; null nếu chưa biết, 0 nếu được tặng }
+        purchaseDate: { type: [string, 'null'], format: date, description: Ngày mua theo YYYY-MM-DD }
+        brand: { type: [string, 'null'], maxLength: 100, description: Thương hiệu; để trống để xoá }
         seasons: { type: array, items: { $ref: '#/components/schemas/Season' }, description: rỗng = mặc được mọi mùa }
         styleTags: { type: array, items: { type: string }, example: [casual, office] }
     WardrobeItem:
@@ -173,6 +321,9 @@ components:
         category: { $ref: '#/components/schemas/Category' }
         colors: { type: array, items: { type: string } }
         material: { type: string }
+        purchasePrice: { type: [number, 'null'], minimum: 0, maximum: 999999999999.99, multipleOf: 0.01, description: Giá mua bằng VND; null nếu chưa biết, 0 nếu được tặng }
+        purchaseDate: { type: [string, 'null'], format: date, description: Ngày mua theo YYYY-MM-DD }
+        brand: { type: [string, 'null'], maxLength: 100, description: Thương hiệu; để trống để xoá }
         seasons: { type: array, items: { $ref: '#/components/schemas/Season' } }
         styleTags: { type: array, items: { type: string } }
         imageUrl: { type: string, format: uri, description: Ảnh đã cắt của riêng món này }

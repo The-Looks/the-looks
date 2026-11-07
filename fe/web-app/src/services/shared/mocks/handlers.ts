@@ -1,5 +1,6 @@
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
 import type { Category, OutfitSuggestion, Poll, SavedOutfit, Scan, WardrobeItem } from '../../../interface/dto/types';
+import { readWardrobeFilters } from '../../user/wardrobe/filters';
 import { DEMO_USER, sampleCloset } from './data';
 
 // Giả lập API theo đúng contract trong be/packages/contracts. Dữ liệu chỉ nằm trong bộ nhớ trình duyệt.
@@ -74,7 +75,63 @@ let closet: WardrobeItem[] = structuredClone(sampleCloset);
 const scans = new Map<string, Scan>();
 const guessCategories: Category[] = ['TOP', 'BOTTOM', 'DRESS', 'SHOES'];
 
+const wearHistory = new Map<string, { wearCount: number; lastWornAt: string }>();
+const mockItemCost = (item: WardrobeItem) => {
+  const wearCount = wearHistory.get(item.id)?.wearCount ?? 0;
+  const price = item.purchasePrice;
+  return { item, wearCount, costPerWear: price == null || wearCount === 0 ? null : Math.round((price / wearCount + Number.EPSILON) * 100) / 100,
+    status: price == null ? 'MISSING_PRICE' : wearCount === 0 ? 'NEVER_WORN' : 'CALCULATED' };
+};
 const wardrobe: HttpHandler[] = [
+  http.get('*/api/app/wardrobe/cost-per-wear', () => {
+    if (!([...entitlements().features] as readonly string[]).includes('COST_PER_WEAR')) return problem(403, 'Chi phí mỗi lần mặc cần gói Pro');
+    const all = closet.filter((item) => item.status === 'CONFIRMED').map(mockItemCost)
+      .sort((a, b) => (b.costPerWear ?? -1) - (a.costPerWear ?? -1) || b.item.createdAt.localeCompare(a.item.createdAt) || a.item.id.localeCompare(b.item.id));
+    return HttpResponse.json({ items: all.slice(0, 10), totalItems: all.length });
+  }),
+  http.get('*/api/app/wardrobe/items/:id/cost-per-wear', ({ params }) => {
+    if (!([...entitlements().features] as readonly string[]).includes('COST_PER_WEAR')) return problem(403, 'Chi phí mỗi lần mặc cần gói Pro');
+    const item = closet.find((i) => i.id === params.id);
+    if (!item) return problem(404, 'Không tìm thấy món đồ');
+    if (item.status !== 'CONFIRMED') return problem(409, 'Xác nhận món đồ trước khi xem chi phí');
+    return HttpResponse.json(mockItemCost(item));
+  }),
+  http.get('*/api/app/wardrobe/stats', () => {
+    if (!([...entitlements().features] as readonly string[]).includes('WARDROBE_STATS')) return problem(403, 'Thống kê tủ đồ cần gói Pro');
+    const all = closet.filter((item) => item.status === 'CONFIRMED');
+    const groups = (category: boolean) => {
+      const counts = new Map<string, number>();
+      all.forEach((item) => {
+        const values = category ? [item.category ?? 'UNKNOWN'] : [...new Set(item.colors?.map((color) => color.trim().toLowerCase()).filter(Boolean))];
+        (values.length ? values : ['UNKNOWN']).forEach((key) => counts.set(key, (counts.get(key) ?? 0) + 1));
+      });
+      return [...counts].map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count || a.key.localeCompare(b.key));
+    };
+    const now = Date.now();
+    const wornItems = all.filter((item) => wearHistory.has(item.id)).length;
+    const unused = all.map((item) => {
+      const lastWornAt = wearHistory.get(item.id)?.lastWornAt ?? null;
+      return { item, lastWornAt, daysSinceWear: lastWornAt ? Math.max(0, Math.floor((now - Date.parse(lastWornAt)) / 86400000)) : null };
+    }).filter((entry) => entry.daysSinceWear === null || entry.daysSinceWear >= 30)
+      .sort((a, b) => (a.lastWornAt ?? '').localeCompare(b.lastWornAt ?? '') || a.item.createdAt.localeCompare(b.item.createdAt) || a.item.id.localeCompare(b.item.id));
+    return HttpResponse.json({ totalItems: all.length, wornItems, neverWornItems: all.length - wornItems,
+      wearRatePercent: all.length ? Math.round(1000 * wornItems / all.length) / 10 : 0,
+      byCategory: groups(true), byColor: groups(false), inactiveCount: unused.length, inactiveAfterDays: 30, unusedItems: unused.slice(0, 10), asOf: new Date(now).toISOString() });
+  }),
+  http.get('*/api/app/wardrobe/items/search', ({ request }) => {
+    const f = readWardrobeFilters(new URL(request.url).searchParams);
+    const labels: Record<string, string> = { TOP: 'áo', BOTTOM: 'quần', DRESS: 'váy', OUTERWEAR: 'áo khoác', SHOES: 'giày', BAG: 'túi', ACCESSORY: 'phụ kiện' };
+    const matches = closet.filter((item) => (!f.status || item.status === f.status)
+      && (!f.category || item.category === f.category)
+      && (!f.color?.trim() || item.colors?.some((color) => color.toLowerCase() === f.color?.trim().toLowerCase()))
+      && (!f.season || !item.seasons?.length || item.seasons.includes(f.season))
+      && (!f.style?.trim() || item.styleTags?.some((style) => style.toLowerCase() === f.style?.trim().toLowerCase()))
+      && (!f.q?.trim() || [item.category, labels[item.category ?? ''], item.material, item.colors?.join(' '), item.styleTags?.join(' ')].join(' ').toLowerCase().includes(f.q.trim().toLowerCase())))
+      .sort((a, b) => f.sort === 'NEWEST'
+        ? b.createdAt.localeCompare(a.createdAt) || a.id.localeCompare(b.id)
+        : (wearHistory.get(a.id)?.lastWornAt ?? '').localeCompare(wearHistory.get(b.id)?.lastWornAt ?? '') || a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
+    return HttpResponse.json({ items: matches.slice(f.page * f.size, (f.page + 1) * f.size), total: matches.length, page: f.page, size: f.size });
+  }),
   http.get('*/api/app/wardrobe/items', ({ request }) => {
     const url = new URL(request.url);
     const status = url.searchParams.get('status');
@@ -120,19 +177,37 @@ const wardrobe: HttpHandler[] = [
   }),
   http.get('*/api/app/wardrobe/scans/:id', ({ params }) => {
     const scan = scans.get(String(params.id));
-    return scan ? HttpResponse.json(scan) : problem(404, 'Không tìm thấy lần quét');
+    return scan ? HttpResponse.json({ ...scan, items: scan.items.map((item) => closet.find((current) => current.id === item.id)).filter(Boolean) }) : problem(404, 'Không tìm thấy lần quét');
   }),
   http.get('*/api/app/wardrobe/items/:id', ({ params }) => {
     const item = closet.find((i) => i.id === params.id);
     return item ? HttpResponse.json(item) : problem(404, 'Không tìm thấy món đồ');
   }),
+  http.post('*/api/app/wardrobe/items/confirm', async ({ request }) => {
+    const body = await request.json() as { items?: { itemId: string; attributes: Partial<WardrobeItem> }[] };
+    if (!body.items?.length || body.items.length > 100) return problem(400, 'Chọn từ 1 đến 100 món');
+    if (new Set(body.items.map((item) => item.itemId)).size !== body.items.length) return problem(409, 'Món bị trùng');
+    for (const entry of body.items) {
+      const item = closet.find((i) => i.id === entry.itemId);
+      if (!item) return problem(404, 'Không tìm thấy món đồ');
+      if (!['PENDING_REVIEW', 'RECOGNITION_FAILED'].includes(item.status)) return problem(409, 'Món không còn chờ xác nhận');
+      if (!entry.attributes?.category) return problem(400, 'Cần chọn loại đồ');
+    }
+    const saved = body.items.map((entry) => ({ ...closet.find((i) => i.id === entry.itemId)!, ...entry.attributes, status: 'CONFIRMED' as const }));
+    closet = closet.map((item) => saved.find((s) => s.id === item.id) ?? item);
+    return HttpResponse.json(saved);
+  }),
   http.post('*/api/app/wardrobe/items/:id/confirm', async ({ params, request }) => {
     const attrs = (await request.json()) as Partial<WardrobeItem>;
+    if (attrs.purchasePrice != null && (attrs.purchasePrice < 0 || !Number.isFinite(attrs.purchasePrice))) return problem(400, 'Giá mua phải không âm');
+    if ((attrs.brand?.length ?? 0) > 100) return problem(400, 'Thương hiệu tối đa 100 ký tự');
     closet = closet.map((i) => (i.id === params.id ? { ...i, ...attrs, status: 'CONFIRMED' } : i));
     return HttpResponse.json(closet.find((i) => i.id === params.id));
   }),
   http.put('*/api/app/wardrobe/items/:id', async ({ params, request }) => {
     const attrs = (await request.json()) as Partial<WardrobeItem>;
+    if (attrs.purchasePrice != null && (attrs.purchasePrice < 0 || !Number.isFinite(attrs.purchasePrice))) return problem(400, 'Giá mua phải không âm');
+    if ((attrs.brand?.length ?? 0) > 100) return problem(400, 'Thương hiệu tối đa 100 ký tự');
     closet = closet.map((i) => (i.id === params.id ? { ...i, ...attrs } : i));
     return HttpResponse.json(closet.find((i) => i.id === params.id));
   }),
@@ -172,6 +247,7 @@ let preferences: { gender?: string | null; styles?: string[]; budget?: string | 
 };
 
 const outfit: HttpHandler[] = [
+  http.get('*/api/app/outfits/wear-summary', () => HttpResponse.json([...wearHistory].map(([itemId, history]) => ({ itemId, ...history })))),
   http.get('*/api/app/outfits/suggestions', ({ request }) =>
     HttpResponse.json(mockSuggestions(new URL(request.url).searchParams.get('occasion') ?? undefined)),
   ),
@@ -222,7 +298,12 @@ const outfit: HttpHandler[] = [
     if (body.vote === 'DISLIKE') disliked.add(comboKey(body.itemIds));
     return new HttpResponse(null, { status: 204 });
   }),
-  http.post('*/api/app/outfits/:id/wear', () => new HttpResponse(null, { status: 204 })),
+  http.post('*/api/app/outfits/:id/wear', ({ params }) => {
+    const outfit = savedOutfits.find((item) => item.id === params.id);
+    if (!outfit) return problem(404, 'Không tìm thấy outfit');
+    outfit.itemIds.forEach((id) => wearHistory.set(id, { wearCount: (wearHistory.get(id)?.wearCount ?? 0) + 1, lastWornAt: new Date().toISOString() }));
+    return new HttpResponse(null, { status: 204 });
+  }),
 ];
 
 // ---------------- voting ----------------

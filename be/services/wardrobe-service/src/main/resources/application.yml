@@ -42,6 +42,7 @@ thelooks:
     session-validation-uri: ${SESSION_VALIDATION_URI:http://localhost:8081/api/public/auth/session/active}
   services:
     billing-url: ${BILLING_SERVICE_URL}
+    outfit-url: ${OUTFIT_SERVICE_URL:http://localhost:8083}
   ai:
     # auto = Gemini vision chính, Gemini model dự phòng rồi Claude; none = nhận diện giả (dev)
     provider: ${AI_PROVIDER:auto}

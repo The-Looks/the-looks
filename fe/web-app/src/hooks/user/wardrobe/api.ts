@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { wardrobeRequests } from '../../../services/user/wardrobe/requests';
+import type { WardrobeFilters } from '../../../services/user/wardrobe/filters';
 import type { Category, ClothingAttributes, ItemStatus } from '../../../interface/dto/types';
 
 // wardrobe-service — Member 1. Contract: wardrobe-api.yaml
@@ -9,6 +10,33 @@ export const wardrobeKeys = {
   list: (status?: ItemStatus, category?: Category) => ['wardrobe', 'list', status, category] as const,
   item: (id: string) => ['wardrobe', 'item', id] as const,
 };
+
+export function useCostPerWear(itemId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ['wardrobe', 'cost-per-wear', itemId ?? 'summary'],
+    queryFn: async ({ signal }) => itemId
+      ? { items: [await wardrobeRequests.itemCost(itemId, signal)], totalItems: 1 }
+      : wardrobeRequests.costSummary(signal),
+    enabled, gcTime: 0, retry: false,
+  });
+}
+
+export function useWardrobeStats(enabled: boolean) {
+  return useQuery({
+    queryKey: ['wardrobe', 'stats'],
+    queryFn: ({ signal }) => wardrobeRequests.stats(signal),
+    enabled,
+    gcTime: 0,
+    retry: false,
+  });
+}
+
+export function useWardrobeSearch(filters: WardrobeFilters) {
+  return useQuery({
+    queryKey: ['wardrobe', 'list', 'search', filters],
+    queryFn: ({ signal }) => wardrobeRequests.search(filters, signal),
+  });
+}
 
 export function useWardrobe(status?: ItemStatus, category?: Category) {
   return useQuery({
@@ -41,7 +69,8 @@ export function useScan(scanId: string | null) {
     enabled: scanId !== null,
     queryFn: async () => {
       const scan = await wardrobeRequests.scan(scanId!);
-      if (scan.status !== 'PROCESSING') qc.invalidateQueries({ queryKey: wardrobeKeys.all });
+      // Chỉ làm mới danh sách: invalidate cả scan đang chạy sẽ tự huỷ/refetch liên tục.
+      if (scan.status !== 'PROCESSING') void qc.invalidateQueries({ queryKey: ['wardrobe', 'list'] });
       return scan;
     },
     refetchInterval: (q) => (q.state.data?.status === 'PROCESSING' ? 2000 : false),
@@ -68,6 +97,14 @@ export function useDelete() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: wardrobeRequests.remove,
+    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+  });
+}
+
+export function useConfirmAll() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: wardrobeRequests.confirmAll,
     onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
   });
 }

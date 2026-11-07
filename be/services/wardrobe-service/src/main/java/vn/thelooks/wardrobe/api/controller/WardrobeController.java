@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import vn.thelooks.security.CurrentUser;
 import vn.thelooks.wardrobe.api.dto.AttributesRequest;
+import vn.thelooks.wardrobe.api.dto.ConfirmItemsRequest;
 import vn.thelooks.wardrobe.api.dto.ItemResponse;
 import vn.thelooks.wardrobe.api.dto.ScanResponse;
 import vn.thelooks.wardrobe.application.port.out.ImageStorage;
@@ -101,6 +102,13 @@ class WardrobeController {
     ItemResponse confirm(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID itemId,
             @Valid @RequestBody AttributesRequest body) {
         return response(review.confirm(CurrentUser.id(jwt), itemId, body.toDomain()));
+    }
+
+    @PostMapping("/items/confirm")
+    List<ItemResponse> confirmAll(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ConfirmItemsRequest body) {
+        var confirmations = body.items().stream()
+                .map(i -> new ReviewClothingItemUseCase.Confirmation(i.itemId(), i.attributes().toDomain())).toList();
+        return review.confirmAll(CurrentUser.id(jwt), confirmations).stream().map(this::response).toList();
     }
 
     @PutMapping("/items/{itemId}")

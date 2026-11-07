@@ -17,7 +17,7 @@ class BillingPlanLimitReader implements PlanLimitReader {
 
     private final RestClient billing;
 
-    BillingPlanLimitReader(RestClient billingRestClient) {
+    BillingPlanLimitReader(@org.springframework.beans.factory.annotation.Qualifier("billingRestClient") RestClient billingRestClient) {
         this.billing = billingRestClient;
     }
 

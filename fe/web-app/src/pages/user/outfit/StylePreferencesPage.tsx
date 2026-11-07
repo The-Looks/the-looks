@@ -46,14 +46,14 @@ export function StylePreferencesPage() {
   const toggleStyle = (s: Style) =>
     setForm((f) => ({ ...f, styles: styles.includes(s) ? styles.filter((x) => x !== s) : [...styles, s] }));
   const submit = () =>
-    save.mutate(form, { onSuccess: () => onboarding && navigate('/wardrobe/add', { replace: true }) });
+    save.mutate(form, { onSuccess: () => onboarding && navigate('/onboarding/wardrobe', { replace: true }) });
 
   if (current.isPending) return <Spinner />;
 
   return (
     <div className="stack-lg">
       <PageHeader
-        eyebrow={onboarding ? 'Bước 1/2' : undefined}
+        eyebrow={onboarding ? 'Bước 1/3' : undefined}
         title="Phong cách của bạn"
         sub="Chọn giới tính và phong cách để cá nhân hóa gợi ý. Bạn có thể sửa lại trong hồ sơ bất cứ lúc nào."
         back={onboarding ? undefined : { to: '/profile', label: 'Cá nhân' }}

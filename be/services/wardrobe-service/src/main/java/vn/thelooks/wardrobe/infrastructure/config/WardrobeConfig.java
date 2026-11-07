@@ -41,4 +41,12 @@ class WardrobeConfig {
                 .requestInterceptor(correlationId)
                 .build();
     }
+    @Bean
+    RestClient outfitHistoryRestClient(@Value("${thelooks.services.outfit-url}") String outfitUrl,
+            BearerTokenForwardingInterceptor bearerToken, CorrelationIdForwardingInterceptor correlationId) {
+        var factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofSeconds(2)); factory.setReadTimeout(Duration.ofSeconds(3));
+        return RestClient.builder().baseUrl(outfitUrl).requestFactory(factory)
+                .requestInterceptor(bearerToken).requestInterceptor(correlationId).build();
+    }
 }

@@ -4,6 +4,7 @@ import { errorMessage } from '../../../services/shared/api/client';
 import type { ClothingAttributes } from '../../../interface/dto/types';
 import { CATEGORY_LABEL, categoryLabel } from '../../../services/shared/labels';
 import { Button, Card, Chip, Field, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { CostPerWearSection } from '../../../components/user/wardrobe/CostPerWearSection';
 import { useConfirm, useDelete, useItem, useUpdateItem } from '../../../hooks/user/wardrobe/api';
 
 type Season = NonNullable<ClothingAttributes['seasons']>[number];
@@ -27,14 +28,18 @@ export function ItemDetailPage() {
 
   useEffect(() => {
     if (!item.data) return;
-    setForm({ category: item.data.category, material: item.data.material ?? '', seasons: item.data.seasons ?? [] });
+    setForm({ category: item.data.category, material: item.data.material ?? '', seasons: item.data.seasons ?? [],
+      purchasePrice: item.data.purchasePrice, purchaseDate: item.data.purchaseDate, brand: item.data.brand });
     setColors((item.data.colors ?? []).join(', '));
     setStyles((item.data.styleTags ?? []).join(', '));
     setReviewed(false);
   }, [item.data]);
 
   const attributes = { ...form, colors: list(colors), styleTags: list(styles) };
+  const invalidPrice = form.purchasePrice != null && (!Number.isFinite(form.purchasePrice) || form.purchasePrice < 0
+    || form.purchasePrice > 999999999999.99 || Number(form.purchasePrice.toFixed(2)) !== form.purchasePrice);
   const save = () => {
+    if (invalidPrice) return;
     if (item.data?.status === 'PENDING_REVIEW' || item.data?.status === 'RECOGNITION_FAILED') confirm.mutate(attributes);
     else update.mutate(attributes);
   };
@@ -63,15 +68,26 @@ export function ItemDetailPage() {
           {SEASONS.map((season) => <Chip key={season.value} active={form.seasons?.includes(season.value)} onClick={() => toggleSeason(season.value)}>{season.label}</Chip>)}
         </div><p className="small muted">Để trống nếu có thể mặc mọi mùa.</p></div>
         <Field id="item-styles" label="Phong cách (cách nhau bằng dấu phẩy)" value={styles} onChange={(event) => setStyles(event.target.value)} placeholder="Casual, công sở" />
+        <h2>Thông tin mua hàng</h2>
+        <p className="small muted">Không bắt buộc. Để trống nếu bạn chưa nhớ; nhập 0 nếu món đồ được tặng.</p>
+        <Field id="item-price" label="Giá mua (VND)" type="number" min="0" max="999999999999.99" step="0.01" value={form.purchasePrice ?? ''} aria-invalid={invalidPrice}
+          onChange={(event) => setForm((current) => ({ ...current, purchasePrice: event.target.value === '' ? null : Number(event.target.value) }))} />
+        {invalidPrice && <Notice tone="error">Giá mua phải không âm, tối đa 12 chữ số và 2 số thập phân.</Notice>}
+        <Field id="item-purchase-date" label="Ngày mua" type="date" value={form.purchaseDate ?? ''}
+          onChange={(event) => setForm((current) => ({ ...current, purchaseDate: event.target.value || null }))} />
+        <Field id="item-brand" label="Thương hiệu" maxLength={100} value={form.brand ?? ''} placeholder="Ví dụ: Uniqlo"
+          onChange={(event) => setForm((current) => ({ ...current, brand: event.target.value || null }))} />
         {(item.data.status === 'PENDING_REVIEW' || item.data.status === 'RECOGNITION_FAILED') && <label className="row"><input type="checkbox" checked={reviewed} onChange={(event) => setReviewed(event.target.checked)} /> Tôi đã kiểm tra ảnh và toàn bộ thông tin của món đồ.</label>}
       </div>}
+      {(confirm.isSuccess || update.isSuccess) && <Notice>Đã lưu thông tin món đồ.</Notice>}
       {(confirm.isError || update.isError || remove.isError) && <Notice tone="error">{errorMessage(confirm.error ?? update.error ?? remove.error)}</Notice>}
       <div className="row">
-        {(item.data.status === 'PENDING_REVIEW' || item.data.status === 'RECOGNITION_FAILED' || item.data.status === 'CONFIRMED') && <Button onClick={save} disabled={confirm.isPending || update.isPending || !form.category || (item.data.status !== 'CONFIRMED' && !reviewed)}>
+        {(item.data.status === 'PENDING_REVIEW' || item.data.status === 'RECOGNITION_FAILED' || item.data.status === 'CONFIRMED') && <Button onClick={save} disabled={invalidPrice || confirm.isPending || update.isPending || !form.category || (item.data.status !== 'CONFIRMED' && !reviewed)}>
           {confirm.isPending || update.isPending ? 'Đang lưu…' : item.data.status === 'CONFIRMED' ? 'Lưu thay đổi' : 'Xác nhận món đồ'}
         </Button>}
         <Button kind="outline" onClick={() => remove.mutate(id, { onSuccess: () => navigate('/wardrobe') })} disabled={remove.isPending}>Xoá món này</Button>
       </div>
     </Card>}
+    {item.data?.status === 'CONFIRMED' && <CostPerWearSection itemId={id} />}
   </div>;
 }
