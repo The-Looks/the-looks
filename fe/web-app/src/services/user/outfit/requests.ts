@@ -26,6 +26,12 @@ export const outfitRequests = {
     unwrap(outfitApi.POST('/api/app/outfits/feedback', {
       body: { itemIds: suggestion.items.map((item) => item.id), vote },
     })),
+  calendar: (from: string, to: string) =>
+    unwrap(outfitApi.GET('/api/app/outfits/calendar', { params: { query: { from, to } } })),
+  planDay: ({ date, outfitId }: { date: string; outfitId: string }) =>
+    unwrap(outfitApi.PUT('/api/app/outfits/calendar/{date}', { params: { path: { date } }, body: { outfitId } })),
+  unplanDay: (date: string) =>
+    unwrap(outfitApi.DELETE('/api/app/outfits/calendar/{date}', { params: { path: { date } } })),
   wearOutfit: (outfitId: string) =>
     unwrap(outfitApi.POST('/api/app/outfits/{outfitId}/wear', { params: { path: { outfitId } } })),
 };

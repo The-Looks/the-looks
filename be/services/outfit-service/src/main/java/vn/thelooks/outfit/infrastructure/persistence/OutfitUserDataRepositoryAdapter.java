@@ -25,6 +25,7 @@ class OutfitUserDataRepositoryAdapter implements OutfitUserDataRepositoryPort {
         jdbc.update("DELETE FROM outfit_ai_usage WHERE owner_id=?", userId);
         jdbc.update("DELETE FROM outfit_feedback WHERE owner_id=?", userId);
         jdbc.update("DELETE FROM outfit_preferences WHERE owner_id=?", userId);
+        jdbc.update("DELETE FROM outfit_wear_plan WHERE owner_id=?", userId);
         jdbc.update("DELETE FROM outfit_outfit WHERE owner_id=?", userId);
     }
 }
