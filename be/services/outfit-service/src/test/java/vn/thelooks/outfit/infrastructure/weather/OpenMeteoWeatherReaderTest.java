@@ -41,6 +41,28 @@ class OpenMeteoWeatherReaderTest {
         } finally { server.stop(0); }
     }
 
+    @Test
+    void fallsBackToTheDefaultCityWhenTheProfileCannotBeRead() throws Exception {
+        var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        var forecastQuery = new AtomicReference<String>();
+        server.createContext("/v1/forecast", exchange -> {
+            forecastQuery.set(exchange.getRequestURI().getRawQuery());
+            respond(exchange, "{\"current\":{\"temperature_2m\":31.0,\"precipitation\":0.0}}");
+        });
+        server.start();
+        try {
+            String base = "http://127.0.0.1:" + server.getAddress().getPort();
+            String deadAuth = "http://127.0.0.1:1";
+            var reader = new OpenMeteoWeatherReader(base, base, deadAuth, 10.8231, 106.6297,
+                    Clock.fixed(Instant.parse("2026-11-07T00:00:00Z"), ZoneOffset.UTC),
+                    new BearerTokenForwardingInterceptor());
+            var weather = reader.current(UUID.randomUUID());
+            assertTrue(weather.isPresent());
+            assertEquals(31.0, weather.orElseThrow().temperatureC());
+            assertTrue(forecastQuery.get().contains("latitude=10.8231"));
+        } finally { server.stop(0); }
+    }
+
     private static void respond(com.sun.net.httpserver.HttpExchange exchange, String json) throws java.io.IOException {
         byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json");

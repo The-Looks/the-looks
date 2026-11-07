@@ -67,8 +67,9 @@ class OpenMeteoWeatherReader implements WeatherReader {
             var profile = auth.get().uri("/api/app/me/profile").retrieve().body(Profile.class);
             city = profile == null ? null : profile.city();
         } catch (RestClientException error) {
-            log.warn("Không đọc được thành phố hồ sơ cho {}: {}", ownerId, error.getMessage());
-            return Optional.empty();
+            // Không đọc được hồ sơ (auth đang ngủ, thiếu AUTH_SERVICE_URL…) → vẫn dùng thành phố mặc định
+            log.warn("Không đọc được thành phố hồ sơ cho {}, dùng thành phố mặc định: {}", ownerId, error.getMessage());
+            city = null;
         }
         String key = city == null ? "" : city.trim().toLowerCase(Locale.ROOT);
         Cache<Weather> cached = forecasts.get(key);
