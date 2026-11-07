@@ -49,6 +49,16 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   3. Khai báo webhook trong PayOS: `https://the-looks.vercel.app/api/public/billing/payos/webhook`.
   4. Mua thử 1 gói Plus tháng (49.000đ) bằng tiền thật để kiểm tra trọn luồng.
   Tự gia hạn: chưa trừ tiền tự động; app nhắc trước 3 ngày, giữ gói thêm 3 ngày ân hạn, người dùng bấm "Thanh toán gia hạn".
+- [ ] **Email nhắc gia hạn (Brevo)** · Tuấn · tuỳ chọn, không có thì chỉ nhắc trong app
+  Render free chặn cổng SMTP (25/465/587) nên không gửi qua Gmail SMTP được; billing gọi API HTTPS của Brevo (free 300 email/ngày).
+  1. Đăng ký https://www.brevo.com → **Senders, Domains & Dedicated IPs → Senders → Add a sender**: nhập email nhóm
+     (ví dụ Gmail của nhóm), bấm link xác minh Brevo gửi về hộp thư đó.
+  2. **SMTP & API → API Keys → Generate a new API key**.
+  3. Render → `thelooks-billing` → Environment: `BREVO_API_KEY`, `MAIL_FROM` (đúng email đã xác minh ở bước 1) → Save, rebuild and deploy.
+  4. Thử: tài khoản test mua gói, sửa `expires_at` của dòng đó trong `billing_subscription` (Neon, `thelooks_billing`) thành 2 ngày tới,
+     đợi tối đa 1 giờ (service phải đang thức) → email tới. Kiểm tra cả mục Spam.
+  Người gửi là Gmail thì dễ vào Spam; có tên miền riêng thì xác minh tên miền trong Brevo và đổi `MAIL_FROM` sang email tên miền.
+  Email người nhận được lưu lúc họ bấm thanh toán, nên người mua trước bản này chỉ được nhắc từ lần thanh toán sau.
 - [ ] **Trừ tiền tự động thật (VNPay token / liên kết MoMo)** · nhóm · khi có hộ kinh doanh hoặc công ty
 - [ ] **Cloudinary (lưu ảnh tủ đồ)** · Tuấn hoặc Thạch · trước khi deploy
   Đăng ký https://cloudinary.com (gói Free) → Dashboard lấy Cloud name, API Key, API Secret.

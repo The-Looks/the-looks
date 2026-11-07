@@ -166,3 +166,7 @@ services:
         sync: false
       - key: PAYOS_CHECKSUM_KEY
         sync: false
+      - key: BREVO_API_KEY # email nhắc gia hạn (brevo.com → SMTP & API → API keys); để trống = tắt
+        sync: false
+      - key: MAIL_FROM # email người gửi đã xác minh trong Brevo (Senders)
+        sync: false

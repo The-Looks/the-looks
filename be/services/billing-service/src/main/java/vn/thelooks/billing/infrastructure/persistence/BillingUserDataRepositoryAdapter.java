@@ -38,6 +38,7 @@ class BillingUserDataRepositoryAdapter implements BillingUserDataRepositoryPort 
         if (pending != null && pending > 0)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Còn đơn thanh toán chưa được đối soát");
         jdbc.update("INSERT INTO billing_deleted_owner(owner_id) VALUES (?) ON CONFLICT DO NOTHING", userId);
+        jdbc.update("DELETE FROM billing_contact WHERE owner_id=?", userId);
         jdbc.update("DELETE FROM billing_subscription WHERE owner_id=?", userId);
         jdbc.update("UPDATE billing_order SET owner_id=NULL WHERE owner_id=?", userId);
     }
