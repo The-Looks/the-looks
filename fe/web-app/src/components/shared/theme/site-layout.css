@@ -27,6 +27,13 @@
 .site-footer-nav a:hover, .site-footer-nav a:focus-visible { color: var(--lavender); transform: translateY(-2px); }
 .site-footer-nav a:hover .anticon, .site-footer-nav a:focus-visible .anticon { opacity: 1; transform: translateX(0); }
 .site-footer-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 7px 20px; margin-top: 34px; padding-top: 20px; border-top: 1px solid #ffffff24; color: #cdbed5; font-size: var(--type-11); }
+.auth-footer { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2px 12px; padding-top: 6px; border-top: 1px solid #ffffffb8; color: var(--muted); font-size: var(--type-10); }
+.auth-footer nav { display: flex; gap: 12px; }
+.auth-footer a { color: var(--purple-dark); text-decoration: none; }
+.auth-footer a:hover, .auth-footer a:focus-visible { text-decoration: underline; }
+.admin-content { display: flex; flex-direction: column; min-height: 100dvh; }
+.admin-content .admin-page { flex: 1 0 auto; }
+.admin-content .site-footer { margin-top: 0; }
 
 @media (max-width: 800px) {
   .site-footer-inner { width: min(100% - 40px, 1390px); }

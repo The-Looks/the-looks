@@ -9,6 +9,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BackLink, Brand } from '../../../components/shared/ui/index';
 import { AccountDrawer } from '../../../components/shared/layout/AccountDrawer';
+import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { useAiUsage } from '../../../hooks/admin/dashboard/useAiUsage';
@@ -370,6 +371,7 @@ export function AdminDashboardPage() {
           {!['overview', 'users', 'revenue', 'affiliate', 'products', 'settings'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
         </div>
       </main>
+      <SiteFooter variant="admin" />
     </div>
     <AccountDrawer open={accountOpen} onClose={() => setAccountOpen(false)} account={me.data} isAdmin />
   </div>;

@@ -16,8 +16,18 @@ const publicLinks = [
   { to: '/login', label: 'Đăng nhập' },
 ];
 
-export function SiteFooter({ variant = 'public' }: { variant?: 'app' | 'public' }) {
-  const links = variant === 'app' ? appLinks : publicLinks;
+const adminLinks = [
+  { to: '/admin', label: 'Quản trị' },
+  { to: '/', label: 'Trang chủ' },
+  { to: '/profile', label: 'Hồ sơ' },
+];
+
+export function SiteFooter({ variant = 'public' }: { variant?: 'app' | 'public' | 'auth' | 'admin' }) {
+  if (variant === 'auth') return <footer className="auth-footer">
+    <span>© {new Date().getFullYear()} THE LOOKS</span>
+    <nav aria-label="Thông tin pháp lý"><Link to="/terms">Điều khoản</Link><Link to="/privacy">Quyền riêng tư</Link></nav>
+  </footer>;
+  const links = variant === 'app' ? appLinks : variant === 'admin' ? adminLinks : publicLinks;
   return <footer className={`site-footer site-footer-${variant}`}>
     <div className="site-footer-inner">
       <div className="site-footer-top">
