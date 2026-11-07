@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import { Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
@@ -18,10 +18,11 @@ export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean;
   const [tooMany, setTooMany] = useState(false);
   const scan = useScan(scanId);
 
-  const onFiles = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    e.target.value = '';
+  const [pasteError, setPasteError] = useState('');
+
+  const upload = (files: File[]) => {
     if (files.length === 0) return;
+    setPasteError('');
     setTooMany(files.length > MAX_IMAGES);
     start.mutate(files.slice(0, MAX_IMAGES), { onSuccess: (s) => {
       setScanId(s.id);
@@ -29,7 +30,45 @@ export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean;
     } });
   };
 
+  const onFiles = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    upload(files);
+  };
+
   const processing = start.isPending || scan.data?.status === 'PROCESSING';
+
+  // Ctrl+V / Cmd+V ở bất kỳ đâu trên trang: dán ảnh vừa copy (ảnh chụp màn hình, ảnh copy từ web / Zalo / Messenger)
+  const uploadRef = useRef(upload);
+  uploadRef.current = upload;
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      if (processing) return;
+      const images = Array.from(e.clipboardData?.files ?? []).filter((f) => f.type.startsWith('image/'));
+      if (images.length === 0) return; // dán chữ vào ô nhập vẫn bình thường
+      e.preventDefault();
+      uploadRef.current(images);
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, [processing]);
+
+  /** Nút "Dán ảnh" cho điện thoại (không có Ctrl+V): đọc ảnh trong bộ nhớ tạm, trình duyệt sẽ hỏi quyền. */
+  const pasteFromButton = async () => {
+    setPasteError('');
+    try {
+      const images: File[] = [];
+      for (const item of await navigator.clipboard.read()) {
+        const type = item.types.find((t) => t.startsWith('image/'));
+        if (type) images.push(new File([await item.getType(type)], `dan-anh-${images.length + 1}.${type.split('/')[1]}`, { type }));
+      }
+      if (images.length === 0) setPasteError('Bộ nhớ tạm chưa có ảnh. Hãy copy một ảnh trước (giữ vào ảnh → Sao chép).');
+      else upload(images);
+    } catch {
+      setPasteError('Trình duyệt chưa cho đọc bộ nhớ tạm. Trên máy tính hãy nhấn Ctrl+V; trên điện thoại hãy dùng "Chọn ảnh từ máy".');
+    }
+  };
+
   const items = scan.data?.items ?? [];
 
   return (
@@ -47,6 +86,11 @@ export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean;
           <label htmlFor="camera-photo" className="btn btn-outline" style={{ cursor: processing ? 'wait' : 'pointer' }}>
             Chụp ảnh
           </label>
+          {typeof navigator !== 'undefined' && 'clipboard' in navigator && 'read' in navigator.clipboard && (
+            <button type="button" className="btn btn-outline" disabled={processing} onClick={() => void pasteFromButton()}>
+              Dán ảnh
+            </button>
+          )}
         </div>
         <input
           id="add-photos"
@@ -58,12 +102,14 @@ export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean;
           onChange={onFiles}
         />
         <input id="camera-photo" type="file" accept="image/*" capture="environment" hidden disabled={processing} onChange={onFiles} />
+        <p className="small muted">Mẹo: copy ảnh ở bất kỳ đâu rồi nhấn <kbd>Ctrl</kbd>+<kbd>V</kbd> trên trang này để thêm nhanh.</p>
         <p className="small muted">
           JPEG, PNG, WebP, AVIF, GIF và định dạng ảnh thiết bị đọc được. Mẹo: đủ sáng, các món không chồng lên nhau. Tối đa {MAX_IMAGES} ảnh mỗi lần. Ảnh gốc không được lưu, chỉ giữ
           ảnh từng món.
         </p>
       </Card>
 
+      {pasteError && <Notice tone="warn">{pasteError}</Notice>}
       {tooMany && <Notice tone="warn">Chỉ gửi {MAX_IMAGES} ảnh đầu tiên, các ảnh còn lại hãy gửi ở lần sau.</Notice>}
       {start.isError && <Notice tone="error">{errorMessage(start.error)}</Notice>}
       {scan.isError && <Notice tone="error">{errorMessage(scan.error)}</Notice>}

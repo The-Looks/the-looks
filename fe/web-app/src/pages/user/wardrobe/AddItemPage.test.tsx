@@ -17,3 +17,11 @@ it('stores a started guided scan in the URL for resume without another upload', 
   expect(screen.getByTestId('url').textContent).toBe('?scan=scan-new');
   expect(mock.scan).toHaveBeenLastCalledWith('scan-new');
 });
+it('uploads images pasted with Ctrl+V and ignores pasted text', () => {
+  render(<MemoryRouter><AddItemPage /></MemoryRouter>);
+  const image = new File(['img'], 'image.png', { type: 'image/png' });
+  fireEvent.paste(window, { clipboardData: { files: [new File(['hi'], 'note.txt', { type: 'text/plain' })] } });
+  expect(mock.start).not.toHaveBeenCalled();
+  fireEvent.paste(window, { clipboardData: { files: [image] } });
+  expect(mock.start).toHaveBeenCalledWith([image], expect.anything());
+});
