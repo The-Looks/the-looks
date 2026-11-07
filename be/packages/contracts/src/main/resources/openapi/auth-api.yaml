@@ -158,6 +158,122 @@ paths:
               schema: { $ref: '#/components/schemas/UserStats' }
         '403': { $ref: 'common.yaml#/components/responses/Problem' }
 
+  /api/app/me/auth-methods:
+    get:
+      summary: Các cách đăng nhập đã thiết lập
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: object, required: [hasPassword], properties: { hasPassword: { type: boolean } } }
+  /api/app/me/password:
+    post:
+      summary: Đặt mật khẩu cho tài khoản Google trong 10 phút sau khi đăng nhập
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [password], properties: { password: { type: string, minLength: 8, maxLength: 256 } } }
+      responses:
+        '204': { description: Đã đặt mật khẩu }
+        '403': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+
+  /api/admin/auth/users/{id}:
+    get:
+      summary: Chi tiết tài khoản và quyền
+      parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AdminUserDetail' } } } }
+  /api/admin/auth/users/{id}/status:
+    put:
+      summary: Khóa hoặc mở tài khoản; khóa thu hồi mọi phiên
+      parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [status], properties: { status: { type: string, enum: [ACTIVE, LOCKED] } } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AdminUserDetail' } } } }
+  /api/admin/auth/users/{id}/roles/{role}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      - { name: role, in: path, required: true, schema: { type: string } }
+    put:
+      summary: Gán vai trò cho người dùng
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AdminUserDetail' } } } }
+    delete:
+      summary: Gỡ vai trò của người dùng
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AdminUserDetail' } } } }
+  /api/admin/auth/roles:
+    get:
+      summary: Danh sách vai trò
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminRole' } } } } }
+    post:
+      summary: Tạo vai trò
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [code, name], properties: { code: { type: string }, name: { type: string } } } } } }
+      responses:
+        '201': { description: Đã tạo, content: { application/json: { schema: { $ref: '#/components/schemas/AdminRole' } } } }
+  /api/admin/auth/roles/{code}:
+    parameters: [ { name: code, in: path, required: true, schema: { type: string } } ]
+    put:
+      summary: Đổi tên vai trò
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [name], properties: { name: { type: string } } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AdminRole' } } } }
+    delete:
+      summary: Xóa vai trò chưa được sử dụng
+      responses:
+        '204': { description: Đã xóa }
+  /api/admin/auth/roles/{code}/permissions:
+    put:
+      summary: Thay danh sách quyền của vai trò
+      parameters: [ { name: code, in: path, required: true, schema: { type: string } } ]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [permissions], properties: { permissions: { type: array, items: { type: string } } } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AdminRole' } } } }
+  /api/admin/auth/permissions:
+    get:
+      summary: Danh sách quyền hạn
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminPermission' } } } } }
+    post:
+      summary: Tạo quyền hạn
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [code, description], properties: { code: { type: string }, description: { type: string } } } } } }
+      responses:
+        '201': { description: Đã tạo, content: { application/json: { schema: { $ref: '#/components/schemas/AdminPermission' } } } }
+  /api/admin/auth/permissions/{code}:
+    parameters: [ { name: code, in: path, required: true, schema: { type: string } } ]
+    put:
+      summary: Sửa mô tả quyền hạn
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [description], properties: { description: { type: string } } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AdminPermission' } } } }
+    delete:
+      summary: Xóa quyền hạn chưa được sử dụng
+      responses:
+        '204': { description: Đã xóa }
+  /api/admin/auth/audit:
+    get:
+      summary: Nhật ký thao tác admin
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+        - { name: outcome, in: query, schema: { type: string, enum: [ALL, SUCCESS, FAILED] } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100 } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/AdminAudit' } } } } }
+  /api/admin/auth/users/{id}/deletion:
+    parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
+    get:
+      summary: Trạng thái yêu cầu xóa tài khoản
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AccountDeletion' } } } }
+    post:
+      summary: Bắt đầu hoặc thử lại xóa dữ liệu ở mọi service
+      responses:
+        '200': { description: Tiến độ, content: { application/json: { schema: { $ref: '#/components/schemas/AccountDeletion' } } } }
+
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }
@@ -190,7 +306,7 @@ components:
         recommendedCharacterTypes: { type: integer, minimum: 1, maximum: 4, example: 3 }
     User:
       type: object
-      required: [id, email, username, roles, createdAt]
+      required: [id, email, username, roles, permissions, createdAt]
       properties:
         id: { type: string, format: uuid }
         email: { type: string, format: email }
@@ -198,7 +314,59 @@ components:
         roles:
           type: array
           items: { type: string }
+        permissions:
+          type: array
+          items: { type: string }
         createdAt: { type: string, format: date-time }
+    AdminUserDetail:
+      type: object
+      required: [id, username, email, status, emailVerified, createdAt, roles, permissions]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        email: { type: string, format: email }
+        status: { type: string, enum: [ACTIVE, LOCKED] }
+        emailVerified: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        roles: { type: array, items: { type: string } }
+        permissions: { type: array, items: { type: string } }
+    AdminRole:
+      type: object
+      required: [code, name, permissions, system]
+      properties:
+        code: { type: string }
+        name: { type: string }
+        permissions: { type: array, items: { type: string } }
+        system: { type: boolean }
+    AdminPermission:
+      type: object
+      required: [code, description, system]
+      properties:
+        code: { type: string }
+        description: { type: string }
+        system: { type: boolean }
+    AdminAudit:
+      type: object
+      required: [id, actorId, action, outcome, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        actorId: { type: string, format: uuid }
+        targetId: { type: [string, 'null'] }
+        action: { type: string }
+        detail: { type: [string, 'null'] }
+        outcome: { type: string, enum: [SUCCESS, FAILED] }
+        createdAt: { type: string, format: date-time }
+    AccountDeletion:
+      type: object
+      required: [targetId, actorId, step, status, createdAt, updatedAt]
+      properties:
+        targetId: { type: string, format: uuid }
+        actorId: { type: string, format: uuid }
+        step: { type: string }
+        status: { type: string, enum: [PENDING, RUNNING, FAILED, DONE] }
+        lastError: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
     AdminUser:
       type: object
       required: [id, username, email, status, emailVerified, createdAt]

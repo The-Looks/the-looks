@@ -108,62 +108,17 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/BillingStats' }
         '403': { $ref: 'common.yaml#/components/responses/Problem' }
-  /api/admin/billing/orders:
+  /api/admin/billing/users/{id}/data:
+    parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ]
     get:
-      summary: (ADMIN) Danh sách đơn, mới nhất trước; lọc theo trạng thái, người dùng, mã đơn
-      parameters:
-        - { name: status, in: query, schema: { type: string, enum: [PENDING, PAID, CANCELLED, REFUNDED] } }
-        - { name: ownerId, in: query, schema: { type: string, format: uuid } }
-        - { name: orderCode, in: query, schema: { type: integer, format: int64 } }
-        - { name: page, in: query, schema: { type: integer, minimum: 0, default: 0 } }
-        - { name: size, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+      summary: Gói còn hạn của người dùng
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/AdminOrderPage' }
-  /api/admin/billing/orders/{orderCode}/refund:
-    post:
-      summary: (ADMIN) Ghi nhận đã hoàn tiền (chuyển trả bằng tay) và trừ lại thời gian gói của đơn
-      parameters:
-        - { name: orderCode, in: path, required: true, schema: { type: integer, format: int64 } }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [reason]
-              properties:
-                reason: { type: string, maxLength: 300 }
+        '200': { description: OK, content: { application/json: { schema: { type: object, required: [plan], properties: { plan: { type: string }, expiresAt: { type: [string, 'null'], format: date-time } } } } } }
+    delete:
+      summary: Xóa gói và tách mã người dùng khỏi đơn thanh toán
       responses:
-        '200':
-          description: Đã hoàn tiền. newExpiry null khi người dùng đã đổi gói khác sau đơn này (admin chỉnh tay)
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [order]
-                properties:
-                  order: { $ref: '#/components/schemas/Order' }
-                  newExpiry: { type: [string, 'null'], format: date-time }
-        '404': { $ref: 'common.yaml#/components/responses/Problem' }
-        '409': { $ref: 'common.yaml#/components/responses/Problem' }
-  /api/admin/billing/status:
-    get:
-      summary: (ADMIN) Cổng thanh toán đang dùng và đã có key PayOS chưa (không trả giá trị key)
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [paymentGateway, payosConfigured]
-                properties:
-                  paymentGateway: { type: string }
-                  payosConfigured: { type: boolean }
+        '204': { description: Đã xử lý }
+
 components:
   securitySchemes:
     bearerAuth: { $ref: 'common.yaml#/components/securitySchemes/bearerAuth' }

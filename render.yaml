@@ -44,6 +44,12 @@ services:
         generateValue: true
       - key: JWT_PRIVATE_KEY_PATH # thêm Secret File tên jwt-private.pem trong dashboard
         value: /etc/secrets/jwt-private.pem
+      - key: WARDROBE_SERVICE_URL
+        value: https://thelooks-wardrobe.onrender.com
+      - key: OUTFIT_SERVICE_URL
+        value: https://thelooks-outfit.onrender.com
+      - key: VOTING_SERVICE_URL
+        value: https://thelooks-voting.onrender.com
 
   - type: web
     name: thelooks-wardrobe

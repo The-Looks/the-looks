@@ -1,0 +1,2 @@
+ALTER TABLE poll_moderation_audit ADD COLUMN outcome VARCHAR(12) NOT NULL DEFAULT 'SUCCESS'
+    CHECK (outcome IN ('SUCCESS','FAILED'));

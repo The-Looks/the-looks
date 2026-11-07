@@ -529,19 +529,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/admin/wardrobe/status": {
+    "/api/admin/wardrobe/users/{id}/data": {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
-        /** (ADMIN) Cấu hình lưu ảnh và AI nhận diện (chỉ báo có / không có key) */
+        /** Số món trong tủ của người dùng */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path?: never;
+                path: {
+                    id: string;
+                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -553,11 +557,7 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            aiProvider: string;
-                            geminiConfigured: boolean;
-                            anthropicConfigured: boolean;
-                            imageStorage: string;
-                            cloudinaryConfigured: boolean;
+                            itemCount: number;
                         };
                     };
                 };
@@ -565,7 +565,27 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        delete?: never;
+        /** Xóa tủ đồ và ảnh của người dùng theo yêu cầu xóa tài khoản */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Đã xóa */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;

@@ -43,6 +43,9 @@ public class PollJpaEntity extends BaseEntity {
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
+    @Column(nullable = false)
+    private boolean hidden;
+
     protected PollJpaEntity() {
     }
 
@@ -68,4 +71,5 @@ public class PollJpaEntity extends BaseEntity {
     public List<String> getOptionAImages() { return optionAImages; }
     public List<String> getOptionBImages() { return optionBImages; }
     public Instant getExpiresAt() { return expiresAt; }
+    public boolean isHidden() { return hidden; }
 }

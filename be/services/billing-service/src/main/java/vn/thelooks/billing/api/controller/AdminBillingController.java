@@ -27,22 +27,15 @@ import vn.thelooks.billing.domain.exception.OrderNotRefundableException;
 import vn.thelooks.billing.domain.model.OrderStatus;
 import vn.thelooks.security.CurrentUser;
 
-/** Chỉ ADMIN (quy tắc chung cho /api/admin/** trong packages/security). */
 @RestController
-@RequestMapping("/api/admin/billing")
+@RequestMapping("/api/admin/billing/stats")
 class AdminBillingController {
 
     private final BillingStatsQuery stats;
     private final AdminOrderQuery orders;
     private final RefundOrderUseCase refunds;
 
-    private final Status status;
-
-    AdminBillingController(BillingStatsQuery stats, AdminOrderQuery orders, RefundOrderUseCase refunds,
-            @Value("${thelooks.billing.gateway}") String gateway,
-            @Value("${thelooks.billing.payos.client-id:}") String clientId,
-            @Value("${thelooks.billing.payos.api-key:}") String apiKey,
-            @Value("${thelooks.billing.payos.checksum-key:}") String checksumKey) {
+    AdminBillingController(BillingStatsQuery stats) {
         this.stats = stats;
         this.orders = orders;
         this.refunds = refunds;
@@ -50,14 +43,8 @@ class AdminBillingController {
         this.status = new Status(gateway, !clientId.isBlank() && !apiKey.isBlank() && !checksumKey.isBlank());
     }
 
-    record Status(String paymentGateway, boolean payosConfigured) {}
-
-    @GetMapping("/status")
-    Status status() {
-        return status;
-    }
-
-    @GetMapping("/stats")
+    @GetMapping
+    @PreAuthorize("hasAuthority('PERMISSION_BILLING_STATS_READ')")
     BillingStatsQuery.BillingStats stats(@RequestParam(defaultValue = "30") int days) {
         return stats.stats(Math.max(1, Math.min(90, days)));
     }

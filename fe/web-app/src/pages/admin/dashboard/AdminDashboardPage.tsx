@@ -3,8 +3,8 @@ import {
   HeartOutlined, LinkOutlined, LockOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
   SettingOutlined, ShoppingOutlined, TeamOutlined, UserAddOutlined,
 } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import { Avatar, Button, Card, Input, Modal, Select, Skeleton, Table, Tag } from 'antd';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Avatar, Button, Card, Input, Skeleton, Table, Tag } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { BackLink, Brand } from '../../../components/shared/ui/index';
@@ -17,14 +17,18 @@ import { useAffiliateStats, useBillingStats, useUserStats } from '../../../hooks
 import { useAffiliateBlocks, useOrders, useRefund, useSystemStatus, useToggleBlock } from '../../../hooks/admin/dashboard/useAdminOps';
 import type { OrderStatus } from '../../../services/admin/dashboard/requests';
 import { listAdminUsers } from '../../../services/admin/dashboard/users';
+import { management } from '../../../services/admin/management/requests';
 import type { AdminUser } from '../../../interface/dto/admin/auth/AdminUsers';
+import { AuditPanel, PermissionsPanel, ReportsPanel, RolesPanel, UserDetailDrawer } from './AdminManagementPanels';
 import './admin-dashboard.css';
 
-type View = 'overview' | 'users' | 'content' | 'products' | 'sync' | 'notifications' | 'audit' | 'settings' | 'revenue' | 'affiliate';
+type View = 'overview' | 'users' | 'roles' | 'permissions' | 'content' | 'products' | 'sync' | 'notifications' | 'audit' | 'settings' | 'revenue' | 'affiliate';
 const nav: { heading: string; items: { key: View; label: string; icon: ReactNode }[] }[] = [
   { heading: 'TỔNG QUAN', items: [{ key: 'overview', label: 'Tổng quan', icon: <AppstoreOutlined /> }] },
   { heading: 'QUẢN LÝ', items: [
     { key: 'users', label: 'Người dùng', icon: <TeamOutlined /> },
+    { key: 'roles', label: 'Vai trò', icon: <LockOutlined /> },
+    { key: 'permissions', label: 'Quyền hạn', icon: <LockOutlined /> },
     { key: 'content', label: 'Nội dung', icon: <HeartOutlined /> },
     { key: 'products', label: 'Sản phẩm', icon: <ShoppingOutlined /> },
     { key: 'sync', label: 'Đồng bộ', icon: <CloudSyncOutlined /> },
@@ -40,6 +44,11 @@ const nav: { heading: string; items: { key: View; label: string; icon: ReactNode
   ] },
 ];
 const titles: Record<View, string> = Object.fromEntries(nav.flatMap((group) => group.items.map((item) => [item.key, item.label]))) as Record<View, string>;
+const viewPermission: Partial<Record<View, string>> = {
+  overview: 'USER_MANAGE', users: 'USER_MANAGE', roles: 'ROLE_MANAGE', permissions: 'ROLE_MANAGE',
+  content: 'REPORT_MODERATE', audit: 'AUDIT_READ',
+  revenue: 'BILLING_STATS_READ', affiliate: 'AFFILIATE_STATS_READ',
+};
 
 function AiUsagePanel() {
   const usage = useAiUsage();
@@ -310,13 +319,21 @@ function OverviewPanel({ onOpenUsers }: { onOpenUsers: () => void }) {
 }
 
 function UsersPanel() {
+  const qc = useQueryClient();
+  const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me });
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState('');
   const users = useQuery({ queryKey: ['admin', 'users', page, query], queryFn: () => listAdminUsers(page, query) });
-  return <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Danh sách người dùng</h2><p>{users.data ? `${users.data.total} tài khoản trong hệ thống` : 'Dữ liệu từ auth-service'}</p></div></div>
+  const changeStatus = useMutation({ mutationFn: ({ id, status }: { id: string; status: 'ACTIVE' | 'LOCKED' }) => management.status(id, status),
+    onSuccess: async () => { setActionError(''); await qc.invalidateQueries({ queryKey: ['admin', 'users'] }); },
+    onError: (error) => setActionError(errorMessage(error)) });
+  return <><Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Danh sách người dùng</h2><p>{users.data ? `${users.data.total} tài khoản trong hệ thống` : 'Dữ liệu từ auth-service'}</p></div></div>
     <form className="admin-toolbar" onSubmit={(event) => { event.preventDefault(); setPage(0); setQuery(search.trim()); }}><Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm tên hoặc email" aria-label="Tìm người dùng" /><Button htmlType="submit">Tìm</Button></form>
     {users.isError && <p role="alert">{errorMessage(users.error)}</p>}
+    {actionError && <p role="alert">{actionError}</p>}
     <Table<AdminUser> rowKey="id" loading={users.isPending} dataSource={users.data?.items ?? []} scroll={{ x: 760 }}
       pagination={{ current: page + 1, pageSize: users.data?.size ?? 10, total: users.data?.total ?? 0, onChange: (next) => setPage(next - 1) }}
       columns={[
@@ -324,8 +341,14 @@ function UsersPanel() {
         { title: 'Ngày tham gia', dataIndex: 'createdAt', render: (value: string) => new Date(value).toLocaleDateString('vi-VN') },
         { title: 'Xác minh', dataIndex: 'emailVerified', render: (verified: boolean) => verified ? 'Đã xác minh' : 'Chưa xác minh' },
         { title: 'Trạng thái', dataIndex: 'status', render: (status: string) => <Tag color={status === 'ACTIVE' ? 'green' : 'red'}>{status === 'ACTIVE' ? 'Hoạt động' : 'Tạm khóa'}</Tag> },
+        { title: 'Thao tác', render: (_: unknown, row: AdminUser) => <><Button onClick={() => setSelectedId(row.id)}>Chi tiết</Button>{' '}
+          <Button size="small" danger={row.status === 'ACTIVE'} disabled={row.id === me.data?.id || changeStatus.isPending}
+            onClick={() => { const next = row.status === 'ACTIVE' ? 'LOCKED' : 'ACTIVE';
+              if (window.confirm(`${next === 'LOCKED' ? 'Khóa' : 'Mở'} tài khoản ${row.email}?`))
+                changeStatus.mutate({ id: row.id, status: next }); }}>
+            {row.status === 'ACTIVE' ? 'Khóa' : 'Mở'}</Button></> },
       ]} />
-  </Card>;
+  </Card><UserDetailDrawer id={selectedId} onClose={() => setSelectedId(null)} /></>;
 }
 
 export function AdminDashboardPage() {
@@ -336,6 +359,7 @@ export function AdminDashboardPage() {
   const [collapsed, setCollapsed] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me });
+  const allowed = !viewPermission[view] || me.data?.permissions?.includes(viewPermission[view]);
   const avatarLetter = me.data?.username?.slice(0, 1).toUpperCase() ?? 'A';
   const choose = (next: View) => { setParams(next === 'overview' ? {} : { view: next }); setMobileNav(false); };
 
@@ -362,13 +386,16 @@ export function AdminDashboardPage() {
     </div></header>
       <main className="admin-page"><div className="admin-page-intro"><h1>{titles[view]}</h1><p>{view === 'overview' ? 'Số liệu được lấy trực tiếp từ các service.' : 'Thông tin quản trị từ hệ thống.'}</p></div>
         <div className="admin-view-content" key={view}>
-          {view === 'overview' && <OverviewPanel onOpenUsers={() => choose('users')} />}
-          {view === 'users' && <UsersPanel />}
-          {view === 'revenue' && <><RevenuePanel /><OrdersPanel /></>}
-          {view === 'products' && <ProductsPanel />}
-          {view === 'settings' && <SystemStatusPanel />}
-          {view === 'affiliate' && <AffiliatePanel />}
-          {!['overview', 'users', 'revenue', 'affiliate', 'products', 'settings'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
+          {!allowed && <Card className="admin-panel"><p role="alert">Tài khoản chưa có quyền xem mục này.</p></Card>}
+          {allowed && view === 'overview' && <OverviewPanel onOpenUsers={() => choose('users')} />}
+          {allowed && view === 'users' && <UsersPanel />}
+          {allowed && view === 'roles' && <RolesPanel />}
+          {allowed && view === 'permissions' && <PermissionsPanel />}
+          {allowed && view === 'content' && <ReportsPanel />}
+          {allowed && view === 'audit' && <AuditPanel />}
+          {allowed && view === 'revenue' && <RevenuePanel />}
+          {allowed && view === 'affiliate' && <AffiliatePanel />}
+          {allowed && !['overview', 'users', 'roles', 'permissions', 'content', 'audit', 'revenue', 'affiliate'].includes(view) && <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>{titles[view]}</h2><p>Chưa có API quản trị cho mục này.</p></div></div><p className="muted">Mục này sẽ hiển thị khi backend cung cấp dữ liệu thật. Hiện chưa có thống kê để hiển thị.</p></Card>}
         </div>
       </main>
       <SiteFooter variant="admin" />

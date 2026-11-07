@@ -288,111 +288,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/admin/billing/orders": {
+    "/api/admin/billing/users/{id}/data": {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: string;
+            };
             cookie?: never;
         };
-        /** (ADMIN) Danh sách đơn, mới nhất trước; lọc theo trạng thái, người dùng, mã đơn */
+        /** Gói còn hạn của người dùng */
         get: {
-            parameters: {
-                query?: {
-                    status?: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED";
-                    ownerId?: string;
-                    orderCode?: number;
-                    page?: number;
-                    size?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AdminOrderPage"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/admin/billing/orders/{orderCode}/refund": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** (ADMIN) Ghi nhận đã hoàn tiền (chuyển trả bằng tay) và trừ lại thời gian gói của đơn */
-        post: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    orderCode: number;
+                    id: string;
                 };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        reason: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Đã hoàn tiền. newExpiry null khi người dùng đã đổi gói khác sau đơn này (admin chỉnh tay) */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            order: components["schemas"]["Order"];
-                            /** Format: date-time */
-                            newExpiry?: string | null;
-                        };
-                    };
-                };
-                404: components["responses"]["Problem"];
-                409: components["responses"]["Problem"];
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/admin/billing/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** (ADMIN) Cổng thanh toán đang dùng và đã có key PayOS chưa (không trả giá trị key) */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
                 cookie?: never;
             };
             requestBody?: never;
@@ -404,8 +316,9 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            paymentGateway: string;
-                            payosConfigured: boolean;
+                            plan: string;
+                            /** Format: date-time */
+                            expiresAt?: string | null;
                         };
                     };
                 };
@@ -413,7 +326,27 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        delete?: never;
+        /** Xóa gói và tách mã người dùng khỏi đơn thanh toán */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Đã xử lý */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -515,7 +448,7 @@ export interface components {
             /** Format: int64 */
             amountVnd: number;
             /** @enum {string} */
-            status: "PENDING" | "PAID" | "CANCELLED" | "REFUNDED";
+            status: "PENDING" | "PAID" | "CANCELLED";
             /** Format: uri */
             checkoutUrl?: string;
             /** Format: date-time */
