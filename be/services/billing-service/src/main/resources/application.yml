@@ -32,6 +32,13 @@ logging:
     level: "%5p [%X{correlationId:-}]"
 
 thelooks:
+  services:
+    # Hỏi email người đang thanh toán (GET /api/app/me). JWT_ISSUER chính là địa chỉ auth-service
+    auth-url: ${AUTH_SERVICE_URL:${JWT_ISSUER:http://localhost:8081}}
+  mail:
+    # Email nhắc gia hạn qua Brevo (HTTPS). Để trống = tắt
+    brevo-api-key: ${BREVO_API_KEY:}
+    from: ${MAIL_FROM:}
   security:
     issuer: ${JWT_ISSUER}
     jwk-set-uri: ${JWT_JWK_SET_URI}
@@ -43,6 +50,8 @@ thelooks:
     # Trang web-app nhận người dùng sau khi thanh toán xong / huỷ
     return-url: ${BILLING_RETURN_URL}
     cancel-url: ${BILLING_CANCEL_URL}
+    # Nút "Gia hạn" trong email nhắc (mặc định = trang chọn gói)
+    renew-url: ${BILLING_RENEW_URL:${BILLING_CANCEL_URL}}
     payos:
       client-id: ${PAYOS_CLIENT_ID:}
       api-key: ${PAYOS_API_KEY:}

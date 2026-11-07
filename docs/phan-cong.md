@@ -49,7 +49,7 @@ mở PR, nhờ Tuấn review. Đổi API thì sửa `wardrobe-api.yaml` + chạy
 | 2.11 | Kiểm tra luồng xoá tài khoản của #40 trên bản deploy (admin xoá 1 tài khoản thử) | 10/11 | |
 | 2.10 | ~~Đồng ý điều khoản khi đăng ký bằng Google~~ (xong 07/11) | | |
 | 2.12 | ~~Thời tiết theo thành phố~~ (xong 07/11: Phát nối hồ sơ ở PR #52, Tuấn thêm dự phòng thành phố mặc định) | | |
-| 2.9 | **Email nhắc gia hạn** (3 ngày trước khi hết hạn) qua Resend | 13/12 | Hiện chỉ nhắc trong app |
+| 2.9 | ~~Email nhắc gia hạn~~ (code xong 07/11, Brevo): còn tạo tài khoản Brevo + điền `BREVO_API_KEY`, `MAIL_FROM` | | `docs/viec-thu-cong.md` |
 | 2.6 | ~~Lịch mặc (Pro)~~ (xong 07/11): `/outfits/calendar` | | |
 
 ## Phát (Member 3) · Đăng nhập, Ask Friends, admin

@@ -22,6 +22,7 @@ import vn.thelooks.billing.application.port.out.PaymentGatewayException;
 import vn.thelooks.billing.application.usecase.CheckoutUseCase;
 import vn.thelooks.billing.application.usecase.ConfirmPaymentUseCase;
 import vn.thelooks.billing.application.usecase.GetEntitlementsQuery;
+import vn.thelooks.billing.application.usecase.RenewalReminderUseCase;
 import vn.thelooks.billing.application.usecase.SetAutoRenewUseCase;
 import vn.thelooks.billing.domain.exception.InvalidPlanException;
 import vn.thelooks.billing.domain.exception.OrderNotFoundException;
@@ -35,13 +36,15 @@ class BillingController {
     private final CheckoutUseCase checkout;
     private final ConfirmPaymentUseCase confirm;
     private final SetAutoRenewUseCase autoRenew;
+    private final RenewalReminderUseCase reminders;
 
     BillingController(GetEntitlementsQuery entitlements, CheckoutUseCase checkout, ConfirmPaymentUseCase confirm,
-            SetAutoRenewUseCase autoRenew) {
+            SetAutoRenewUseCase autoRenew, RenewalReminderUseCase reminders) {
         this.entitlements = entitlements;
         this.checkout = checkout;
         this.confirm = confirm;
         this.autoRenew = autoRenew;
+        this.reminders = reminders;
     }
 
     /** Gói và giới hạn hiện tại. Service khác (outfit, wardrobe) gọi endpoint này với JWT được chuyển tiếp. */
@@ -60,7 +63,9 @@ class BillingController {
     @PostMapping("/checkout")
     @ResponseStatus(HttpStatus.CREATED)
     OrderResponse checkout(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CheckoutRequest request) {
-        return OrderResponse.from(checkout.checkout(CurrentUser.id(jwt), request.plan(), request.period()));
+        var order = checkout.checkout(CurrentUser.id(jwt), request.plan(), request.period());
+        reminders.rememberContact(CurrentUser.id(jwt)); // email để nhắc gia hạn; lỗi chỉ ghi log
+        return OrderResponse.from(order);
     }
 
     /** Trang kết quả gọi sau khi người dùng quay lại từ cổng thanh toán. */
