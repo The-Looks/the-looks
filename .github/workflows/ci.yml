@@ -37,7 +37,7 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: fe/web-app/package-lock.json
-      - run: npm ci
+      - run: npm install --no-audit --no-fund  # lockfile tạo trên Windows thiếu gói phụ thuộc của Linux nên npm ci báo lệch
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
