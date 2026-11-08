@@ -1,6 +1,6 @@
 # Phân công công việc
 
-Cập nhật: 07/11/2026 · Giai đoạn MVP: T11–T12/2026 · Ra mắt giới hạn cho sinh viên FPT: T1/2027
+Cập nhật: 08/11/2026 · Giai đoạn MVP: T11–T12/2026 · Ra mắt giới hạn cho sinh viên FPT: T1/2027
 
 Mỗi người sở hữu trọn phần của mình: backend, màn hình web và test. Ai cần đổi API của người khác thì sửa
 `be/packages/contracts/.../*-api.yaml` trong PR và nhờ chủ phần đó review.
@@ -62,6 +62,27 @@ mở PR, nhờ Tuấn review. Đổi API thì sửa `wardrobe-api.yaml` + chạy
 
 **PR #40 / #44 (đã merge 07/11):** Phát đã gỡ xung đột; migration trùng số đã được Tuấn sửa gấp ngay sau đó
 (billing V4/V5, outfit V7, wardrobe V4). Lần sau tạo migration mới: kiểm tra số lớn nhất trên `main` ngay trước khi merge.
+
+## Feedback người dùng 08/11
+
+Người dùng thử góp ý: hồ sơ cá nhân, khảo sát phong cách, giao diện sinh động hơn, chào đón người mới,
+chào người dùng cũ, lưu việc dang dở, chữ dễ đọc hơn. Thạch không nhận thêm (đang ưu tiên 1.8, 1.11), review PR 2.16.
+
+Thứ tự bắt buộc: **2.13 làm trước** (đổi CSS chung, tránh xung đột), **2.14 trước 3.11** (cần bộ linh vật),
+**2.15 trước 2.16**, **3.12 trước 3.13**.
+
+| # | Người | Việc | Code | Hạn | Xong khi |
+|---|---|---|---|---|---|
+| 2.13 | Tuấn | **Chữ & UI**: cỡ chữ gốc 16→17px, thang tiêu đề rõ hơn, chữ phụ đủ tương phản (WCAG AA ≥ 4.5:1), một màu highlight thống nhất. Chỉ sửa token trong `components/shared/theme/web-app.css` | FE | 13/11 | Mọi trang đọc rõ trên điện thoại, tương phản đạt AA |
+| 2.14 | Tuấn | **Phong cách hình ảnh + linh vật**: chốt bộ màu/nét vẽ, dùng AI tạo 6 linh vật + 3–4 illustration (banner trang chủ, trang trống, chào đón) vào `fe/web-app/public/illustrations/`; làm lại banner trang chủ | FE + ảnh | 15/11 | Banner mới lên web; 6 linh vật sẵn cho Phát dùng |
+| 2.15 | Tuấn | **Khảo sát phong cách**: mở rộng `StylePreferences` (dịp hay mặc: đi học/đi làm/đi chơi/hẹn hò; màu yêu thích; dáng ôm/rộng) + 5 câu trắc nghiệm tính cách quy ra nhãn phong cách. Migration outfit, dùng trong chấm điểm gợi ý | BE + FE + test | 22/11 | Hai người trả lời khác nhau nhận gợi ý khác nhau (có test) |
+| 2.16 | Tuấn | **Chào đón người mới**: lần đầu đăng nhập (chưa có sở thích, tủ trống) → 4 bước: chào + chọn linh vật → khảo sát 2.15 → thêm 3 món đầu (dùng lại onboarding tủ đồ) → outfit đầu tiên. Bỏ qua được, có thanh tiến trình | FE + test | 29/11 | Tài khoản mới đi hết 4 bước dưới 3 phút |
+| 3.11 | Phát | **Hồ sơ: tên hiển thị + linh vật**: `user_profiles` thêm `display_name` (mặc định tên Google) và `mascot` (1 trong 6 mã của 2.14); `/api/app/me` trả 2 trường; header + trang Hồ sơ hiện tên, avatar, linh vật | BE + FE + test | 20/11 | Đổi tên, chọn linh vật → header đổi ngay |
+| 3.12 | Phát | **Lưu việc dang dở**: lưu trên trình duyệt (localStorage) trang đang làm + nháp (thêm món, tạo bình chọn, gợi ý outfit đang xem); quay lại thì khôi phục | FE + test | 27/11 | Đang tạo bình chọn, đóng tab, mở lại vẫn còn nháp |
+| 3.13 | Phát | **Chào người dùng cũ**: trang chủ "Chào {tên}" + linh vật, thẻ "Tiếp tục" ghép từ 3.12 và dữ liệu có sẵn (món chờ duyệt, bình chọn sắp hết hạn, lịch mặc hôm nay) | FE + test | 04/12 | Người cũ vào trang chủ thấy tên mình và 1–3 việc để làm tiếp |
+
+Cố ý chưa làm: lưu nháp trên server / đồng bộ nhiều máy (localStorage đủ cho MVP), bảng lịch sử hoạt động riêng
+(3.13 ghép từ dữ liệu đã có).
 
 ## Cả nhóm
 
