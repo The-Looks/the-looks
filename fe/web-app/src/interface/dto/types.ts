@@ -11,6 +11,7 @@ export type WardrobeItem = Wardrobe['schemas']['WardrobeItem'];
 export type ItemStatus = Wardrobe['schemas']['ItemStatus'];
 export type Category = Wardrobe['schemas']['Category'];
 export type ClothingAttributes = Wardrobe['schemas']['ClothingAttributes'];
+export type WardrobeStats = Wardrobe['schemas']['WardrobeStats'];
 export type Scan = Wardrobe['schemas']['Scan'];
 
 export type Occasion = Outfit['schemas']['Occasion'];

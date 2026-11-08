@@ -18,6 +18,9 @@ import vn.thelooks.wardrobe.domain.model.ItemStatus;
 @Service
 class WardrobeStatsService implements GetWardrobeStatsQuery {
     static final int INACTIVE_DAYS = 30;
+    /** Gợi ý dọn tủ: món không mặc (hoặc thêm vào mà chưa mặc) từ 90 ngày trở lên. */
+    static final int DECLUTTER_DAYS = 90;
+    static final int DECLUTTER_LIMIT = 20;
     private final ClothingItemRepository items;
     private final WearHistoryReader history;
     private final WardrobeStatsAccess access;
@@ -47,9 +50,14 @@ class WardrobeStatsService implements GetWardrobeStatsQuery {
         }).filter(item -> item.lastWornAt() == null || item.daysSinceWear() >= INACTIVE_DAYS)
                 .sorted(Comparator.comparing(UnusedItem::lastWornAt, Comparator.nullsFirst(Comparator.naturalOrder()))
                         .thenComparing(item -> item.item().createdAt()).thenComparing(item -> item.item().id())).toList();
+        var declutterSince = now.minus(Duration.ofDays(DECLUTTER_DAYS));
+        var declutter = unused.stream().filter(u -> u.lastWornAt() == null
+                ? !u.item().createdAt().isAfter(declutterSince) : u.daysSinceWear() >= DECLUTTER_DAYS)
+                .limit(DECLUTTER_LIMIT).toList();
         return new Stats(closet.size(), wornCount, closet.size() - wornCount,
                 closet.isEmpty() ? 0 : Math.round(1000.0 * wornCount / closet.size()) / 10.0,
-                counts(categories), counts(colors), unused.size(), INACTIVE_DAYS, unused.stream().limit(10).toList(), now);
+                counts(categories), counts(colors), unused.size(), INACTIVE_DAYS, unused.stream().limit(10).toList(),
+                DECLUTTER_DAYS, declutter, now);
     }
     private List<Count> counts(Map<String, Long> values) {
         return values.entrySet().stream().map(e -> new Count(e.getKey(), e.getValue()))

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -10,16 +10,20 @@ vi.mock('../../../components/user/wardrobe/CostPerWearSection', () => ({ CostPer
 
 const mocks = vi.hoisted(() => ({
   features: ['WARDROBE_STATS'], planError: false, planPending: false,
-  statsError: null as Error | null, statsPending: false, enabled: vi.fn(), retry: vi.fn(), planRetry: vi.fn(),
+  statsError: null as Error | null, statsPending: false, enabled: vi.fn(), retry: vi.fn(), planRetry: vi.fn(), changeStatus: vi.fn(),
   data: { totalItems: 3, wornItems: 1, neverWornItems: 2, wearRatePercent: 33.3,
     byCategory: [{ key: 'TOP', count: 2 }, { key: 'BOTTOM', count: 1 }], byColor: [{ key: 'white', count: 2 }, { key: 'UNKNOWN', count: 1 }],
     inactiveCount: 2, inactiveAfterDays: 30, asOf: '2026-11-06T00:00:00Z', unusedItems: [
       { item: { id: 'one', category: 'TOP', colors: ['white'] }, lastWornAt: null as string | null, daysSinceWear: null as number | null },
       { item: { id: 'two', category: 'BOTTOM', colors: [] }, lastWornAt: '2026-10-01T00:00:00Z' as string | null, daysSinceWear: 36 as number | null },
+    ],
+    declutterAfterDays: 90, declutterItems: [
+      { item: { id: 'old', category: 'DRESS', colors: ['red'] }, lastWornAt: '2026-07-01T00:00:00Z' as string | null, daysSinceWear: 128 as number | null },
+      { item: { id: 'older', category: 'SHOES', colors: [] }, lastWornAt: null as string | null, daysSinceWear: null as number | null },
     ] },
 }));
 vi.mock('../../../hooks/user/billing/api', () => ({ useMyPlan: () => ({ data: { features: mocks.features }, isError: mocks.planError, isPending: mocks.planPending, error: new Error('Billing chưa sẵn sàng'), refetch: mocks.planRetry }) }));
-vi.mock('../../../hooks/user/wardrobe/api', () => ({ useWardrobeStats: (enabled: boolean) => {
+vi.mock('../../../hooks/user/wardrobe/api', () => ({ useChangeStatus: () => ({ mutate: mocks.changeStatus, isPending: false, isError: false }), useWardrobeStats: (enabled: boolean) => {
   mocks.enabled(enabled); return { data: mocks.data, isError: !!mocks.statsError, error: mocks.statsError, isPending: mocks.statsPending, refetch: mocks.retry };
 } }));
 const show = () => {
@@ -42,7 +46,7 @@ it('shows Pro metrics, accessible charts and distinct never-worn/old wear states
   show(); expect(mocks.enabled).toHaveBeenCalledWith(true); expect(screen.getByText('33,3%')).toBeTruthy();
   expect(screen.getByRole('meter', { name: 'Áo: 2 món' })).toBeTruthy();
   expect(screen.getByRole('meter', { name: 'Chưa có màu: 1 món' })).toBeTruthy();
-  expect(screen.getByText('Chưa từng mặc', { selector: 'strong' })).toBeTruthy(); expect(screen.getByText('36 ngày chưa mặc')).toBeTruthy();
+  expect(within(screen.getByRole('region', { name: 'Món ít dùng' })).getByText('Chưa từng mặc', { selector: 'strong' })).toBeTruthy(); expect(screen.getByText('36 ngày chưa mặc')).toBeTruthy();
   expect(screen.getByRole('link', { name: /36 ngày chưa mặc/ }).getAttribute('href')).toBe('/wardrobe/two');
 });
 it('shows empty wardrobe without fabricating chart data', () => {
@@ -69,4 +73,13 @@ it('has loading states and refreshes both entitlements and statistics', () => {
   expect(mocks.retry).toHaveBeenCalled(); expect(mocks.planRetry).toHaveBeenCalled();
   mocks.statsPending = true; view.rerender(<MemoryRouter><WardrobeStatsPage /></MemoryRouter>);
   expect(screen.getByText('Đang tổng hợp tủ đồ và lịch sử mặc…')).toBeTruthy();
+});
+it('suggests decluttering long-unworn items and archives them in one tap', () => {
+  show();
+  expect(screen.getByRole('heading', { name: 'Gợi ý dọn tủ' })).toBeTruthy();
+  expect(screen.getByText('128 ngày chưa mặc')).toBeTruthy();
+  fireEvent.click(screen.getAllByRole('button', { name: 'Đã bán' })[0]!);
+  expect(mocks.changeStatus).toHaveBeenCalledWith({ itemIds: ['old'], status: 'SOLD' }, expect.anything());
+  fireEvent.click(screen.getByRole('button', { name: 'Cất đi cả 2 món' }));
+  expect(mocks.changeStatus).toHaveBeenCalledWith({ itemIds: ['old', 'older'], status: 'ARCHIVED' }, expect.anything());
 });

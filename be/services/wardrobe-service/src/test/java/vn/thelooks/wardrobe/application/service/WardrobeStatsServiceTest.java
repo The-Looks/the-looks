@@ -68,6 +68,21 @@ class WardrobeStatsServiceTest {
         assertThat(s.unusedItems()).extracting(i -> i.item().id()).containsExactlyElementsOf(closet.subList(0, 10).stream().map(ClothingItem::id).toList());
     }
     @Test
+    void suggestsDecluttering90DaysUnwornAndOldNeverWornItemsOnly() {
+        var oldWorn = item(Category.TOP, List.of("white"), 0);
+        var recentWorn = item(Category.BOTTOM, List.of("black"), 1);
+        var oldNever = withCreated(item(Category.SHOES, List.of("white"), 2), now.minusSeconds(90L * 86400));
+        var newNever = withCreated(item(Category.BAG, List.of("red"), 3), now.minusSeconds(89L * 86400));
+        when(items.findByOwner(owner, ItemStatus.CONFIRMED)).thenReturn(List.of(oldWorn, recentWorn, oldNever, newNever));
+        when(history.lastWornAt(owner)).thenReturn(Map.of(oldWorn.id(), now.minusSeconds(90L * 86400), recentWorn.id(), now.minusSeconds(89L * 86400)));
+        var s = service.stats(owner);
+        assertThat(s.declutterAfterDays()).isEqualTo(90);
+        assertThat(s.declutterItems()).extracting(i -> i.item().id()).containsExactly(oldNever.id(), oldWorn.id());
+    }
+    private static ClothingItem withCreated(ClothingItem i, Instant at) {
+        return new ClothingItem(i.id(), i.ownerId(), i.imageKey(), i.status(), i.attributes(), i.scanId(), i.confidence(), at);
+    }
+    @Test
     void doesNotFabricateZeroWearIfOutfitIsUnavailable() {
         when(items.findByOwner(owner, ItemStatus.CONFIRMED)).thenReturn(List.of(item(Category.TOP, List.of(), 0)));
         when(history.lastWornAt(owner)).thenThrow(new WearHistoryUnavailableException(null));

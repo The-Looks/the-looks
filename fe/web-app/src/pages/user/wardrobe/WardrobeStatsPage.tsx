@@ -1,9 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, ButtonLink, EmptyState, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { CostPerWearSection } from '../../../components/user/wardrobe/CostPerWearSection';
 import { useMyPlan } from '../../../hooks/user/billing/api';
-import { useWardrobeStats } from '../../../hooks/user/wardrobe/api';
+import { useChangeStatus, useWardrobeStats } from '../../../hooks/user/wardrobe/api';
+import type { WardrobeStats } from '../../../interface/dto/types';
 import { ApiError, errorMessage } from '../../../services/shared/api/client';
 import { CATEGORY_LABEL, categoryLabel } from '../../../services/shared/labels';
 import './wardrobe-stats.css';
@@ -18,6 +20,37 @@ function Distribution({ title, rows, total, category = false }: { title: string;
       <meter min={0} max={Math.max(total, 1)} value={row.count} aria-label={`${label(row.key)}: ${row.count} món`} />
     </li>)}</ul>
     {!category && <p className="small muted">Món nhiều màu được tính vào từng màu, nên tổng các màu có thể lớn hơn số món.</p>}
+  </section>;
+}
+
+/** Gợi ý dọn tủ: món lâu không mặc, cất đi hoặc đánh dấu đã bán ngay tại chỗ. */
+function Declutter({ days, rows }: { days: number; rows: WardrobeStats['declutterItems'] }) {
+  const move = useChangeStatus();
+  const [done, setDone] = useState('');
+  const act = (itemIds: string[], status: 'ARCHIVED' | 'SOLD') => move.mutate({ itemIds, status }, {
+    onSuccess: () => setDone(`${status === 'ARCHIVED' ? 'Đã cất đi' : 'Đã đánh dấu đã bán'} ${itemIds.length} món.`),
+  });
+  return <section className="wardrobe-stats-panel" aria-label="Gợi ý dọn tủ">
+    <h2>Gợi ý dọn tủ</h2>
+    {done && <Notice>{done} Xem lại bằng bộ lọc trạng thái trong tủ đồ.</Notice>}
+    {move.isError && <Notice tone="error">{errorMessage(move.error)}</Notice>}
+    {rows.length === 0 ? <p>Tủ đồ gọn gàng: không có món nào {days} ngày chưa mặc.</p> : <>
+      <p className="muted">{rows.length} món đã {days} ngày chưa mặc. Cất đi cho tủ gọn hơn (không còn được gợi ý khi phối đồ), hoặc đánh dấu đã bán nếu bạn đã pass lại.</p>
+      <ul className="stats-unused-list">
+        {rows.map(({ item, lastWornAt, daysSinceWear }) => <li key={item.id} className="stats-declutter-row">
+          <Link to={`/wardrobe/${item.id}`} className="stats-unused-item">
+            <ItemTile category={item.category} imageUrl={item.imageUrl} />
+            <div><strong>{categoryLabel(item.category)}</strong><span>{item.colors?.join(', ') || 'Chưa có màu'}</span></div>
+            <div className="stats-wear-date"><strong>{lastWornAt === null ? 'Chưa từng mặc' : `${daysSinceWear} ngày chưa mặc`}</strong></div>
+          </Link>
+          <div className="row">
+            <Button kind="outline" small disabled={move.isPending} onClick={() => act([item.id], 'ARCHIVED')}>Cất đi</Button>
+            <Button kind="ghost" small disabled={move.isPending} onClick={() => act([item.id], 'SOLD')}>Đã bán</Button>
+          </div>
+        </li>)}
+      </ul>
+      <div className="row"><Button disabled={move.isPending} onClick={() => act(rows.map((row) => row.item.id), 'ARCHIVED')}>Cất đi cả {rows.length} món</Button></div>
+    </>}
   </section>;
 }
 
@@ -71,6 +104,7 @@ export function WardrobeStatsPage() {
           </ul>}
           <Link to="/wardrobe?status=CONFIRMED&sort=LEAST_RECENTLY_WORN">Xem tủ đồ theo lần mặc</Link>
         </section>
+        <Declutter days={s.declutterAfterDays} rows={s.declutterItems} />
       </>}
     </>;
   }

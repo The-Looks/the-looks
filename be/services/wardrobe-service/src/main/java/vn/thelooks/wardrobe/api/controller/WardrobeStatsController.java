@@ -25,7 +25,8 @@ class WardrobeStatsController {
     record UnusedItemResponse(ItemResponse item, Instant lastWornAt, Long daysSinceWear) {}
     record StatsResponse(long totalItems, long wornItems, long neverWornItems, double wearRatePercent,
             List<GetWardrobeStatsQuery.Count> byCategory, List<GetWardrobeStatsQuery.Count> byColor,
-            long inactiveCount, int inactiveAfterDays, List<UnusedItemResponse> unusedItems, Instant asOf) {}
+            long inactiveCount, int inactiveAfterDays, List<UnusedItemResponse> unusedItems,
+            int declutterAfterDays, List<UnusedItemResponse> declutterItems, Instant asOf) {}
     private final GetWardrobeStatsQuery stats;
     private final ImageStorage images;
     WardrobeStatsController(GetWardrobeStatsQuery stats, ImageStorage images) { this.stats = stats; this.images = images; }
@@ -33,8 +34,11 @@ class WardrobeStatsController {
     ResponseEntity<StatsResponse> stats(@AuthenticationPrincipal Jwt jwt) {
         var s = stats.stats(CurrentUser.id(jwt));
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(new StatsResponse(s.totalItems(), s.wornItems(), s.neverWornItems(), s.wearRatePercent(), s.byCategory(), s.byColor(),
-                s.inactiveCount(), s.inactiveAfterDays(), s.unusedItems().stream().map(i -> new UnusedItemResponse(
-                        ItemResponse.from(i.item(), images.url(i.item().imageKey(), Duration.ofHours(1))), i.lastWornAt(), i.daysSinceWear())).toList(), s.asOf()));
+                s.inactiveCount(), s.inactiveAfterDays(), s.unusedItems().stream().map(this::unused).toList(),
+                s.declutterAfterDays(), s.declutterItems().stream().map(this::unused).toList(), s.asOf()));
+    }
+    private UnusedItemResponse unused(GetWardrobeStatsQuery.UnusedItem i) {
+        return new UnusedItemResponse(ItemResponse.from(i.item(), images.url(i.item().imageKey(), Duration.ofHours(1))), i.lastWornAt(), i.daysSinceWear());
     }
     @ExceptionHandler(WardrobeStatsAccessDeniedException.class)
     ProblemDetail denied(WardrobeStatsAccessDeniedException e) { return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage()); }
