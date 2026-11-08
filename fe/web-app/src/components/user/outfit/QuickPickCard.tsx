@@ -15,19 +15,13 @@ export function QuickPickCard() {
       <Card className="home-hero-card">
         <div className="home-hero-photo" aria-hidden="true" />
         <div className="home-hero-glass">
-          <span className="eyebrow home-kicker">✦ Quick Pick</span>
+          <span className="home-kicker">Quick Pick</span>
           <h2>{brand.content.quickPickTitle}</h2>
           <p>{brand.content.quickPickDescription}</p>
           <Button kind="ghost" onClick={() => pick.mutate()} disabled={pick.isPending}>
             {pick.isPending ? 'Đang chọn…' : pick.data ? 'Chọn bộ khác' : 'Gợi ý cho tôi'}{' '}
             <span aria-hidden="true">→</span>
           </Button>
-        </div>
-        <div className="home-hero-stamp" aria-hidden="true">
-          YOUR STYLE
-          <br />
-          YOUR STORY
-          <br />✦
         </div>
       </Card>
 

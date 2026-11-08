@@ -52,7 +52,7 @@ export function LoginPage() {
     <main className="login-scene">
       <section className={`auth-panel login-panel${fromRegister ? ' login-panel-return' : ''}`}>
         <AuthHeader to="/" label="Trang chủ" />
-        <div className="stack"><span className="eyebrow">CHÀO MỪNG ĐẾN THE LOOKS</span><h2>Đăng nhập</h2><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
+        <div className="stack"><h1>Đăng nhập</h1><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           <PasswordField id="login-password" label="Mật khẩu" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />

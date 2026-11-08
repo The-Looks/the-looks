@@ -5,7 +5,7 @@ import { StrictMode, Suspense, useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { queryClient } from '../services/shared/api/queryClient';
-import { applyBrandToDocument, brand } from '../services/shared/brand';
+import { applyBrandToDocument, brand, webColors } from '../services/shared/brand';
 import { session } from '../services/shared/session';
 import '../components/shared/theme/styles.css';
 import '../components/shared/theme/web-app.css';
@@ -59,18 +59,25 @@ enableMocks().finally(() => {
           locale={viVN}
           theme={{
             token: {
-              colorPrimary: brand.colors.purple,
-              colorInfo: brand.colors.purple,
-              colorSuccess: brand.colors.green,
-              colorWarning: brand.colors.amber,
-              colorError: brand.colors.pink,
-              colorText: brand.colors.ink,
-              colorTextSecondary: brand.colors.muted,
-              colorBgBase: brand.colors.bg,
-              colorBorder: brand.colors.line,
+              colorPrimary: webColors.purple,
+              colorPrimaryHover: webColors.purpleDark,
+              colorPrimaryActive: webColors.purpleDark,
+              colorInfo: webColors.purple,
+              colorLink: webColors.purple,
+              colorLinkHover: webColors.purpleDark,
+              colorLinkActive: webColors.purpleDark,
+              colorSuccess: webColors.green,
+              colorWarning: webColors.amber,
+              colorError: webColors.pink,
+              colorText: webColors.ink,
+              colorTextSecondary: webColors.muted,
+              colorTextTertiary: webColors.muted,
+              colorTextPlaceholder: webColors.muted,
+              colorBgBase: webColors.bg,
+              colorBorder: webColors.line,
               borderRadius: brand.radius.md,
               fontFamily: 'var(--font-body)',
-              fontSize: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--type-14')),
+              fontSize: Number.parseFloat(getComputedStyle(document.body).fontSize),
             },
             components: {
               Button: { borderRadius: 999, controlHeight: 44, fontWeight: Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--weight-semibold')) },
