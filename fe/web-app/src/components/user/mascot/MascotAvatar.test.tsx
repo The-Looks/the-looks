@@ -35,3 +35,9 @@ it('prefers the uploaded photo, otherwise shows the account mascot', () => {
   expect(container.querySelector('svg')).not.toBeNull();
   expect(accountAvatar('other')).toBeFalsy();
 });
+
+it('draws a dressable mascot in code and names its clothes', () => {
+  const { container, getByRole } = render(<MascotAvatar look={{ mascot: 'panda', top: 'hoodie', bottom: 'jeans', shoes: 'boots', hat: 'cap' }} />);
+  expect(container.querySelector('image')).toBeNull();
+  expect(getByRole('img').getAttribute('aria-label')).toBe('Trúc Mập, Hoodie, Quần jean, Bốt, Mũ lưỡi trai');
+});

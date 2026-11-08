@@ -1,10 +1,15 @@
-import { MASCOTS, type MascotId } from './mascots';
+import { isModular, MASCOTS, type MascotId } from './mascots';
 
 /** Phụ kiện gắn lên linh vật, kiểu tạo nhân vật trong game: mỗi chỗ một món, có thể để trống. */
-export type Slot = 'hat' | 'glasses' | 'neck' | 'background';
+export type Slot = 'top' | 'bottom' | 'shoes' | 'hat' | 'glasses' | 'neck' | 'background';
+/** Quần áo chỉ mặc được cho linh vật tự phối; 6 con vẽ sẵn đã có trang phục riêng. */
+export const CLOTHING: Slot[] = ['top', 'bottom', 'shoes'];
 
 export type Look = {
   mascot: MascotId;
+  top?: string;
+  bottom?: string;
+  shoes?: string;
   hat?: string;
   glasses?: string;
   neck?: string;
@@ -12,6 +17,26 @@ export type Look = {
 };
 
 export const ACCESSORIES: Record<Slot, { id: string; name: string; color?: string }[]> = {
+  top: [
+    { id: 'tee', name: 'Áo thun' },
+    { id: 'hoodie', name: 'Hoodie' },
+    { id: 'shirt', name: 'Sơ mi' },
+    { id: 'sweater', name: 'Áo len' },
+    { id: 'jacket', name: 'Áo khoác jean' },
+    { id: 'dress', name: 'Váy liền' },
+  ],
+  bottom: [
+    { id: 'jeans', name: 'Quần jean' },
+    { id: 'shorts', name: 'Quần short' },
+    { id: 'skirt', name: 'Chân váy' },
+    { id: 'joggers', name: 'Quần jogger' },
+  ],
+  shoes: [
+    { id: 'sneakers', name: 'Giày sneaker' },
+    { id: 'boots', name: 'Bốt' },
+    { id: 'loafers', name: 'Giày lười' },
+    { id: 'sandals', name: 'Dép quai' },
+  ],
   hat: [
     { id: 'beanie', name: 'Mũ len' },
     { id: 'cap', name: 'Mũ lưỡi trai' },
@@ -42,7 +67,10 @@ export const ACCESSORIES: Record<Slot, { id: string; name: string; color?: strin
   ],
 };
 
-export const SLOTS: Slot[] = ['hat', 'glasses', 'neck', 'background'];
+export const SLOTS: Slot[] = ['top', 'bottom', 'shoes', 'hat', 'glasses', 'neck', 'background'];
+
+/** Chỗ dùng được cho linh vật này (con vẽ sẵn không thay quần áo). */
+export const slotsFor = (mascot: MascotId) => SLOTS.filter((s) => isModular(mascot) || !CLOTHING.includes(s));
 
 const isMascot = (id: unknown): id is MascotId => MASCOTS.some((m) => m.id === id);
 const known = (slot: Slot, id: unknown) => typeof id === 'string' && ACCESSORIES[slot].some((a) => a.id === id) ? id : undefined;
@@ -53,7 +81,7 @@ export function normalizeLook(raw: unknown): Look | undefined {
   const r = raw as Record<string, unknown>;
   if (!isMascot(r.mascot)) return undefined;
   const look: Look = { mascot: r.mascot };
-  for (const slot of SLOTS) {
+  for (const slot of slotsFor(r.mascot)) {
     const id = known(slot, r[slot]);
     if (id) look[slot] = id;
   }
@@ -70,12 +98,13 @@ export function decodeLook(text: string): Look | undefined {
   return normalizeLook({ mascot, ...Object.fromEntries(parts.map((p) => p.split(':'))) });
 }
 
-/** Nút ngẫu nhiên: mỗi chỗ có khoảng 1/3 cơ hội để trống cho đỡ rối. */
+/** Nút ngẫu nhiên. */
 export function randomLook(random: () => number = Math.random): Look {
   const pick = <T,>(list: readonly T[]) => list[Math.floor(random() * list.length)]!;
   const look: Look = { mascot: pick(MASCOTS).id };
-  for (const slot of SLOTS) {
-    if (random() < 0.67) look[slot] = pick(ACCESSORIES[slot]).id;
+  for (const slot of slotsFor(look.mascot)) {
+    // Linh vật tự phối luôn có áo / quần / giày cho đỡ trống; phụ kiện thì 2/3 cơ hội
+    if (CLOTHING.includes(slot) || random() < 0.67) look[slot] = pick(ACCESSORIES[slot]).id;
   }
   return look;
 }

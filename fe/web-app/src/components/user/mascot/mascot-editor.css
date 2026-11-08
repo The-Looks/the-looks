@@ -56,3 +56,4 @@
   .mascot-stage { position: static; }
   .mascot-stage-art { max-width: 260px; }
 }
+.mascot-note { grid-column: 1 / -1; margin: 0; }

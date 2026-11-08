@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { ANCHORS, MASCOTS } from '../../../services/user/onboarding/mascots';
-import { ACCESSORIES, backgroundColor, type Look } from '../../../services/user/onboarding/look';
+import { ANCHORS, isModular, MASCOTS } from '../../../services/user/onboarding/mascots';
+import { ACCESSORIES, backgroundColor, slotsFor, type Look } from '../../../services/user/onboarding/look';
+import { ModularMascot } from './ModularMascot';
 
 // Bảng màu và nét viền giống bộ linh vật (public/illustrations).
 const INK = '#241d21';
@@ -129,18 +130,22 @@ export function MascotAvatar({ look, portrait = false, title }: { look: Look; po
   const anchor = ANCHORS[look.mascot];
   const image = look.mascot === 'frog' && look.hat ? '/illustrations/frog-bare.svg' : `/illustrations/${look.mascot}.svg`;
   const bg = backgroundColor(look);
+  const extras = <>
+    {look.neck && <Part x={anchor.neck.x} y={anchor.neck.y} scale={anchor.neck.w / 100}><Neck id={look.neck} /></Part>}
+    {look.glasses && <Part x={anchor.eyes.x} y={anchor.eyes.y} scale={anchor.eyes.d / 30}><Glasses id={look.glasses} /></Part>}
+    {look.hat && <Part x={anchor.hat.x} y={anchor.hat.y} scale={anchor.hat.w / 100}><Hat id={look.hat} /></Part>}
+  </>;
   const label = title ?? [MASCOTS.find((m) => m.id === look.mascot)?.name,
-    ...(['hat', 'glasses', 'neck'] as const).map((slot) => ACCESSORIES[slot].find((a) => a.id === look[slot])?.name)]
+    ...slotsFor(look.mascot).filter((s) => s !== 'background').map((slot) => ACCESSORIES[slot].find((a) => a.id === look[slot])?.name)]
     .filter(Boolean).join(', ');
   return (
     <svg className="mascot-avatar" viewBox={portrait ? portraitBox(look) : '0 0 320 320'}
       {...(title === '' ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label })}
       width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
       {bg && <rect x="-40" y="-40" width="400" height="400" fill={bg} />}
-      <image href={image} x="0" y="0" width="320" height="320" />
-      {look.neck && <Part x={anchor.neck.x} y={anchor.neck.y} scale={anchor.neck.w / 100}><Neck id={look.neck} /></Part>}
-      {look.glasses && <Part x={anchor.eyes.x} y={anchor.eyes.y} scale={anchor.eyes.d / 30}><Glasses id={look.glasses} /></Part>}
-      {look.hat && <Part x={anchor.hat.x} y={anchor.hat.y} scale={anchor.hat.w / 100}><Hat id={look.hat} /></Part>}
+      {isModular(look.mascot)
+        ? <ModularMascot id={look.mascot} top={look.top} bottom={look.bottom} shoes={look.shoes}>{extras}</ModularMascot>
+        : <><image href={image} x="0" y="0" width="320" height="320" />{extras}</>}
     </svg>
   );
 }
