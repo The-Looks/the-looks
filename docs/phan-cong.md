@@ -47,7 +47,7 @@ Cách làm: mỗi việc một nhánh `feature/<tên>`, commit nhỏ, mở PR, n
 | # | Việc | Code | Hạn | Xong khi |
 |---|---|---|---|---|
 | 1.11 | ~~Cất đi / đã bán + đổi trạng thái, xoá nhiều món cùng lúc~~ (xong 08/11): nút *Chọn nhiều* ở tủ đồ, `PATCH /items/batch`, `POST /items/batch-delete` | | | |
-| 1.12 | **Gợi ý dọn tủ (Pro)**: danh sách món ≥ 90 ngày chưa mặc (dùng `wear-summary` có sẵn), nút "Cất đi" / "Đã bán" (dùng 1.11); hiện trên trang thống kê | BE + FE + test | 06/12 | Pro thấy danh sách đúng, Free thấy lời mời nâng cấp. Làm sau 1.11 |
+| 1.12 | ~~Gợi ý dọn tủ~~ (xong 08/11): mục *Gợi ý dọn tủ* trên trang thống kê (gói có `WARDROBE_STATS`), món ≥ 90 ngày chưa mặc, nút *Cất đi* / *Đã bán* / *Cất đi cả N món* | | | |
 | 1.8 | ~~Xoá ảnh khi xoá tài khoản~~ (đã có từ PR #44 của Phát) | | | |
 | 1.10 | **Thử AI nhận diện** (Gemini) với 100–300 ảnh thật, chỉnh prompt nếu sai nhiều | Ít code | 29/11 | Bảng kết quả trong `docs/ai-nhan-dien.md` cho báo cáo EXE |
 | 1.9 | **Affiliate nguồn Shopee**: chỉ làm khi AccessTrade **đã duyệt** chiến dịch Shopee (đang chờ). Nguồn `ProductCatalog` thứ hai theo mẫu `AccessTradeTikTokCatalog` | BE + test | Khi được duyệt | Gợi ý mua thêm có cả sản phẩm Shopee |
