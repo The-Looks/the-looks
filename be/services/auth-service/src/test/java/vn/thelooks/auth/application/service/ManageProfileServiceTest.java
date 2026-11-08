@@ -23,6 +23,15 @@ class ManageProfileServiceTest {
     }
 
     @Test
+    void acceptsOnlyKnownMascots() {
+        UUID userId = UUID.randomUUID();
+        service.selectMascot(userId, "fox");
+        verify(profiles).selectMascot(userId, "fox");
+        assertEquals(400, assertThrows(ResponseStatusException.class,
+                () -> service.selectMascot(userId, "unknown")).getStatusCode().value());
+    }
+
+    @Test
     void rejectsOversizedOrUntrustedAvatar() {
         UUID userId = UUID.randomUUID();
         assertThrows(ResponseStatusException.class, () -> service.uploadAvatar(userId, new byte[2 * 1024 * 1024 + 1]));

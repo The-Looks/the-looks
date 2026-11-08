@@ -14,6 +14,8 @@ import { HomeStoryDivider, HomeStoryReveal } from '../../../components/shared/ho
 import { brand } from '../../../services/shared/brand';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { readProfileDraft, type ProfileDraft } from '../../../services/user/profile/draft';
+import { accountMascot } from '../../../services/user/profile/avatar';
+import { profileKey, profileRequests } from '../../../services/user/profile/requests';
 
 const metric = (label: string, value: number | string, icon: React.ReactNode, detail: string) => (
   <div className="metric-card">
@@ -24,7 +26,9 @@ const metric = (label: string, value: number | string, icon: React.ReactNode, de
 
 export function HomePage() {
   const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me });
+  const profile = useQuery({ queryKey: profileKey, queryFn: profileRequests.get, enabled: Boolean(me.data) });
   const userId = me.data?.id;
+  const mascot = userId ? accountMascot(userId, profile.data) : undefined;
   const [profileDraft, setProfileDraft] = useState<ProfileDraft | null>(null);
   useEffect(() => {
     if (!userId) { setProfileDraft(null); return; }
@@ -41,7 +45,10 @@ export function HomePage() {
 
   return (
     <div className="stack-lg home-page">
-      <PageHeader eyebrow={brand.tagline} title={me.data?.username ? `Chào ${me.data.username}!` : 'Chào bạn!'}
+      <PageHeader eyebrow={brand.tagline} title={<span className="home-greeting">
+        {me.data?.username ? `Chào ${me.data.username}!` : 'Chào bạn!'}
+        {mascot && <img src={`/illustrations/portraits/${mascot.id}.svg`} alt="" width="44" height="44" />}
+      </span>}
         action={<ButtonLink to="/outfits/suggest" small><PlusOutlined /> <span className="home-create-label">Tạo outfit mới</span></ButtonLink>} />
 
       {profileDraft && <HomeStoryReveal><Card>

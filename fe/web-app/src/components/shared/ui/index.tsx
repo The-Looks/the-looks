@@ -131,7 +131,7 @@ export function PageHeader({
   back,
   action,
 }: {
-  title: string;
+  title: ReactNode;
   eyebrow?: string;
   sub?: string;
   back?: { to: string; label: string };

@@ -30,6 +30,7 @@ class ProfileController {
     ProfileController(ManageProfileUseCase profiles) { this.profiles = profiles; }
 
     record UpdateProfile(@NotBlank @Size(max=60) String username, @Size(max=120) String city) {}
+    record SelectMascot(@NotBlank String mascotId) {}
 
     @GetMapping("/profile")
     UserProfile get(@AuthenticationPrincipal Jwt jwt) { return profiles.get(CurrentUser.id(jwt)); }
@@ -37,6 +38,11 @@ class ProfileController {
     @PutMapping("/profile")
     UserProfile update(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UpdateProfile request) {
         return profiles.update(CurrentUser.id(jwt), request.username(), request.city());
+    }
+
+    @PutMapping("/profile/mascot")
+    UserProfile selectMascot(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody SelectMascot request) {
+        return profiles.selectMascot(CurrentUser.id(jwt), request.mascotId());
     }
 
     @GetMapping("/avatar")

@@ -23,7 +23,7 @@ export function AppShell({ children, publicPreview = false }: { children?: React
   return (
     <Layout className="app-frame app-frame-topnav">
       <Layout className="app-main-layout">
-        <AppHeader selected={selected} publicPreview={publicPreview} avatarLetter={avatarLetter} avatarSrc={avatarSrc} menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+        <AppHeader selected={selected} publicPreview={publicPreview} avatarLetter={avatarLetter} avatarSrc={avatarSrc} accountName={me.data?.username} menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
 
         <main className="app-page"><div key={pathname} className="route-transition">{children ?? <Outlet />}</div></main>
         <SiteFooter variant={publicPreview ? 'public' : 'app'} />

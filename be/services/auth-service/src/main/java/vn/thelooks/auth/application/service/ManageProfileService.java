@@ -2,6 +2,7 @@ package vn.thelooks.auth.application.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 import javax.imageio.ImageIO;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import vn.thelooks.auth.domain.model.UserProfile;
 @Service
 class ManageProfileService implements ManageProfileUseCase {
     private static final int MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+    private static final Set<String> MASCOT_IDS = Set.of("cat", "fox", "rabbit", "bear", "frog", "penguin");
     private final UserProfileRepositoryPort profiles;
 
     ManageProfileService(UserProfileRepositoryPort profiles) { this.profiles = profiles; }
@@ -26,6 +28,12 @@ class ManageProfileService implements ManageProfileUseCase {
         if (name.isEmpty() || name.length() > 60 || (location != null && location.length() > 120))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tên hoặc thành phố không hợp lệ");
         return profiles.update(userId, name, location == null || location.isEmpty() ? null : location);
+    }
+
+    public UserProfile selectMascot(UUID userId, String mascotId) {
+        if (!MASCOT_IDS.contains(mascotId))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Linh vật không hợp lệ");
+        return profiles.selectMascot(userId, mascotId);
     }
 
     public UserProfile uploadAvatar(UUID userId, byte[] bytes) {

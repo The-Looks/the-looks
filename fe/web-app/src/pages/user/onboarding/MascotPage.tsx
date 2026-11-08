@@ -1,8 +1,11 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { Button } from '../../../components/shared/ui/index';
+import { Button, Notice } from '../../../components/shared/ui/index';
+import { errorMessage } from '../../../services/shared/api/client';
 import { MASCOTS, mascotImage } from '../../../services/user/onboarding/mascots';
 import { readOnboarding, updateOnboarding } from '../../../services/user/onboarding/progress';
+import { profileKey, profileRequests } from '../../../services/user/profile/requests';
 import type { OnboardingContext } from './OnboardingLayout';
 
 export function MascotPage() {
@@ -11,12 +14,25 @@ export function MascotPage() {
     const saved = readOnboarding(accountId).mascot;
     return MASCOTS.find(({ id }) => id === saved)?.id;
   });
+  const [selectionTouched, setSelectionTouched] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const profile = useQuery({ queryKey: profileKey, queryFn: profileRequests.get });
+  const picked = selectionTouched ? selected : profile.data?.mascotId ?? selected;
+  const qc = useQueryClient();
   const navigate = useNavigate();
 
-  function next(event: FormEvent<HTMLFormElement>) {
+  async function next(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!selected) return;
-    navigate('/onboarding');
+    if (!picked) return;
+    setSaving(true); setSaveError('');
+    try {
+      const updated = await profileRequests.selectMascot(picked);
+      updateOnboarding(accountId, { mascot: picked });
+      qc.setQueryData(profileKey, updated);
+      navigate('/onboarding');
+    } catch (error) { setSaveError(errorMessage(error)); }
+    finally { setSaving(false); }
   }
 
   return (
@@ -33,9 +49,10 @@ export function MascotPage() {
               <img src={mascotImage(id)} alt="" width="320" height="320" />
               <span className="mascot-caption">
                 <span><strong>{name}</strong><span>{style}</span></span>
-                <input type="radio" name="mascot" value={id} checked={selected === id}
+                <input type="radio" name="mascot" value={id} checked={picked === id}
                   onChange={() => {
                     setSelected(id);
+                    setSelectionTouched(true);
                     updateOnboarding(accountId, { mascot: id });
                   }} />
               </span>
@@ -43,7 +60,8 @@ export function MascotPage() {
           ))}
         </div>
       </fieldset>
-      <div className="row"><Button type="submit" disabled={!selected}>Tiếp tục đến khảo sát</Button></div>
+      {saveError && <Notice tone="error">{saveError}</Notice>}
+      <div className="row"><Button type="submit" disabled={!picked || saving}>{saving ? 'Đang lưu…' : 'Tiếp tục đến khảo sát'}</Button></div>
     </form>
   );
 }

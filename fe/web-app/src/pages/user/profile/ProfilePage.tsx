@@ -10,8 +10,11 @@ import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../
 import { usePreferences } from '../../../hooks/user/outfit/api';
 import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 import { profileKey, profileRequests } from '../../../services/user/profile/requests';
-import { accountAvatarSource } from '../../../services/user/profile/avatar';
+import { accountAvatarSource, accountMascot } from '../../../services/user/profile/avatar';
 import { clearProfileDraft, readProfileDraft, writeProfileDraft } from '../../../services/user/profile/draft';
+import { MASCOTS, mascotImage, type MascotId } from '../../../services/user/onboarding/mascots';
+import { updateOnboarding } from '../../../services/user/onboarding/progress';
+import '../onboarding/onboarding.css';
 
 export function ProfilePage() {
   const qc = useQueryClient();
@@ -23,6 +26,9 @@ export function ProfilePage() {
   const [draftSaved, setDraftSaved] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [savingMascot, setSavingMascot] = useState(false);
+  const [mascotError, setMascotError] = useState('');
+  const [mascotSaved, setMascotSaved] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState('');
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deletionError, setDeletionError] = useState('');
@@ -38,6 +44,7 @@ export function ProfilePage() {
   const outfits = useQuery({ queryKey: ['outfits'], queryFn: () => unwrap(outfitApi.GET('/api/app/outfits')) });
   const polls = useQuery({ queryKey: ['polls'], queryFn: () => unwrap(votingApi.GET('/api/app/polls')) });
   const preferences = usePreferences();
+  const selectedMascot = me.data ? accountMascot(me.data.id, profile.data)?.id : undefined;
 
   useEffect(() => {
     if (profile.data && me.data) {
@@ -75,6 +82,18 @@ export function ProfilePage() {
     try { qc.setQueryData(profileKey, await profileRequests.uploadAvatar(file)); }
     catch (error) { setProfileError(errorMessage(error)); }
     finally { setUploadingAvatar(false); }
+  };
+
+  const selectMascot = async (mascotId: MascotId) => {
+    if (!me.data || savingMascot || mascotId === selectedMascot) return;
+    setSavingMascot(true); setMascotError(''); setMascotSaved(false);
+    try {
+      const updated = await profileRequests.selectMascot(mascotId);
+      updateOnboarding(me.data.id, { mascot: mascotId });
+      qc.setQueryData(profileKey, updated);
+      setMascotSaved(true);
+    } catch (error) { setMascotError(errorMessage(error)); }
+    finally { setSavingMascot(false); }
   };
 
   const deleteAccount = async () => {
@@ -136,6 +155,24 @@ export function ProfilePage() {
           catch (error) { setProfileError(errorMessage(error)); }
         }}>Xóa ảnh đại diện</Button>}
       </div>
+    </Card>}
+    {me.data && <Card>
+      <h2>Chọn linh vật đại diện</h2>
+      <p className="small muted">Bạn có thể đổi bất cứ lúc nào. Nếu đã tải ảnh đại diện, hãy xóa ảnh để hiển thị linh vật.</p>
+      {mascotError && <Notice tone="error">{mascotError}</Notice>}
+      {mascotSaved && <p role="status">Đã lưu linh vật.</p>}
+      <fieldset className="mascot-picker">
+        <legend className="mascot-legend">Sáu cá tính thời trang</legend>
+        <div className="mascot-grid">
+          {MASCOTS.map(({ id, name, style }) => <label className="mascot-choice" key={id}>
+            <img src={mascotImage(id)} alt="" width="320" height="320" />
+            <span className="mascot-caption"><span><strong>{name}</strong><span>{style}</span></span>
+              <input type="radio" name="profile-mascot" value={id} checked={selectedMascot === id}
+                disabled={!profile.data || savingMascot} onChange={() => void selectMascot(id)} />
+            </span>
+          </label>)}
+        </div>
+      </fieldset>
     </Card>}
     {authMethods.data && !authMethods.data.hasPassword && <Card><h2>Thiết lập mật khẩu</h2>
       <p className="small muted">Bạn đã đăng nhập bằng Google. Đặt mật khẩu để lần sau có thể đăng nhập bằng cả Google và email.</p>
