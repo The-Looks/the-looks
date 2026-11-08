@@ -3,6 +3,7 @@ import { Button, ButtonLink, Notice } from '../../shared/ui/index';
 import { HomeBanner } from '../../shared/home/HomeBanner';
 import { useQuickPick } from '../../../hooks/user/outfit/api';
 import { OutfitCard } from './OutfitCard';
+import { WeatherChip } from './WeatherChip';
 import { FeedbackButtons } from './FeedbackButtons';
 import { SaveButton } from './SaveButton';
 
@@ -18,6 +19,7 @@ export function QuickPickCard() {
           <span aria-hidden="true">→</span>
         </Button>
       </HomeBanner>
+      <WeatherChip />
 
       {pick.isError && (
         <Notice tone={pick.error instanceof ApiError && pick.error.status === 503 ? 'warn' : 'error'}>

@@ -8,6 +8,8 @@ export const outfitRequests = {
     unwrap(outfitApi.GET('/api/app/outfits/suggestions', { params: { query: { occasion, limit } } })),
   quickPick: async (): Promise<OutfitSuggestion | null> =>
     (await unwrap(outfitApi.GET('/api/app/outfits/quick-pick'))) ?? null,
+  weather: async (): Promise<{ temperatureC: number; rainy: boolean } | null> =>
+    (await unwrap(outfitApi.GET('/api/app/outfits/weather'))) ?? null,
   preferences: () => unwrap(outfitApi.GET('/api/app/outfits/preferences')),
   savePreferences: (body: StylePreferences) =>
     unwrap(outfitApi.PUT('/api/app/outfits/preferences', { body })),

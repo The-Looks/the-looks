@@ -99,6 +99,21 @@ paths:
               schema: { $ref: '#/components/schemas/OutfitSuggestion' }
         '204': { description: Tủ đồ chưa đủ món để phối }
         '503': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/outfits/weather:
+    get:
+      summary: Thời tiết hôm nay ở thành phố trong hồ sơ (mặc định TP.HCM), đúng số liệu gợi ý outfit đang dùng
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [temperatureC, rainy]
+                properties:
+                  temperatureC: { type: number }
+                  rainy: { type: boolean, description: Lượng mưa hiện tại ≥ 0.5 mm }
+        '204': { description: Chưa lấy được thời tiết (dịch vụ thời tiết lỗi / hết lượt), gợi ý vẫn chạy theo mùa }
   /api/app/outfits/preferences:
     get:
       summary: Hồ sơ phong cách (giới tính, phong cách, ngân sách); trống nếu chưa khai

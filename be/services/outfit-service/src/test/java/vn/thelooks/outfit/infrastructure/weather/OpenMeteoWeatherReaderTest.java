@@ -20,7 +20,7 @@ class OpenMeteoWeatherReaderTest {
         var server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         var forecastQuery = new AtomicReference<String>();
         server.createContext("/api/app/me/profile", exchange -> respond(exchange,
-                "{\"username\":\"Lan\",\"city\":\"Hà Nội\",\"hasAvatar\":false}"));
+                "{\"username\":\"Lan\",\"city\":\"Sa Pa\",\"hasAvatar\":false}"));
         server.createContext("/v1/search", exchange -> respond(exchange,
                 "{\"results\":[{\"name\":\"Hanoi\",\"latitude\":21.03,\"longitude\":105.85}]}"));
         server.createContext("/v1/forecast", exchange -> {

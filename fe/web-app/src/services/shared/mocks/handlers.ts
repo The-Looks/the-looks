@@ -288,6 +288,7 @@ const outfit: HttpHandler[] = [
   http.get('*/api/app/outfits/suggestions', ({ request }) =>
     HttpResponse.json(mockSuggestions(new URL(request.url).searchParams.get('occasion') ?? undefined)),
   ),
+  http.get('*/api/app/outfits/weather', () => HttpResponse.json({ temperatureC: 31, rainy: false })),
   http.get('*/api/app/outfits/quick-pick', () => {
     const s = mockSuggestions()[0];
     return s ? HttpResponse.json(s) : new HttpResponse(null, { status: 204 });

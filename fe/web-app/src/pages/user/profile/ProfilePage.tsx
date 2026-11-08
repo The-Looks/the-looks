@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppstoreOutlined, HeartOutlined, LogoutOutlined, SkinOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Input } from 'antd';
+import { Avatar, Input, Select } from 'antd';
+import { plain, VN_CITIES } from '../../../services/shared/vnCities';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi, errorMessage, outfitApi, unwrap, votingApi, wardrobeApi } from '../../../services/shared/api/client';
@@ -12,6 +13,12 @@ import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 import { accountAvatar } from '../../../components/user/mascot/accountAvatar';
 import { profileKey, profileRequests } from '../../../services/user/profile/requests';
 import { clearProfileDraft, readProfileDraft, writeProfileDraft } from '../../../services/user/profile/draft';
+
+/** 34 tỉnh / thành; thành phố đã lưu từ trước (gõ tay) vẫn giữ trong danh sách để không mất. */
+const cityOptions = (current: string) => [
+  ...(current && !(VN_CITIES as readonly string[]).includes(current) ? [{ value: current, label: `${current} (đã lưu)` }] : []),
+  ...VN_CITIES.map((name) => ({ value: name, label: name })),
+];
 
 export function ProfilePage() {
   const qc = useQueryClient();
@@ -125,7 +132,9 @@ export function ProfilePage() {
         <label htmlFor="profile-name">Tên hiển thị</label>
         <Input id="profile-name" maxLength={60} value={username} disabled={!profile.data} onChange={(event) => updateDraft(event.target.value, city)} />
         <label htmlFor="profile-city">Thành phố</label>
-        <Input id="profile-city" maxLength={120} placeholder="Ví dụ: Hà Nội" value={city} disabled={!profile.data} onChange={(event) => updateDraft(username, event.target.value)} />
+        <Select id="profile-city" showSearch allowClear placeholder="Chọn tỉnh / thành phố" value={city || undefined} disabled={!profile.data}
+          options={cityOptions(city)} filterOption={(input, option) => plain(String(option?.value ?? '')).includes(plain(input))}
+          onChange={(value?: string) => updateDraft(username, value ?? '')} style={{ width: '100%' }} />
         <Button disabled={!profile.data || !username.trim() || savingProfile} onClick={() => void saveProfile()}>
           {savingProfile ? 'Đang lưu…' : 'Lưu hồ sơ'}</Button>
         <label htmlFor="profile-avatar">Ảnh đại diện (PNG/JPEG, tối đa 2 MB)</label>
