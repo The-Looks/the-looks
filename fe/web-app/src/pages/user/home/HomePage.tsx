@@ -47,7 +47,7 @@ export function HomePage() {
   return (
     <div className="stack-lg home-page">
       <PageHeader eyebrow={brand.tagline} title={<span className="home-greeting">
-        {me.data?.username ? `Chào ${me.data.username}!` : 'Chào bạn!'}
+        {me.data?.username ? <>Chào <span className="editorial-title-accent">{me.data.username}!</span></> : 'Chào bạn!'}
         {mascot && <span className="home-greeting-mascot"><MascotAvatar look={mascot} portrait title="" /></span>}
       </span>}
         action={<ButtonLink to="/outfits/suggest" small><PlusOutlined /> <span className="home-create-label">Tạo outfit mới</span></ButtonLink>} />

@@ -1,0 +1,5 @@
+﻿{"type":"thread.started","thread_id":"01a1b55d-dada-7943-9c36-9336889eeded"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Exceeded skills context budget. All skill descriptions were removed and 95 additional skills were not included in the model-visible skills list."}}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"`useEffect` runs code after React renders. Use it to synchronize a component with something outside React, such as a browser event, timer, or network connection.\n\n```jsx\nuseEffect(() => {\n  const timer = setInterval(tick, 1000);\n  return () => clearInterval(timer);\n}, []);\n```\n\nThe function returned by the effect cleans up the timer. The dependency array controls when the effect runs again: `[]` means after the component mounts; `[value]` means after it mounts and whenever `value` changes."}}
+{"type":"turn.completed","usage":{"input_tokens":23221,"cached_input_tokens":13184,"cache_write_input_tokens":0,"output_tokens":115,"reasoning_output_tokens":0}}

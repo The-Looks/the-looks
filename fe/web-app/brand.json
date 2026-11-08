@@ -23,16 +23,16 @@
     "white": "#FFFFFF"
   },
   "typography": {
-    "head": "Plus Jakarta Sans",
-    "body": "Inter",
+    "head": "Be Vietnam Pro",
+    "body": "Be Vietnam Pro",
     "files": {
-      "head600": "/assets/fonts/head-600.woff2",
-      "head700": "/assets/fonts/head-700.woff2",
-      "head800": "/assets/fonts/head-800.woff2",
-      "body400": "/assets/fonts/body-400.woff2",
-      "body500": "/assets/fonts/body-500.woff2",
-      "body600": "/assets/fonts/body-600.woff2",
-      "body700": "/assets/fonts/body-700.woff2"
+      "head600": "/assets/fonts/BeVietnamPro-SemiBold.ttf",
+      "head700": "/assets/fonts/BeVietnamPro-Bold.ttf",
+      "head800": "/assets/fonts/BeVietnamPro-ExtraBold.ttf",
+      "body400": "/assets/fonts/BeVietnamPro-Regular.ttf",
+      "body500": "/assets/fonts/BeVietnamPro-Medium.ttf",
+      "body600": "/assets/fonts/BeVietnamPro-SemiBold.ttf",
+      "body700": "/assets/fonts/BeVietnamPro-Bold.ttf"
     },
     "sizes": [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 34, 35, 36, 38, 48, 52, 54, 57],
     "weights": { "regular": 400, "medium": 500, "semibold": 600, "bold": 700, "extrabold": 800 }

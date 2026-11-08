@@ -1,5 +1,65 @@
-/* Brand tokens are loaded from fe/web-app/brand.json before React renders. */
+/* Static fallbacks for CSS tooling; applyBrandToDocument overrides these from brand.json. */
 :root {
+  --purple: #6b2bb8;
+  --purple-dark: #542090;
+  --pink: #9e3655;
+  --lavender: #c9a8f4;
+  --lav-soft: #f1e7fa;
+  --bg: #faf8fc;
+  --surface: #fff;
+  --ink: #251d2f;
+  --muted: #5c5265;
+  --line: #ece4f3;
+  --green: #21674e;
+  --green-soft: #e3f3ec;
+  --amber: #805019;
+  --amber-soft: #fbefd9;
+  --pink-soft: #fbe4ea;
+  --on-accent: #fff;
+  --accent-rose: #a43161;
+  --accent-gold: #8c5a28;
+  --font-head: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-pill: 999px;
+  --asset-quick-pick: none;
+  --asset-auth-wall: none;
+  --type-10: 10px;
+  --type-11: 11px;
+  --type-12: 12px;
+  --type-13: 13px;
+  --type-14: 14px;
+  --type-15: 15px;
+  --type-16: 16px;
+  --type-17: 17px;
+  --type-18: 18px;
+  --type-19: 19px;
+  --type-20: 20px;
+  --type-22: 22px;
+  --type-23: 23px;
+  --type-24: 24px;
+  --type-25: 25px;
+  --type-26: 26px;
+  --type-27: 27px;
+  --type-28: 28px;
+  --type-29: 29px;
+  --type-30: 30px;
+  --type-32: 32px;
+  --type-34: 34px;
+  --type-35: 35px;
+  --type-36: 36px;
+  --type-38: 38px;
+  --type-48: 48px;
+  --type-52: 52px;
+  --type-54: 54px;
+  --type-57: 57px;
   --text-caption: .8125rem;
   --text-label: .875rem;
   --text-body: 1rem;
@@ -35,7 +95,7 @@ img {
 h1,
 h2,
 h3 {
-  font-family: var(--font-head);
+  font-family: var(--font-head), sans-serif;
   margin: 0;
   text-wrap: balance;
 }
@@ -55,6 +115,16 @@ h3 {
   font-size: var(--text-body);
   font-weight: var(--weight-bold);
 }
+.editorial-title-accent { color: var(--purple-dark); }
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .editorial-title-accent {
+    background: linear-gradient(105deg, var(--purple-dark), var(--accent-rose));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
 p {
   margin: 0;
 }
@@ -189,7 +259,7 @@ a {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-head);
+  font-family: var(--font-head), sans-serif;
   font-weight: var(--weight-extrabold);
   font-size: var(--text-body);
   letter-spacing: 0.02em;
@@ -544,7 +614,7 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
  .nav > a { padding: 12px 18px; gap: 12px; font-size: var(--text-body); border-radius: 12px; }
  .nav a.active { background: #eee7f3; color: var(--purple); }
  .nav-footer { display: grid; gap: 16px; margin-top: auto; padding: 24px 16px 8px; }
- .nav-footer p { font-family: var(--font-head); font-size: 17px; font-weight: 600; line-height: 1.6; }
+ .nav-footer p { font-family: var(--font-head), sans-serif; font-size: 17px; font-weight: 600; line-height: 1.6; }
  .nav-footer span { font-size: var(--text-caption); color: var(--muted); }
  .mobile-brand { display: none; }
 }

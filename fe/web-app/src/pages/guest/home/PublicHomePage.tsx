@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BackLink, ButtonLink } from '../../../components/shared/ui/index';
 import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
+import { brand } from '../../../services/shared/brand';
 
 const features = [
   { title: 'Tủ đồ của bạn', description: 'Sắp xếp những món bạn đang có để tìm lại nhanh hơn và phối theo cách mới.' },
@@ -19,7 +20,8 @@ export function PublicHomePage() {
         <BackLink to="/">Về trang chủ</BackLink>
         <section className="public-home-hero" aria-labelledby="public-home-title">
           <div className="public-home-hero-copy">
-            <h1 id="public-home-title">Mặc đẹp từ tủ đồ của bạn</h1>
+            <span className="public-home-kicker">{brand.tagline}</span>
+            <h1 id="public-home-title">Mặc đẹp từ <span className="editorial-title-accent">tủ đồ của bạn</span></h1>
             <p>THE LOOKS giúp bạn nhìn lại tủ đồ, tìm ý tưởng phối đồ và nhờ bạn bè chọn outfit phù hợp. Mỗi ngày mặc đẹp theo cách của riêng bạn.</p>
             <div className="public-home-hero-actions">
               <ButtonLink to="/register">Bắt đầu miễn phí <ArrowRightOutlined /></ButtonLink>

@@ -11,7 +11,7 @@ export function PublicDashboardPage() {
   return (
     <AppShell publicPreview>
       <div className="stack-lg home-page public-dashboard">
-        <PageHeader title="Phong cách của bạn"
+        <PageHeader eyebrow={brand.tagline} title={<>Phong cách <span className="editorial-title-accent">của bạn</span></>}
           action={<ButtonLink to="/outfits/suggest" small><PlusOutlined /> <span className="home-create-label">Tạo outfit mới</span></ButtonLink>} />
         <p className="public-dashboard-note"><Link to="/register">Tạo tài khoản</Link> để bắt đầu với tủ đồ và bình chọn của bạn.</p>
 

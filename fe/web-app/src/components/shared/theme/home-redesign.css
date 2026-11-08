@@ -48,6 +48,7 @@
 .home-page { gap: 26px; }
 .home-page > .page-header { margin-bottom: 0; }
 .home-page > .page-header h1 { font-size: var(--title-page); }
+.home-page > .page-header .eyebrow { color: var(--accent-gold); font-weight: var(--weight-bold); letter-spacing: .15em; }
 .home-editorial-flow { display: grid; gap: 0; min-width: 0; }
 .home-editorial-flow > .stack { min-width: 0; }
 .home-story-divider { position: relative; height: 82px; overflow: hidden; }

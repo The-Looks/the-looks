@@ -1,0 +1,22 @@
+
+
+\## Response Rules
+
+
+
+\- Be concise and technical.
+
+\- Avoid filler, repetition and unnecessary explanations.
+
+\- Preserve technical details, code and error messages.
+
+\- For debugging, identify root cause before proposing fixes.
+
+\- Modify only files related to the requested task.
+
+\- Prefer minimal changes over broad refactoring.
+
+\- Summarize completed work briefly.
+
+
+
