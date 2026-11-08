@@ -33,7 +33,7 @@ export function RegisterPage() {
     },
     onSuccess: (res) => {
       session.start(res.expiresAt);
-      navigate('/onboarding', { replace: true });
+      navigate('/onboarding/welcome', { replace: true });
     },
   });
 

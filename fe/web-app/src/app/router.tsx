@@ -36,6 +36,10 @@ const WardrobeStatsPage = lazy(() => import('../pages/user/wardrobe/WardrobeStat
 const AddItemPage = lazy(() => import('../pages/user/wardrobe/AddItemPage').then((m) => ({ default: m.AddItemPage })));
 const ItemDetailPage = lazy(() => import('../pages/user/wardrobe/ItemDetailPage').then((m) => ({ default: m.ItemDetailPage })));
 const OnboardingWardrobePage = lazy(() => import('../pages/user/wardrobe/OnboardingWardrobePage').then((m) => ({ default: m.OnboardingWardrobePage })));
+const onboarding = () => import('../pages/user/onboarding/OnboardingLayout');
+const OnboardingEntry = lazy(() => onboarding().then((m) => ({ default: m.OnboardingEntry })));
+const OnboardingLayout = lazy(() => onboarding().then((m) => ({ default: m.OnboardingLayout })));
+const MascotPage = lazy(() => import('../pages/user/onboarding/MascotPage').then((m) => ({ default: m.MascotPage })));
 const WardrobePage = lazy(() => import('../pages/user/wardrobe/WardrobePage').then((m) => ({ default: m.WardrobePage })));
 const HomePage = lazy(() => import('../pages/user/home/HomePage').then((m) => ({ default: m.HomePage })));
 const PublicHomePage = lazy(() => import('../pages/guest/home/PublicHomePage').then((m) => ({ default: m.PublicHomePage })));
@@ -67,11 +71,15 @@ export const router = createBrowserRouter([{ element: <RouteMotionLayout />, chi
     element: <RequireAuth />,
     children: [
       { element: <RequireAdmin />, children: [{ path: 'admin', element: <AdminDashboardPage /> }] },
+      { path: 'onboarding/check', element: <OnboardingEntry /> },
+      { path: 'onboarding', element: <OnboardingLayout />, children: [
+        { index: true, element: <StylePreferencesPage /> },
+        { path: 'welcome', element: <MascotPage /> },
+        { path: 'wardrobe', element: <OnboardingWardrobePage /> },
+      ] },
       {
         element: <AppShell />,
         children: [
-          { path: 'onboarding', element: <StylePreferencesPage /> },
-          { path: 'onboarding/wardrobe', element: <OnboardingWardrobePage /> },
           { path: 'wardrobe', element: <WardrobePage /> },
           { path: 'wardrobe/stats', element: <WardrobeStatsPage /> },
           { path: 'wardrobe/add', element: <AddItemPage /> },

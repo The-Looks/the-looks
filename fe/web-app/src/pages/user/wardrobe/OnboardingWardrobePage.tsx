@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
+import { Button, Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { OutfitCard } from '../../../components/user/outfit/OutfitCard';
 import { SaveButton } from '../../../components/user/outfit/SaveButton';
 import { useWardrobe } from '../../../hooks/user/wardrobe/api';
 import { useQuickPick } from '../../../hooks/user/outfit/api';
 import { errorMessage } from '../../../services/shared/api/client';
 import { wardrobeReadiness } from '../../../services/user/wardrobe/onboarding';
+import type { OnboardingContext } from '../onboarding/OnboardingLayout';
 import { AddItemPage } from './AddItemPage';
 import './onboarding-wardrobe.css';
 
 export function OnboardingWardrobePage() {
   const [params, setParams] = useSearchParams();
+  const onboarding = useOutletContext<OnboardingContext | null>();
   const wardrobe = useWardrobe('CONFIRMED');
   const readiness = wardrobeReadiness(wardrobe.data ?? []);
   const [advanceAfterReview, setAdvanceAfterReview] = useState(false);
@@ -32,18 +34,20 @@ export function OnboardingWardrobePage() {
       mutate();
     }
   }, [outfitStep, signature, mutate]);
+  useEffect(() => {
+    if (wardrobe.isSuccess && !readiness.ready && params.has('step')) {
+      const next = new URLSearchParams(params);
+      next.delete('step');
+      setParams(next, { replace: true });
+    }
+  }, [wardrobe.isSuccess, readiness.ready, params, setParams]);
 
   if (wardrobe.isPending) return <Spinner label="Đang xem các món bạn đã thêm…" />;
   if (wardrobe.isError) return <Notice tone="error">{errorMessage(wardrobe.error)} <Button onClick={() => void wardrobe.refetch()}>Thử lại</Button></Notice>;
   return <div className="stack-lg onboarding-wardrobe">
-    <PageHeader eyebrow={outfitStep ? 'Bước 3/3' : 'Bước 2/3'} title={outfitStep ? 'Outfit đầu tiên của bạn' : 'Bắt đầu với 3 món quen thuộc'}
+    <PageHeader title={outfitStep ? 'Outfit đầu tiên của bạn' : 'Thêm 3 món đầu tiên'}
       sub={outfitStep ? 'Phối từ những món bạn vừa xác nhận trong tủ đồ.' : 'Chọn 3–5 món hay mặc: một áo, một quần và một đôi giày là khởi đầu dễ nhất. Bạn cũng có thể dùng váy thay áo và quần.'}
       back={{ to: outfitStep ? '/onboarding/wardrobe' : '/onboarding', label: outfitStep ? 'Thêm món khác' : 'Phong cách của bạn' }} />
-    <ol className="onboarding-steps" aria-label="Tiến độ bắt đầu">
-      <li>1. Phong cách <span>Đã lưu</span></li>
-      <li aria-current={!outfitStep ? 'step' : undefined}>2. Tủ đồ <span>{readiness.count} món đã xác nhận</span></li>
-      <li aria-current={outfitStep ? 'step' : undefined}>3. Outfit đầu tiên</li>
-    </ol>
     {!outfitStep ? <>
       <Card>
         <div className="row"><strong>{Math.min(readiness.count, 3)}/3 món để bắt đầu</strong><span className="muted">Có thể thêm đến 5 món hoặc nhiều hơn sau đó</span></div>
@@ -59,12 +63,16 @@ export function OnboardingWardrobePage() {
       </Card>
       <AddItemPage guided onConfirmed={() => setAdvanceAfterReview(true)} />
     </> : <section className="stack onboarding-outfit" aria-label="Outfit đầu tiên">
+      <img className="onboarding-outfit-art" src="/illustrations/first-outfit.svg" alt="" />
       {quick.isPending && <Spinner label="Đang phối outfit đầu tiên…" />}
       {quick.isError && <Notice tone="error">{errorMessage(quick.error)} <Button onClick={() => mutate()}>Thử phối lại</Button></Notice>}
       {quick.isSuccess && !quick.data && <Card><h2>Cần thêm một lựa chọn phù hợp</h2><p>Những món hiện có chưa phối được thành bộ cho thời tiết và phong cách lúc này. Thêm áo, quần hoặc váy dùng được nhiều mùa rồi thử lại.</p><Button onClick={() => { requested.current = ''; setParams({}); }}>Thêm món khác</Button></Card>}
       {quick.data && <>
         <OutfitCard suggestion={quick.data} actions={<SaveButton suggestion={quick.data} />} />
-        <div className="row"><ButtonLink to="/">Vào trang chủ</ButtonLink><ButtonLink to="/outfits/suggest?occasion=SCHOOL" kind="outline">Xem thêm cách phối</ButtonLink></div>
+        <div className="row">
+          <Link className="btn" to="/" replace onClick={onboarding?.finish}>Vào trang chủ</Link>
+          <Link className="btn btn-outline" to="/outfits/suggest?occasion=SCHOOL" replace onClick={onboarding?.finish}>Xem thêm cách phối</Link>
+        </div>
       </>}
     </section>}
   </div>;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useMatch, useNavigate } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import type { StylePreferences } from '../../../interface/dto/types';
 import { Button, Card, Chip, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
@@ -26,16 +26,15 @@ const BUDGETS: { value: NonNullable<StylePreferences['budget']>; label: string }
 ];
 
 /**
- * Hồ sơ phong cách: dùng cho bước đầu sau khi đăng ký (/onboarding) và trang Cá nhân (/profile/style).
- * Bước đăng ký xác nhận giới tính và ít nhất một phong cách; sau đó có thể sửa trong hồ sơ.
+ * Hồ sơ phong cách dùng cho bước khảo sát (/onboarding) và trang Cá nhân (/profile/style).
  */
 export function StylePreferencesPage() {
-  const onboarding = useLocation().pathname === '/onboarding';
+  const onboarding = Boolean(useMatch('/onboarding'));
   const navigate = useNavigate();
   const current = usePreferences();
   const save = useSavePreferences();
   const [form, setForm] = useState<StylePreferences>({ gender: null, styles: [], budget: null, colors: [] });
-  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizOpen, setQuizOpen] = useState(onboarding && !current.data?.styles?.length);
   const [answers, setAnswers] = useState<(Style | undefined)[]>([]);
   const [quizResult, setQuizResult] = useState<Style[]>([]);
   const [confirmed, setConfirmed] = useState(false);
@@ -70,10 +69,9 @@ export function StylePreferencesPage() {
   return (
     <div className="stack-lg">
       <PageHeader
-        eyebrow={onboarding ? 'Bước 1/3' : undefined}
         title="Phong cách của bạn"
         sub="Chọn giới tính, phong cách và màu yêu thích để cá nhân hóa gợi ý. Bạn có thể sửa lại trong hồ sơ bất cứ lúc nào."
-        back={onboarding ? undefined : { to: '/profile', label: 'Cá nhân' }}
+        back={onboarding ? { to: '/onboarding/welcome', label: 'Chọn linh vật' } : { to: '/profile', label: 'Cá nhân' }}
       />
       {current.isError && <Notice tone="error">{errorMessage(current.error)}</Notice>}
 
