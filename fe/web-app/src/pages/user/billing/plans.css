@@ -24,5 +24,5 @@
 .plan-features { display: grid; gap: 10px; margin: 0; padding-left: 20px; color: var(--ink); }
 .plan-features li::marker { color: var(--purple); }
 .plan-footer { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); }
-.plan-free-note { display: block; min-height: 44px; padding: 12px 0; color: var(--muted); font-size: var(--type-13); text-align: center; }
+.plan-free-note { display: block; min-height: 44px; padding: 12px 0; color: var(--muted); font-size: var(--text-label); text-align: center; }
 @media (max-width: 900px) { .plans-grid { grid-template-columns: 1fr; } .plan-card { min-height: 0; } }

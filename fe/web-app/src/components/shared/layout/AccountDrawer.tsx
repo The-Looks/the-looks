@@ -7,12 +7,14 @@ export function AccountDrawer({
   open,
   onClose,
   account,
+  avatarSrc,
   isAdmin = false,
   publicPreview = false,
 }: {
   open: boolean;
   onClose: () => void;
   account?: { username: string; email: string };
+  avatarSrc?: string;
   isAdmin?: boolean;
   publicPreview?: boolean;
 }) {
@@ -21,7 +23,7 @@ export function AccountDrawer({
   const avatarLetter = publicPreview ? 'B' : account?.username?.slice(0, 1).toUpperCase() ?? 'T';
 
   return <Drawer id="account-drawer" title="Tài khoản" placement="right" open={open} onClose={onClose} width={320} className="app-account-drawer">
-    <div className="drawer-identity"><Avatar size={48} className="user-avatar">{avatarLetter}</Avatar><div><strong>{publicPreview ? 'Khách' : account?.username ?? 'Tài khoản'}</strong><span>{publicPreview ? 'Khám phá THE LOOKS' : account?.email ?? ''}</span></div></div>
+    <div className="drawer-identity"><Avatar size={48} className="user-avatar" src={avatarSrc} alt="">{avatarLetter}</Avatar><div><strong>{publicPreview ? 'Khách' : account?.username ?? 'Tài khoản'}</strong><span>{publicPreview ? 'Khám phá THE LOOKS' : account?.email ?? ''}</span></div></div>
     <nav className="drawer-navigation" aria-label="Menu tài khoản">
       <Link to={publicPreview ? '/login' : '/profile'} onClick={onClose} className={pathname.startsWith('/profile') ? 'active' : ''}><UserOutlined /><span>{publicPreview ? 'Đăng nhập' : 'Hồ sơ'}</span></Link>
       <Link to={publicPreview ? '/register' : '/plans'} onClick={onClose} className={pathname.startsWith('/plans') ? 'active' : ''}><CrownOutlined /><span>{publicPreview ? 'Tạo tài khoản' : 'THE LOOKS Premium'}</span></Link>

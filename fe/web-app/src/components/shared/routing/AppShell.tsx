@@ -3,6 +3,8 @@ import { useState, type ReactNode } from 'react';
 import { Layout } from 'antd';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { authRequests } from '../../../services/guest/auth/requests';
+import { accountAvatarSource } from '../../../services/user/profile/avatar';
+import { profileKey, profileRequests } from '../../../services/user/profile/requests';
 import { APP_NAV, AppHeader, currentAppNav } from '../layout/AppHeader';
 import { AccountDrawer } from '../layout/AccountDrawer';
 import { SiteFooter } from '../layout/SiteFooter';
@@ -11,15 +13,17 @@ export function AppShell({ children, publicPreview = false }: { children?: React
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me, enabled: !publicPreview });
+  const profile = useQuery({ queryKey: profileKey, queryFn: profileRequests.get, enabled: !publicPreview && Boolean(me.data) });
   const isAdmin = me.data?.roles?.includes('ADMIN') ?? false;
   const selected = currentAppNav(pathname);
   const avatarLetter = publicPreview ? 'B' : me.data?.username?.slice(0, 1).toUpperCase() ?? 'T';
+  const avatarSrc = !publicPreview && me.data ? accountAvatarSource(me.data.id, profile.data) : undefined;
   const closeMenu = () => setMenuOpen(false);
 
   return (
     <Layout className="app-frame app-frame-topnav">
       <Layout className="app-main-layout">
-        <AppHeader selected={selected} publicPreview={publicPreview} avatarLetter={avatarLetter} menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+        <AppHeader selected={selected} publicPreview={publicPreview} avatarLetter={avatarLetter} avatarSrc={avatarSrc} menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
 
         <main className="app-page"><div key={pathname} className="route-transition">{children ?? <Outlet />}</div></main>
         <SiteFooter variant={publicPreview ? 'public' : 'app'} />
@@ -31,7 +35,7 @@ export function AppShell({ children, publicPreview = false }: { children?: React
         </Link>)}
       </nav>
 
-      <AccountDrawer open={menuOpen} onClose={closeMenu} account={me.data} isAdmin={isAdmin} publicPreview={publicPreview} />
+      <AccountDrawer open={menuOpen} onClose={closeMenu} account={me.data} avatarSrc={avatarSrc} isAdmin={isAdmin} publicPreview={publicPreview} />
     </Layout>
   );
 }

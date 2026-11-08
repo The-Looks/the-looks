@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <ellipse cx="160" cy="282" rx="50" ry="6.5" fill="#f5dce1" />
+  <!-- Amber Webbed Feet -->
+  <g id="feet">
+    <path d="M 124 270 C 122 266, 126 262, 134 262 C 144 262, 148 268, 148 274 C 148 279, 142 281, 134 281 L 122 281 C 118 281, 118 276, 120 272 Z"
+          fill="#db812a" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="120" y1="281" x2="148" y2="281" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 124 274 L 128 278" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 134 274 L 138 278" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 172 270 C 172 266, 176 262, 186 262 C 194 262, 198 268, 198 274 C 198 279, 194 281, 186 281 L 172 281 C 168 281, 168 276, 170 272 Z"
+          fill="#db812a" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="168" y1="281" x2="198" y2="281" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 178 274 L 182 278" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 188 274 L 192 278" stroke="#241d21" stroke-width="1.8"/>
+  </g>
+  <!-- Tailored Trousers -->
+  <g id="trousers">
+    <rect x="132" y="254" width="10" height="10" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <rect x="178" y="254" width="10" height="10" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 126 182 L 194 182 L 198 256 L 168 256 L 160 204 L 152 256 L 122 256 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="137" y1="190" x2="137" y2="252" stroke="#3b3238" stroke-width="1.8"/>
+    <line x1="183" y1="190" x2="183" y2="252" stroke="#3b3238" stroke-width="1.8"/>
+    <rect x="121" y="250" width="32" height="6" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <rect x="167" y="250" width="32" height="6" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+  </g>
+  <!-- Penguin Body & Flippers (Ink Silhouette) -->
+  <g id="body">
+    <!-- Left Flipper (resting gracefully on hip) -->
+    <path d="M 124 122 C 108 132, 94 154, 102 176 C 106 184, 114 186, 122 178 L 132 144 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Right Flipper (dapper posture) -->
+    <path d="M 196 122 C 212 132, 226 154, 218 176 C 214 184, 206 186, 198 178 L 188 144 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Penguin Main Torso -->
+    <path d="M 132 110 C 118 126, 118 160, 124 184 L 196 184 C 202 160, 202 126, 188 110 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Crisp White Belly / Front -->
+    <path d="M 142 114 C 134 130, 134 164, 138 184 L 182 184 C 186 164, 186 130, 178 114 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+  </g>
+  <!-- Collared Shirt & Preppy Plaid Vest -->
+  <g id="preppy-vest">
+    <!-- Crisp Collared Shirt Points -->
+    <polygon points="144,116 160,132 152,112" fill="#fff7f3" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="176,116 160,132 168,112" fill="#fff7f3" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Burgundy Knotted Necktie -->
+    <polygon points="158,124 162,124 163,142 160,146 157,142" fill="#771e35" stroke="#241d21" stroke-width="1.8"/>
+    <!-- Moss Knit Vest Body -->
+    <path d="M 134 128 L 148 128 L 160 148 L 172 128 L 186 128 C 190 144, 190 166, 188 182 L 132 182 C 130 166, 130 144, 134 128 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <!-- Burgundy Argyle / Plaid Pattern Lines -->
+    <line x1="140" y1="134" x2="160" y2="164" stroke="#771e35" stroke-width="2"/>
+    <line x1="160" y1="164" x2="180" y2="134" stroke="#771e35" stroke-width="2"/>
+    <line x1="160" y1="134" x2="140" y2="164" stroke="#771e35" stroke-width="2"/>
+    <line x1="180" y1="164" x2="160" y2="134" stroke="#771e35" stroke-width="2"/>
+    <!-- Off-White Fine Argyle Grid Lines -->
+    <line x1="148" y1="130" x2="172" y2="168" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <line x1="172" y1="130" x2="148" y2="168" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <line x1="148" y1="168" x2="160" y2="182" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <line x1="172" y1="168" x2="160" y2="182" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <!-- Vest V-Neck Trim & Hem -->
+    <path d="M 148 128 L 160 148 L 172 128" fill="none" stroke="#771e35" stroke-width="2.2" stroke-linejoin="round"/>
+    <line x1="132" y1="182" x2="188" y2="182" stroke="#771e35" stroke-width="3"/>
+    <!-- Vest Fold marks -->
+    <path d="M 136 158 Q 142 162 148 160" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 184 158 Q 178 162 172 160" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Penguin Head & Face -->
+  <g id="head">
+    <!-- Teardrop Head Outline -->
+    <path d="M 136 78 C 132 58, 142 42, 160 42 C 178 42, 188 58, 184 78 C 182 98, 178 114, 160 114 C 142 114, 138 98, 136 78 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Crisp White Face Mask -->
+    <path d="M 142 78 C 140 64, 148 54, 160 54 C 172 54, 180 64, 178 78 C 176 96, 172 108, 160 108 C 148 108, 144 96, 142 78 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Rosy Cheeks -->
+    <ellipse cx="145" cy="88" rx="5" ry="3" fill="#f5dce1"/>
+    <ellipse cx="175" cy="88" rx="5" ry="3" fill="#f5dce1"/>
+    <!-- Preppy Sharp Eyes -->
+    <ellipse cx="148" cy="76" rx="3.5" ry="4.5" fill="#241d21"/>
+    <circle cx="147" cy="74" r="1.4" fill="#fff7f3"/>
+    <ellipse cx="172" cy="76" rx="3.5" ry="4.5" fill="#241d21"/>
+    <circle cx="171" cy="74" r="1.4" fill="#fff7f3"/>
+    <path d="M 144 70 Q 148 68 152 70" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 176 70 Q 172 68 168 70" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Amber Triangular Beak -->
+    <polygon points="154,82 166,82 160,92" fill="#db812a" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="156" y1="86" x2="164" y2="86" stroke="#241d21" stroke-width="1.2"/>
+  </g>
+</svg>

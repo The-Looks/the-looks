@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <ellipse cx="160" cy="286" rx="115" ry="8" fill="#f5dce1" />
+
+  <!-- Coordinated Garment Flat Lay Grid (Right / Center Area) -->
+  <g id="flat-lay">
+    <!-- Styled Canvas Mat / Board -->
+    <rect x="110" y="38" width="195" height="236" rx="12" fill="#fff7f3" stroke="#241d21" stroke-width="2.8"/>
+    <rect x="114" y="42" width="187" height="228" rx="8" fill="none" stroke="#f5dce1" stroke-width="2" stroke-dasharray="4 4"/>
+
+    <!-- 1. Top: Neatly Folded Burgundy MA-1 Bomber Jacket -->
+    <g id="folded-jacket">
+      <path d="M 135 52 L 205 52 L 212 110 L 128 110 Z" fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+      <rect x="132" y="106" width="76" height="7" rx="1.5" fill="#f5dce1" stroke="#241d21" stroke-width="1.8"/>
+      <!-- Folded Sleeves -->
+      <path d="M 135 52 L 122 84 L 132 96 L 138 68 Z" fill="#63172a" stroke="#241d21" stroke-width="2"/>
+      <path d="M 205 52 L 218 84 L 208 96 L 202 68 Z" fill="#63172a" stroke="#241d21" stroke-width="2"/>
+      <!-- Baseball Collar -->
+      <path d="M 154 52 C 154 46, 186 46, 186 52 Z" fill="#f5dce1" stroke="#241d21" stroke-width="2"/>
+      <!-- Silver Front Zipper -->
+      <line x1="170" y1="52" x2="170" y2="106" stroke="#fff7f3" stroke-width="2"/>
+      <circle cx="170" cy="68" r="1.5" fill="#241d21"/>
+    </g>
+
+    <!-- 2. Bottom: Folded Vintage Denim Jeans -->
+    <g id="folded-denim">
+      <path d="M 132 122 L 208 122 L 206 182 L 134 182 Z" fill="#4a6882" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+      <!-- Waistband & Button -->
+      <rect x="132" y="122" width="76" height="8" rx="1" fill="#587a9b" stroke="#241d21" stroke-width="1.8"/>
+      <circle cx="170" cy="126" r="2" fill="#fff7f3" stroke="#241d21" stroke-width="1"/>
+      <!-- Front Curved Pocket Stitch -->
+      <path d="M 136 130 C 146 130, 150 142, 150 148" fill="none" stroke="#241d21" stroke-width="1.5"/>
+      <line x1="170" y1="130" x2="170" y2="155" stroke="#241d21" stroke-width="1.5"/>
+      <!-- Folded Hem Selvedge -->
+      <rect x="134" y="176" width="72" height="6" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+      <line x1="168" y1="176" x2="168" y2="182" stroke="#771e35" stroke-width="1.8"/>
+    </g>
+
+    <!-- 3. Coordinated Shoes: Angled Streetwear Sneaker Pair -->
+    <g id="flatlay-shoes">
+      <!-- Left Sneaker -->
+      <path d="M 130 200 C 130 194, 138 190, 152 190 C 158 190, 162 195, 162 202 L 128 202 Z" fill="#4a6882" stroke="#241d21" stroke-width="2"/>
+      <path d="M 126 202 L 164 202 C 166 206, 162 212, 158 212 L 130 212 C 126 212, 124 206, 126 202 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+      <line x1="140" y1="192" x2="148" y2="194" stroke="#fff7f3" stroke-width="1.5"/>
+      <!-- Right Sneaker -->
+      <path d="M 174 202 C 174 195, 178 190, 184 190 C 198 190, 206 194, 206 200 L 208 202 Z" fill="#4a6882" stroke="#241d21" stroke-width="2"/>
+      <path d="M 172 202 L 210 202 C 212 206, 210 212, 206 212 L 178 212 C 174 212, 170 206, 172 202 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+      <line x1="188" y1="194" x2="196" y2="192" stroke="#fff7f3" stroke-width="1.5"/>
+    </g>
+
+    <!-- 4. Accessories: Beret, Sunglasses, Style Tag -->
+    <g id="accessories">
+      <!-- Artsy Moss Beret -->
+      <ellipse cx="254" cy="74" rx="24" ry="16" fill="#5b6b4e" stroke="#241d21" stroke-width="2"/>
+      <path d="M 254 58 L 254 54" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+      <!-- Chic Sunglasses -->
+      <rect x="234" y="114" width="16" height="10" rx="3" fill="#241d21"/>
+      <rect x="256" y="114" width="16" height="10" rx="3" fill="#241d21"/>
+      <line x1="250" y1="118" x2="256" y2="118" stroke="#771e35" stroke-width="2"/>
+      <!-- Styling Card / Wardrobe Tag -->
+      <polygon points="236,150 268,150 274,178 242,178" fill="#f5dce1" stroke="#241d21" stroke-width="1.8"/>
+      <circle cx="252" cy="156" r="2" fill="#241d21"/>
+      <line x1="244" y1="164" x2="264" y2="164" stroke="#771e35" stroke-width="1.8"/>
+      <line x1="245" y1="170" x2="261" y2="170" stroke="#771e35" stroke-width="1.8"/>
+    </g>
+  </g>
+
+  <!-- Mascot (Fox) Kneeling Beside and Styling the Outfit with Artistic Pride -->
+  <g id="styling-mascot" transform="translate(-70, 48) scale(0.92)">
+    <!-- Big Fox Tail sweeping up behind -->
+    <path d="M 115 190 C 85 180, 50 145, 54 115 C 58 85, 95 80, 110 100 C 118 112, 115 140, 125 170 Z"
+          fill="#cf5c2e" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 54 115 C 58 85, 95 80, 110 100 C 104 104, 98 98, 92 106 C 88 112, 80 110, 76 118 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Kneeling Streetwear Legs -->
+    <path d="M 125 182 L 180 182 L 195 242 L 152 242 L 140 204 L 118 238 L 96 238 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Sneakers in kneeling pose -->
+    <path d="M 92 238 L 124 238 C 126 244, 122 250, 116 250 L 90 250 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+    <path d="M 150 242 L 196 242 C 198 248, 194 254, 188 254 L 146 254 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+    <!-- Bomber Jacket -->
+    <path d="M 122 120 C 108 138, 110 168, 118 184 L 178 184 C 186 168, 188 138, 172 120 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="116" y="180" width="64" height="8" rx="2" fill="#f5dce1" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Arms Extended Over Flat Lay (Carefully adjusting the collar/tag) -->
+    <path d="M 172 124 C 188 134, 212 144, 230 148 L 226 160 C 206 156, 186 146, 170 138 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <!-- White Paws touching the collar -->
+    <ellipse cx="236" cy="154" rx="7" ry="5.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <path d="M 145 130 C 160 142, 184 154, 206 160 L 200 172 C 180 166, 158 152, 140 140 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <ellipse cx="212" cy="166" rx="7" ry="5.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Head Leaning Forward with Proud Happy Expression -->
+    <path d="M 134 76 L 118 36 C 128 34, 144 42, 154 58 Z" fill="#cf5c2e" stroke="#241d21" stroke-width="3"/>
+    <polygon points="118,36 126,35 124,48" fill="#241d21"/>
+    <path d="M 166 58 C 176 42, 192 34, 202 36 L 186 76 Z" fill="#cf5c2e" stroke="#241d21" stroke-width="3"/>
+    <polygon points="202,36 194,35 196,48" fill="#241d21"/>
+    <path d="M 136 68 C 118 72, 110 88, 120 98 C 132 108, 148 114, 160 114 C 172 114, 188 108, 200 98 C 210 88, 202 72, 184 68 Z"
+          fill="#cf5c2e" stroke="#241d21" stroke-width="3"/>
+    <path d="M 120 98 C 114 90, 122 78, 134 82 C 144 86, 152 94, 160 94 C 168 94, 176 86, 186 82 C 198 78, 206 90, 200 98 C 190 108, 174 114, 160 114 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <ellipse cx="132" cy="94" rx="5.5" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="188" cy="94" rx="5.5" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="145" cy="83" rx="4.5" ry="5.5" fill="#241d21"/>
+    <circle cx="144" cy="81" r="1.6" fill="#fff7f3"/>
+    <ellipse cx="175" cy="83" rx="4.5" ry="5.5" fill="#241d21"/>
+    <circle cx="174" cy="81" r="1.6" fill="#fff7f3"/>
+    <polygon points="156,94 164,94 160,98" fill="#241d21"/>
+    <path d="M 156 102 Q 161 106 166 103" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Styling Sparkles -->
+  <g id="sparkles">
+    <path d="M 282 30 L 285 37 L 292 40 L 285 43 L 282 50 L 279 43 L 272 40 L 279 37 Z" fill="#771e35"/>
+    <path d="M 104 42 L 106 48 L 112 50 L 106 52 L 104 58 L 102 52 L 96 50 L 102 48 Z" fill="#4a6882"/>
+  </g>
+</svg>

@@ -1,8 +1,7 @@
-.wardrobe-stats h1 { font-size: 28px; }
 .stats-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 20px 0; border-bottom: 1px solid var(--line); }
-.stats-summary dt { color: var(--muted); font-size: 14px; }
+.stats-summary dt { color: var(--muted); font-size: var(--text-body); }
 .stats-summary dd { font-size: 28px; margin: 8px 0 0; font-variant-numeric: tabular-nums; }
-.stats-summary small { font-size: 14px; color: var(--muted); }
+.stats-summary small { font-size: var(--text-body); color: var(--muted); }
 .stats-distributions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
 .wardrobe-stats-panel { display: grid; gap: 16px; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
 .stats-bars, .stats-unused-list { list-style: none; padding: 0; margin: 0; }
@@ -16,7 +15,7 @@
 .stats-unused-item { display: grid; grid-template-columns: 56px minmax(0, 1fr) minmax(120px, auto); align-items: center; gap: 16px; padding: 12px 0; color: var(--ink); text-decoration: none; }
 .stats-unused-item .tile { width: 56px; height: 56px; min-height: 0; aspect-ratio: 1; }
 .stats-unused-item .tile-label { display: none; }
-.stats-unused-item span { display: block; color: var(--muted); font-size: 12px; }
+.stats-unused-item span { display: block; color: var(--muted); font-size: var(--text-label); }
 .stats-wear-date { text-align: right; font-variant-numeric: tabular-nums; }
 @media (max-width: 760px) { .stats-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stats-distributions { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 480px) { .wardrobe-stats-panel { padding: 16px; } .stats-unused-item { gap: 10px; grid-template-columns: 48px minmax(0, 1fr); } .stats-unused-item .tile { width: 48px; height: 48px; } .stats-wear-date { grid-column: 2; text-align: left; } }

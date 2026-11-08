@@ -3,6 +3,7 @@ import { ApiError, authApi, unwrap } from '../../shared/api/client';
 import { session } from '../../shared/session';
 
 export type UserProfile = components['schemas']['UserProfile'];
+export const profileKey = ['me', 'profile'] as const;
 
 export const profileRequests = {
   get: () => unwrap(authApi.GET('/api/app/me/profile')),

@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <ellipse cx="160" cy="282" rx="52" ry="6.5" fill="#f5dce1" />
+  <!-- Tail -->
+  <path d="M 124 205 C 100 210, 72 205, 66 185 C 60 162, 72 138, 88 130"
+        fill="none" stroke="#241d21" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 124 205 C 100 210, 72 205, 66 185 C 60 162, 72 138, 88 130"
+        fill="none" stroke="#fff7f3" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 72 152 C 75 142, 80 134, 88 130"
+        fill="none" stroke="#d99b68" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- Trousers -->
+  <g id="trousers">
+    <path d="M 125 168 C 148 171, 172 171, 195 168 L 200 262 L 168 262 L 160 196 L 152 262 L 120 262 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="136" y1="184" x2="136" y2="258" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="184" y1="184" x2="184" y2="258" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="119" y="256" width="34" height="6.5" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <rect x="167" y="256" width="34" height="6.5" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <path d="M 157 192 Q 160 198 163 192" fill="none" stroke="#3b3238" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 127 236 Q 133 240 141 237" fill="none" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 179 236 Q 187 240 193 237" fill="none" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Socks & Loafers -->
+  <rect x="130" y="260" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+  <path d="M 122 266 C 122 266, 128 264, 142 264 C 148 264, 150 268, 150 273 C 150 278, 146 280, 138 280 L 124 280 C 120 280, 120 275, 120 272 Z"
+        fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+  <line x1="120" y1="280" x2="150" y2="280" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+  <rect x="132" y="266" width="8" height="4" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+  <rect x="178" y="260" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+  <path d="M 170 266 C 170 266, 176 264, 190 264 C 196 264, 198 268, 198 273 C 198 278, 194 280, 186 280 L 172 280 C 168 280, 168 275, 168 272 Z"
+        fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+  <line x1="168" y1="280" x2="198" y2="280" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+  <rect x="180" y="266" width="8" height="4" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+  <!-- Tote Bag -->
+  <g id="tote-bag">
+    <path d="M 92 182 L 120 182 L 122 228 C 122 231, 119 234, 116 234 L 96 234 C 93 234, 90 231, 90 228 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <rect x="98" y="194" width="16" height="18" rx="2" fill="#771e35" stroke="#241d21" stroke-width="2"/>
+    <line x1="93" y1="187" x2="119" y2="187" stroke="#241d21" stroke-width="1.5" stroke-dasharray="2 2"/>
+    <path d="M 97 182 C 97 165, 102 152, 107 150 C 112 152, 115 165, 115 182"
+          fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <!-- Minimalist Ivory Knit -->
+  <g id="knit-sweater">
+    <path d="M 132 124 C 122 135, 112 148, 104 165 L 118 174 C 125 158, 134 146, 142 138 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="103" y="166" width="16" height="7.5" rx="2" transform="rotate(-30 111 170)"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="111" cy="179" rx="6" ry="5.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <line x1="109" y1="181" x2="109" y2="184" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="113" y1="181" x2="113" y2="184" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 188 124 C 198 135, 208 148, 214 162 L 202 173 C 196 158, 187 146, 178 138 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="200" y="164" width="16" height="7.5" rx="2" transform="rotate(35 208 168)"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="199" cy="178" rx="6" ry="5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <path d="M 134 122 C 124 135, 122 152, 124 172 L 196 172 C 198 152, 196 135, 186 122 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="123" y="167" width="74" height="7.5" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+    <line x1="135" y1="167" x2="135" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="147" y1="167" x2="147" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="160" y1="167" x2="160" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="173" y1="167" x2="173" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="185" y1="167" x2="185" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <path d="M 129 146 Q 138 151 147 147" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 191 146 Q 182 151 173 147" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 152 158 Q 160 162 168 158" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 139 122 C 137 112, 139 104, 144 102 C 153 100, 167 100, 176 102 C 181 104, 183 112, 181 122 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="149" y1="103" x2="149" y2="121" stroke="#241d21" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="160" y1="102" x2="160" y2="121" stroke="#241d21" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="171" y1="103" x2="171" y2="121" stroke="#241d21" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 142 111 Q 160 114 178 111" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Head & Ears -->
+  <g id="head">
+    <path d="M 132 72 L 123 40 C 129 38, 140 44, 150 56 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="129,66 127,47 143,57" fill="#f5dce1"/>
+    <path d="M 170 56 C 180 44, 191 38, 197 40 L 188 72 Z"
+          fill="#d99b68" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="191,66 193,47 177,57" fill="#f5dce1"/>
+    <path d="M 130 76 C 122 84, 124 96, 134 102 C 146 109, 174 109, 186 102 C 196 96, 198 84, 190 76 C 182 66, 138 66, 130 76 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 174 60 C 184 66, 194 76, 193 84 C 192 90, 187 96, 180 94 C 174 88, 172 72, 174 60 Z"
+          fill="#d99b68"/>
+    <ellipse cx="138" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="182" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <path d="M 142 80 Q 148 76 154 80" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 166 80 Q 172 76 178 80" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 142 80 L 139 77" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 178 80 L 181 77" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="158,86 162,86 160,89" fill="#771e35"/>
+    <path d="M 156 91 Q 160 93 164 91" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 132 86 Q 116 84 108 88" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 132 91 Q 118 93 110 97" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 188 86 Q 204 84 212 88" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 188 91 Q 202 93 210 97" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+</svg>
