@@ -125,6 +125,9 @@ paths:
   /api/app/outfits/shopping:
     get:
       summary: Gợi ý mua thêm - món tủ đồ còn thiếu cho dịp này + sản phẩm trên sàn (link affiliate)
+      description: >
+        Món còn thiếu: thiếu hẳn áo / quần / giày, hoặc có nhưng không món nào hợp dịp / phong cách đã chọn.
+        Tối đa 6 sản phẩm, lấy lần lượt từ TikTok Shop và datafeeds các chiến dịch AccessTrade đã duyệt; màu yêu thích lên trước.
       parameters:
         - { name: occasion, in: query, required: true, schema: { $ref: '#/components/schemas/Occasion' } }
       responses:
@@ -384,7 +387,7 @@ components:
           required: [category, label]
           properties:
             category: { type: string, enum: [TOP, BOTTOM, SHOES] }
-            label: { type: string, description: 'Tên tiếng Việt, vd "giày"' }
+            label: { type: string, description: 'Tên tiếng Việt, vd "giày" hoặc "áo đi làm"' }
         products: { type: array, items: { $ref: '#/components/schemas/ProductOffer' } }
     ProductOffer:
       type: object

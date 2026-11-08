@@ -42,6 +42,11 @@ public class OutfitRecommender {
             Occasion.HANGOUT, Set.of("casual", "streetwear", "sporty", "trendy", "basic"),
             Occasion.DATE, Set.of("elegant", "romantic", "trendy", "smart-casual", "feminine"));
 
+    /** Nhãn phong cách hợp một dịp. */
+    public static Set<String> occasionTags(Occasion occasion) {
+        return OCCASION_TAGS.get(occasion);
+    }
+
     private static final Set<String> NEUTRAL_COLORS = Set.of(
             "black", "white", "gray", "grey", "beige", "navy", "brown", "cream", "denim",
             "đen", "trắng", "xám", "be", "nâu", "kem");
