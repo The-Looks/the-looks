@@ -93,11 +93,15 @@ export function useUpdateItem(id: string) {
   });
 }
 
+/** Làm mới tủ đồ sau khi xoá, trừ chính các món vừa xoá (tải lại sẽ 404). */
+const refreshExcept = (qc: ReturnType<typeof useQueryClient>, deleted: string[]) =>
+  qc.invalidateQueries({ queryKey: wardrobeKeys.all, predicate: (q) => !(q.queryKey[1] === 'item' && deleted.includes(q.queryKey[2] as string)) });
+
 export function useDelete() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: wardrobeRequests.remove,
-    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+    onSuccess: (_, id) => refreshExcept(qc, [id]),
   });
 }
 
@@ -114,7 +118,7 @@ export function useDeleteMany() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: wardrobeRequests.removeAll,
-    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+    onSuccess: (_, ids) => refreshExcept(qc, ids),
   });
 }
 
