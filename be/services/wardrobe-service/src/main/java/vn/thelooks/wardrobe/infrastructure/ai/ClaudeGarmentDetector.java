@@ -5,6 +5,8 @@ import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.models.messages.Base64ImageSource;
 import com.anthropic.models.messages.ContentBlockParam;
 import com.anthropic.models.messages.MessageCreateParams;
+import com.anthropic.models.messages.OutputConfig;
+import com.anthropic.models.messages.StructuredOutputConfig;
 import com.anthropic.models.messages.StructuredMessage;
 import com.anthropic.models.messages.StructuredMessageCreateParams;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -70,9 +72,17 @@ class ClaudeGarmentDetector implements GarmentDetector {
 
     private final AnthropicClient client;
     private final String model;
+    private final OutputConfig.Effort effort;
 
-    ClaudeGarmentDetector(@Value("${thelooks.ai.model}") String model) {
+    ClaudeGarmentDetector(String model) {
+        this(model, "low");
+    }
+
+    /** @param effort mức suy nghĩ; đọc loại / màu đồ trong ảnh không cần suy nghĩ sâu, "low" nhanh nhất */
+    @org.springframework.beans.factory.annotation.Autowired
+    ClaudeGarmentDetector(@Value("${thelooks.ai.model}") String model, @Value("${thelooks.ai.effort:low}") String effort) {
         this.model = model;
+        this.effort = OutputConfig.Effort.of(effort);
         this.client = AnthropicOkHttpClient.builder().fromEnv().timeout(Duration.ofSeconds(18)).maxRetries(0).build();
     }
 
@@ -82,7 +92,7 @@ class ClaudeGarmentDetector implements GarmentDetector {
                 .model(model)
                 .maxTokens(2500L)
                 .system(SYSTEM)
-                .outputConfig(Detections.class)
+                .outputConfig(StructuredOutputConfig.<Detections>builder().format(Detections.class).effort(effort).build())
                 .addUserMessageOfContentBlockParams(List.of(
                         ContentBlockParam.ofImage(Base64ImageSource.builder()
                                 .mediaType(Base64ImageSource.MediaType.IMAGE_JPEG)
