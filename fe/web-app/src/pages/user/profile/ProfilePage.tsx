@@ -9,7 +9,8 @@ import { session } from '../../../services/shared/session';
 import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { usePreferences } from '../../../hooks/user/outfit/api';
 import { ScrollReveal } from '../../../components/shared/home/HomeStory';
-import { profileRequests } from '../../../services/user/profile/requests';
+import { profileKey, profileRequests } from '../../../services/user/profile/requests';
+import { accountAvatarSource } from '../../../services/user/profile/avatar';
 import { clearProfileDraft, readProfileDraft, writeProfileDraft } from '../../../services/user/profile/draft';
 
 export function ProfilePage() {
