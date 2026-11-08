@@ -40,8 +40,11 @@ class WardrobeServiceTest {
 
     static final UUID USER = UUID.randomUUID();
 
-    final Map<UUID, ClothingItem> itemStore = new HashMap<>();
-    final Map<UUID, Scan> scanStore = new HashMap<>();
+    final Map<UUID, ClothingItem> itemStore = new java.util.concurrent.ConcurrentHashMap<>();
+    final Map<UUID, Scan> scanStore = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Mặc định chạy nền ngay trong luồng gọi; test song song thay bằng virtual thread. */
+    java.util.concurrent.Executor executor = Runnable::run;
+    GarmentDetector detector = (image, type) -> this.detections;
     final List<String> deletedImages = new ArrayList<>();
     Integer planLimit = null;
     List<DetectedGarment> detections = List.of(garment(Category.TOP, 0), garment(Category.BOTTOM, 0.5));
@@ -52,7 +55,7 @@ class WardrobeServiceTest {
     }
 
     final WardrobeService service = new WardrobeService(new ItemRepo(), new ScanRepo(),
-            (GarmentDetector) (image, type) -> detections,
+            (GarmentDetector) (image, type) -> detector.detect(image, type),
             new ImageCropper() {
                 @Override
                 public NormalizedImage normalize(byte[] image, String contentType) {
@@ -83,7 +86,7 @@ class WardrobeServiceTest {
                     deletedImages.add(key);
                 }
             },
-            () -> planLimit, Runnable::run, Clock.systemUTC());
+            () -> planLimit, r -> executor.execute(r), Clock.systemUTC());
 
     static List<UploadedImage> photos(int n) {
         return java.util.stream.IntStream.range(0, n).mapToObj(i -> new UploadedImage(new byte[] {9}, "image/jpeg")).toList();
@@ -232,6 +235,33 @@ class WardrobeServiceTest {
         service.deleteAll(USER, ids);
         assertThat(itemStore).isEmpty();
         assertThat(deletedImages).containsExactlyInAnyOrderElementsOf(scanned.stream().map(ClothingItem::imageKey).toList());
+    }
+
+    @Test
+    void scansAllPhotosOfAnUploadAtTheSameTime() throws Exception {
+        var allInFlight = new java.util.concurrent.CountDownLatch(3);
+        detector = (image, type) -> {
+            allInFlight.countDown();
+            try {
+                if (!allInFlight.await(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("ảnh bị quét lần lượt");
+                }
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+            return List.of(garment(Category.TOP, 0));
+        };
+        try (var pool = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+            executor = pool;
+            Scan scan = service.start(USER, List.of(new UploadedImage(new byte[] {1}, "image/jpeg"),
+                    new UploadedImage(new byte[] {2}, "image/jpeg"), new UploadedImage(new byte[] {3}, "image/jpeg")));
+            long deadline = System.nanoTime() + 10_000_000_000L;
+            while (scanStore.get(scan.id()).status() == ScanStatus.PROCESSING && System.nanoTime() < deadline) {
+                Thread.sleep(20);
+            }
+            assertThat(scanStore.get(scan.id()).status()).isEqualTo(ScanStatus.DONE);
+            assertThat(service.scan(USER, scan.id()).orElseThrow().items()).hasSize(3);
+        }
     }
 
     class ItemRepo implements ClothingItemRepository {

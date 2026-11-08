@@ -75,7 +75,7 @@ export function Badge({ children, tone }: { children: ReactNode; tone?: 'green' 
 }
 
 /** Ảnh món đồ; chưa có ảnh thì hiện biểu tượng theo loại đồ. */
-export function ItemTile({ category, imageUrl, label }: { category?: string; imageUrl?: string; label?: string }) {
+export function ItemTile({ category, imageUrl, label }: { category?: string; imageUrl?: string | null; label?: string }) {
   const name = label ?? categoryLabel(category);
   return (
     <div className="tile" title={name}>
