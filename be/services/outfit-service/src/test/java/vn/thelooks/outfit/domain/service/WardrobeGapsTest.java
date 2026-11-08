@@ -47,12 +47,12 @@ class WardrobeGapsTest {
 
     @Test
     void genderAndBudgetComeFromThePreferences() {
-        var female = new StylePreferences(Gender.FEMALE, java.util.Set.of(), Budget.LOW);
+        var female = new StylePreferences(Gender.FEMALE, java.util.Set.of(), Budget.LOW, null);
         var gap = WardrobeGaps.find(List.of(), Occasion.HANGOUT, female).orElseThrow();
         assertThat(gap.keyword()).isEqualTo("croptop");
         assertThat(gap.gender()).isEqualTo(Gender.FEMALE);
         assertThat(gap.budget()).isEqualTo(Budget.LOW);
         assertThat(WardrobeGaps.find(List.of(item("TOP")), Occasion.WORK,
-                new StylePreferences(Gender.MALE, null, null)).orElseThrow().keyword()).isEqualTo("baggy");
+                new StylePreferences(Gender.MALE, null, null, null)).orElseThrow().keyword()).isEqualTo("baggy");
     }
 }

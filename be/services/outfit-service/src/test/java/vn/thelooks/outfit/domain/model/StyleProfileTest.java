@@ -42,7 +42,7 @@ class StyleProfileTest {
 
     @Test
     void statedStylesPersonaliseANewUser() {
-        StyleProfile taste = StyleProfile.NONE.withStated(java.util.Set.of("streetwear"));
+        StyleProfile taste = StyleProfile.NONE.withStated(java.util.Set.of("streetwear"), Set.of());
         assertThat(taste.known()).isTrue();
         assertThat(taste.affinity(List.of(loudTop))).isGreaterThan(taste.affinity(List.of(minimalTee)));
         assertThat(taste.summary()).contains("streetwear");
@@ -50,9 +50,35 @@ class StyleProfileTest {
 
     @Test
     void learnedBehaviourWinsOverStatedStyles() {
-        StyleProfile taste = likesMinimalHatesRed().withStated(java.util.Set.of("minimal", "streetwear"));
+        StyleProfile taste = likesMinimalHatesRed().withStated(java.util.Set.of("minimal", "streetwear"), Set.of("red"));
         assertThat(taste.styles().get("minimal")).isEqualTo(1.0); // học được 1.0, không bị hạ xuống
         assertThat(taste.styles().get("streetwear")).isNegative(); // hay né thì không ghi đè
+        assertThat(taste.colors().get("red")).isNegative();
+    }
+
+    @Test
+    void twoNewUsersWithDifferentSurveyAnswersGetDifferentTopOutfits() {
+        var recommender = new OutfitRecommender();
+        var closet = List.of(item("TOP", "white", "minimal"), item("BOTTOM", "beige", "minimal"),
+                item("TOP", "black", "streetwear"), item("BOTTOM", "black", "streetwear"));
+        var now = Instant.parse("2026-11-08T00:00:00Z");
+        var minimalist = StyleProfile.NONE.withStated(Set.of("minimal"), Set.of("white", "beige"));
+        var street = StyleProfile.NONE.withStated(Set.of("streetwear"), Set.of("black"));
+
+        // cùng mặc hôm qua để điểm "lâu chưa mặc" như nhau (món chưa mặc lần nào đã đạt điểm tối đa)
+        Map<UUID, Instant> wornYesterday = new java.util.HashMap<>();
+        closet.forEach(i -> wornYesterday.put(i.id(), now.minusSeconds(86_400)));
+        var first = recommender.recommend(closet, wornYesterday, Map.of(), minimalist, null, now, Set.of(), 1).getFirst();
+        var second = recommender.recommend(closet, wornYesterday, Map.of(), street, null, now, Set.of(), 1).getFirst();
+        assertThat(first.items()).allMatch(i -> i.styleTags().contains("minimal"));
+        assertThat(second.items()).allMatch(i -> i.styleTags().contains("streetwear"));
+    }
+
+    @Test
+    void statedColorsAloneShapeTheTaste() {
+        var taste = StyleProfile.NONE.withStated(Set.of(), Set.of("white"));
+        assertThat(taste.affinity(List.of(minimalTee))).isGreaterThan(taste.affinity(List.of(loudTop)));
+        assertThat(taste.summary()).contains("màu white");
     }
 
     @Test
