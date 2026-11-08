@@ -18,7 +18,10 @@ import tools.jackson.databind.ObjectMapper;
 import vn.thelooks.wardrobe.application.port.out.GarmentDetector;
 import vn.thelooks.wardrobe.domain.model.DetectedGarment;
 
-/** Gemini vision is primary. An alternate Gemini model and Claude are tried on provider failure. */
+/**
+ * Chế độ auto: Claude nhận diện trước; Claude lỗi (hết credit, quá giới hạn, mất kết nối) hoặc không thấy món nào
+ * thì thử Gemini, rồi Gemini dự phòng.
+ */
 @Component
 @ConditionalOnProperty(name = "thelooks.ai.provider", havingValue = "auto", matchIfMissing = true)
 class GeminiGarmentDetector implements GarmentDetector {
@@ -30,6 +33,7 @@ class GeminiGarmentDetector implements GarmentDetector {
     private final String backup;
     private final GarmentDetector claude;
 
+    @org.springframework.beans.factory.annotation.Autowired
     GeminiGarmentDetector(ObjectMapper mapper, @Value("${GEMINI_API_KEY:}") String key,
             @Value("${thelooks.ai.gemini-model:gemini-3.5-flash-lite}") String primary,
             @Value("${thelooks.ai.gemini-backup-model:gemini-3.1-flash-lite}") String backup,
@@ -42,9 +46,26 @@ class GeminiGarmentDetector implements GarmentDetector {
         this.claude = claudeKey.isBlank() ? null : new ClaudeGarmentDetector(claudeModel);
     }
 
+    /** Cho test: thay Claude bằng bản giả. */
+    GeminiGarmentDetector(ObjectMapper mapper, String key, String primary, String backup, GarmentDetector claude) {
+        this.mapper = mapper;
+        this.key = key;
+        this.primary = primary;
+        this.backup = backup;
+        this.claude = claude;
+    }
+
     @Override
     public List<DetectedGarment> detect(byte[] image, String contentType) {
         RuntimeException last = new IllegalStateException("Cần GEMINI_API_KEY hoặc ANTHROPIC_API_KEY để nhận diện ảnh thật");
+        if (claude != null) try {
+            List<DetectedGarment> result = claude.detect(image, contentType);
+            if (!result.isEmpty()) return result;
+            last = new IllegalStateException("AI không nhận diện được món đồ trong ảnh");
+        } catch (RuntimeException ex) {
+            log.warn("Claude nhận diện ảnh lỗi, chuyển sang Gemini: {}", ex.getMessage());
+            last = ex;
+        }
         if (!key.isBlank()) for (String model : List.of(primary, backup)) {
             try {
                 List<DetectedGarment> result = call(model, image, contentType);
@@ -55,8 +76,6 @@ class GeminiGarmentDetector implements GarmentDetector {
                 last = new IllegalStateException("Gemini nhận diện ảnh thất bại", ex);
             }
         }
-        if (claude != null) try { return claude.detect(image, contentType); }
-        catch (RuntimeException ex) { log.warn("Claude garment fallback failed: {}", ex.getMessage()); last = ex; }
         throw last;
     }
 
