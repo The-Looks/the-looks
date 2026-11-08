@@ -71,7 +71,7 @@ export function StylePreferencesPage() {
       <PageHeader
         title="Phong cách của bạn"
         sub="Chọn giới tính, phong cách và màu yêu thích để cá nhân hóa gợi ý. Bạn có thể sửa lại trong hồ sơ bất cứ lúc nào."
-        back={onboarding ? { to: '/onboarding/welcome', label: 'Chọn linh vật' } : { to: '/profile', label: 'Cá nhân' }}
+        back={onboarding ? { to: '/onboarding/welcome', fixed: true } : { to: '/profile' }}
       />
       {current.isError && <Notice tone="error">{errorMessage(current.error)}</Notice>}
 

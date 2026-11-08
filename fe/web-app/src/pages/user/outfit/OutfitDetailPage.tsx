@@ -12,7 +12,7 @@ export function OutfitDetailPage() {
 
   return (
     <div className="stack-lg">
-      <PageHeader title="Chi tiết outfit" back={{ to: '/outfits', label: 'Outfit đã lưu' }} />
+      <PageHeader title="Chi tiết outfit" back={{ to: '/outfits' }} />
       {outfit.isPending && <Spinner />}
       {outfit.isError && <Notice tone="error">{errorMessage(outfit.error)}</Notice>}
       {outfit.data && (

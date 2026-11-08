@@ -1,7 +1,7 @@
 import { ArrowRightOutlined, HeartOutlined, LinkOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BackLink, Button, ButtonLink, Notice } from '../../../components/shared/ui/index';
+import { BackButton, Button, ButtonLink, Notice } from '../../../components/shared/ui/index';
 import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 
@@ -35,7 +35,7 @@ export function GuestLandingPage() {
     <div className="guest-landing">
       <PublicHeader page="friends" />
       <main>
-        <BackLink to="/">Về trang chủ</BackLink>
+        <BackButton />
         <section className="guest-landing-hero">
           <div>
             <span className="guest-kicker"><HeartOutlined /> LOOKSY / THE LOOKS</span>

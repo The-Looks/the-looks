@@ -1,9 +1,8 @@
-import type { LinkProps } from 'react-router-dom';
-import { BackLink, Brand } from '../../shared/ui/index';
+import { BackButton, Brand } from '../../shared/ui/index';
 
-export function AuthHeader({ to, label, state }: { to: string; label: string; state?: LinkProps['state'] }) {
+export function AuthHeader({ to, fixed, state }: { to: string; fixed?: boolean; state?: Record<string, unknown> }) {
   return <header className="auth-panel-header">
-    <BackLink to={to} state={state}>{label}</BackLink>
+    <BackButton to={to} fixed={fixed} state={state} />
     <Brand />
   </header>;
 }

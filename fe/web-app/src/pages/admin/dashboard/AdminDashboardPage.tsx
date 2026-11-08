@@ -380,6 +380,7 @@ export function AdminDashboardPage() {
       <button className="admin-collapse-button" type="button" aria-label={collapsed ? 'Mở rộng thanh điều hướng' : 'Thu gọn thanh điều hướng'} aria-controls="admin-sidebar" aria-expanded={!collapsed} onClick={() => setCollapsed((value) => !value)}>{collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</button>
       <button className="admin-menu-button" type="button" aria-label="Mở menu" aria-controls="admin-sidebar" aria-expanded={mobileNav} onClick={() => setMobileNav((value) => !value)}><MenuUnfoldOutlined /></button>
       <div className="admin-topbar-title"><span>Quản trị / {titles[view]}</span><BackLink to="/" className="admin-topbar-back" aria-label="Quay lại trang chủ">Quay lại<span className="admin-back-destination"> trang chủ</span></BackLink></div>
+      <div className="admin-topbar-title"><span>Quản trị / {titles[view]}</span><BackButton /></div>
     </div><div className="admin-topbar-actions">
       <button type="button" className="admin-notification-button" aria-label="Xem thông báo quản trị" onClick={() => choose('notifications')}><BellOutlined /></button>
       <button type="button" className="topbar-avatar-trigger admin-avatar-trigger" aria-label="Mở menu tài khoản" aria-controls="account-drawer" aria-expanded={accountOpen} onClick={() => setAccountOpen(true)}><Avatar className="user-avatar">{avatarLetter}</Avatar></button>

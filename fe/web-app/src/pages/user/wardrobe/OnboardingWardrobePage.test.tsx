@@ -52,7 +52,7 @@ it('offers retry on generation failure without resetting wardrobe progress', () 
 });
 it('returns to adding items when the backend cannot compose for the current weather', () => {
   ready(); mocks.quick.isSuccess = true; show('/onboarding/wardrobe?step=outfit');
-  fireEvent.click(screen.getAllByRole('button', { name: 'Thêm món khác' })[1]!);
+  fireEvent.click(screen.getByRole('button', { name: 'Thêm món khác' }));
   expect(screen.getByRole('progressbar')).toBeTruthy(); expect(screen.getByTestId('url').textContent).toBe('');
 });
 it('shows wardrobe failures and retries without sending a premature outfit request', () => {

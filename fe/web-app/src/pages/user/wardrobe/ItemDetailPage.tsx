@@ -53,7 +53,7 @@ export function ItemDetailPage() {
   }));
 
   return <div className="stack-lg">
-    <PageHeader title={categoryLabel(item.data?.category)} back={{ to: '/wardrobe', label: 'Tủ đồ' }} />
+    <PageHeader title={categoryLabel(item.data?.category)} back={{ to: '/wardrobe' }} />
     {item.isPending && <Spinner />}
     {item.isError && <Notice tone="error">{errorMessage(item.error)}</Notice>}
     {item.data && <Card>
