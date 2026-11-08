@@ -73,10 +73,10 @@ Thứ tự bắt buộc: **1.13 làm trước** (đổi CSS chung, tránh xung �
 
 | # | Người | Việc | Code | Hạn | Xong khi |
 |---|---|---|---|---|---|
-| 1.13 | Thạch | **Chữ & UI**: cỡ chữ gốc 16→17px, thang tiêu đề rõ hơn, chữ phụ đủ tương phản (WCAG AA ≥ 4.5:1), một màu highlight thống nhất. Chỉ sửa token trong `components/shared/theme/web-app.css` | FE | 13/11 | Mọi trang đọc rõ trên điện thoại, tương phản đạt AA |
-| 1.14 | Thạch | **Phong cách hình ảnh + linh vật**: chốt bộ màu/nét vẽ, dùng AI tạo 6 linh vật + 3–4 illustration (banner trang chủ, trang trống, chào đón) vào `fe/web-app/public/illustrations/`; làm lại banner trang chủ | FE + ảnh | 15/11 | Banner mới lên web; 6 linh vật sẵn cho Phát dùng |
+| 1.13 | Thạch | ~~**Chữ & UI**~~ (xong 08/11, PR #69) | | | |
+| 1.14 | Thạch | ~~**Phong cách hình ảnh + linh vật**~~ (xong 08/11, PR #69) | | | |
 | 2.15 | Tuấn | ~~**Khảo sát phong cách**~~ (xong 08/11): trắc nghiệm 5 câu quy ra phong cách + màu yêu thích (cộng điểm khi chấm outfit), ở `/onboarding` và `/profile/style`. Bỏ "dáng ôm/rộng" (món đồ chưa có dữ liệu dáng) và "dịp hay mặc" (người dùng chọn dịp mỗi lần gợi ý) | BE + FE + test | | |
-| 1.15 | Thạch | **Chào đón người mới**: lần đầu đăng nhập (chưa có sở thích, tủ trống) → 4 bước: chào + chọn linh vật → khảo sát 2.15 → thêm 3 món đầu (dùng lại onboarding tủ đồ) → outfit đầu tiên. Bỏ qua được, có thanh tiến trình | FE + test | 02/12 | Tài khoản mới đi hết 4 bước dưới 3 phút |
+| 1.15 | Thạch | ~~**Chào đón người mới**~~ (xong 08/11, PR #69) | | | |
 | 3.11 | Phát | **Hồ sơ: tên hiển thị + linh vật**: `user_profiles` thêm `display_name` (mặc định tên Google) và `mascot` (1 trong 6 mã của 1.14); `/api/app/me` trả 2 trường; header + trang Hồ sơ hiện tên, avatar, linh vật | BE + FE + test | 20/11 | Đổi tên, chọn linh vật → header đổi ngay |
 | 3.12 | Phát | **Lưu việc dang dở**: lưu trên trình duyệt (localStorage) trang đang làm + nháp (thêm món, tạo bình chọn, gợi ý outfit đang xem); quay lại thì khôi phục | FE + test | 27/11 | Đang tạo bình chọn, đóng tab, mở lại vẫn còn nháp |
 | 3.13 | Phát | **Chào người dùng cũ**: trang chủ "Chào {tên}" + linh vật, thẻ "Tiếp tục" ghép từ 3.12 và dữ liệu có sẵn (món chờ duyệt, bình chọn sắp hết hạn, lịch mặc hôm nay) | FE + test | 04/12 | Người cũ vào trang chủ thấy tên mình và 1–3 việc để làm tiếp |
