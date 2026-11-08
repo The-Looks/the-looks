@@ -107,7 +107,7 @@ export function ProfilePage() {
           {(profile.data?.username ?? me.data.username).slice(0, 1).toUpperCase()}</Avatar>
           <div><h2>{profile.data?.username ?? me.data.username}</h2><p className="muted">{me.data.email}</p>
             <p className="small muted">{profile.data?.city || 'Chưa chọn thành phố'} · Tham gia từ {formatDate(me.data.createdAt)}</p>
-            <ButtonLink to="/profile/mascot" kind="ghost" small>Tạo linh vật</ButtonLink></div></div>
+            <ButtonLink to="/profile/mascot" kind="ghost" small>Chọn hoặc tạo linh vật</ButtonLink></div></div>
         <div className="divider" />
         <div className="profile-stats"><div><SkinOutlined /><strong>{wardrobe.data?.length ?? '—'}</strong><small>Món đồ</small></div><div><AppstoreOutlined /><strong>{outfits.data?.length ?? '—'}</strong><small>Outfit</small></div><div><HeartOutlined /><strong>{polls.data?.length ?? '—'}</strong><small>Bình chọn</small></div></div>
       </Card>

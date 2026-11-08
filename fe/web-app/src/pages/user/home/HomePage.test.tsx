@@ -17,6 +17,7 @@ afterEach(() => { cleanup(); localStorage.clear(); });
 function showHome(userId: string, username: string) {
   const client = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity, retry: false } } });
   client.setQueryData(['me'], { id: userId, username });
+  client.setQueryData(['me', 'profile'], { username, hasAvatar: false, mascotId: userId === 'user-1' ? 'fox' : null });
   return render(<QueryClientProvider client={client}><MemoryRouter><HomePage /></MemoryRouter></QueryClientProvider>);
 }
 
@@ -24,6 +25,7 @@ it('greets the account by name and links its unfinished profile draft', async ()
   writeProfileDraft('user-1', 'Tên chưa lưu', 'Huế');
   showHome('user-1', 'An');
   expect(screen.getByRole('heading', { name: 'Chào An!' })).toBeTruthy();
+  expect(screen.getByRole('heading', { name: 'Chào An!' }).querySelector('svg image')?.getAttribute('href')).toBe('/illustrations/fox.svg');
   expect(await screen.findByRole('link', { name: 'Tiếp tục chỉnh sửa hồ sơ' })).toHaveProperty('href', expect.stringContaining('/profile'));
 });
 

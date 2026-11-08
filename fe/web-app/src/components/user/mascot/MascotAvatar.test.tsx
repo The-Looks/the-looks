@@ -3,7 +3,7 @@ import { afterEach, expect, it } from 'vitest';
 import type { Look } from '../../../services/user/onboarding/look';
 import { saveLook } from '../../../services/user/onboarding/progress';
 import { MascotAvatar } from './MascotAvatar';
-import { accountAvatar } from './accountAvatar';
+import { accountAvatar, accountLook } from './accountAvatar';
 
 afterEach(() => { cleanup(); localStorage.clear(); });
 
@@ -34,6 +34,13 @@ it('prefers the uploaded photo, otherwise shows the account mascot', () => {
   const { container } = render(<>{accountAvatar('lan', { ...uploaded, hasAvatar: false })}</>);
   expect(container.querySelector('svg')).not.toBeNull();
   expect(accountAvatar('other')).toBeFalsy();
+});
+
+it('uses the account mascot over an older browser choice and keeps matching accessories', () => {
+  saveLook('lan', { mascot: 'cat', hat: 'beret' });
+  expect(accountLook('lan', { username: 'Lan', hasAvatar: false, mascotId: 'panda' })).toEqual({ mascot: 'panda' });
+  saveLook('lan', { mascot: 'panda', hat: 'beret' });
+  expect(accountLook('lan', { username: 'Lan', hasAvatar: false, mascotId: 'panda' })).toEqual({ mascot: 'panda', hat: 'beret' });
 });
 
 it('draws a dressable mascot in code and names its clothes', () => {

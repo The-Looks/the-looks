@@ -430,6 +430,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/me/profile/mascot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Chọn linh vật đại diện của tài khoản hiện tại */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        mascotId: "cat" | "fox" | "rabbit" | "bear" | "frog" | "penguin" | "dog" | "panda" | "tiger" | "koala" | "pig" | "duck" | "hamster" | "raccoon" | "lion" | "monkey";
+                    };
+                };
+            };
+            responses: {
+                /** @description Đã cập nhật */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["UserProfile"];
+                    };
+                };
+                400: components["responses"]["Problem"];
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/app/me/avatar": {
         parameters: {
             query?: never;
@@ -1274,6 +1318,8 @@ export interface components {
             hasAvatar: boolean;
             /** Format: date-time */
             avatarUpdatedAt?: string | null;
+            /** @enum {string|null} */
+            mascotId?: "cat" | "fox" | "rabbit" | "bear" | "frog" | "penguin" | "dog" | "panda" | "tiger" | "koala" | "pig" | "duck" | "hamster" | "raccoon" | "lion" | "monkey" | null;
         };
         DailyCount: {
             /** Format: date */

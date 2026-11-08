@@ -6,6 +6,7 @@ import vn.thelooks.auth.domain.model.UserProfile;
 public interface ManageProfileUseCase {
     UserProfile get(UUID userId);
     UserProfile update(UUID userId, String username, String city);
+    UserProfile selectMascot(UUID userId, String mascotId);
     UserProfile uploadAvatar(UUID userId, byte[] bytes);
     UserProfile removeAvatar(UUID userId);
     Avatar avatar(UUID userId);

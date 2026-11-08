@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.UUID;
 import java.util.Base64;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import vn.thelooks.auth.application.port.out.UserProfileRepositoryPort;
@@ -20,6 +20,17 @@ class ManageProfileServiceTest {
         UUID userId = UUID.randomUUID();
         service.update(userId, "  Lan  ", "  Hà Nội  ");
         verify(profiles).update(userId, "Lan", "Hà Nội");
+    }
+
+    @Test
+    void acceptsOnlyKnownMascots() {
+        UUID userId = UUID.randomUUID();
+        service.selectMascot(userId, "fox");
+        verify(profiles).selectMascot(userId, "fox");
+        service.selectMascot(userId, "panda");
+        verify(profiles).selectMascot(userId, "panda");
+        assertEquals(400, assertThrows(ResponseStatusException.class,
+                () -> service.selectMascot(userId, "unknown")).getStatusCode().value());
     }
 
     @Test

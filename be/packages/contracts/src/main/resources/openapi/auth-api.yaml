@@ -150,6 +150,21 @@ paths:
       responses:
         '200': { description: Đã cập nhật, content: { application/json: { schema: { $ref: '#/components/schemas/UserProfile' } } } }
         '400': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/me/profile/mascot:
+    put:
+      summary: Chọn linh vật đại diện của tài khoản hiện tại
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mascotId]
+              properties:
+                mascotId: { type: string, enum: [cat, fox, rabbit, bear, frog, penguin, dog, panda, tiger, koala, pig, duck, hamster, raccoon, lion, monkey] }
+      responses:
+        '200': { description: Đã cập nhật, content: { application/json: { schema: { $ref: '#/components/schemas/UserProfile' } } } }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
   /api/app/me/avatar:
     get:
       summary: Ảnh đại diện của tài khoản hiện tại
@@ -339,6 +354,7 @@ components:
         city: { type: [string, 'null'] }
         hasAvatar: { type: boolean }
         avatarUpdatedAt: { type: [string, 'null'], format: date-time }
+        mascotId: { type: [string, 'null'], enum: [cat, fox, rabbit, bear, frog, penguin, dog, panda, tiger, koala, pig, duck, hamster, raccoon, lion, monkey, null] }
     DailyCount:
       type: object
       required: [date, count]

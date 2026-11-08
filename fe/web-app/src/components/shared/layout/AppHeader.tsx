@@ -32,6 +32,7 @@ export function AppHeader({
   publicPreview,
   avatarLetter,
   avatarSrc,
+  accountName,
   menuOpen,
   onOpenMenu,
 }: {
@@ -39,6 +40,7 @@ export function AppHeader({
   publicPreview: boolean;
   avatarLetter: string;
   avatarSrc?: ReactNode;
+  accountName?: string;
   menuOpen: boolean;
   onOpenMenu: () => void;
 }) {
@@ -60,8 +62,9 @@ export function AppHeader({
         />
         <Tooltip title="Thông báo"><Link to="/notifications" className="topbar-icon" aria-label="Thông báo"><Badge dot><BellOutlined /></Badge></Link></Tooltip>
       </>}
-      <button className="topbar-avatar-trigger" type="button" aria-label="Mở menu tài khoản" aria-expanded={menuOpen} aria-controls="account-drawer" onClick={onOpenMenu}>
+      <button className={`topbar-avatar-trigger${accountName ? ' with-name' : ''}`} type="button" aria-label="Mở menu tài khoản" aria-expanded={menuOpen} aria-controls="account-drawer" onClick={onOpenMenu}>
         <Avatar className="user-avatar" src={avatarSrc} alt="">{avatarLetter}</Avatar>
+        {accountName && <span className="topbar-account-name">{accountName}</span>}
       </button>
     </div>
   </header>;

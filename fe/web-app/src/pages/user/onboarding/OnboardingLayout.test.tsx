@@ -1,10 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { authRequests } from '../../../services/guest/auth/requests';
 import type { StylePreferences, WardrobeItem } from '../../../interface/dto/types';
 import { readOnboarding, updateOnboarding } from '../../../services/user/onboarding/progress';
+import { profileRequests } from '../../../services/user/profile/requests';
 import { MascotPage } from './MascotPage';
 import { OnboardingEntry, OnboardingLayout } from './OnboardingLayout';
 
@@ -12,6 +13,10 @@ const mock = vi.hoisted(() => ({ preferences: {} as StylePreferences, items: [] 
 vi.mock('../../../hooks/user/outfit/api', () => ({ usePreferences: () => ({ data: mock.preferences }) }));
 vi.mock('../../../hooks/user/wardrobe/api', () => ({ useWardrobe: () => ({ data: mock.items }) }));
 vi.mock('../../../services/guest/auth/requests', () => ({ authRequests: { me: vi.fn() } }));
+vi.mock('../../../services/user/profile/requests', () => ({
+  profileKey: ['me', 'profile'],
+  profileRequests: { get: vi.fn(), selectMascot: vi.fn() },
+}));
 
 const account = {
   id: 'new-user', username: 'Lan', email: 'lan@example.test',
@@ -38,6 +43,8 @@ function renderFlow(pathname = '/onboarding/check') {
 
 beforeEach(() => {
   vi.mocked(authRequests.me).mockResolvedValue(account);
+  vi.mocked(profileRequests.get).mockResolvedValue({ username: 'Lan', hasAvatar: false });
+  vi.mocked(profileRequests.selectMascot).mockImplementation(async (mascotId) => ({ username: 'Lan', hasAvatar: false, mascotId }));
   vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
   mock.preferences = {};
   mock.items = [];
@@ -57,9 +64,10 @@ it('welcomes an empty account, saves the dressed-up mascot, and advances to the 
   fireEvent.click(screen.getByRole('button', { name: 'Mũ len' }));
   expect(screen.getByRole('button', { name: 'Mũ len' }).getAttribute('aria-pressed')).toBe('true');
   fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục đến khảo sát' }));
+  await screen.findByRole('heading', { name: 'Khảo sát phong cách' });
   expect(readOnboarding(account.id).mascot).toBe('fox');
   expect(readOnboarding(account.id).look).toEqual(expect.objectContaining({ mascot: 'fox', hat: 'beanie' }));
-  await screen.findByRole('heading', { name: 'Khảo sát phong cách' });
+  expect(profileRequests.selectMascot).toHaveBeenCalledWith('fox');
   expect(screen.getByText('Phong cách', { selector: 'li' }).getAttribute('aria-current')).toBe('step');
   expect(readOnboarding('different-user').mascot).toBeUndefined();
 
@@ -72,6 +80,15 @@ it('restores the previous selection on return to the welcome step', async () => 
   updateOnboarding(account.id, { mascot: 'rabbit' });
   renderFlow('/onboarding/welcome');
   expect((await screen.findByRole('button', { name: 'Thỏ Nơ · Nữ tính' })).getAttribute('aria-pressed')).toBe('true');
+});
+
+it('uses the saved account mascot over an older browser choice', async () => {
+  updateOnboarding(account.id, { mascot: 'rabbit' });
+  vi.mocked(profileRequests.get).mockResolvedValue({ username: 'Lan', hasAvatar: false, mascotId: 'fox' });
+  renderFlow('/onboarding/welcome');
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Cáo Phố · Streetwear' }).getAttribute('aria-pressed')).toBe('true'));
+  fireEvent.click(screen.getByRole('button', { name: 'Mèo Mây · Tối giản' }));
+  expect(screen.getByRole('button', { name: 'Mèo Mây · Tối giản' }).getAttribute('aria-pressed')).toBe('true');
 });
 
 it.each(['preferences', 'items', 'skipped', 'admin'] as const)('preserves the destination for an account with %s', async (reason) => {

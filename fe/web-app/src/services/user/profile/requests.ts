@@ -1,6 +1,7 @@
 import type { components } from '../../../interface/dto/guest/auth/auth';
 import { ApiError, authApi, unwrap } from '../../shared/api/client';
 import { session } from '../../shared/session';
+import type { MascotId } from '../onboarding/mascots';
 
 export type UserProfile = components['schemas']['UserProfile'];
 export const profileKey = ['me', 'profile'] as const;
@@ -9,6 +10,8 @@ export const profileRequests = {
   get: () => unwrap(authApi.GET('/api/app/me/profile')),
   update: (username: string, city: string) =>
     unwrap(authApi.PUT('/api/app/me/profile', { body: { username, city: city.trim() || null } })),
+  selectMascot: (mascotId: MascotId) =>
+    unwrap(authApi.PUT('/api/app/me/profile/mascot', { body: { mascotId } })),
   removeAvatar: () => unwrap(authApi.DELETE('/api/app/me/avatar')),
   async uploadAvatar(file: File): Promise<UserProfile> {
     if (file.size > 2 * 1024 * 1024) throw new ApiError(413, 'Ảnh đại diện phải nhỏ hơn 2 MB.');

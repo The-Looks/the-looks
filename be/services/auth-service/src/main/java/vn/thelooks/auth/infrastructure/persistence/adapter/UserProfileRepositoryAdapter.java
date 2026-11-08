@@ -17,10 +17,10 @@ class UserProfileRepositoryAdapter implements UserProfileRepositoryPort {
 
     public UserProfile get(UUID userId) {
         return jdbc.query("""
-                SELECT u.username, p.city, p.avatar_content_type, p.avatar_updated_at
+                SELECT u.username, p.city, p.avatar_content_type, p.avatar_updated_at, p.mascot_id
                 FROM users u LEFT JOIN user_profiles p ON p.user_id=u.id WHERE u.id=? AND u.status='ACTIVE'
                 """, (rs, row) -> new UserProfile(rs.getString(1), rs.getString(2), rs.getString(3) != null,
-                rs.getTimestamp(4) == null ? null : rs.getTimestamp(4).toInstant()), userId)
+                rs.getTimestamp(4) == null ? null : rs.getTimestamp(4).toInstant(), rs.getString(5)), userId)
                 .stream().findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tài khoản không tồn tại"));
     }
 
@@ -32,6 +32,16 @@ class UserProfileRepositoryAdapter implements UserProfileRepositoryPort {
                 INSERT INTO user_profiles(user_id,city) VALUES (?,?)
                 ON CONFLICT (user_id) DO UPDATE SET city=EXCLUDED.city,updated_at=now()
                 """, userId, city);
+        return get(userId);
+    }
+
+    @Transactional
+    public UserProfile selectMascot(UUID userId, String mascotId) {
+        get(userId);
+        jdbc.update("""
+                INSERT INTO user_profiles(user_id,mascot_id) VALUES (?,?)
+                ON CONFLICT (user_id) DO UPDATE SET mascot_id=EXCLUDED.mascot_id,updated_at=now()
+                """, userId, mascotId);
         return get(userId);
     }
 
