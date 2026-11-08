@@ -202,6 +202,38 @@ class WardrobeServiceTest {
         assertThat(service.confirmAll(USER, List.of(entry)).getFirst().status()).isEqualTo(ItemStatus.CONFIRMED);
     }
 
+    @Test
+    void archivesSellsAndRestoresManyItemsAtOnce() {
+        var scanned = service.scan(USER, service.start(USER, photos(1)).id()).orElseThrow().items();
+        var ids = scanned.stream().map(ClothingItem::id).toList();
+        assertThatThrownBy(() -> service.changeStatus(USER, ids, ItemStatus.ARCHIVED))
+                .isInstanceOf(InvalidItemStateException.class); // chưa xác nhận
+        service.confirmAll(USER, scanned.stream().map(i -> new Confirmation(i.id(), i.attributes())).toList());
+
+        assertThat(service.changeStatus(USER, ids, ItemStatus.ARCHIVED)).allMatch(i -> i.status() == ItemStatus.ARCHIVED);
+        service.changeStatus(USER, List.of(ids.get(0)), ItemStatus.SOLD);
+        assertThat(itemStore.get(ids.get(0)).status()).isEqualTo(ItemStatus.SOLD);
+        service.changeStatus(USER, ids, ItemStatus.CONFIRMED);
+        assertThat(itemStore.values()).allMatch(i -> i.status() == ItemStatus.CONFIRMED);
+
+        assertThatThrownBy(() -> service.changeStatus(USER, ids, ItemStatus.PENDING_REVIEW)).isInstanceOf(InvalidItemStateException.class);
+        assertThatThrownBy(() -> service.changeStatus(USER, List.of(ids.get(0), ids.get(0)), ItemStatus.SOLD)).isInstanceOf(InvalidItemStateException.class);
+        assertThatThrownBy(() -> service.changeStatus(USER, List.of(ids.get(0), UUID.randomUUID()), ItemStatus.SOLD))
+                .isInstanceOf(ClothingItemNotFoundException.class);
+        assertThat(itemStore.get(ids.get(0)).status()).isEqualTo(ItemStatus.CONFIRMED); // không đổi một phần
+    }
+
+    @Test
+    void deletesManyItemsWithTheirImagesButNotOtherPeoplesItems() {
+        var scanned = service.scan(USER, service.start(USER, photos(1)).id()).orElseThrow().items();
+        var ids = scanned.stream().map(ClothingItem::id).toList();
+        assertThatThrownBy(() -> service.deleteAll(UUID.randomUUID(), ids)).isInstanceOf(ClothingItemNotFoundException.class);
+        assertThat(itemStore).hasSize(2);
+        service.deleteAll(USER, ids);
+        assertThat(itemStore).isEmpty();
+        assertThat(deletedImages).containsExactlyInAnyOrderElementsOf(scanned.stream().map(ClothingItem::imageKey).toList());
+    }
+
     class ItemRepo implements ClothingItemRepository {
         public ClothingItem save(ClothingItem item) { itemStore.put(item.id(), item); return item; }
         public Optional<ClothingItem> findById(UUID id) { return Optional.ofNullable(itemStore.get(id)); }

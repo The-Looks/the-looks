@@ -211,6 +211,40 @@ paths:
               schema: { $ref: '#/components/schemas/WardrobeItem' }
         '404': { $ref: 'common.yaml#/components/responses/Problem' }
 
+  /api/app/wardrobe/items/batch:
+    patch:
+      summary: Cất đi / đánh dấu đã bán / đưa lại vào tủ nhiều món (1..100)
+      description: >
+        Chỉ món đã xác nhận (CONFIRMED, ARCHIVED, SOLD) và chỉ chuyển sang một trong ba trạng thái đó.
+        Một món lỗi thì không món nào bị đổi. Món ARCHIVED / SOLD không vào gợi ý outfit và bị ẩn khỏi tủ đồ
+        khi không lọc theo trạng thái; SOLD không tính vào giới hạn số món của gói.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BatchItemsRequest' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/WardrobeItem' } }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+        '409': { $ref: 'common.yaml#/components/responses/Problem' }
+  /api/app/wardrobe/items/batch-delete:
+    post:
+      summary: Xoá nhiều món và ảnh của chúng (1..100); một món không tìm thấy thì không xoá món nào
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BatchItemsRequest' }
+      responses:
+        '204': { description: Đã xoá }
+        '400': { $ref: 'common.yaml#/components/responses/Problem' }
+        '404': { $ref: 'common.yaml#/components/responses/Problem' }
+
   /api/admin/wardrobe/status:
     get:
       summary: (ADMIN) Trạng thái cấu hình AI và lưu ảnh, không trả về khóa bí mật
@@ -295,7 +329,13 @@ components:
         total: { type: integer, format: int64 }
         page: { type: integer }
         size: { type: integer }
-    ItemStatus: { type: string, enum: [PROCESSING, PENDING_REVIEW, CONFIRMED, RECOGNITION_FAILED] }
+    ItemStatus: { type: string, enum: [PROCESSING, PENDING_REVIEW, CONFIRMED, RECOGNITION_FAILED, ARCHIVED, SOLD] }
+    BatchItemsRequest:
+      type: object
+      required: [itemIds]
+      properties:
+        itemIds: { type: array, minItems: 1, maxItems: 100, items: { type: string, format: uuid } }
+        status: { $ref: '#/components/schemas/ItemStatus', description: 'Bắt buộc khi đổi trạng thái: CONFIRMED, ARCHIVED hoặc SOLD' }
     Category: { type: string, enum: [TOP, BOTTOM, DRESS, OUTERWEAR, SHOES, BAG, ACCESSORY] }
     Season: { type: string, enum: [SPRING, SUMMER, AUTUMN, WINTER] }
     ConfirmItemsRequest:

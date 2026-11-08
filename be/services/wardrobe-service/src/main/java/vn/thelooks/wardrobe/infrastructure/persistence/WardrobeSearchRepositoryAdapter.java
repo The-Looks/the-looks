@@ -22,6 +22,7 @@ class WardrobeSearchRepositoryAdapter implements WardrobeSearchRepository {
         var params = new java.util.HashMap<String, Object>();
         params.put("owner", ownerId);
         if (filter.status() != null) { where.append(" and i.status = :status"); params.put("status", filter.status().name()); }
+        else where.append(" and i.status not in ('ARCHIVED', 'SOLD')"); // mặc định chỉ hiện món còn trong tủ
         if (filter.category() != null) { where.append(" and i.category = :category"); params.put("category", filter.category().name()); }
         if (filter.color() != null) { where.append(" and :color = any(string_to_array(lower(i.colors), ','))"); params.put("color", filter.color().toLowerCase(Locale.ROOT)); }
         if (filter.season() != null) { where.append(" and (i.seasons = '' or :season = any(string_to_array(i.seasons, ',')))"); params.put("season", filter.season().name()); }

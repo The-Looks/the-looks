@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import vn.thelooks.security.CurrentUser;
 import vn.thelooks.wardrobe.api.dto.AttributesRequest;
+import vn.thelooks.wardrobe.api.dto.BatchItemsRequest;
 import vn.thelooks.wardrobe.api.dto.ConfirmItemsRequest;
 import vn.thelooks.wardrobe.api.dto.ItemResponse;
 import vn.thelooks.wardrobe.api.dto.ScanResponse;
@@ -34,6 +36,7 @@ import vn.thelooks.wardrobe.application.port.out.ImageStorage;
 import vn.thelooks.wardrobe.application.usecase.DeleteClothingItemUseCase;
 import vn.thelooks.wardrobe.application.usecase.GetScanQuery;
 import vn.thelooks.wardrobe.application.usecase.GetWardrobeQuery;
+import vn.thelooks.wardrobe.application.usecase.ManageItemsInBulkUseCase;
 import vn.thelooks.wardrobe.application.usecase.ReviewClothingItemUseCase;
 import vn.thelooks.wardrobe.application.usecase.ScanClothingUseCase;
 import vn.thelooks.wardrobe.application.usecase.ScanClothingUseCase.UploadedImage;
@@ -56,15 +59,18 @@ class WardrobeController {
     private final GetWardrobeQuery wardrobe;
     private final ReviewClothingItemUseCase review;
     private final DeleteClothingItemUseCase delete;
+    private final ManageItemsInBulkUseCase bulk;
     private final ImageStorage storage;
 
     WardrobeController(ScanClothingUseCase scan, GetScanQuery scans, GetWardrobeQuery wardrobe,
-            ReviewClothingItemUseCase review, DeleteClothingItemUseCase delete, ImageStorage storage) {
+            ReviewClothingItemUseCase review, DeleteClothingItemUseCase delete, ManageItemsInBulkUseCase bulk,
+            ImageStorage storage) {
         this.scan = scan;
         this.scans = scans;
         this.wardrobe = wardrobe;
         this.review = review;
         this.delete = delete;
+        this.bulk = bulk;
         this.storage = storage;
     }
 
@@ -121,6 +127,17 @@ class WardrobeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void remove(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID itemId) {
         delete.delete(CurrentUser.id(jwt), itemId);
+    }
+
+    @PatchMapping("/items/batch")
+    List<ItemResponse> changeStatus(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody BatchItemsRequest body) {
+        return bulk.changeStatus(CurrentUser.id(jwt), body.itemIds(), body.status()).stream().map(this::response).toList();
+    }
+
+    @PostMapping("/items/batch-delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void removeAll(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody BatchItemsRequest body) {
+        bulk.deleteAll(CurrentUser.id(jwt), body.itemIds());
     }
 
     private ItemResponse response(ClothingItem item) {

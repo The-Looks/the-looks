@@ -12,11 +12,12 @@ public interface ClothingItemRepository {
 
     Optional<ClothingItem> findById(UUID id);
 
+    /** status null = mọi món còn trong tủ (trừ ARCHIVED, SOLD). */
     List<ClothingItem> findByOwner(UUID ownerId, ItemStatus status);
 
     void deleteById(UUID id);
 
-    /** Số món đang có (mọi trạng thái trừ RECOGNITION_FAILED), để so với giới hạn của gói. */
+    /** Số món đang có (mọi trạng thái trừ RECOGNITION_FAILED và SOLD), để so với giới hạn của gói. */
     long countByOwner(UUID ownerId);
 
     List<ClothingItem> findByScan(UUID scanId);

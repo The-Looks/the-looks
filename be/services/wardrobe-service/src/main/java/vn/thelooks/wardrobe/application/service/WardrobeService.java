@@ -27,6 +27,7 @@ import vn.thelooks.wardrobe.application.port.out.ScanRepository;
 import vn.thelooks.wardrobe.application.usecase.DeleteClothingItemUseCase;
 import vn.thelooks.wardrobe.application.usecase.GetScanQuery;
 import vn.thelooks.wardrobe.application.usecase.GetWardrobeQuery;
+import vn.thelooks.wardrobe.application.usecase.ManageItemsInBulkUseCase;
 import vn.thelooks.wardrobe.application.usecase.ReviewClothingItemUseCase;
 import vn.thelooks.wardrobe.application.usecase.ScanClothingUseCase;
 import vn.thelooks.wardrobe.domain.exception.ClothingItemNotFoundException;
@@ -43,7 +44,7 @@ import vn.thelooks.wardrobe.domain.service.GarmentSelection;
 
 @Service
 class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQuery, ReviewClothingItemUseCase,
-        DeleteClothingItemUseCase {
+        DeleteClothingItemUseCase, ManageItemsInBulkUseCase {
 
     private static final Logger log = LoggerFactory.getLogger(WardrobeService.class);
     static final Set<String> ACCEPTED_TYPES = Set.of("image/jpeg", "image/png");
@@ -212,6 +213,41 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
         } catch (RuntimeException e) {
             log.warn("Không xoá được ảnh {}: {}", item.imageKey(), e.toString()); // món đã xoá, ảnh dọn sau
         }
+    }
+
+    @Override
+    @Transactional
+    public List<ClothingItem> changeStatus(UUID ownerId, List<UUID> itemIds, ItemStatus status) {
+        if (status == null || !ItemStatus.OWNED.contains(status)) {
+            throw new InvalidItemStateException("Chỉ chuyển được sang: trong tủ, cất đi, đã bán");
+        }
+        List<ClothingItem> selected = ownedBatch(ownerId, itemIds);
+        if (selected.stream().anyMatch(i -> !ItemStatus.OWNED.contains(i.status()))) {
+            throw new InvalidItemStateException("Có món chưa xác nhận. Xác nhận món đồ trước khi cất đi hoặc đánh dấu đã bán.");
+        }
+        return selected.stream().map(i -> items.save(i.withStatus(status, i.attributes()))).toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteAll(UUID ownerId, List<UUID> itemIds) {
+        List<ClothingItem> selected = ownedBatch(ownerId, itemIds);
+        selected.forEach(i -> items.deleteById(i.id()));
+        for (ClothingItem i : selected) {
+            try {
+                storage.delete(i.imageKey());
+            } catch (RuntimeException e) {
+                log.warn("Không xoá được ảnh {}: {}", i.imageKey(), e.toString()); // món đã xoá, ảnh dọn sau
+            }
+        }
+    }
+
+    private List<ClothingItem> ownedBatch(UUID ownerId, List<UUID> itemIds) {
+        Set<UUID> distinct = itemIds == null ? Set.of() : new HashSet<>(itemIds);
+        if (distinct.isEmpty() || itemIds.size() > MAX_ITEMS || distinct.contains(null) || distinct.size() != itemIds.size()) {
+            throw new InvalidItemStateException("Chọn từ 1 đến 100 món, không trùng nhau");
+        }
+        return itemIds.stream().map(id -> owned(ownerId, id)).toList();
     }
 
     private ClothingItem owned(UUID ownerId, UUID itemId) {

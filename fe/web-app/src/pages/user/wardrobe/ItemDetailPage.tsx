@@ -5,7 +5,7 @@ import type { ClothingAttributes } from '../../../interface/dto/types';
 import { CATEGORY_LABEL, categoryLabel } from '../../../services/shared/labels';
 import { Button, Card, Chip, Field, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { CostPerWearSection } from '../../../components/user/wardrobe/CostPerWearSection';
-import { useConfirm, useDelete, useItem, useUpdateItem } from '../../../hooks/user/wardrobe/api';
+import { useChangeStatus, useConfirm, useDelete, useItem, useUpdateItem } from '../../../hooks/user/wardrobe/api';
 
 type Season = NonNullable<ClothingAttributes['seasons']>[number];
 const SEASONS: { value: Season; label: string }[] = [
@@ -21,6 +21,8 @@ export function ItemDetailPage() {
   const confirm = useConfirm(id);
   const update = useUpdateItem(id);
   const remove = useDelete();
+  const status = useChangeStatus();
+  const move = (to: 'CONFIRMED' | 'ARCHIVED' | 'SOLD') => status.mutate({ itemIds: [id], status: to });
   const [form, setForm] = useState<ClothingAttributes>({});
   const [colors, setColors] = useState('');
   const [styles, setStyles] = useState('');
@@ -80,11 +82,18 @@ export function ItemDetailPage() {
         {(item.data.status === 'PENDING_REVIEW' || item.data.status === 'RECOGNITION_FAILED') && <label className="row"><input type="checkbox" checked={reviewed} onChange={(event) => setReviewed(event.target.checked)} /> Tôi đã kiểm tra ảnh và toàn bộ thông tin của món đồ.</label>}
       </div>}
       {(confirm.isSuccess || update.isSuccess) && <Notice>Đã lưu thông tin món đồ.</Notice>}
-      {(confirm.isError || update.isError || remove.isError) && <Notice tone="error">{errorMessage(confirm.error ?? update.error ?? remove.error)}</Notice>}
+      {(confirm.isError || update.isError || remove.isError || status.isError) && <Notice tone="error">{errorMessage(confirm.error ?? update.error ?? remove.error ?? status.error)}</Notice>}
+      {item.data.status === 'ARCHIVED' && <Notice>Món này đang cất đi, không được gợi ý khi phối đồ.</Notice>}
+      {item.data.status === 'SOLD' && <Notice>Món này đã bán, không được gợi ý khi phối đồ và không tính vào giới hạn tủ đồ.</Notice>}
       <div className="row">
         {(item.data.status === 'PENDING_REVIEW' || item.data.status === 'RECOGNITION_FAILED' || item.data.status === 'CONFIRMED') && <Button onClick={save} disabled={invalidPrice || confirm.isPending || update.isPending || !form.category || (item.data.status !== 'CONFIRMED' && !reviewed)}>
           {confirm.isPending || update.isPending ? 'Đang lưu…' : item.data.status === 'CONFIRMED' ? 'Lưu thay đổi' : 'Xác nhận món đồ'}
         </Button>}
+        {item.data.status === 'CONFIRMED' && <>
+          <Button kind="outline" onClick={() => move('ARCHIVED')} disabled={status.isPending}>Cất đi</Button>
+          <Button kind="outline" onClick={() => move('SOLD')} disabled={status.isPending}>Đã bán</Button>
+        </>}
+        {(item.data.status === 'ARCHIVED' || item.data.status === 'SOLD') && <Button onClick={() => move('CONFIRMED')} disabled={status.isPending}>Đưa lại vào tủ</Button>}
         <Button kind="outline" onClick={() => remove.mutate(id, { onSuccess: () => navigate('/wardrobe') })} disabled={remove.isPending}>Xoá món này</Button>
       </div>
     </Card>}
