@@ -38,10 +38,13 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   2. Render → `thelooks-wardrobe` và `thelooks-outfit` → Environment: `GEMINI_API_KEY` (chung một key), `AI_PROVIDER=auto`.
   3. Kiểm tra tên model trong `thelooks.ai.gemini-model` / `gemini-backup-model` còn đúng với danh sách model của Google;
      sai tên thì mọi lần gọi lỗi rồi mới chuyển sang Claude (chậm thêm vài giây).
-- [ ] **Anthropic (AI dự phòng khi Gemini lỗi)** · Tuấn · tuỳ chọn
-  1. Tạo key ở https://console.anthropic.com → API Keys. Đặt **giới hạn chi tiêu tháng** ngay trong console.
-  2. Biến môi trường outfit-service: `AI_PROVIDER=claude`, `ANTHROPIC_API_KEY=...`
-     (model mặc định `claude-haiku-5-5`; ngân sách app tự giới hạn bằng `AI_MONTHLY_BUDGET_USD`, mặc định 25).
+- [ ] **Claude làm AI chính (nhanh hơn Gemini)** · Tuấn
+  1. Tạo key ở https://console.anthropic.com → API Keys, **nạp credit** (Plans & Billing) và đặt **giới hạn chi tiêu tháng**.
+  2. Render → **cả** `thelooks-outfit` **và** `thelooks-wardrobe` → Environment, kiểm tra tận mắt (sửa `render.yaml`
+     không tự đổi biến của service đã tạo): `AI_PROVIDER` = `claude` (không phải `auto`), `ANTHROPIC_API_KEY` = key → Save.
+  3. Tuỳ chọn: `AI_MODEL` (mặc định `claude-haiku-5-5`, nhanh nhất; `claude-sonnet-5-5` kỹ hơn nhưng chậm và đắt hơn ~20 lần),
+     `AI_EFFORT` (mặc định `low` = nhanh nhất; `medium` / `high` chậm hơn). Ngân sách app: `AI_MONTHLY_BUDGET_USD`, mặc định 25.
+  4. Kiểm tra: trang Admin → Trạng thái hệ thống phải ghi AI = `claude`.
 - [ ] **PayOS (thanh toán gói, nhóm đã chốt 05/11)** · Tuấn · trước khi bán gói thật
   1. Đăng ký https://my.payos.vn bằng tài khoản ngân hàng của nhóm, tạo kênh thanh toán.
   2. Render → Blueprint → **Manual Sync** để tạo `thelooks-billing`, điền: `DB_URL` (database `thelooks_billing`), `DB_PASSWORD`,
