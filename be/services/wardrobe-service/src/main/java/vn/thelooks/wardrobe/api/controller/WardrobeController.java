@@ -43,6 +43,7 @@ import vn.thelooks.wardrobe.application.usecase.ScanClothingUseCase.UploadedImag
 import vn.thelooks.wardrobe.domain.exception.ClothingItemNotFoundException;
 import vn.thelooks.wardrobe.domain.exception.InvalidImageException;
 import vn.thelooks.wardrobe.domain.exception.InvalidItemStateException;
+import vn.thelooks.wardrobe.domain.exception.ScanLimitException;
 import vn.thelooks.wardrobe.domain.exception.WardrobeFullException;
 import vn.thelooks.wardrobe.domain.model.Category;
 import vn.thelooks.wardrobe.domain.model.ClothingItem;
@@ -156,6 +157,11 @@ class WardrobeController {
     @ExceptionHandler(InvalidImageException.class)
     ProblemDetail badImage(InvalidImageException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(ScanLimitException.class)
+    ProblemDetail tooManyScans(ScanLimitException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, e.getMessage());
     }
 
     @ExceptionHandler(WardrobeFullException.class)

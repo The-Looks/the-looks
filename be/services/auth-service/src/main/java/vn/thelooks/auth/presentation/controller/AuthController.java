@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vn.thelooks.auth.application.port.out.UserPersistencePort;
 import vn.thelooks.auth.application.port.out.RefreshTokenSessionStore;
+import vn.thelooks.auth.domain.exception.InvalidCredentialsException;
+import vn.thelooks.auth.presentation.advice.TooManyLoginAttemptsException;
 import vn.thelooks.auth.application.port.in.LoginUseCase;
 import vn.thelooks.auth.application.port.in.RegisterUseCase;
 import vn.thelooks.auth.application.port.in.SessionUseCase;
@@ -45,10 +47,11 @@ class AuthController {
     private final RefreshTokenSessionStore refreshSessions;
     private final Clock clock;
     private final String allowedOrigin;
+    private final LoginThrottle throttle;
 
     AuthController(RegisterUseCase register, LoginUseCase login, SessionUseCase sessions, UserPersistencePort users,
             RefreshTokenSessionStore refreshSessions, Clock clock,
-            @Value("${thelooks.security.web-origin}") String allowedOrigin) {
+            @Value("${thelooks.security.web-origin}") String allowedOrigin, LoginThrottle throttle) {
         this.register = register;
         this.login = login;
         this.sessions = sessions;
@@ -56,6 +59,7 @@ class AuthController {
         this.refreshSessions = refreshSessions;
         this.clock = clock;
         this.allowedOrigin = allowedOrigin;
+        this.throttle = throttle;
     }
 
     @PostMapping("/public/auth/register")
@@ -74,7 +78,17 @@ class AuthController {
     @PostMapping("/public/auth/login")
     ResponseEntity<SessionResponse> login(@Valid @RequestBody LoginRequest body, HttpServletRequest request) {
         requireOrigin(request);
-        return tokenResponse(login.login(body.email(), body.password()), request);
+        String ip = request.getRemoteAddr(); // IP thật nhờ server.forward-headers-strategy=framework
+        throttle.blocked(body.email(), ip).ifPresent(wait -> { throw new TooManyLoginAttemptsException(wait); });
+        LoginUseCase.AuthTokens tokens;
+        try {
+            tokens = login.login(body.email(), body.password());
+        } catch (InvalidCredentialsException e) {
+            throttle.failed(body.email(), ip);
+            throw e;
+        }
+        throttle.succeeded(body.email());
+        return tokenResponse(tokens, request);
     }
 
     @PostMapping("/public/auth/refresh")

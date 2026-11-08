@@ -264,6 +264,18 @@ class WardrobeServiceTest {
         }
     }
 
+    @Test
+    void capsHowManyPhotosCanBeSentToTheAiPerDay() {
+        for (int i = 0; i < 4; i++) {
+            byte batch = (byte) (40 + i);
+            service.start(USER, java.util.stream.IntStream.range(0, 10)
+                    .mapToObj(n -> new UploadedImage(new byte[] {(byte) (10 + n), batch}, "image/jpeg")).toList());
+        }
+        assertThatThrownBy(() -> service.start(USER, photos(1)))
+                .isInstanceOf(vn.thelooks.wardrobe.domain.exception.ScanLimitException.class).hasMessageContaining("40/40");
+        assertThat(service.start(UUID.randomUUID(), photos(1))).isNotNull(); // người khác vẫn quét được
+    }
+
     class ItemRepo implements ClothingItemRepository {
         public ClothingItem save(ClothingItem item) { itemStore.put(item.id(), item); return item; }
         public Optional<ClothingItem> findById(UUID id) { return Optional.ofNullable(itemStore.get(id)); }
@@ -288,5 +300,9 @@ class WardrobeServiceTest {
             return save(scan);
         }
         public Optional<Scan> findById(UUID id) { return Optional.ofNullable(scanStore.get(id)); }
+        public int imagesSince(UUID ownerId, java.time.Instant since) {
+            return scanStore.values().stream().filter(s -> s.ownerId().equals(ownerId) && !s.createdAt().isBefore(since))
+                    .mapToInt(Scan::imageCount).sum();
+        }
     }
 }

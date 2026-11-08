@@ -8,7 +8,7 @@ public interface RegisterUseCase {
     User register(RegisterCommand command);
 
     /** Phiên bản Điều khoản + Chính sách quyền riêng tư hiện hành (trùng với LEGAL_VERSION ở web). */
-    String TERMS_VERSION = "2026-11-05";
+    String TERMS_VERSION = "2026-11-08";
 
     record RegisterCommand(String email, String password, String username) {
     }

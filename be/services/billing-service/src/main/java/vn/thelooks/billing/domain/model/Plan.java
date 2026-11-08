@@ -12,7 +12,8 @@ import java.util.Set;
 public enum Plan {
     FREE("Free", 0, 0, 50, 3, Set.of()),
     PLUS("Plus", 49_000, 499_000, 300, 20, Set.of()),
-    PRO("Pro", 79_000, 799_000, null, 100, Set.of(Feature.values()));
+    // TRY_ON_3D chưa làm: không đưa vào gói để trang Gói không quảng cáo tính năng chưa có
+    PRO("Pro", 79_000, 799_000, null, 100, Set.of(Feature.WARDROBE_STATS, Feature.COST_PER_WEAR, Feature.WEAR_CALENDAR));
 
     private final String displayName;
     private final long monthlyPriceVnd;

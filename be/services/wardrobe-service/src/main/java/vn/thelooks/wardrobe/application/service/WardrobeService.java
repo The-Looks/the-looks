@@ -36,6 +36,7 @@ import vn.thelooks.wardrobe.application.usecase.ScanClothingUseCase;
 import vn.thelooks.wardrobe.domain.exception.ClothingItemNotFoundException;
 import vn.thelooks.wardrobe.domain.exception.InvalidImageException;
 import vn.thelooks.wardrobe.domain.exception.InvalidItemStateException;
+import vn.thelooks.wardrobe.domain.exception.ScanLimitException;
 import vn.thelooks.wardrobe.domain.exception.WardrobeFullException;
 import vn.thelooks.wardrobe.domain.model.ClothingAttributes;
 import vn.thelooks.wardrobe.domain.model.ClothingItem;
@@ -51,6 +52,9 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
 
     private static final Logger log = LoggerFactory.getLogger(WardrobeService.class);
     static final Set<String> ACCEPTED_TYPES = Set.of("image/jpeg", "image/png");
+    // ponytail: một mức cho mọi gói; tách theo gói (billing limits) khi có người dùng trả phí cần nhiều hơn
+    static final int MAX_IMAGES_PER_DAY = 40;
+    static final java.time.ZoneId VIETNAM = java.time.ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final ClothingItemRepository items;
     private final ScanRepository scans;
@@ -103,6 +107,12 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
             if (u.contentType() == null || !ACCEPTED_TYPES.contains(u.contentType().toLowerCase())) {
                 throw new InvalidImageException("Chỉ nhận ảnh JPEG hoặc PNG");
             }
+        }
+        // Mỗi ảnh là một lần gọi AI có tính tiền: chặn quét - xoá - quét lại không giới hạn
+        int usedToday = scans.imagesSince(ownerId, java.time.LocalDate.now(clock.withZone(VIETNAM)).atStartOfDay(VIETNAM).toInstant());
+        if (usedToday + uploads.size() > MAX_IMAGES_PER_DAY) {
+            throw new ScanLimitException("Hôm nay bạn đã quét " + usedToday + "/" + MAX_IMAGES_PER_DAY
+                    + " ảnh. Quay lại vào ngày mai để thêm tiếp nhé.");
         }
         // Hỏi giới hạn ngay trong request: cần JWT của người dùng để gọi billing-service
         Integer max = plans.maxWardrobeItems();

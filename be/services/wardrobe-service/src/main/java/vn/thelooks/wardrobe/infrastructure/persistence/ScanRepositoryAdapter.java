@@ -88,4 +88,10 @@ class ScanRepositoryAdapter implements ScanRepository {
         return jdbc.sql("select id from wardrobe_item where scan_id = :scan order by created_at")
                 .param("scan", scanId).query(UUID.class).list();
     }
+
+    @Override
+    public int imagesSince(UUID ownerId, java.time.Instant since) {
+        return jdbc.sql("select coalesce(sum(image_count), 0) from wardrobe_scan where owner_id = :owner and created_at >= :since")
+                .param("owner", ownerId).param("since", java.sql.Timestamp.from(since)).query(Integer.class).single();
+    }
 }
