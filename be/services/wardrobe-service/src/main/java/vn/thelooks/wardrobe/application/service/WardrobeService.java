@@ -137,8 +137,17 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
      * rồi cắt + lưu ảnh từng món song song.
      */
     void process(Scan scan, List<NormalizedImage> photos, Integer max) {
+        long started = System.nanoTime();
+        java.util.concurrent.atomic.AtomicLong slowestAi = new java.util.concurrent.atomic.AtomicLong();
         List<CompletableFuture<List<DetectedGarment>>> detections = photos.stream()
-                .map(photo -> CompletableFuture.supplyAsync(() -> detector.detect(photo.jpeg(), "image/jpeg"), background))
+                .map(photo -> CompletableFuture.supplyAsync(() -> {
+                    long t = System.nanoTime();
+                    try {
+                        return detector.detect(photo.jpeg(), "image/jpeg");
+                    } finally {
+                        slowestAi.accumulateAndGet((System.nanoTime() - t) / 1_000_000, Math::max);
+                    }
+                }, background))
                 .toList();
         int skipped = 0, failedPhotos = 0, kept = 0;
         long existing = max == null ? 0 : items.countByOwner(scan.ownerId());
@@ -160,7 +169,12 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
                 saves.add(CompletableFuture.supplyAsync(() -> save(scan, photo, g), background));
             }
         }
+        long aiDone = System.nanoTime();
         List<UUID> created = saves.stream().map(CompletableFuture::join).flatMap(Optional::stream).toList();
+        // Để biết chậm ở đâu: AI (ảnh chậm nhất) hay cắt + lưu ảnh lên Cloudinary
+        log.info("Quét {} ảnh (scan {}): AI chậm nhất {} ms, cắt + lưu {} món {} ms, tổng {} ms, lỗi {} ảnh",
+                photos.size(), scan.id(), slowestAi.get(), created.size(), (System.nanoTime() - aiDone) / 1_000_000,
+                (System.nanoTime() - started) / 1_000_000, failedPhotos);
         ScanStatus status = failedPhotos == photos.size() ? ScanStatus.FAILED : ScanStatus.DONE;
         scans.save(new Scan(scan.id(), scan.ownerId(), status, scan.imageCount(), created, skipped, scan.createdAt()));
     }

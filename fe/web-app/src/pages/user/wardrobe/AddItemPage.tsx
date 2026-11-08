@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
-import { Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import { Card, ItemTile, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { BatchReview } from '../../../components/user/wardrobe/BatchReview';
 import { useScan, useStartScan } from '../../../hooks/user/wardrobe/api';
 
@@ -14,7 +14,8 @@ const MAX_IMAGES = 10;
 export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean; onConfirmed?: () => void } = {}) {
   const start = useStartScan();
   const [params, setParams] = useSearchParams();
-  const [scanId, setScanId] = useState<string | null>(() => guided ? params.get('scan') : null);
+  // Mã lần quét nằm trên địa chỉ trang (?scan=…): tải lại trang vẫn tiếp tục chờ và hiện các món đang tách
+  const [scanId, setScanId] = useState<string | null>(() => params.get('scan'));
   const [tooMany, setTooMany] = useState(false);
   const scan = useScan(scanId);
 
@@ -26,7 +27,7 @@ export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean;
     setTooMany(files.length > MAX_IMAGES);
     start.mutate(files.slice(0, MAX_IMAGES), { onSuccess: (s) => {
       setScanId(s.id);
-      if (guided) setParams((current) => { const next = new URLSearchParams(current); next.set('scan', s.id); return next; }, { replace: true });
+      setParams((current) => { const next = new URLSearchParams(current); next.set('scan', s.id); return next; }, { replace: true });
     } });
   };
 
@@ -113,7 +114,12 @@ export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean;
       {tooMany && <Notice tone="warn">Chỉ gửi {MAX_IMAGES} ảnh đầu tiên, các ảnh còn lại hãy gửi ở lần sau.</Notice>}
       {start.isError && <Notice tone="error">{errorMessage(start.error)}</Notice>}
       {scan.isError && <Notice tone="error">{errorMessage(scan.error)}</Notice>}
-      {processing && scanId && <Spinner label="Đang tìm và cắt từng món trong ảnh…" />}
+      {processing && scanId && <Spinner label={items.length
+        ? `Đã tách được ${items.length} món, đang tách tiếp…`
+        : 'Đang tìm và cắt từng món trong ảnh… Bạn có thể tải lại trang, kết quả vẫn còn.'} />}
+      {processing && items.length > 0 && <div className="wardrobe-grid" aria-label="Món vừa tách">
+        {items.map((item) => <ItemTile key={item.id} category={item.category} imageUrl={item.imageUrl} />)}
+      </div>}
 
       {scan.data?.status === 'FAILED' && (
         <Notice tone="error">Không đọc được ảnh. Thử chụp lại rõ hơn hoặc chọn ảnh khác.</Notice>
