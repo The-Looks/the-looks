@@ -25,6 +25,12 @@ export const session = {
     expiresAt = 0;
     refreshUnavailable = false;
     clearLegacyAccessToken();
+    try {
+      for (let index = localStorage.length - 1; index >= 0; index--) {
+        const key = localStorage.key(index);
+        if (key?.startsWith('thelooks.draft.')) localStorage.removeItem(key);
+      }
+    } catch { /* Storage may be unavailable. */ }
     emit();
   },
   subscribe(listener: () => void) {
