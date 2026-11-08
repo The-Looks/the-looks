@@ -16,4 +16,7 @@ public interface ScanRepository {
     Scan saveUnlessDuplicate(Scan scan, String contentHash, Duration window);
 
     Optional<Scan> findById(UUID id);
+
+    /** Tổng số ảnh người này đã gửi quét từ thời điểm {@code since}. */
+    int imagesSince(UUID ownerId, java.time.Instant since);
 }

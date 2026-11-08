@@ -80,16 +80,16 @@ export function TermsPage() {
 export function PrivacyPage() {
   return (
     <LegalLayout title="Chính sách quyền riêng tư">
-      <p>Chính sách này giải thích THE LOOKS thu thập dữ liệu cá nhân nào, dùng vào việc gì, chia sẻ với ai và quyền của bạn, theo quy định của pháp luật Việt Nam về bảo vệ dữ liệu cá nhân.</p>
+      <p>Chính sách này giải thích THE LOOKS thu thập dữ liệu cá nhân nào, dùng vào việc gì, chia sẻ với ai và quyền của bạn, theo quy định của pháp luật Việt Nam về bảo vệ dữ liệu cá nhân (Luật Bảo vệ dữ liệu cá nhân số 91/2025/QH15 và văn bản hướng dẫn).</p>
 
       <h2>1. Dữ liệu chúng tôi thu thập</h2>
       <ul>
         <li><strong>Tài khoản:</strong> email, tên người dùng, mật khẩu (chỉ lưu dạng đã mã hoá một chiều). Nếu đăng nhập bằng Google: email và mã định danh tài khoản Google.</li>
         <li><strong>Ảnh tủ đồ:</strong> ảnh bạn chụp hoặc tải lên. Ảnh gốc chỉ dùng để nhận diện rồi bị bỏ đi; chúng tôi chỉ lưu ảnh đã cắt của từng món đồ. Ảnh gốc có thể chứa khuôn mặt hoặc cơ thể của bạn.</li>
         <li><strong>Thông tin món đồ:</strong> loại, màu, chất liệu, mùa, phong cách.</li>
-        <li><strong>Hồ sơ phong cách (không bắt buộc):</strong> giới tính, phong cách yêu thích, ngân sách mua sắm.</li>
+        <li><strong>Hồ sơ (không bắt buộc):</strong> tên hiển thị, ảnh đại diện, tỉnh / thành phố (để lấy thời tiết cho gợi ý), giới tính, phong cách và màu yêu thích, ngân sách mua sắm. Linh vật bạn tạo chỉ lưu trên trình duyệt của bạn.</li>
         <li><strong>Hoạt động trong app:</strong> outfit đã lưu, lượt thích / không thích gợi ý, lần mặc, bình chọn, lượt bấm "Gợi ý mua thêm", thời điểm đăng nhập.</li>
-        <li><strong>Thanh toán:</strong> gói đã mua, mã đơn, số tiền, thời điểm thanh toán. Chúng tôi không nhận và không lưu số thẻ hay thông tin tài khoản ngân hàng của bạn.</li>
+        <li><strong>Thanh toán:</strong> gói đã mua, mã đơn, số tiền, thời điểm thanh toán, và email tài khoản để nhắc trước khi gói hết hạn. Chúng tôi không nhận và không lưu số thẻ hay thông tin tài khoản ngân hàng của bạn.</li>
         <li><strong>Bình chọn công khai:</strong> để chống bình chọn trùng, chúng tôi lưu một mã băm (không đảo ngược được) tạo từ địa chỉ IP của người bình chọn, không lưu IP gốc.</li>
         <li><strong>Kỹ thuật:</strong> cookie đăng nhập (bắt buộc để giữ phiên), nhật ký lỗi của máy chủ.</li>
       </ul>
@@ -107,19 +107,20 @@ export function PrivacyPage() {
       <ul>
         <li><strong>Dịch vụ AI (Google Gemini, Anthropic Claude):</strong> nhận ảnh món đồ và mô tả tủ đồ để nhận diện quần áo và gợi ý outfit. Với một số gói dịch vụ miễn phí, nhà cung cấp AI có thể dùng dữ liệu gửi lên để cải thiện sản phẩm của họ.</li>
         <li><strong>PayOS:</strong> xử lý thanh toán gói qua VietQR / chuyển khoản.</li>
-        <li><strong>AccessTrade, TikTok Shop:</strong> khi bạn bấm "Gợi ý mua thêm", liên kết kèm một mã ẩn danh (không chứa email hay tên) để ghi nhận hoa hồng.</li>
-        <li><strong>Hạ tầng:</strong> Vercel (web), Render (máy chủ ứng dụng), Neon (cơ sở dữ liệu), Cloudinary (lưu ảnh, nếu được bật), Open-Meteo (thời tiết, không nhận dữ liệu cá nhân).</li>
+        <li><strong>Brevo:</strong> gửi email nhắc gia hạn gói; chỉ nhận email của bạn và thông tin gói sắp hết hạn.</li>
+        <li><strong>AccessTrade và các cửa hàng đối tác (TikTok Shop và cửa hàng khác trong mạng AccessTrade):</strong> khi bạn bấm "Gợi ý mua thêm", liên kết kèm một mã ẩn danh (không chứa email hay tên) để ghi nhận hoa hồng.</li>
+        <li><strong>Hạ tầng:</strong> Vercel (web), Render (máy chủ ứng dụng), Neon (cơ sở dữ liệu), Cloudinary (lưu ảnh, nếu được bật), Open-Meteo (thời tiết; chỉ nhận toạ độ của tỉnh / thành phố, không nhận dữ liệu nhận diện bạn).</li>
       </ul>
 
       <h2>4. Lưu trữ ngoài Việt Nam</h2>
       <p>Máy chủ và cơ sở dữ liệu của chúng tôi đặt tại Singapore; một số nhà cung cấp ở trên có thể xử lý dữ liệu tại các quốc gia khác. Khi tạo tài khoản, bạn đồng ý với việc chuyển dữ liệu ra nước ngoài cho các mục đích nêu trong chính sách này.</p>
 
       <h2>5. Thời gian lưu trữ</h2>
-      <p>Dữ liệu được lưu khi tài khoản còn hoạt động. Món đồ bạn xoá sẽ bị xoá cùng ảnh. Khi bạn yêu cầu xoá tài khoản, dữ liệu cá nhân sẽ bị xoá; riêng thông tin đơn thanh toán có thể được giữ lại trong thời hạn pháp luật về kế toán, thuế yêu cầu.</p>
+      <p>Dữ liệu được lưu khi tài khoản còn hoạt động. Món đồ bạn xoá sẽ bị xoá cùng ảnh. Khi bạn yêu cầu xoá tài khoản, dữ liệu cá nhân sẽ bị xoá; riêng thông tin đơn thanh toán (đã tách khỏi tài khoản) có thể được giữ lại trong thời hạn pháp luật về kế toán, thuế yêu cầu.</p>
 
       <h2>6. Quyền của bạn</h2>
       <ul>
-        <li>Xem, sửa thông tin và hồ sơ phong cách trong mục Cá nhân; xoá từng món đồ trong Tủ đồ.</li>
+        <li>Xem, sửa thông tin và hồ sơ phong cách trong mục Cá nhân; xoá từng món đồ trong Tủ đồ; tự xoá tài khoản cùng toàn bộ dữ liệu trong mục Cá nhân.</li>
         <li>Yêu cầu cung cấp bản sao, chỉnh sửa, xoá dữ liệu hoặc xoá tài khoản; rút lại sự đồng ý (khi đó chúng tôi có thể không cung cấp được một số tính năng).</li>
         <li>Gửi yêu cầu tới <Contact />. Chúng tôi phản hồi trong thời hạn pháp luật quy định.</li>
       </ul>

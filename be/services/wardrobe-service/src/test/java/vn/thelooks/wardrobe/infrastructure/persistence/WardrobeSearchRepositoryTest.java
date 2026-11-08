@@ -30,6 +30,7 @@ class WardrobeSearchRepositoryTest {
     String schema;
     ClothingItemRepositoryAdapter items;
     WardrobeSearchRepositoryAdapter search;
+    ScanRepositoryAdapter scans;
     ClothingItem summerTop, winterTop, bottom, shoes, pending;
 
     @BeforeEach
@@ -42,6 +43,7 @@ class WardrobeSearchRepositoryTest {
         Flyway.configure().dataSource(source).schemas(schema).load().migrate();
         var jdbc = JdbcClient.create(source);
         items = new ClothingItemRepositoryAdapter(jdbc); search = new WardrobeSearchRepositoryAdapter(jdbc);
+        scans = new ScanRepositoryAdapter(jdbc, new org.springframework.jdbc.datasource.DataSourceTransactionManager(source));
         summerTop = item(owner, Category.TOP, "white", "casual", Set.of(Season.SUMMER), 0, ItemStatus.CONFIRMED);
         winterTop = item(owner, Category.TOP, "white", "office", Set.of(Season.WINTER), 1, ItemStatus.CONFIRMED);
         bottom = item(owner, Category.BOTTOM, "offwhite", "smart-casual", Set.of(Season.SUMMER), 2, ItemStatus.CONFIRMED);
@@ -96,6 +98,16 @@ class WardrobeSearchRepositoryTest {
         assertThat(items.findByOwner(owner, null)).extracting(ClothingItem::id).doesNotContain(archived.id(), sold.id());
         assertThat(items.findByOwner(owner, ItemStatus.SOLD)).extracting(ClothingItem::id).containsExactly(sold.id());
         assertThat(items.countByOwner(owner)).isEqualTo(6); // 4 đã xác nhận + 1 chờ + 1 cất đi; đã bán không chiếm chỗ
+    }
+    @Test
+    void countsTodaysScannedImagesPerOwner() {
+        java.util.function.BiConsumer<UUID, Instant> scan = (who, at) -> scans.save(new vn.thelooks.wardrobe.domain.model.Scan(
+                UUID.randomUUID(), who, vn.thelooks.wardrobe.domain.model.ScanStatus.DONE, 3, List.of(), 0, at));
+        scan.accept(owner, now.minusSeconds(3600));
+        scan.accept(owner, now.plusSeconds(60));
+        scan.accept(UUID.randomUUID(), now.plusSeconds(60));
+        assertThat(scans.imagesSince(owner, now)).isEqualTo(3);
+        assertThat(scans.imagesSince(owner, now.minusSeconds(7200))).isEqualTo(6);
     }
     private Filter filter(int page, int size) { return new Filter(null, null, null, null, null, null, Sort.NEWEST, page, size); }
     private List<UUID> ids(Filter filter) { return search.search(owner, filter, Map.of()).items().stream().map(ClothingItem::id).toList(); }
