@@ -12,7 +12,6 @@ export function MyPollsPage() {
   return (
     <div className="stack-lg">
       <PageHeader
-        eyebrow="Ask Friends"
         title="Bình chọn của tôi"
         sub="Gửi 2 outfit cho bạn bè qua Zalo, họ chọn ẩn danh không cần cài app."
         action={<ButtonLink to="/polls/new" small>+ Tạo bình chọn</ButtonLink>}

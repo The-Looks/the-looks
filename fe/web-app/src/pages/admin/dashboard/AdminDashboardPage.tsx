@@ -372,14 +372,14 @@ export function AdminDashboardPage() {
 
   return <div className={`admin-frame${collapsed ? ' admin-frame-collapsed' : ''}`}>
     {mobileNav && <button className="admin-sidebar-scrim" type="button" aria-label="Đóng thanh điều hướng" onClick={() => setMobileNav(false)} />}
-    <aside id="admin-sidebar" className={`admin-sidebar${mobileNav ? ' admin-sidebar-open' : ''}`}>
-      <div className="admin-brand-row"><Link to="/" className="admin-brand" aria-label="THE LOOKS, về trang chủ"><Brand /><strong>THE LOOKS</strong></Link><button className="admin-sidebar-close" type="button" aria-label="Đóng menu" onClick={() => setMobileNav(false)}><MenuFoldOutlined /></button></div>
+    <aside id="admin-sidebar" className={`admin-sidebar${mobileNav ? ' admin-sidebar-open' : ''}`} aria-hidden={collapsed && !mobileNav} ref={(node) => { node?.toggleAttribute('inert', collapsed && !mobileNav); }}>
+      <div className="admin-brand-row"><Link to="/" className="admin-brand" aria-label="The Looks, về trang chủ"><Brand /><strong>The Looks</strong></Link><button className="admin-sidebar-close" type="button" aria-label="Đóng menu" onClick={() => setMobileNav(false)}><MenuFoldOutlined /></button></div>
       <nav aria-label="Điều hướng quản trị">{nav.map((group) => <div className="admin-nav-group" key={group.heading}><span className="admin-nav-heading">{group.heading}</span>{group.items.map((item) => <button key={item.key} type="button" title={item.label} aria-current={view === item.key ? 'page' : undefined} className={`admin-nav-item${view === item.key ? ' active' : ''}`} onClick={() => choose(item.key)}>{item.icon}<span className="admin-nav-label">{item.label}</span></button>)}</div>)}</nav>
     </aside>
     <div className="admin-content"><header className="admin-topbar"><div className="admin-topbar-left">
       <button className="admin-collapse-button" type="button" aria-label={collapsed ? 'Mở rộng thanh điều hướng' : 'Thu gọn thanh điều hướng'} aria-controls="admin-sidebar" aria-expanded={!collapsed} onClick={() => setCollapsed((value) => !value)}>{collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</button>
       <button className="admin-menu-button" type="button" aria-label="Mở menu" aria-controls="admin-sidebar" aria-expanded={mobileNav} onClick={() => setMobileNav((value) => !value)}><MenuUnfoldOutlined /></button>
-      <div className="admin-topbar-title"><span>Quản trị / {titles[view]}</span><BackLink to="/" className="admin-topbar-back">Quay lại trang chủ</BackLink></div>
+      <div className="admin-topbar-title"><span>Quản trị / {titles[view]}</span><BackLink to="/" className="admin-topbar-back" aria-label="Quay lại trang chủ">Quay lại<span className="admin-back-destination"> trang chủ</span></BackLink></div>
     </div><div className="admin-topbar-actions">
       <button type="button" className="admin-notification-button" aria-label="Xem thông báo quản trị" onClick={() => choose('notifications')}><BellOutlined /></button>
       <button type="button" className="topbar-avatar-trigger admin-avatar-trigger" aria-label="Mở menu tài khoản" aria-controls="account-drawer" aria-expanded={accountOpen} onClick={() => setAccountOpen(true)}><Avatar className="user-avatar">{avatarLetter}</Avatar></button>

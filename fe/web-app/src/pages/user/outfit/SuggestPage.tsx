@@ -29,7 +29,6 @@ export function SuggestPage() {
   return (
     <div className="stack-lg">
       <PageHeader
-        eyebrow="AI phối đồ"
         title="Hôm nay bạn đi đâu?"
         sub="Chọn dịp, AI gợi ý outfit từ chính tủ đồ của bạn."
         action={
