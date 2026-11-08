@@ -20,9 +20,10 @@ it('dresses a mix-and-match mascot', () => {
   expect(JSON.parse(screen.getByRole('status').textContent!)).toEqual({ mascot: 'dog', top: 'hoodie', shoes: 'boots' });
 });
 
-it('explains that a drawn mascot keeps its own outfit', () => {
+it('swaps the drawn outfit of an original mascot for picked clothes', () => {
   render(<Harness start={{ mascot: 'fox' }} />);
   fireEvent.click(screen.getByRole('tab', { name: 'Áo' }));
-  expect(screen.getByText(/Cáo Phố đã có trang phục riêng/)).toBeTruthy();
-  expect(screen.queryByRole('button', { name: 'Hoodie' })).toBeNull();
+  expect(screen.getByText(/thay bộ đồ gốc của Cáo Phố/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Hoodie' }));
+  expect(JSON.parse(screen.getByRole('status').textContent!)).toEqual({ mascot: 'fox', top: 'hoodie' });
 });

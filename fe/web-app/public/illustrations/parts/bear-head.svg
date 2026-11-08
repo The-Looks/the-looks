@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <g id="head">
+    <!-- Round Bear Ears -->
+    <circle cx="126" cy="62" r="14" fill="#8e5a38" stroke="#241d21" stroke-width="3"/>
+    <circle cx="126" cy="62" r="8" fill="#fae8d7"/>
+    <circle cx="194" cy="62" r="14" fill="#8e5a38" stroke="#241d21" stroke-width="3"/>
+    <circle cx="194" cy="62" r="8" fill="#fae8d7"/>
+    <!-- Broad Bear Head -->
+    <path d="M 124 74 C 114 88, 116 104, 130 112 C 144 118, 176 118, 190 112 C 204 104, 206 88, 196 74 C 188 64, 132 64, 124 74 Z"
+          fill="#8e5a38" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- Cream Snout Oval -->
+    <ellipse cx="160" cy="95" rx="18" ry="14" fill="#fae8d7" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Cheeks Blush -->
+    <ellipse cx="132" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <ellipse cx="188" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <!-- Friendly Bear Eyes -->
+    <ellipse cx="144" cy="80" rx="4" ry="5" fill="#241d21"/>
+    <circle cx="143" cy="78" r="1.5" fill="#fff7f3"/>
+    <ellipse cx="176" cy="80" rx="4" ry="5" fill="#241d21"/>
+    <circle cx="175" cy="78" r="1.5" fill="#fff7f3"/>
+    <path d="M 140 73 Q 146 71 150 74" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 180 73 Q 174 71 170 74" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dark Heart/Oval Nose -->
+    <ellipse cx="160" cy="91" rx="6" ry="4.5" fill="#241d21"/>
+    <circle cx="158" cy="90" r="1" fill="#fff7f3"/>
+    <!-- Warm Smiling Mouth -->
+    <path d="M 160 95 L 160 99" stroke="#241d21" stroke-width="2"/>
+    <path d="M 153 99 Q 160 104 167 99" fill="none" stroke="#241d21" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+</svg>

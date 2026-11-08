@@ -40,7 +40,7 @@ export type Anchor = {
 };
 
 /** Linh vật tự phối dùng chung một dáng: đầu tâm (160, 84). */
-const MODULAR: Anchor = { hat: { x: 160, y: 56, w: 82 }, eyes: { x: 160, y: 84, d: 30 }, neck: { x: 160, y: 124, w: 46 }, portrait: [98, 24, 124] };
+export const MODULAR: Anchor = { hat: { x: 160, y: 56, w: 82 }, eyes: { x: 160, y: 84, d: 30 }, neck: { x: 160, y: 124, w: 46 }, portrait: [98, 24, 124] };
 
 export const ANCHORS: Record<MascotId, Anchor> = {
   cat: { hat: { x: 160, y: 64, w: 68 }, eyes: { x: 160, y: 80, d: 26 }, neck: { x: 160, y: 104, w: 44 }, portrait: [97, 11, 126] },

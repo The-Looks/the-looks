@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { ANCHORS, isModular, MASCOTS } from '../../../services/user/onboarding/mascots';
-import { ACCESSORIES, backgroundColor, slotsFor, type Look } from '../../../services/user/onboarding/look';
+import { ANCHORS, MASCOTS, MODULAR } from '../../../services/user/onboarding/mascots';
+import { ACCESSORIES, backgroundColor, isDressed, SLOTS, type Look } from '../../../services/user/onboarding/look';
 import { ModularMascot } from './ModularMascot';
 
 // Bảng màu và nét viền giống bộ linh vật (public/illustrations).
@@ -123,6 +123,7 @@ function portraitBox(look: Look) {
 
 /**
  * Linh vật kèm phụ kiện người dùng chọn. portrait = chỉ phần đầu, cho ảnh đại diện.
+ * Con vẽ sẵn chưa chọn quần áo thì dùng nguyên hình gốc; chọn áo / quần / giày thì ghép đầu gốc lên dáng chung.
  * Ếch có sẵn mũ nồi trong hình gốc: đội mũ khác thì dùng bản không mũ.
  */
 export function MascotAvatar({ look, portrait = false, title }: { look: Look; portrait?: boolean; title?: string }) {
@@ -130,21 +131,24 @@ export function MascotAvatar({ look, portrait = false, title }: { look: Look; po
   const anchor = ANCHORS[look.mascot];
   const image = look.mascot === 'frog' && look.hat ? '/illustrations/frog-bare.svg' : `/illustrations/${look.mascot}.svg`;
   const bg = backgroundColor(look);
+  const dressed = isDressed(look);
+  // mặc đồ thì cổ áo ở chỗ của dáng chung, không phải chỗ cổ trong hình gốc
+  const neck = dressed ? MODULAR.neck : anchor.neck;
   const extras = <>
-    {look.neck && <Part x={anchor.neck.x} y={anchor.neck.y} scale={anchor.neck.w / 100}><Neck id={look.neck} /></Part>}
+    {look.neck && <Part x={neck.x} y={neck.y} scale={neck.w / 100}><Neck id={look.neck} /></Part>}
     {look.glasses && <Part x={anchor.eyes.x} y={anchor.eyes.y} scale={anchor.eyes.d / 30}><Glasses id={look.glasses} /></Part>}
     {look.hat && <Part x={anchor.hat.x} y={anchor.hat.y} scale={anchor.hat.w / 100}><Hat id={look.hat} /></Part>}
   </>;
   const label = title ?? [MASCOTS.find((m) => m.id === look.mascot)?.name,
-    ...slotsFor(look.mascot).filter((s) => s !== 'background').map((slot) => ACCESSORIES[slot].find((a) => a.id === look[slot])?.name)]
+    ...SLOTS.filter((s) => s !== 'background').map((slot) => ACCESSORIES[slot].find((a) => a.id === look[slot])?.name)]
     .filter(Boolean).join(', ');
   return (
     <svg className="mascot-avatar" viewBox={portrait ? portraitBox(look) : '0 0 320 320'}
       {...(title === '' ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label })}
       width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
       {bg && <rect x="-40" y="-40" width="400" height="400" fill={bg} />}
-      {isModular(look.mascot)
-        ? <ModularMascot id={look.mascot} top={look.top} bottom={look.bottom} shoes={look.shoes}>{extras}</ModularMascot>
+      {dressed
+        ? <ModularMascot id={look.mascot} hat={look.hat} top={look.top} bottom={look.bottom} shoes={look.shoes}>{extras}</ModularMascot>
         : <><image href={image} x="0" y="0" width="320" height="320" />{extras}</>}
     </svg>
   );

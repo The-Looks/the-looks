@@ -2,7 +2,7 @@ import { isModular, MASCOTS, type MascotId } from './mascots';
 
 /** Phụ kiện gắn lên linh vật, kiểu tạo nhân vật trong game: mỗi chỗ một món, có thể để trống. */
 export type Slot = 'top' | 'bottom' | 'shoes' | 'hat' | 'glasses' | 'neck' | 'background';
-/** Quần áo chỉ mặc được cho linh vật tự phối; 6 con vẽ sẵn đã có trang phục riêng. */
+/** Quần áo; con vẽ sẵn chưa chọn món nào thì mặc bộ đồ gốc trong hình. */
 export const CLOTHING: Slot[] = ['top', 'bottom', 'shoes'];
 
 export type Look = {
@@ -69,9 +69,6 @@ export const ACCESSORIES: Record<Slot, { id: string; name: string; color?: strin
 
 export const SLOTS: Slot[] = ['top', 'bottom', 'shoes', 'hat', 'glasses', 'neck', 'background'];
 
-/** Chỗ dùng được cho linh vật này (con vẽ sẵn không thay quần áo). */
-export const slotsFor = (mascot: MascotId) => SLOTS.filter((s) => isModular(mascot) || !CLOTHING.includes(s));
-
 const isMascot = (id: unknown): id is MascotId => MASCOTS.some((m) => m.id === id);
 const known = (slot: Slot, id: unknown) => typeof id === 'string' && ACCESSORIES[slot].some((a) => a.id === id) ? id : undefined;
 
@@ -81,7 +78,7 @@ export function normalizeLook(raw: unknown): Look | undefined {
   const r = raw as Record<string, unknown>;
   if (!isMascot(r.mascot)) return undefined;
   const look: Look = { mascot: r.mascot };
-  for (const slot of slotsFor(r.mascot)) {
+  for (const slot of SLOTS) {
     const id = known(slot, r[slot]);
     if (id) look[slot] = id;
   }
@@ -102,12 +99,16 @@ export function decodeLook(text: string): Look | undefined {
 export function randomLook(random: () => number = Math.random): Look {
   const pick = <T,>(list: readonly T[]) => list[Math.floor(random() * list.length)]!;
   const look: Look = { mascot: pick(MASCOTS).id };
-  for (const slot of slotsFor(look.mascot)) {
-    // Linh vật tự phối luôn có áo / quần / giày cho đỡ trống; phụ kiện thì 2/3 cơ hội
-    if (CLOTHING.includes(slot) || random() < 0.67) look[slot] = pick(ACCESSORIES[slot]).id;
+  // Con vẽ sẵn: một nửa số lần giữ bộ đồ gốc. Đã mặc đồ thì đủ áo / quần / giày; phụ kiện 2/3 cơ hội.
+  const dress = isModular(look.mascot) || random() < 0.5;
+  for (const slot of SLOTS) {
+    if (CLOTHING.includes(slot) ? dress : random() < 0.67) look[slot] = pick(ACCESSORIES[slot]).id;
   }
   return look;
 }
+
+/** Đang mặc đồ chọn riêng (con tự phối luôn vậy). */
+export const isDressed = (look: Look) => isModular(look.mascot) || CLOTHING.some((s) => look[s]);
 
 export function backgroundColor(look: Look) {
   return ACCESSORIES.background.find((b) => b.id === look.background)?.color;

@@ -21,7 +21,7 @@ const TABS: { id: Tab; label: string }[] = [
 export function MascotEditor({ value, onChange }: { value: Look; onChange: (look: Look) => void }) {
   const [tab, setTab] = useState<Tab>('mascot');
   const clothes = tab !== 'mascot' && CLOTHING.includes(tab);
-  const fixedOutfit = clothes && !isModular(value.mascot);
+  const original = clothes && !isModular(value.mascot);
   const set = (slot: Slot, id?: string) => {
     const next = { ...value };
     if (id) next[slot] = id; else delete next[slot];
@@ -50,10 +50,9 @@ export function MascotEditor({ value, onChange }: { value: Look; onChange: (look
           {tab === 'mascot'
             ? MASCOTS.map((m) => option(m.id, `${m.name} · ${m.style}`, { ...value, mascot: m.id }, value.mascot === m.id,
                 () => onChange({ ...value, mascot: m.id })))
-            : fixedOutfit
-            ? <p className="muted mascot-note">{MASCOTS.find((m) => m.id === value.mascot)?.name} đã có trang phục riêng.
-              Chọn một linh vật "Tự phối" ở tab Linh vật để thay áo, quần, giày.</p>
             : <>
+              {original && <p className="muted mascot-note">Chọn áo, quần hoặc giày để thay bộ đồ gốc của {MASCOTS.find((m) => m.id === value.mascot)?.name}.
+                Bỏ chọn hết để mặc lại bộ đồ gốc.</p>}
               {option('none', 'Không', { ...value, [tab]: undefined }, !value[tab], () => set(tab))}
               {ACCESSORIES[tab].map((a) => option(a.id, a.name, { ...value, [tab]: a.id }, value[tab] === a.id, () => set(tab, a.id)))}
             </>}
