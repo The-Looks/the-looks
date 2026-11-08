@@ -17,15 +17,13 @@
 .admin-frame .admin-topbar { height: 74px; padding: 0 32px; }
 .admin-topbar-title { display: grid; gap: 4px; }
 .admin-topbar-title > span { color: var(--muted); font-size: var(--text-caption); }
-.admin-topbar-back { display: inline-flex; align-items: center; gap: 5px; color: var(--purple); font: var(--weight-semibold) var(--text-caption) var(--font-body); text-decoration: none; }
-.admin-topbar-back:hover { text-decoration: none; }
 .admin-topbar-actions { display: flex; align-items: center; gap: 22px; color: var(--muted); }
 .admin-menu-button { display: none; }
 .admin-topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .admin-collapse-button, .admin-menu-button, .admin-notification-button, .admin-sidebar-close { align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; font-size: var(--text-body); }
 .admin-collapse-button, .admin-notification-button { display: inline-flex; }
 .admin-collapse-button:hover, .admin-menu-button:hover, .admin-notification-button:hover { border-color: var(--lavender); color: var(--purple); }
-.admin-collapse-button:focus-visible, .admin-menu-button:focus-visible, .admin-notification-button:focus-visible, .admin-sidebar-close:focus-visible, .admin-nav-item:focus-visible, .admin-topbar-back:focus-visible { outline: 2px solid var(--lavender); outline-offset: 2px; }
+.admin-collapse-button:focus-visible, .admin-menu-button:focus-visible, .admin-notification-button:focus-visible, .admin-sidebar-close:focus-visible, .admin-nav-item:focus-visible { outline: 2px solid var(--lavender); outline-offset: 2px; }
 .admin-sidebar-scrim { display: none; }
 .admin-overview { display: grid; gap: 18px; }
 .admin-empty { display: grid; place-items: center; min-height: 185px; color: var(--muted); text-align: center; font-size: var(--text-label); }

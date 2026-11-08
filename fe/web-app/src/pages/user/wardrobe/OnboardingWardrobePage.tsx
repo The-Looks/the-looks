@@ -47,7 +47,7 @@ export function OnboardingWardrobePage() {
   return <div className="stack-lg onboarding-wardrobe">
     <PageHeader title={outfitStep ? 'Outfit đầu tiên của bạn' : 'Thêm 3 món đầu tiên'}
       sub={outfitStep ? 'Phối từ những món bạn vừa xác nhận trong tủ đồ.' : 'Chọn 3–5 món hay mặc: một áo, một quần và một đôi giày là khởi đầu dễ nhất. Bạn cũng có thể dùng váy thay áo và quần.'}
-      back={{ to: outfitStep ? '/onboarding/wardrobe' : '/onboarding', label: outfitStep ? 'Thêm món khác' : 'Phong cách của bạn' }} />
+      back={{ to: outfitStep ? '/onboarding/wardrobe' : '/onboarding', fixed: true }} />
     {!outfitStep ? <>
       <Card>
         <div className="row"><strong>{Math.min(readiness.count, 3)}/3 món để bắt đầu</strong><span className="muted">Có thể thêm đến 5 món hoặc nhiều hơn sau đó</span></div>

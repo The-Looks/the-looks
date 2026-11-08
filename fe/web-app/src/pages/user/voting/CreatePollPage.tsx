@@ -49,7 +49,7 @@ export function CreatePollPage() {
 
   return (
     <div className="stack-lg">
-      <PageHeader title="Tạo bình chọn" back={{ to: '/polls', label: 'Bình chọn' }} />
+      <PageHeader title="Tạo bình chọn" back={{ to: '/polls' }} />
       {outfits.isPending && <Spinner />}
       {create.data ? (
         <Card>

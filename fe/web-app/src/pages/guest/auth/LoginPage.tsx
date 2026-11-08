@@ -48,7 +48,7 @@ export function LoginPage() {
   return (
     <main className="login-scene">
       <section className={`auth-panel login-panel${fromRegister ? ' login-panel-return' : ''}`}>
-        <AuthHeader to="/" label="Trang chủ" />
+        <AuthHeader to="/" />
         <div className="stack"><h1>Đăng nhập</h1><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />

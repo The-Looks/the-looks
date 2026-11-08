@@ -105,7 +105,7 @@ export function WearCalendarPage() {
 
   return (
     <div className="stack-lg">
-      <PageHeader title="Lịch mặc" back={{ to: '/outfits', label: 'Outfit đã lưu' }}
+      <PageHeader title="Lịch mặc" back={{ to: '/outfits' }}
         sub="Xếp outfit đã lưu cho 2 tuần tới; ngày đã mặc được đánh dấu tự động khi bạn bấm “Mặc bộ này”." />
       {(planDay.isError || unplanDay.isError || wear.isError) &&
         <Notice tone="error">{errorMessage(planDay.error ?? unplanDay.error ?? wear.error)}</Notice>}

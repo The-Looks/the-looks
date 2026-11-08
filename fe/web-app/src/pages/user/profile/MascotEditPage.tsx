@@ -24,7 +24,7 @@ export function MascotEditPage() {
   const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me });
   return <div className="stack-lg">
     <PageHeader title="Linh vật của bạn" sub="Linh vật hiện ở ảnh đại diện khi bạn chưa tải ảnh riêng."
-      back={{ to: '/profile', label: 'Cá nhân' }} />
+      back={{ to: '/profile' }} />
     {me.isPending && <Spinner />}
     {me.isError && <Notice tone="error">{errorMessage(me.error)}</Notice>}
     {me.data && <Editor accountId={me.data.id} />}

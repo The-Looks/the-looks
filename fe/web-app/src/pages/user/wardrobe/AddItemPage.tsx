@@ -76,7 +76,7 @@ export function AddItemPage({ guided = false, onConfirmed }: { guided?: boolean;
     <div className="stack-lg">
       {!guided && <PageHeader
         title="Thêm món đồ"
-        back={{ to: '/wardrobe', label: 'Tủ đồ' }}
+        back={{ to: '/wardrobe' }}
         sub="Chụp cả bộ đang mặc hoặc trải nhiều món ra chụp một lần: AI tự tách từng món, bạn chỉ cần kiểm tra lại."
       />}
       <Card>

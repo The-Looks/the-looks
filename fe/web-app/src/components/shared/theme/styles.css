@@ -206,12 +206,6 @@ a {
   gap: 4px;
   margin-bottom: 16px;
 }
-.page-header .back {
-  justify-self: start;
-  text-decoration: none;
-  font-size: var(--text-label);
-  font-weight: var(--weight-semibold);
-}
 .eyebrow {
   font-size: var(--text-caption);
   font-weight: var(--weight-bold);

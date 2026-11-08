@@ -10,7 +10,7 @@ export function HomeBanner({ children }: { children: ReactNode }) {
         <p>{brand.content.quickPickDescription}</p>
         {children}
       </div>
-      <img className="home-banner-art" src="/illustrations/lookbook.svg" alt="Sáu linh vật THE LOOKS trong trang phục theo sáu phong cách" width="960" height="570" />
+      <img className="home-banner-art" src={brand.assets.quickPick} alt="Áo blazer tím phối cùng áo kem, chân váy xếp ly và phụ kiện" width="1672" height="941" />
     </section>
   );
 }

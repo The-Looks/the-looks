@@ -4,7 +4,7 @@ import { Input, Modal } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import { formatDateTime } from '../../../services/shared/format';
-import { AssetPlaceholder, BackLink, Button, Notice, ProgressBar, Spinner } from '../../../components/shared/ui/index';
+import { AssetPlaceholder, BackButton, Button, Notice, ProgressBar, Spinner } from '../../../components/shared/ui/index';
 import { PublicHeader } from '../../../components/shared/layout/PublicHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { useCastVote, usePoll } from '../../../hooks/guest/voting/api';
@@ -29,7 +29,7 @@ export function PublicPollPage() {
     <div className={`guest-page${showResult ? ' guest-page--result' : ''}`}>
       <PublicHeader page="vote" />
       <main className="guest-layout">
-        <BackLink className="guest-vote-back" to="/ask-friends">Quay lại</BackLink>
+        <BackButton className="guest-vote-back" to="/ask-friends" />
         <aside className="guest-side">
           <section className="guest-invite">
             <span className="guest-heart"><HeartOutlined /></span>

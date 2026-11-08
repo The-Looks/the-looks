@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { session, useSession } from '../../../services/shared/session';
-import { BackLink, Card, Notice, Spinner } from '../../../components/shared/ui/index';
+import { Card, Notice, Spinner } from '../../../components/shared/ui/index';
 import { AuthHeader } from '../../../components/guest/auth/AuthHeader';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 
@@ -17,11 +17,10 @@ export function GoogleCallbackPage() {
   return (
     <main className="auth-page">
       <Card className="auth-card">
-        <AuthHeader to="/" label="Trang chủ" />
+        <AuthHeader to={failed ? '/login' : '/'} fixed />
         {failed ? (
           <div className="stack">
             <Notice tone="error">Không hoàn tất đăng nhập Google. Vui lòng thử lại.</Notice>
-            <BackLink to="/login">Quay lại đăng nhập</BackLink>
           </div>
         ) : <Spinner label="Đang hoàn tất đăng nhập Google…" />}
         <SiteFooter variant="auth" />

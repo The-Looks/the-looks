@@ -1,5 +1,5 @@
 import { BellOutlined, CrownOutlined, ExperimentOutlined, PieChartOutlined, SkinOutlined } from '@ant-design/icons';
-import { AssetPlaceholder, BackLink, ButtonLink, Card, PageHeader } from '../../../components/shared/ui/index';
+import { AssetPlaceholder, ButtonLink, Card, PageHeader } from '../../../components/shared/ui/index';
 
 export function NotificationsPage() {
   return <div className="stack-lg">
@@ -15,7 +15,7 @@ export function NotificationsPage() {
 
 export function PremiumPage() {
   return <div className="stack-lg">
-    <PageHeader eyebrow="THE LOOKS PREMIUM" title="Nâng tầm phong cách mỗi ngày" sub="Khám phá thêm các khả năng dành cho tủ đồ của bạn." />
+    <PageHeader eyebrow="THE LOOKS PREMIUM" title="Nâng tầm phong cách mỗi ngày" sub="Khám phá thêm các khả năng dành cho tủ đồ của bạn." back={{ to: '/profile' }} />
     <Card hero className="premium-hero"><CrownOutlined /><h2>Phong cách của bạn, nhiều lựa chọn hơn.</h2><p className="muted">Tính năng và giá gói Premium sẽ được công bố sau.</p></Card>
     <div className="grid-cards">
       <Card><ExperimentOutlined className="premium-feature-icon" /><h2>THE LOOKS AI</h2><p className="muted">Ý tưởng phối đồ theo dịp và gu cá nhân.</p></Card>
@@ -23,6 +23,5 @@ export function PremiumPage() {
       <Card><PieChartOutlined className="premium-feature-icon" /><h2>Thống kê phong cách</h2><p className="muted">Hiểu cách bạn sử dụng tủ đồ.</p></Card>
     </div>
     <div className="premium-preview"><AssetPlaceholder label="Ảnh giới thiệu Premium" assetPath="assets/premium/hero.jpg" /><p className="small muted">Logo và ảnh sẽ được bổ sung vào assets sau.</p></div>
-    <BackLink to="/profile">Về hồ sơ</BackLink>
   </div>;
 }
