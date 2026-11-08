@@ -529,6 +529,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/app/wardrobe/items/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Cất đi / đánh dấu đã bán / đưa lại vào tủ nhiều món (1..100)
+         * @description Chỉ món đã xác nhận (CONFIRMED, ARCHIVED, SOLD) và chỉ chuyển sang một trong ba trạng thái đó. Một món lỗi thì không món nào bị đổi. Món ARCHIVED / SOLD không vào gợi ý outfit và bị ẩn khỏi tủ đồ khi không lọc theo trạng thái; SOLD không tính vào giới hạn số món của gói.
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["BatchItemsRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["WardrobeItem"][];
+                    };
+                };
+                400: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+                409: components["responses"]["Problem"];
+            };
+        };
+        trace?: never;
+    };
+    "/api/app/wardrobe/items/batch-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Xoá nhiều món và ảnh của chúng (1..100); một món không tìm thấy thì không xoá món nào */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["BatchItemsRequest"];
+                };
+            };
+            responses: {
+                /** @description Đã xoá */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["Problem"];
+                404: components["responses"]["Problem"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/wardrobe/status": {
         parameters: {
             query?: never;
@@ -693,7 +779,12 @@ export interface components {
             size: number;
         };
         /** @enum {string} */
-        ItemStatus: "PROCESSING" | "PENDING_REVIEW" | "CONFIRMED" | "RECOGNITION_FAILED";
+        ItemStatus: "PROCESSING" | "PENDING_REVIEW" | "CONFIRMED" | "RECOGNITION_FAILED" | "ARCHIVED" | "SOLD";
+        BatchItemsRequest: {
+            itemIds: string[];
+            /** @description Bắt buộc khi đổi trạng thái: CONFIRMED, ARCHIVED hoặc SOLD */
+            status?: components["schemas"]["ItemStatus"];
+        };
         /** @enum {string} */
         Category: "TOP" | "BOTTOM" | "DRESS" | "OUTERWEAR" | "SHOES" | "BAG" | "ACCESSORY";
         /** @enum {string} */

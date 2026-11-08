@@ -87,6 +87,16 @@ class WardrobeSearchRepositoryTest {
         assertThat(second.items()).extracting(ClothingItem::id).containsExactly(shoes.id(), summerTop.id());
         assertThat(first.total()).isEqualTo(4);
     }
+    @Test
+    void hidesArchivedAndSoldItemsUnlessAskedForThem() {
+        var archived = item(owner, Category.TOP, "white", "casual", Set.of(), 9, ItemStatus.ARCHIVED);
+        var sold = item(owner, Category.TOP, "white", "casual", Set.of(), 10, ItemStatus.SOLD);
+        assertThat(ids(filter(0, 100))).doesNotContain(archived.id(), sold.id());
+        assertThat(ids(new Filter(ItemStatus.ARCHIVED, null, null, null, null, null, null, 0, 100))).containsExactly(archived.id());
+        assertThat(items.findByOwner(owner, null)).extracting(ClothingItem::id).doesNotContain(archived.id(), sold.id());
+        assertThat(items.findByOwner(owner, ItemStatus.SOLD)).extracting(ClothingItem::id).containsExactly(sold.id());
+        assertThat(items.countByOwner(owner)).isEqualTo(6); // 4 đã xác nhận + 1 chờ + 1 cất đi; đã bán không chiếm chỗ
+    }
     private Filter filter(int page, int size) { return new Filter(null, null, null, null, null, null, Sort.NEWEST, page, size); }
     private List<UUID> ids(Filter filter) { return search.search(owner, filter, Map.of()).items().stream().map(ClothingItem::id).toList(); }
     private ClothingItem item(UUID ownerId, Category category, String color, String style, Set<Season> seasons, int time, ItemStatus status) {

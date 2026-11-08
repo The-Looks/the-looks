@@ -32,6 +32,10 @@ export const wardrobeRequests = {
     unwrap(wardrobeApi.POST('/api/app/wardrobe/items/confirm', { body: { items } })),
   update: (id: string, attrs: ClothingAttributes) =>
     unwrap(wardrobeApi.PUT('/api/app/wardrobe/items/{itemId}', { params: { path: { itemId: id } }, body: attrs })),
+  changeStatus: ({ itemIds, status }: { itemIds: string[]; status: ItemStatus }) =>
+    unwrap(wardrobeApi.PATCH('/api/app/wardrobe/items/batch', { body: { itemIds, status } })),
+  removeAll: (itemIds: string[]) =>
+    unwrap(wardrobeApi.POST('/api/app/wardrobe/items/batch-delete', { body: { itemIds } })),
   remove: (id: string) =>
     unwrap(wardrobeApi.DELETE('/api/app/wardrobe/items/{itemId}', { params: { path: { itemId: id } } })),
 };

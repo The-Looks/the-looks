@@ -76,7 +76,8 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
     @Override
     public List<ClothingItem> findByOwner(UUID ownerId, ItemStatus status) {
         return jdbc.sql("""
-                select * from wardrobe_item where owner_id = :owner and (cast(:status as varchar) is null or status = :status)
+                select * from wardrobe_item where owner_id = :owner
+                  and (status = :status or (cast(:status as varchar) is null and status not in ('ARCHIVED', 'SOLD')))
                 order by created_at desc
                 """)
                 .param("owner", ownerId)
@@ -92,7 +93,7 @@ class ClothingItemRepositoryAdapter implements ClothingItemRepository {
 
     @Override
     public long countByOwner(UUID ownerId) {
-        return jdbc.sql("select count(*) from wardrobe_item where owner_id = :owner and status <> 'RECOGNITION_FAILED'")
+        return jdbc.sql("select count(*) from wardrobe_item where owner_id = :owner and status not in ('RECOGNITION_FAILED', 'SOLD')")
                 .param("owner", ownerId).query(Long.class).single();
     }
 

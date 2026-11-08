@@ -122,7 +122,7 @@ const wardrobe: HttpHandler[] = [
   http.get('*/api/app/wardrobe/items/search', ({ request }) => {
     const f = readWardrobeFilters(new URL(request.url).searchParams);
     const labels: Record<string, string> = { TOP: 'áo', BOTTOM: 'quần', DRESS: 'váy', OUTERWEAR: 'áo khoác', SHOES: 'giày', BAG: 'túi', ACCESSORY: 'phụ kiện' };
-    const matches = closet.filter((item) => (!f.status || item.status === f.status)
+    const matches = closet.filter((item) => (f.status ? item.status === f.status : item.status !== 'ARCHIVED' && item.status !== 'SOLD')
       && (!f.category || item.category === f.category)
       && (!f.color?.trim() || item.colors?.some((color) => color.toLowerCase() === f.color?.trim().toLowerCase()))
       && (!f.season || !item.seasons?.length || item.seasons.includes(f.season))
@@ -138,7 +138,7 @@ const wardrobe: HttpHandler[] = [
     const status = url.searchParams.get('status');
     const category = url.searchParams.get('category');
     return HttpResponse.json(
-      closet.filter((i) => (!status || i.status === status) && (!category || i.category === category)),
+      closet.filter((i) => (status ? i.status === status : i.status !== 'ARCHIVED' && i.status !== 'SOLD') && (!category || i.category === category)),
     );
   }),
   // Giả lập quét ảnh: mỗi ảnh ra 1–3 món sau ~2 giây (ảnh mock không cắt được nên dùng lại ảnh gốc)
@@ -211,6 +211,20 @@ const wardrobe: HttpHandler[] = [
     if ((attrs.brand?.length ?? 0) > 100) return problem(400, 'Thương hiệu tối đa 100 ký tự');
     closet = closet.map((i) => (i.id === params.id ? { ...i, ...attrs } : i));
     return HttpResponse.json(closet.find((i) => i.id === params.id));
+  }),
+  http.patch('*/api/app/wardrobe/items/batch', async ({ request }) => {
+    const { itemIds, status } = (await request.json()) as { itemIds: string[]; status: WardrobeItem['status'] };
+    const owned = ['CONFIRMED', 'ARCHIVED', 'SOLD'];
+    const selected = closet.filter((i) => itemIds.includes(i.id));
+    if (selected.length !== itemIds.length) return problem(404, 'Không tìm thấy món đồ');
+    if (!owned.includes(status) || selected.some((i) => !owned.includes(i.status))) return problem(409, 'Có món chưa xác nhận. Xác nhận món đồ trước khi cất đi hoặc đánh dấu đã bán.');
+    closet = closet.map((i) => (itemIds.includes(i.id) ? { ...i, status } : i));
+    return HttpResponse.json(closet.filter((i) => itemIds.includes(i.id)));
+  }),
+  http.post('*/api/app/wardrobe/items/batch-delete', async ({ request }) => {
+    const { itemIds } = (await request.json()) as { itemIds: string[] };
+    closet = closet.filter((i) => !itemIds.includes(i.id));
+    return new HttpResponse(null, { status: 204 });
   }),
   http.delete('*/api/app/wardrobe/items/:id', ({ params }) => {
     closet = closet.filter((i) => i.id !== params.id);

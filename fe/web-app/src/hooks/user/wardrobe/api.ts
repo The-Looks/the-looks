@@ -101,6 +101,23 @@ export function useDelete() {
   });
 }
 
+/** Cất đi / đã bán / đưa lại vào tủ nhiều món. */
+export function useChangeStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: wardrobeRequests.changeStatus,
+    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+  });
+}
+
+export function useDeleteMany() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: wardrobeRequests.removeAll,
+    onSuccess: () => qc.invalidateQueries({ queryKey: wardrobeKeys.all }),
+  });
+}
+
 export function useConfirmAll() {
   const qc = useQueryClient();
   return useMutation({

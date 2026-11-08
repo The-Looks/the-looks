@@ -8,13 +8,14 @@ vi.mock('../../../components/user/wardrobe/CostPerWearSection', () => ({ CostPer
 const mocks = vi.hoisted(() => ({
   data: { id: 'item-1', status: 'CONFIRMED', category: 'TOP', colors: ['white'], material: 'cotton', seasons: [], styleTags: ['casual'],
     createdAt: '2026-11-06T00:00:00Z', purchasePrice: 300000 as number | null, purchaseDate: '2026-11-06' as string | null, brand: 'Uniqlo' as string | null },
-  update: vi.fn(), confirm: vi.fn(),
+  update: vi.fn(), confirm: vi.fn(), changeStatus: vi.fn(),
 }));
 vi.mock('../../../hooks/user/wardrobe/api', () => ({
   useItem: () => ({ data: mocks.data }),
   useConfirm: () => ({ mutate: mocks.confirm }),
   useUpdateItem: () => ({ mutate: mocks.update }),
   useDelete: () => ({ mutate: vi.fn() }),
+  useChangeStatus: () => ({ mutate: mocks.changeStatus }),
 }));
 afterEach(cleanup);
 beforeEach(() => { vi.clearAllMocks(); mocks.data.status = 'CONFIRMED'; mocks.data.purchasePrice = 300000; mocks.data.purchaseDate = '2026-11-06'; mocks.data.brand = 'Uniqlo'; });
@@ -59,5 +60,17 @@ describe('purchase details', () => {
     fireEvent.click(screen.getByRole('checkbox'));
     fireEvent.click(screen.getByRole('button', { name: 'Xác nhận món đồ' }));
     expect(mocks.confirm).toHaveBeenCalledWith(expect.objectContaining({ purchasePrice: 300000, brand: 'Uniqlo', purchaseDate: '2026-11-06' }));
+  });
+  it('archives a confirmed item and restores an archived one', () => {
+    mocks.data.status = 'CONFIRMED';
+    const view = show();
+    fireEvent.click(screen.getByRole('button', { name: 'Cất đi' }));
+    expect(mocks.changeStatus).toHaveBeenCalledWith({ itemIds: [expect.any(String)], status: 'ARCHIVED' });
+    view.unmount();
+    mocks.data.status = 'ARCHIVED';
+    show();
+    expect(screen.queryByRole('button', { name: 'Cất đi' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Đưa lại vào tủ' }));
+    expect(mocks.changeStatus).toHaveBeenCalledWith({ itemIds: [expect.any(String)], status: 'CONFIRMED' });
   });
 });
