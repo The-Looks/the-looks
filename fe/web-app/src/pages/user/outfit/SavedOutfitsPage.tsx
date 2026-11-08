@@ -16,7 +16,7 @@ export function SavedOutfitsPage() {
     <div className="stack-lg">
       <PageHeader
         title="Outfit đã lưu"
-        back={{ to: '/outfits/suggest', label: 'Phối đồ' }}
+        back={{ to: '/outfits/suggest' }}
         action={
           <div className="row">
             <ButtonLink to="/outfits/calendar" small>

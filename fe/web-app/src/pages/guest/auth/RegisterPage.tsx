@@ -51,7 +51,7 @@ export function RegisterPage() {
         <p>Lưu tủ đồ, khám phá bộ phối mới và hỏi bạn bè chỉ bằng một đường link.</p>
       </aside>
       <section className={`auth-panel register-panel${animateFromLogin ? ' register-panel-enter' : ''}`}>
-        <AuthHeader to="/login" label="Đăng nhập" state={{ fromRegister: true }} />
+        <AuthHeader to="/login" state={{ fromRegister: true }} />
         <div className="stack"><h1>Tạo tài khoản</h1><p className="muted">Chỉ mất một phút để bắt đầu.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="reg-name" label="Tên người dùng" required maxLength={60} value={form.username} onChange={set('username')} />

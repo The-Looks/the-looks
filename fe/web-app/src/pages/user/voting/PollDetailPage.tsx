@@ -35,7 +35,7 @@ export function PollDetailPage() {
 
   return (
     <div className="stack-lg">
-      <PageHeader title={poll.data?.question ?? 'Kết quả bình chọn'} back={{ to: '/polls', label: 'Bình chọn' }} />
+      <PageHeader title={poll.data?.question ?? 'Kết quả bình chọn'} back={{ to: '/polls' }} />
       {poll.isPending && <Spinner />}
       {poll.isError && <Notice tone="error">{errorMessage(poll.error)}</Notice>}
       {poll.data && (

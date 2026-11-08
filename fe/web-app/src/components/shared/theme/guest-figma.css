@@ -23,7 +23,7 @@
 .guest-help-link:hover { text-decoration: underline; }
 
 .guest-landing > main { width: min(100% - 72px, 1450px); margin-inline: auto; }
-.guest-landing > main > .back-link { display: inline-flex; align-items: center; gap: 7px; margin: 22px 0 0; font-weight: var(--weight-semibold); text-decoration: none; }
+.guest-landing > main > .back-button { margin-top: 22px; }
 .guest-landing-hero {
   position: relative; isolation: isolate; display: flex; align-items: center;
   max-width: none; min-height: clamp(510px, 47vw, 650px); margin: 20px 0 52px;
@@ -73,7 +73,7 @@
 .guest-how-it-works > p.small { display: flex; align-items: center; gap: 8px; }
 
 .guest-layout { width: min(100% - 72px, 1450px); max-width: none; margin: 0 auto; padding: 25px 0 48px; grid-template-columns: minmax(230px, 285px) minmax(0, 1fr); gap: 20px; align-items: start; }
-.guest-vote-back { grid-column: 1 / -1; justify-self: start; display: inline-flex; align-items: center; gap: 7px; margin-bottom: 3px; font-weight: var(--weight-semibold); text-decoration: none; }
+.guest-vote-back { grid-column: 1 / -1; margin-bottom: 3px; }
 .guest-side { gap: 15px; }
 .guest-invite { position: relative; isolation: isolate; overflow: hidden; min-height: 250px; padding: 26px; border-radius: 22px; background: var(--ink); color: #fff; box-shadow: 0 14px 32px #251d2f1c; }
 .guest-invite::before { content: ''; position: absolute; z-index: -1; inset: 0; background: var(--asset-auth-wall) center / cover; opacity: .12; }

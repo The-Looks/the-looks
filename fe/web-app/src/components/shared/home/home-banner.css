@@ -1,17 +1,17 @@
 .home-banner {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-  align-items: center;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   overflow: hidden;
-  background: var(--pink-soft);
+  background: var(--lav-soft);
   border-radius: var(--r-lg);
 }
 
 .home-banner-copy {
   display: grid;
+  align-content: center;
   justify-items: start;
   gap: 20px;
-  padding: clamp(24px, 4vw, 60px);
+  padding: clamp(26px, 4.5vw, 68px);
   color: var(--ink);
 }
 
@@ -21,7 +21,7 @@
 }
 
 .home-banner-copy p {
-  max-width: 34ch;
+  max-width: 35ch;
   margin: 0;
   font-size: var(--text-body);
 }
@@ -31,10 +31,14 @@
 .home-banner-art {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  aspect-ratio: 1.65;
+  object-fit: cover;
+  object-position: right center;
 }
 
 @media (max-width: 600px) {
   .home-banner { grid-template-columns: minmax(0, 1fr); }
-  .home-banner-copy { gap: 12px; }
+  .home-banner-copy { gap: 12px; padding: 24px; }
+  .home-banner-art { height: auto; aspect-ratio: 16 / 9; }
 }

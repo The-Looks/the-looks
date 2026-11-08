@@ -176,7 +176,7 @@
 .public-home-header nav a:hover { color: var(--purple); }
 .public-home-actions { gap: 10px; }
 .public-home .btn { min-height: 42px; border-radius: 11px; font-size: var(--text-label); }
-.public-home main > .back-link { margin-inline: max(40px, calc((100% - 1390px) / 2)); }
+.public-home main > .back-button { margin-inline: max(40px, calc((100% - 1390px) / 2)); }
 .public-home-hero { width: min(100% - 80px, 1390px); min-height: 600px; margin: 12px auto 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; background: var(--surface); overflow: hidden; }
 .public-home-hero-copy { padding: clamp(52px, 6vw, 95px) clamp(34px, 5vw, 75px); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
 .public-home-kicker { margin-bottom: 18px; color: var(--accent-gold); font-size: var(--text-caption); font-weight: var(--weight-bold); letter-spacing: .15em; }
@@ -218,7 +218,7 @@
 .public-home-close p { margin-bottom: 22px; color: #e4d6ea; font-size: var(--text-label); }
 @media (max-width: 1000px) {
   .public-home-header, .public-home-hero, .public-home-features, .public-home-steps, .public-home-close { width: min(100% - 40px, 1390px); }
-  .public-home main > .back-link { margin-inline: max(20px, calc((100% - 1390px) / 2)); }
+  .public-home main > .back-button { margin-inline: max(20px, calc((100% - 1390px) / 2)); }
   .public-home-header nav { gap: 14px; }
   .public-home-hero { grid-template-columns: 1fr 1fr; }
   .public-home-hero-copy { padding: 40px 32px; }

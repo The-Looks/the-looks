@@ -109,7 +109,7 @@ export function WardrobeStatsPage() {
     </>;
   }
   return <div className="stack-lg wardrobe-stats">
-    <PageHeader title="Thống kê tủ đồ" sub="Mặc nhiều hơn từ những món bạn đã có." back={{ to: '/wardrobe', label: 'Tủ đồ' }}
+    <PageHeader title="Thống kê tủ đồ" sub="Mặc nhiều hơn từ những món bạn đã có." back={{ to: '/wardrobe' }}
       action={allowed ? <Button kind="outline" disabled={stats.isFetching || plan.isFetching} onClick={() => { void plan.refetch(); void stats.refetch(); void qc.invalidateQueries({ queryKey: ['wardrobe', 'cost-per-wear'] }); }}>Làm mới</Button> : undefined} />
     {content}
   </div>;

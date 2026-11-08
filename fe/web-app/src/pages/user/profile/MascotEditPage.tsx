@@ -49,7 +49,7 @@ export function MascotEditPage() {
   const profile = useQuery({ queryKey: profileKey, queryFn: profileRequests.get, enabled: Boolean(me.data) });
   return <div className="stack-lg">
     <PageHeader title="Linh vật của bạn" sub="Linh vật hiện ở ảnh đại diện khi bạn chưa tải ảnh riêng."
-      back={{ to: '/profile', label: 'Cá nhân' }} />
+      back={{ to: '/profile' }} />
     {me.isPending && <Spinner />}
     {me.isError && <Notice tone="error">{errorMessage(me.error)}</Notice>}
     {me.data && <Editor accountId={me.data.id} profile={profile.data} />}

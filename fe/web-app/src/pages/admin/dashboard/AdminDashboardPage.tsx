@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Card, Input, Modal, Select, Skeleton, Table, Tag } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { BackLink, Brand } from '../../../components/shared/ui/index';
+import { BackButton, Brand } from '../../../components/shared/ui/index';
 import { AccountDrawer } from '../../../components/shared/layout/AccountDrawer';
 import { SiteFooter } from '../../../components/shared/layout/SiteFooter';
 import { errorMessage } from '../../../services/shared/api/client';
@@ -379,7 +379,7 @@ export function AdminDashboardPage() {
     <div className="admin-content"><header className="admin-topbar"><div className="admin-topbar-left">
       <button className="admin-collapse-button" type="button" aria-label={collapsed ? 'Mở rộng thanh điều hướng' : 'Thu gọn thanh điều hướng'} aria-controls="admin-sidebar" aria-expanded={!collapsed} onClick={() => setCollapsed((value) => !value)}>{collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</button>
       <button className="admin-menu-button" type="button" aria-label="Mở menu" aria-controls="admin-sidebar" aria-expanded={mobileNav} onClick={() => setMobileNav((value) => !value)}><MenuUnfoldOutlined /></button>
-      <div className="admin-topbar-title"><span>Quản trị / {titles[view]}</span><BackLink to="/" className="admin-topbar-back">Quay lại trang chủ</BackLink></div>
+      <div className="admin-topbar-title"><span>Quản trị / {titles[view]}</span><BackButton /></div>
     </div><div className="admin-topbar-actions">
       <button type="button" className="admin-notification-button" aria-label="Xem thông báo quản trị" onClick={() => choose('notifications')}><BellOutlined /></button>
       <button type="button" className="topbar-avatar-trigger admin-avatar-trigger" aria-label="Mở menu tài khoản" aria-controls="account-drawer" aria-expanded={accountOpen} onClick={() => setAccountOpen(true)}><Avatar className="user-avatar">{avatarLetter}</Avatar></button>

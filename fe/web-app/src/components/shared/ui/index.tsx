@@ -1,20 +1,39 @@
 import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
-import { DoubleLeftOutlined, PictureOutlined } from '@ant-design/icons';
-import { Link, useLocation, useNavigate, type LinkProps } from 'react-router-dom';
+import { ArrowLeftOutlined, PictureOutlined } from '@ant-design/icons';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { categoryLabel } from '../../../services/shared/labels';
 import { brand } from '../../../services/shared/brand';
+import { useSession } from '../../../services/shared/session';
+import { backDelta, screenKey } from '../routing/backHistory';
 
 type ButtonKind = 'primary' | 'ghost' | 'outline' | 'pink';
 
-export function BackLink({ children, className = '', state, ...props }: LinkProps) {
-  const backState = state && typeof state === 'object' && !Array.isArray(state)
-    ? { ...state, backNavigation: true }
-    : { backNavigation: true };
+type BackOptions = { to: string; fixed?: boolean; state?: Record<string, unknown> };
+
+export function BackButton({ to = '/', fixed, state, className = '' }: Partial<BackOptions> & { className?: string }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSession();
+
+  function goBack() {
+    const entry = window.history.state;
+    const [pathname = '/', search = ''] = to.split('?');
+    const delta = typeof entry?.idx === 'number'
+      ? backDelta(
+        { index: entry.idx, screen: screenKey(location), authenticated: isAuthenticated },
+        entry.theLooksBack,
+        fixed ? screenKey({ pathname, search }) : undefined,
+      )
+      : undefined;
+    if (delta !== undefined) navigate(delta);
+    else navigate(to, { replace: true, state: { ...state, backNavigation: true } });
+  }
+
   return (
-    <Link {...props} state={backState} className={['back', 'back-link', className].filter(Boolean).join(' ')}>
-      <DoubleLeftOutlined aria-hidden="true" />
-      <span>{children}</span>
-    </Link>
+    <button className={`back-button ${className}`.trim()} type="button" onClick={goBack}>
+      <ArrowLeftOutlined aria-hidden="true" />
+      <span>Quay lại</span>
+    </button>
   );
 }
 
@@ -134,24 +153,13 @@ export function PageHeader({
   title: ReactNode;
   eyebrow?: string;
   sub?: string;
-  back?: { to: string; label: string };
+  back?: BackOptions;
   action?: ReactNode;
 }) {
   const location = useLocation();
-  const navigate = useNavigate();
-  const showBack = back ?? (location.pathname !== '/' ? { to: '/', label: 'Quay lại' } : undefined);
   return (
     <header className="page-header">
-      {showBack && (
-        <button className="back page-back-button" type="button" onClick={() => {
-          if (back) navigate(back.to, { state: { backNavigation: true } });
-          else if (window.history.state?.idx > 0) navigate(-1);
-          else navigate('/', { state: { backNavigation: true } });
-        }}>
-          <DoubleLeftOutlined aria-hidden="true" />
-          <span>{showBack.label}</span>
-        </button>
-      )}
+      {(back || location.pathname !== '/') && <BackButton {...back} />}
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}
       <div className="spread">
         <h1>{title}</h1>
