@@ -31,6 +31,8 @@ import vn.thelooks.wardrobe.application.port.out.ImageStorage;
 @ConditionalOnProperty(name = "thelooks.storage.provider", havingValue = "cloudinary")
 class CloudinaryImageStorage implements ImageStorage {
 
+    static final String FOLDER = "thelooks/";
+
     private final RestClient http;
     private final String cloudName;
     private final String apiKey;
@@ -56,7 +58,7 @@ class CloudinaryImageStorage implements ImageStorage {
 
     @Override
     public String store(UUID ownerId, byte[] content, String contentType) {
-        String publicId = "thelooks/" + ownerId + "/" + UUID.randomUUID();
+        String publicId = FOLDER + ownerId + "/" + UUID.randomUUID();
         var form = signedForm(Map.of("public_id", publicId));
         form.add("file", new ByteArrayResource(content) {
             @Override
@@ -74,6 +76,10 @@ class CloudinaryImageStorage implements ImageStorage {
 
     @Override
     public URI url(String key, Duration validity) {
+        if (!key.startsWith(FOLDER)) {
+            // Món thêm từ hồi lưu ảnh trên ổ đĩa Render ("<owner>/<id>.jpg"): ổ đĩa bị xoá khi khởi động lại, ảnh không còn.
+            return null;
+        }
         return URI.create("https://res.cloudinary.com/" + cloudName + "/image/upload/" + key + ".jpg");
     }
 

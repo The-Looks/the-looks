@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,29 +121,49 @@ class WardrobeService implements ScanClothingUseCase, GetScanQuery, GetWardrobeQ
         return scan;
     }
 
-    /** Chạy nền: AI tìm món → chọn món → cắt → lưu ảnh → tạo món PENDING_REVIEW. Ảnh gốc bỏ đi sau bước này. */
+    /**
+     * Chạy nền: AI tìm món → chọn món → cắt → lưu ảnh → tạo món PENDING_REVIEW. Ảnh gốc bỏ đi sau bước này.
+     * AI là phần chậm nên gọi song song mọi ảnh; chọn món theo đúng thứ tự ảnh để giới hạn của gói tính đúng,
+     * rồi cắt + lưu ảnh từng món song song.
+     */
     void process(Scan scan, List<NormalizedImage> photos, Integer max) {
-        int skipped = 0, failedPhotos = 0;
-        List<UUID> created = new ArrayList<>();
-        for (NormalizedImage photo : photos) {
+        List<CompletableFuture<List<DetectedGarment>>> detections = photos.stream()
+                .map(photo -> CompletableFuture.supplyAsync(() -> detector.detect(photo.jpeg(), "image/jpeg"), background))
+                .toList();
+        int skipped = 0, failedPhotos = 0, kept = 0;
+        long existing = max == null ? 0 : items.countByOwner(scan.ownerId());
+        List<CompletableFuture<Optional<UUID>>> saves = new ArrayList<>();
+        for (int i = 0; i < photos.size(); i++) {
+            Integer remaining = max == null ? null : (int) Math.max(0, max - existing - kept);
+            GarmentSelection.Result chosen;
             try {
-                List<DetectedGarment> detected = detector.detect(photo.jpeg(), "image/jpeg");
-                Integer remaining = max == null ? null : (int) Math.max(0, max - items.countByOwner(scan.ownerId()));
-                GarmentSelection.Result chosen = GarmentSelection.select(detected, remaining);
-                skipped += chosen.skippedForLimit();
-                for (DetectedGarment g : chosen.kept()) {
-                    String key = storage.store(scan.ownerId(), images.crop(photo, g.box()), "image/jpeg");
-                    ClothingItem item = items.save(new ClothingItem(UUID.randomUUID(), scan.ownerId(), key,
-                            ItemStatus.PENDING_REVIEW, g.attributes(), scan.id(), g.confidence(), clock.instant()));
-                    created.add(item.id());
-                }
-            } catch (RuntimeException e) {
+                chosen = GarmentSelection.select(detections.get(i).join(), remaining);
+            } catch (CompletionException | CancellationException | NullPointerException e) {
                 failedPhotos++;
-                log.warn("Quét ảnh thất bại (scan {}): {}", scan.id(), e.toString());
+                log.warn("Quét ảnh thất bại (scan {}): {}", scan.id(), (e.getCause() == null ? e : e.getCause()).toString());
+                continue;
+            }
+            skipped += chosen.skippedForLimit();
+            kept += chosen.kept().size();
+            NormalizedImage photo = photos.get(i);
+            for (DetectedGarment g : chosen.kept()) {
+                saves.add(CompletableFuture.supplyAsync(() -> save(scan, photo, g), background));
             }
         }
+        List<UUID> created = saves.stream().map(CompletableFuture::join).flatMap(Optional::stream).toList();
         ScanStatus status = failedPhotos == photos.size() ? ScanStatus.FAILED : ScanStatus.DONE;
         scans.save(new Scan(scan.id(), scan.ownerId(), status, scan.imageCount(), created, skipped, scan.createdAt()));
+    }
+
+    private Optional<UUID> save(Scan scan, NormalizedImage photo, DetectedGarment g) {
+        try {
+            String key = storage.store(scan.ownerId(), images.crop(photo, g.box()), "image/jpeg");
+            return Optional.of(items.save(new ClothingItem(UUID.randomUUID(), scan.ownerId(), key,
+                    ItemStatus.PENDING_REVIEW, g.attributes(), scan.id(), g.confidence(), clock.instant())).id());
+        } catch (RuntimeException e) {
+            log.warn("Lưu món đồ thất bại (scan {}): {}", scan.id(), e.toString());
+            return Optional.empty();
+        }
     }
 
     @Override

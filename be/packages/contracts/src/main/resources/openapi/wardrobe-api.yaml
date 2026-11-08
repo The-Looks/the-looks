@@ -389,7 +389,7 @@ components:
         brand: { type: [string, 'null'], maxLength: 100, description: Thương hiệu; để trống để xoá }
         seasons: { type: array, items: { $ref: '#/components/schemas/Season' } }
         styleTags: { type: array, items: { type: string } }
-        imageUrl: { type: string, format: uri, description: Ảnh đã cắt của riêng món này }
+        imageUrl: { type: [string, 'null'], format: uri, description: 'Ảnh đã cắt của riêng món này; null khi ảnh không còn (món thêm lúc còn lưu ảnh trên ổ đĩa Render)' }
         scanId: { type: [string, 'null'], format: uuid, description: Lần quét tạo ra món này }
         confidence: { type: [number, 'null'], description: Độ tin cậy của AI 0..1; thấp thì nhắc người dùng kiểm tra kỹ }
         createdAt: { type: string, format: date-time }

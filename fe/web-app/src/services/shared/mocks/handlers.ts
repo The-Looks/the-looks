@@ -240,7 +240,7 @@ const wearPlans = new Map<string, string>();
 const disliked = new Set<string>();
 const comboKey = (ids: string[]) => [...ids].sort().join(',');
 const confirmed = () => closet.filter((i) => i.status === 'CONFIRMED');
-const toItem = (i: WardrobeItem) => ({ id: i.id, category: i.category ?? 'TOP', imageUrl: i.imageUrl });
+const toItem = (i: WardrobeItem) => ({ id: i.id, category: i.category ?? 'TOP', imageUrl: i.imageUrl ?? undefined });
 
 function mockSuggestions(occasion?: string): OutfitSuggestion[] {
   const by = (c: string) => confirmed().filter((i) => i.category === c);
