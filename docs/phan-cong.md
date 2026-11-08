@@ -36,7 +36,7 @@ Cách làm: mỗi việc một nhánh `feature/<tên>`, commit nhỏ, mở PR, n
 | 2.0 | ~~Key Cloudinary trên Render~~ (xong 07/11) | | |
 | 2.8 | ~~Key PayOS, Gemini, AccessTrade trên Render~~ (xong 07/11); theo dõi chi phí AI hằng tuần | Liên tục | Ngân sách AI 25 USD/tháng |
 | 2.2 | ~~CI + bảo vệ nhánh `main`~~ (xong 07/11): mọi PR phải qua 2 job `backend` và `web` mới merge được | | |
-| 2.11 | Kiểm tra luồng xoá tài khoản của #40 trên bản deploy (admin xoá 1 tài khoản thử) | 10/11 | |
+| 2.11 | ~~Kiểm tra luồng xoá tài khoản trên bản deploy~~ (xong 08/11) | | |
 | 2.10 | ~~Đồng ý điều khoản khi đăng ký bằng Google~~ (xong 07/11) | | |
 | 2.12 | ~~Thời tiết theo thành phố~~ (xong 07/11: Phát nối hồ sơ ở PR #52, Tuấn thêm dự phòng thành phố mặc định) | | |
 | 2.9 | ~~Email nhắc gia hạn~~ (code xong 07/11, Brevo): còn tạo tài khoản Brevo + điền `BREVO_API_KEY`, `MAIL_FROM` | | `docs/viec-thu-cong.md` |
@@ -49,7 +49,7 @@ Cách làm: mỗi việc một nhánh `feature/<tên>`, commit nhỏ, mở PR, n
 | 1.11 | ~~Cất đi / đã bán + đổi trạng thái, xoá nhiều món cùng lúc~~ (xong 08/11): nút *Chọn nhiều* ở tủ đồ, `PATCH /items/batch`, `POST /items/batch-delete` | | | |
 | 1.12 | ~~Gợi ý dọn tủ~~ (xong 08/11): mục *Gợi ý dọn tủ* trên trang thống kê (gói có `WARDROBE_STATS`), món ≥ 90 ngày chưa mặc, nút *Cất đi* / *Đã bán* / *Cất đi cả N món* | | | |
 | 1.8 | ~~Xoá ảnh khi xoá tài khoản~~ (đã có từ PR #44 của Phát) | | | |
-| 1.10 | **Thử AI nhận diện** (Gemini) với 100–300 ảnh thật, chỉnh prompt nếu sai nhiều | Ít code | 29/11 | Bảng kết quả trong `docs/ai-nhan-dien.md` cho báo cáo EXE |
+| 1.10 | **Thử AI nhận diện**: đã gom 250 ảnh thật + bộ chạy thử (`docs/ai-eval/README.md`); còn chạy 1 lệnh với key AI để ra `docs/ai-nhan-dien.md` | Ít code | 29/11 | Bảng kết quả trong `docs/ai-nhan-dien.md` cho báo cáo EXE |
 | 1.9 | **Affiliate nguồn Shopee**: chỉ làm khi AccessTrade **đã duyệt** chiến dịch Shopee (đang chờ). Nguồn `ProductCatalog` thứ hai theo mẫu `AccessTradeTikTokCatalog` | BE + test | Khi được duyệt | Gợi ý mua thêm có cả sản phẩm Shopee |
 
 ## Phát (Member 3) · Đăng nhập, Ask Friends, admin

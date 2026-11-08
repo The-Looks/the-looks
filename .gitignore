@@ -13,3 +13,6 @@ graphify-out/
 # Local build cache and accidental frontend root lockfile
 /be/.gradle/
 /fe/package-lock.json
+
+# Ảnh thử AI nhận diện (tải lại từ clothing-dataset khi chạy, không commit)
+/docs/ai-eval/images/
