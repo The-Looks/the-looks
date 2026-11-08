@@ -88,7 +88,7 @@ class GeminiOutfitAdvisor implements OutfitAiAdvisor {
         JsonNode parts = root.path("candidates").path(0).path("content").path("parts");
         if (!parts.isArray()) throw new IllegalStateException("Gemini returned no candidates");
         for (JsonNode part : parts) if (part.hasNonNull("text")) {
-            ClaudeOutfitAdvisor.Picks picks = mapper.readValue(part.path("text").asString(), ClaudeOutfitAdvisor.Picks.class);
+            ClaudeOutfitAdvisor.Picks picks = parse(mapper, part.path("text").asString());
             JsonNode usage = root.path("usageMetadata");
             long inputTokens = usage.path("promptTokenCount").asLong();
             long outputTokens = Math.max(usage.path("candidatesTokenCount").asLong(),
@@ -109,5 +109,14 @@ class GeminiOutfitAdvisor implements OutfitAiAdvisor {
         if (model.contains("3.1-flash-lite")) return new double[] {0.25, 1.50};
         if (model.contains("flash-lite")) return new double[] {0.30, 2.50};
         return new double[] {0.75, 3.75};
+    }
+
+    /** Gemini có lúc trả thẳng danh sách [...] thay vì {"picks": [...]}: nhận cả hai. */
+    static ClaudeOutfitAdvisor.Picks parse(ObjectMapper mapper, String json) {
+        JsonNode node = mapper.readTree(json);
+        if (node.isArray()) {
+            node = mapper.createObjectNode().set("picks", node);
+        }
+        return mapper.treeToValue(node, ClaudeOutfitAdvisor.Picks.class);
     }
 }

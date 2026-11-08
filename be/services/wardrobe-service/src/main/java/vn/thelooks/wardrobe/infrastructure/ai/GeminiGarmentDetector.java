@@ -94,7 +94,16 @@ class GeminiGarmentDetector implements GarmentDetector {
         JsonNode parts = mapper.readTree(response.body()).path("candidates").path(0).path("content").path("parts");
         if (!parts.isArray()) throw new IllegalStateException("Gemini returned no candidates");
         for (JsonNode part : parts) if (part.hasNonNull("text"))
-            return ClaudeGarmentDetector.toDomain(mapper.readValue(part.path("text").asString(), ClaudeGarmentDetector.Detections.class));
+            return ClaudeGarmentDetector.toDomain(parse(mapper, part.path("text").asString()));
         throw new IllegalStateException("Gemini returned no JSON text");
+    }
+
+    /** Gemini có lúc trả thẳng danh sách món [...] thay vì {"garments": [...]}: nhận cả hai. */
+    static ClaudeGarmentDetector.Detections parse(ObjectMapper mapper, String json) {
+        JsonNode node = mapper.readTree(json);
+        if (node.isArray()) {
+            node = mapper.createObjectNode().set("garments", node);
+        }
+        return mapper.treeToValue(node, ClaudeGarmentDetector.Detections.class);
     }
 }
