@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <g id="head">
+    <path d="M 132 72 L 123 40 C 129 38, 140 44, 150 56 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="129,66 127,47 143,57" fill="#f5dce1"/>
+    <path d="M 170 56 C 180 44, 191 38, 197 40 L 188 72 Z"
+          fill="#d99b68" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="191,66 193,47 177,57" fill="#f5dce1"/>
+    <path d="M 130 76 C 122 84, 124 96, 134 102 C 146 109, 174 109, 186 102 C 196 96, 198 84, 190 76 C 182 66, 138 66, 130 76 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 174 60 C 184 66, 194 76, 193 84 C 192 90, 187 96, 180 94 C 174 88, 172 72, 174 60 Z"
+          fill="#d99b68"/>
+    <ellipse cx="138" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="182" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <path d="M 142 80 Q 148 76 154 80" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 166 80 Q 172 76 178 80" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 142 80 L 139 77" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 178 80 L 181 77" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="158,86 162,86 160,89" fill="#771e35"/>
+    <path d="M 156 91 Q 160 93 164 91" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 132 86 Q 116 84 108 88" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 132 91 Q 118 93 110 97" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 188 86 Q 204 84 212 88" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 188 91 Q 202 93 210 97" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+</svg>

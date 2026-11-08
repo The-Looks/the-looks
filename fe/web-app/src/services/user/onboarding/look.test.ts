@@ -1,5 +1,5 @@
 import { beforeEach, expect, it } from 'vitest';
-import { ACCESSORIES, decodeLook, encodeLook, normalizeLook, randomLook } from './look';
+import { ACCESSORIES, decodeLook, encodeLook, isDressed, normalizeLook, randomLook } from './look';
 import { isModular, MASCOTS } from './mascots';
 import { readLook, saveLook, updateOnboarding } from './progress';
 
@@ -14,8 +14,7 @@ it('round-trips a look through the compact text form', () => {
 it('drops unknown mascots and accessories', () => {
   expect(normalizeLook({ mascot: 'dragon' })).toBeUndefined();
   expect(normalizeLook({ mascot: 'cat', hat: 'helmet', glasses: 'round' })).toEqual({ mascot: 'cat', glasses: 'round' });
-  // con vẽ sẵn không thay quần áo; con tự phối thì giữ
-  expect(normalizeLook({ mascot: 'fox', top: 'hoodie' })).toEqual({ mascot: 'fox' });
+  expect(normalizeLook({ mascot: 'fox', top: 'hoodie' })).toEqual({ mascot: 'fox', top: 'hoodie' });
   expect(normalizeLook({ mascot: 'panda', top: 'hoodie', bottom: 'jeans', shoes: 'boots' }))
     .toEqual({ mascot: 'panda', top: 'hoodie', bottom: 'jeans', shoes: 'boots' });
   expect(decodeLook('')).toBeUndefined();
@@ -40,7 +39,10 @@ it('keeps old accounts that only saved a mascot and stores a look per account', 
   expect(readLook('other')).toBeUndefined();
 });
 
-it('offers 16 mascots, 10 of them dressable', () => {
+it('offers 16 mascots; drawn ones keep their own outfit until clothes are picked', () => {
   expect(MASCOTS).toHaveLength(16);
   expect(MASCOTS.filter((m) => isModular(m.id))).toHaveLength(10);
+  expect(isDressed({ mascot: 'fox' })).toBe(false);
+  expect(isDressed({ mascot: 'fox', shoes: 'boots' })).toBe(true);
+  expect(isDressed({ mascot: 'dog' })).toBe(true);
 });

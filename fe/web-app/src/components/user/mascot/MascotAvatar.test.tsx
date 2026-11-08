@@ -41,3 +41,10 @@ it('draws a dressable mascot in code and names its clothes', () => {
   expect(container.querySelector('image')).toBeNull();
   expect(getByRole('img').getAttribute('aria-label')).toBe('Trúc Mập, Hoodie, Quần jean, Bốt, Mũ lưỡi trai');
 });
+
+it('puts the original head on the shared body once clothes are picked', () => {
+  const hrefs = (look: Look) => [...render(<MascotAvatar look={look} />).container.querySelectorAll('image')].map((i) => i.getAttribute('href'));
+  expect(hrefs({ mascot: 'fox' })).toEqual(['/illustrations/fox.svg']);
+  expect(hrefs({ mascot: 'fox', top: 'tee' })).toEqual(['/illustrations/parts/fox-tail.svg', '/illustrations/parts/fox-head.svg']);
+  expect(hrefs({ mascot: 'frog', top: 'tee', hat: 'cap' })).toEqual(['/illustrations/parts/frog-head-bare.svg']);
+});

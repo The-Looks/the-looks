@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <g id="head">
+    <!-- Big Hair Bow behind ears -->
+    <path d="M 132 58 C 118 52, 114 68, 126 74 C 138 78, 146 68, 148 64 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 188 58 C 202 52, 206 68, 194 74 C 182 78, 174 68, 172 64 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="160" cy="64" r="5" fill="#771e35" stroke="#241d21" stroke-width="2"/>
+    <!-- Left Rabbit Ear (Upright) -->
+    <path d="M 144 68 C 136 48, 130 26, 142 16 C 152 6, 160 26, 154 66 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 143 56 C 138 42, 136 28, 144 22 C 148 18, 153 28, 150 56 Z" fill="#f5dce1"/>
+    <!-- Right Rabbit Ear (Playfully tilted tip) -->
+    <path d="M 166 66 C 162 38, 168 18, 180 18 C 188 18, 194 28, 188 40 C 184 48, 186 56, 176 68 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 170 58 C 168 40, 172 26, 178 24 C 182 24, 184 32, 180 42 C 178 48, 178 54, 172 58 Z" fill="#f5dce1"/>
+    <!-- Head Silhouette -->
+    <ellipse cx="160" cy="88" rx="32" ry="26" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <!-- Rosy Cheeks -->
+    <ellipse cx="138" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <ellipse cx="182" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <!-- Sweet Gentle Eyes -->
+    <ellipse cx="145" cy="86" rx="4.5" ry="5.5" fill="#241d21"/>
+    <circle cx="144" cy="84" r="1.8" fill="#fff7f3"/>
+    <circle cx="147" cy="88" r="0.8" fill="#fff7f3"/>
+    <ellipse cx="175" cy="86" rx="4.5" ry="5.5" fill="#241d21"/>
+    <circle cx="174" cy="84" r="1.8" fill="#fff7f3"/>
+    <circle cx="177" cy="88" r="0.8" fill="#fff7f3"/>
+    <!-- Cute Eyelashes -->
+    <path d="M 141 81 L 138 78" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 179 81 L 182 78" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Bunny Nose & Mouth -->
+    <polygon points="158,92 162,92 160,95" fill="#771e35"/>
+    <path d="M 156 97 Q 160 99 164 97" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Whiskers -->
+    <line x1="134" y1="92" x2="120" y2="92" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="134" y1="96" x2="122" y2="99" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="186" y1="92" x2="200" y2="92" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="186" y1="96" x2="198" y2="99" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

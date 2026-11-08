@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import type { ModularId } from '../../../services/user/onboarding/mascots';
+import { isModular, type MascotId, type ModularId } from '../../../services/user/onboarding/mascots';
 
 /*
- * Linh vật "tự phối": mọi con dùng chung một dáng người (khung 320×320, đầu tâm 160,84), nên áo / quần / giày
+ * Linh vật mặc đồ: mọi con dùng chung một dáng người (khung 320×320, đầu tâm 160,84), nên áo / quần / giày
  * vẽ một lần là mặc vừa cho mọi con. Hình tự vẽ, cùng nét viền và bảng màu với bộ linh vật trong public/illustrations.
  */
 
@@ -26,9 +26,9 @@ function Eyes({ y = 86, gap = 14, color = INK }: { y?: number; gap?: number; col
 const Cheeks = ({ y = 96 }: { y?: number }) => <Both><ellipse cx="134" cy={y} rx="6" ry="3.8" fill={BLUSH} stroke="none" /></Both>;
 const Smile = ({ y = 102 }: { y?: number }) => <path d={`M 153 ${y} Q 160 ${y + 6} 167 ${y}`} fill="none" strokeLinecap="round" />;
 
-type Head = { fur: Fur; back?: ReactNode; head: ReactNode };
+type Figure = { fur: Fur; back?: ReactNode; head: ReactNode };
 
-export const HEADS: Record<ModularId, Head> = {
+export const HEADS: Record<ModularId, Figure> = {
   dog: {
     fur: { body: '#e3b98a', belly: '#f8e6cf' },
     back: <path d="M 190 196 C 214 190, 222 170, 216 160" fill="none" stroke="#e3b98a" strokeWidth="9" strokeLinecap="round" />,
@@ -257,10 +257,35 @@ export const SHOES: Record<string, Piece> = {
   </Both> },
 };
 
-/** Vẽ linh vật tự phối; children = mũ, kính, phụ kiện cổ (vẽ đè lên đầu). */
-export function ModularMascot({ id, top, bottom, shoes, children }:
-  { id: ModularId; top?: string; bottom?: string; shoes?: string; children?: ReactNode }) {
-  const animal = HEADS[id];
+const image = (name: string) => <image href={`/illustrations/parts/${name}.svg`} x="0" y="0" width="320" height="320" />;
+
+/** Màu lông của 6 con vẽ sẵn, để thân dáng chung khớp với cái đầu gốc. */
+const DRAWN_FUR: Record<Exclude<MascotId, ModularId>, Fur> = {
+  cat: { body: '#fbf3ea', belly: CREAM },
+  fox: { body: '#cf5c2e', belly: CREAM },
+  rabbit: { body: CREAM, belly: '#f5dce1' },
+  bear: { body: '#8e5a38', belly: '#fae8d7' },
+  frog: { body: '#648653', belly: '#edf3e4' },
+  penguin: { body: '#2c2629', belly: CREAM },
+};
+
+/**
+ * Con tự phối: đầu vẽ trong code. Con vẽ sẵn: lấy đúng cái đầu (và đuôi cáo) từ hình gốc, đặt lên dáng chung để
+ * thay được bộ đồ vẽ sẵn. Ếch đội mũ khác thì dùng đầu không mũ nồi.
+ */
+function figureFor(id: MascotId, hat?: string): Figure {
+  if (isModular(id)) return HEADS[id];
+  return {
+    fur: DRAWN_FUR[id],
+    back: id === 'fox' ? image('fox-tail') : undefined,
+    head: image(id === 'frog' && hat ? 'frog-head-bare' : `${id}-head`),
+  };
+}
+
+/** Vẽ linh vật mặc đồ; children = mũ, kính, phụ kiện cổ (vẽ đè lên đầu). */
+export function ModularMascot({ id, hat, top, bottom, shoes, children }:
+  { id: MascotId; hat?: string; top?: string; bottom?: string; shoes?: string; children?: ReactNode }) {
+  const animal = figureFor(id, hat);
   const shirt = top ? TOPS[top] : undefined;
   return (
     <g stroke={INK} strokeWidth="2.6" strokeLinejoin="round">
