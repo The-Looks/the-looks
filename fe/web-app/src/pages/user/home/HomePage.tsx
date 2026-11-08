@@ -1,4 +1,6 @@
 import { AppstoreOutlined, CalendarOutlined, HeartOutlined, PlusOutlined, SkinOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MyPlanCard } from '../../../components/user/billing/MyPlanCard';
 import { QuickPickCard } from '../../../components/user/outfit/QuickPickCard';
@@ -10,6 +12,8 @@ import { formatDate } from '../../../services/shared/format';
 import { AssetPlaceholder, ButtonLink, Card, PageHeader, ProgressBar } from '../../../components/shared/ui/index';
 import { HomeStoryDivider, HomeStoryReveal } from '../../../components/shared/home/HomeStory';
 import { brand } from '../../../services/shared/brand';
+import { authRequests } from '../../../services/guest/auth/requests';
+import { readProfileDraft, type ProfileDraft } from '../../../services/user/profile/draft';
 
 const metric = (label: string, value: number | string, icon: React.ReactNode, detail: string) => (
   <div className="metric-card">
@@ -19,6 +23,16 @@ const metric = (label: string, value: number | string, icon: React.ReactNode, de
 );
 
 export function HomePage() {
+  const me = useQuery({ queryKey: ['me'], queryFn: authRequests.me });
+  const userId = me.data?.id;
+  const [profileDraft, setProfileDraft] = useState<ProfileDraft | null>(null);
+  useEffect(() => {
+    if (!userId) { setProfileDraft(null); return; }
+    const refreshDraft = () => setProfileDraft(readProfileDraft(userId));
+    refreshDraft();
+    window.addEventListener('storage', refreshDraft);
+    return () => window.removeEventListener('storage', refreshDraft);
+  }, [userId]);
   const wardrobe = useWardrobe();
   const outfits = useSavedOutfits();
   const polls = useMyPolls();
@@ -27,8 +41,14 @@ export function HomePage() {
 
   return (
     <div className="stack-lg home-page">
-      <PageHeader eyebrow={brand.tagline} title="Chào bạn!"
+      <PageHeader eyebrow={brand.tagline} title={me.data?.username ? `Chào ${me.data.username}!` : 'Chào bạn!'}
         action={<ButtonLink to="/outfits/suggest" small><PlusOutlined /> <span className="home-create-label">Tạo outfit mới</span></ButtonLink>} />
+
+      {profileDraft && <HomeStoryReveal><Card>
+        <h2>Tiếp tục việc dở</h2>
+        <p className="muted">Bạn có thông tin hồ sơ chưa lưu trên trình duyệt này.</p>
+        <ButtonLink to="/profile" kind="outline" small>Tiếp tục chỉnh sửa hồ sơ</ButtonLink>
+      </Card></HomeStoryReveal>}
 
       <div className="home-editorial-flow">
         <QuickPickCard />

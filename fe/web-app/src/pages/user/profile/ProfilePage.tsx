@@ -9,8 +9,9 @@ import { session } from '../../../services/shared/session';
 import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { usePreferences } from '../../../hooks/user/outfit/api';
 import { ScrollReveal } from '../../../components/shared/home/HomeStory';
-import { accountAvatarSource } from '../../../services/user/profile/avatar';
 import { profileKey, profileRequests } from '../../../services/user/profile/requests';
+import { accountAvatarSource } from '../../../services/user/profile/avatar';
+import { clearProfileDraft, readProfileDraft, writeProfileDraft } from '../../../services/user/profile/draft';
 
 export function ProfilePage() {
   const qc = useQueryClient();
@@ -19,6 +20,7 @@ export function ProfilePage() {
   const [city, setCity] = useState('');
   const [profileError, setProfileError] = useState('');
   const [profileSaved, setProfileSaved] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState('');
@@ -38,14 +40,30 @@ export function ProfilePage() {
   const preferences = usePreferences();
 
   useEffect(() => {
-    if (profile.data) { setUsername(profile.data.username); setCity(profile.data.city ?? ''); }
-  }, [profile.data]);
+    if (profile.data && me.data) {
+      const draft = readProfileDraft(me.data.id);
+      setUsername(draft?.username ?? profile.data.username);
+      setCity(draft?.city ?? profile.data.city ?? '');
+      setDraftSaved(Boolean(draft));
+    }
+  }, [profile.data, me.data]);
+
+  const updateDraft = (name: string, location: string) => {
+    setUsername(name); setCity(location); setProfileSaved(false);
+    if (!profile.data || !me.data) return;
+    if (name === profile.data.username && location === (profile.data.city ?? '')) {
+      clearProfileDraft(me.data.id);
+      setDraftSaved(false);
+    } else setDraftSaved(writeProfileDraft(me.data.id, name, location));
+  };
 
   const saveProfile = async () => {
     setSavingProfile(true); setProfileError(''); setProfileSaved(false);
     try {
       const updated = await profileRequests.update(username.trim(), city.trim());
-      qc.setQueryData(profileKey, updated);
+      if (me.data) clearProfileDraft(me.data.id);
+      setDraftSaved(false);
+      qc.setQueryData(['me', 'profile'], updated);
       await qc.invalidateQueries({ queryKey: ['me'] });
       setProfileSaved(true);
     } catch (error) { setProfileError(errorMessage(error)); }
@@ -101,11 +119,12 @@ export function ProfilePage() {
       {profile.isError && <Notice tone="error">{errorMessage(profile.error)}</Notice>}
       {profileError && <Notice tone="error">{profileError}</Notice>}
       {profileSaved && <p role="status">Đã lưu hồ sơ.</p>}
+      {draftSaved && <p className="small muted" role="status">Nháp được lưu trên trình duyệt này.</p>}
       <div className="stack" style={{ maxWidth: 440 }}>
         <label htmlFor="profile-name">Tên hiển thị</label>
-        <Input id="profile-name" maxLength={60} value={username} onChange={(event) => setUsername(event.target.value)} />
+        <Input id="profile-name" maxLength={60} value={username} disabled={!profile.data} onChange={(event) => updateDraft(event.target.value, city)} />
         <label htmlFor="profile-city">Thành phố</label>
-        <Input id="profile-city" maxLength={120} placeholder="Ví dụ: Hà Nội" value={city} onChange={(event) => setCity(event.target.value)} />
+        <Input id="profile-city" maxLength={120} placeholder="Ví dụ: Hà Nội" value={city} disabled={!profile.data} onChange={(event) => updateDraft(username, event.target.value)} />
         <Button disabled={!profile.data || !username.trim() || savingProfile} onClick={() => void saveProfile()}>
           {savingProfile ? 'Đang lưu…' : 'Lưu hồ sơ'}</Button>
         <label htmlFor="profile-avatar">Ảnh đại diện (PNG/JPEG, tối đa 2 MB)</label>
