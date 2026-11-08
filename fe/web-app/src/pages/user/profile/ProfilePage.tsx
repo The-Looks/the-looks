@@ -9,7 +9,7 @@ import { session } from '../../../services/shared/session';
 import { Button, ButtonLink, Card, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { usePreferences } from '../../../hooks/user/outfit/api';
 import { ScrollReveal } from '../../../components/shared/home/HomeStory';
-import { accountAvatarSource } from '../../../services/user/profile/avatar';
+import { accountAvatar } from '../../../components/user/mascot/accountAvatar';
 import { profileKey, profileRequests } from '../../../services/user/profile/requests';
 
 export function ProfilePage() {
@@ -78,10 +78,11 @@ export function ProfilePage() {
     {me.data && <ScrollReveal><div className="profile-grid">
       <Card>
         <div className="profile-identity"><Avatar size={72} className="user-avatar" alt=""
-          src={accountAvatarSource(me.data.id, profile.data)}>
+          src={accountAvatar(me.data.id, profile.data)}>
           {(profile.data?.username ?? me.data.username).slice(0, 1).toUpperCase()}</Avatar>
           <div><h2>{profile.data?.username ?? me.data.username}</h2><p className="muted">{me.data.email}</p>
-            <p className="small muted">{profile.data?.city || 'Chưa chọn thành phố'} · Tham gia từ {formatDate(me.data.createdAt)}</p></div></div>
+            <p className="small muted">{profile.data?.city || 'Chưa chọn thành phố'} · Tham gia từ {formatDate(me.data.createdAt)}</p>
+            <ButtonLink to="/profile/mascot" kind="ghost" small>Tạo linh vật</ButtonLink></div></div>
         <div className="divider" />
         <div className="profile-stats"><div><SkinOutlined /><strong>{wardrobe.data?.length ?? '—'}</strong><small>Món đồ</small></div><div><AppstoreOutlined /><strong>{outfits.data?.length ?? '—'}</strong><small>Outfit</small></div><div><HeartOutlined /><strong>{polls.data?.length ?? '—'}</strong><small>Bình chọn</small></div></div>
       </Card>

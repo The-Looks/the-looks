@@ -49,28 +49,29 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-it('welcomes an empty account, saves a selected mascot, and advances to the survey', async () => {
+it('welcomes an empty account, saves the dressed-up mascot, and advances to the survey', async () => {
   renderFlow();
-  await screen.findByRole('heading', { name: 'Chọn linh vật của bạn' });
-  expect(screen.getAllByRole('radio')).toHaveLength(6);
-  const next = screen.getByRole<HTMLButtonElement>('button', { name: 'Tiếp tục đến khảo sát' });
-  expect(next.disabled).toBe(true);
-  fireEvent.click(screen.getByRole('radio', { name: 'Cáo Phố Streetwear' }));
+  await screen.findByRole('heading', { name: 'Tạo linh vật của bạn' });
+  fireEvent.click(screen.getByRole('button', { name: 'Cáo Phố · Streetwear' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Mũ' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Mũ len' }));
+  expect(screen.getByRole('button', { name: 'Mũ len' }).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục đến khảo sát' }));
   expect(readOnboarding(account.id).mascot).toBe('fox');
-  fireEvent.click(next);
+  expect(readOnboarding(account.id).look).toEqual(expect.objectContaining({ mascot: 'fox', hat: 'beanie' }));
   await screen.findByRole('heading', { name: 'Khảo sát phong cách' });
   expect(screen.getByText('Phong cách', { selector: 'li' }).getAttribute('aria-current')).toBe('step');
   expect(readOnboarding('different-user').mascot).toBeUndefined();
 
   fireEvent.click(screen.getByRole('button', { name: 'Bỏ qua hướng dẫn' }));
   await screen.findByRole('heading', { name: 'Tủ đồ' });
-  expect(readOnboarding(account.id)).toEqual({ mascot: 'fox', dismissed: true });
+  expect(readOnboarding(account.id)).toEqual(expect.objectContaining({ mascot: 'fox', dismissed: true }));
 });
 
 it('restores the previous selection on return to the welcome step', async () => {
   updateOnboarding(account.id, { mascot: 'rabbit' });
   renderFlow('/onboarding/welcome');
-  expect((await screen.findByRole<HTMLInputElement>('radio', { name: 'Thỏ Nơ Nữ tính' })).checked).toBe(true);
+  expect((await screen.findByRole('button', { name: 'Thỏ Nơ · Nữ tính' })).getAttribute('aria-pressed')).toBe('true');
 });
 
 it.each(['preferences', 'items', 'skipped', 'admin'] as const)('preserves the destination for an account with %s', async (reason) => {
@@ -81,5 +82,5 @@ it.each(['preferences', 'items', 'skipped', 'admin'] as const)('preserves the de
 
   renderFlow();
   await screen.findByRole('heading', { name: 'Tủ đồ' });
-  expect(screen.queryByRole('heading', { name: 'Chọn linh vật của bạn' })).toBeNull();
+  expect(screen.queryByRole('heading', { name: 'Tạo linh vật của bạn' })).toBeNull();
 });

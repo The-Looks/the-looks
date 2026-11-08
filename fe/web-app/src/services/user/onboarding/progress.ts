@@ -1,7 +1,8 @@
 import type { StylePreferences, WardrobeItem } from '../../../interface/dto/types';
+import { normalizeLook, type Look } from './look';
 import type { MascotId } from './mascots';
 
-type Progress = { mascot?: MascotId; dismissed?: boolean };
+type Progress = { mascot?: MascotId; look?: Look; dismissed?: boolean };
 const fallback = new Map<string, Progress>();
 const storageKey = (id: string) => `thelooks.onboarding.${id}`;
 
@@ -29,4 +30,14 @@ export function updateOnboarding(id: string, patch: Progress) {
 export function needsOnboarding(preferences: StylePreferences, items: WardrobeItem[]) {
   return items.length === 0 && !preferences.gender && !preferences.budget &&
     !preferences.styles?.length && !preferences.colors?.length;
+}
+
+/** Linh vật + phụ kiện đã chọn; tài khoản cũ chỉ lưu mascot thì coi như chưa có phụ kiện. */
+export function readLook(id: string): Look | undefined {
+  const progress = readOnboarding(id);
+  return normalizeLook(progress.look) ?? normalizeLook({ mascot: progress.mascot });
+}
+
+export function saveLook(id: string, look: Look) {
+  updateOnboarding(id, { look, mascot: look.mascot });
 }

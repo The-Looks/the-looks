@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Avatar, Badge, Input, Tooltip } from 'antd';
 import {
   AppstoreOutlined,
@@ -37,7 +38,7 @@ export function AppHeader({
   selected: string;
   publicPreview: boolean;
   avatarLetter: string;
-  avatarSrc?: string;
+  avatarSrc?: ReactNode;
   menuOpen: boolean;
   onOpenMenu: () => void;
 }) {

@@ -1,49 +1,31 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Button } from '../../../components/shared/ui/index';
-import { MASCOTS, mascotImage } from '../../../services/user/onboarding/mascots';
-import { readOnboarding, updateOnboarding } from '../../../services/user/onboarding/progress';
+import { MascotEditor } from '../../../components/user/mascot/MascotEditor';
+import { randomLook, type Look } from '../../../services/user/onboarding/look';
+import { readLook, saveLook } from '../../../services/user/onboarding/progress';
 import type { OnboardingContext } from './OnboardingLayout';
 
 export function MascotPage() {
   const { accountId } = useOutletContext<OnboardingContext>();
-  const [selected, setSelected] = useState(() => {
-    const saved = readOnboarding(accountId).mascot;
-    return MASCOTS.find(({ id }) => id === saved)?.id;
-  });
+  // Như game: vào là có sẵn một nhân vật ngẫu nhiên để sửa, không bắt đầu từ trang trắng.
+  const [look, setLook] = useState<Look>(() => readLook(accountId) ?? randomLook());
   const navigate = useNavigate();
 
   function next(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!selected) return;
+    saveLook(accountId, look);
     navigate('/onboarding');
   }
 
   return (
     <form className="stack-lg" onSubmit={next}>
       <header className="onboarding-intro">
-        <h1>Chọn linh vật của bạn</h1>
-        <p>Chào mừng đến THE LOOKS! Ai sẽ đồng hành cùng bạn khám phá tủ đồ và phối outfit đầu tiên?</p>
+        <h1>Tạo linh vật của bạn</h1>
+        <p>Chọn một người bạn đồng hành rồi phối mũ, kính, phụ kiện cho thật hợp gu. Bạn đổi lại được bất cứ lúc nào trong Hồ sơ.</p>
       </header>
-      <fieldset className="mascot-picker">
-        <legend className="mascot-legend">Sáu cá tính thời trang</legend>
-        <div className="mascot-grid">
-          {MASCOTS.map(({ id, name, style }) => (
-            <label className="mascot-choice" key={id}>
-              <img src={mascotImage(id)} alt="" width="320" height="320" />
-              <span className="mascot-caption">
-                <span><strong>{name}</strong><span>{style}</span></span>
-                <input type="radio" name="mascot" value={id} checked={selected === id}
-                  onChange={() => {
-                    setSelected(id);
-                    updateOnboarding(accountId, { mascot: id });
-                  }} />
-              </span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <div className="row"><Button type="submit" disabled={!selected}>Tiếp tục đến khảo sát</Button></div>
+      <MascotEditor value={look} onChange={setLook} />
+      <div className="row"><Button type="submit">Tiếp tục đến khảo sát</Button></div>
     </form>
   );
 }

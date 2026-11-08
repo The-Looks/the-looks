@@ -39,6 +39,7 @@ const OnboardingWardrobePage = lazy(() => import('../pages/user/wardrobe/Onboard
 const onboarding = () => import('../pages/user/onboarding/OnboardingLayout');
 const OnboardingEntry = lazy(() => onboarding().then((m) => ({ default: m.OnboardingEntry })));
 const OnboardingLayout = lazy(() => onboarding().then((m) => ({ default: m.OnboardingLayout })));
+const MascotEditPage = lazy(() => import('../pages/user/profile/MascotEditPage').then((m) => ({ default: m.MascotEditPage })));
 const MascotPage = lazy(() => import('../pages/user/onboarding/MascotPage').then((m) => ({ default: m.MascotPage })));
 const WardrobePage = lazy(() => import('../pages/user/wardrobe/WardrobePage').then((m) => ({ default: m.WardrobePage })));
 const HomePage = lazy(() => import('../pages/user/home/HomePage').then((m) => ({ default: m.HomePage })));
@@ -93,6 +94,7 @@ export const router = createBrowserRouter([{ element: <RouteMotionLayout />, chi
           { path: 'polls/:code', element: <PollDetailPage /> },
           { path: 'profile', element: <ProfilePage /> },
           { path: 'profile/style', element: <StylePreferencesPage /> },
+          { path: 'profile/mascot', element: <MascotEditPage /> },
           { path: 'plans', element: <PlansPage /> },
           { path: 'billing/result', element: <BillingResultPage /> },
           { path: 'notifications', element: <NotificationsPage /> },

@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { Layout } from 'antd';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { authRequests } from '../../../services/guest/auth/requests';
-import { accountAvatarSource } from '../../../services/user/profile/avatar';
+import { accountAvatar } from '../../user/mascot/accountAvatar';
 import { profileKey, profileRequests } from '../../../services/user/profile/requests';
 import { APP_NAV, AppHeader, currentAppNav } from '../layout/AppHeader';
 import { AccountDrawer } from '../layout/AccountDrawer';
@@ -17,7 +17,7 @@ export function AppShell({ children, publicPreview = false }: { children?: React
   const isAdmin = me.data?.roles?.includes('ADMIN') ?? false;
   const selected = currentAppNav(pathname);
   const avatarLetter = publicPreview ? 'B' : me.data?.username?.slice(0, 1).toUpperCase() ?? 'T';
-  const avatarSrc = !publicPreview && me.data ? accountAvatarSource(me.data.id, profile.data) : undefined;
+  const avatarSrc = !publicPreview && me.data ? accountAvatar(me.data.id, profile.data) : undefined;
   const closeMenu = () => setMenuOpen(false);
 
   return (
