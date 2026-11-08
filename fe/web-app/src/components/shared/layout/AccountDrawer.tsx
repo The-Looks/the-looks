@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { AppstoreOutlined, CrownOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Drawer } from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -14,7 +15,7 @@ export function AccountDrawer({
   open: boolean;
   onClose: () => void;
   account?: { username: string; email: string };
-  avatarSrc?: string;
+  avatarSrc?: ReactNode;
   isAdmin?: boolean;
   publicPreview?: boolean;
 }) {
