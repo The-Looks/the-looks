@@ -22,3 +22,5 @@
 @media (max-width: 480px) { .wardrobe-stats-panel { padding: 16px; } .stats-unused-item { gap: 10px; grid-template-columns: 48px minmax(0, 1fr); } .stats-unused-item .tile { width: 48px; height: 48px; } .stats-wear-date { grid-column: 2; text-align: left; } }
 
 .stats-bars .spread > span { min-width: 0; overflow-wrap: anywhere; }
+
+.stats-declutter-row { display: grid; gap: 8px; }

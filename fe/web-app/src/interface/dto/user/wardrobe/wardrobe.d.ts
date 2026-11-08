@@ -768,6 +768,15 @@ export interface components {
                 /** @description null nếu chưa từng mặc */
                 daysSinceWear: number | null;
             }[];
+            /** @description Ngưỡng gợi ý dọn tủ */
+            declutterAfterDays: number;
+            /** @description Gợi ý dọn tủ — món ít nhất 90 ngày chưa mặc, hoặc thêm vào từ 90 ngày trước mà chưa mặc lần nào; cùng thứ tự với unusedItems */
+            declutterItems: {
+                item: components["schemas"]["WardrobeItem"];
+                /** Format: date-time */
+                lastWornAt: string | null;
+                daysSinceWear: number | null;
+            }[];
             /** Format: date-time */
             asOf: string;
         };

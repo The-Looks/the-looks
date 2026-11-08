@@ -117,7 +117,9 @@ const wardrobe: HttpHandler[] = [
       .sort((a, b) => (a.lastWornAt ?? '').localeCompare(b.lastWornAt ?? '') || a.item.createdAt.localeCompare(b.item.createdAt) || a.item.id.localeCompare(b.item.id));
     return HttpResponse.json({ totalItems: all.length, wornItems, neverWornItems: all.length - wornItems,
       wearRatePercent: all.length ? Math.round(1000 * wornItems / all.length) / 10 : 0,
-      byCategory: groups(true), byColor: groups(false), inactiveCount: unused.length, inactiveAfterDays: 30, unusedItems: unused.slice(0, 10), asOf: new Date(now).toISOString() });
+      byCategory: groups(true), byColor: groups(false), inactiveCount: unused.length, inactiveAfterDays: 30, unusedItems: unused.slice(0, 10),
+      declutterAfterDays: 90, declutterItems: unused.filter((e) => e.daysSinceWear === null ? now - Date.parse(e.item.createdAt) >= 90 * 86400000 : e.daysSinceWear >= 90).slice(0, 20),
+      asOf: new Date(now).toISOString() });
   }),
   http.get('*/api/app/wardrobe/items/search', ({ request }) => {
     const f = readWardrobeFilters(new URL(request.url).searchParams);

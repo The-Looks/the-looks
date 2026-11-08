@@ -17,7 +17,7 @@ class WardrobeStatsControllerTest {
     void usesJwtOwnerAndDisablesCachingOfProtectedStatistics() {
         UUID owner = UUID.randomUUID();
         var query = mock(GetWardrobeStatsQuery.class);
-        when(query.stats(owner)).thenReturn(new GetWardrobeStatsQuery.Stats(0, 0, 0, 0, List.of(), List.of(), 0, 30, List.of(), Instant.now()));
+        when(query.stats(owner)).thenReturn(new GetWardrobeStatsQuery.Stats(0, 0, 0, 0, List.of(), List.of(), 0, 30, List.of(), 90, List.of(), Instant.now()));
         var controller = new WardrobeStatsController(query, mock(ImageStorage.class));
         var jwt = Jwt.withTokenValue("token").header("alg", "RS256").subject(owner.toString()).build();
         var response = controller.stats(jwt);

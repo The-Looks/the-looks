@@ -10,6 +10,6 @@ public interface GetWardrobeStatsQuery {
     record UnusedItem(ClothingItem item, Instant lastWornAt, Long daysSinceWear) {}
     record Stats(long totalItems, long wornItems, long neverWornItems, double wearRatePercent,
             List<Count> byCategory, List<Count> byColor, long inactiveCount, int inactiveAfterDays,
-            List<UnusedItem> unusedItems, Instant asOf) {}
+            List<UnusedItem> unusedItems, int declutterAfterDays, List<UnusedItem> declutterItems, Instant asOf) {}
     Stats stats(UUID ownerId);
 }

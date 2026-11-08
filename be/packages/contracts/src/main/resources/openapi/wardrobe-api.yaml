@@ -300,7 +300,7 @@ components:
         count: { type: integer, format: int64, minimum: 0 }
     WardrobeStats:
       type: object
-      required: [totalItems, wornItems, neverWornItems, wearRatePercent, byCategory, byColor, inactiveCount, inactiveAfterDays, unusedItems, asOf]
+      required: [totalItems, wornItems, neverWornItems, wearRatePercent, byCategory, byColor, inactiveCount, inactiveAfterDays, unusedItems, declutterAfterDays, declutterItems, asOf]
       properties:
         totalItems: { type: integer, format: int64 }
         wornItems: { type: integer, format: int64 }
@@ -320,6 +320,18 @@ components:
               item: { $ref: '#/components/schemas/WardrobeItem' }
               lastWornAt: { type: [string, 'null'], format: date-time }
               daysSinceWear: { type: [integer, 'null'], description: null nếu chưa từng mặc }
+        declutterAfterDays: { type: integer, description: Ngưỡng gợi ý dọn tủ, hiện tại 90 }
+        declutterItems:
+          type: array
+          maxItems: 20
+          description: Gợi ý dọn tủ — món ít nhất 90 ngày chưa mặc, hoặc thêm vào từ 90 ngày trước mà chưa mặc lần nào; cùng thứ tự với unusedItems
+          items:
+            type: object
+            required: [item, lastWornAt, daysSinceWear]
+            properties:
+              item: { $ref: '#/components/schemas/WardrobeItem' }
+              lastWornAt: { type: [string, 'null'], format: date-time }
+              daysSinceWear: { type: [integer, 'null'] }
         asOf: { type: string, format: date-time }
     WardrobePage:
       type: object
