@@ -106,6 +106,8 @@ class OpenMeteoWeatherReader implements WeatherReader {
     }
 
     private Coordinates coordinates(String city, String key, Instant now) {
+        var known = VietnamCities.find(city);
+        if (known.isPresent()) return new Coordinates(known.get().latitude(), known.get().longitude());
         Cache<Coordinates> cached = places.get(key);
         if (cached != null && now.isBefore(cached.at().plus(Duration.ofDays(1)))) return cached.value();
         GeoResponse response = geocoding.get().uri(b -> b.path("/v1/search")

@@ -9,6 +9,7 @@ import { OutfitCard } from '../../../components/user/outfit/OutfitCard';
 import { SaveButton } from '../../../components/user/outfit/SaveButton';
 import { ShoppingCard } from '../../../components/user/outfit/ShoppingCard';
 import { OCCASIONS, occasionLabel } from '../../../services/user/outfit/occasions';
+import { WeatherChip } from '../../../components/user/outfit/WeatherChip';
 import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 
 const occasionIcons = {
@@ -37,6 +38,7 @@ export function SuggestPage() {
           </ButtonLink>
         }
       />
+      <WeatherChip />
 
       <ScrollReveal><div className="grid-cards occasion-grid reveal-list" role="radiogroup" aria-label="Chọn dịp">
         {OCCASIONS.map((o) => (

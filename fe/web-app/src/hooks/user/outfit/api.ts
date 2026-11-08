@@ -25,6 +25,11 @@ export function useQuickPick() {
   });
 }
 
+/** Thời tiết gợi ý đang dùng; null = chưa lấy được (gợi ý vẫn chạy theo mùa). */
+export function useWeather() {
+  return useQuery({ queryKey: ['outfits', 'weather'], queryFn: outfitRequests.weather, staleTime: 30 * 60_000, retry: false });
+}
+
 export function usePreferences() {
   return useQuery({
     queryKey: ['outfits', 'preferences'],
