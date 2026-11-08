@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="110 28 100 100">
+  <rect x="110" y="28" width="100" height="100" fill="#fbe4ea"/>
+  <g id="head">
+    <!-- Teardrop Head Outline -->
+    <path d="M 136 78 C 132 58, 142 42, 160 42 C 178 42, 188 58, 184 78 C 182 98, 178 114, 160 114 C 142 114, 138 98, 136 78 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Crisp White Face Mask -->
+    <path d="M 142 78 C 140 64, 148 54, 160 54 C 172 54, 180 64, 178 78 C 176 96, 172 108, 160 108 C 148 108, 144 96, 142 78 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Rosy Cheeks -->
+    <ellipse cx="145" cy="88" rx="5" ry="3" fill="#f5dce1"/>
+    <ellipse cx="175" cy="88" rx="5" ry="3" fill="#f5dce1"/>
+    <!-- Preppy Sharp Eyes -->
+    <ellipse cx="148" cy="76" rx="3.5" ry="4.5" fill="#241d21"/>
+    <circle cx="147" cy="74" r="1.4" fill="#fff7f3"/>
+    <ellipse cx="172" cy="76" rx="3.5" ry="4.5" fill="#241d21"/>
+    <circle cx="171" cy="74" r="1.4" fill="#fff7f3"/>
+    <path d="M 144 70 Q 148 68 152 70" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 176 70 Q 172 68 168 70" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Amber Triangular Beak -->
+    <polygon points="154,82 166,82 160,92" fill="#db812a" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="156" y1="86" x2="164" y2="86" stroke="#241d21" stroke-width="1.2"/>
+  </g>
+</svg>

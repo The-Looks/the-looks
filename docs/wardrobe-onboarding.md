@@ -9,6 +9,8 @@ Sau khi đăng ký hoặc đăng nhập với tài khoản chưa có sở thích
 
 Lựa chọn linh vật và trạng thái bỏ qua hoặc hoàn tất được lưu trong trình duyệt theo ID tài khoản. Các mã linh vật là `cat`, `fox`, `rabbit`, `bear`, `frog` và `penguin`. Tệp SVG tương ứng nằm trong `fe/web-app/public/illustrations/`.
 
+Chân dung trong thư mục `illustrations/portraits/` là ảnh đại diện mặc định của tài khoản đã chọn linh vật. Ảnh do người dùng tải lên được ưu tiên.
+
 - Tiến độ chỉ tính món CONFIRMED từ backend. Mục tiêu bắt đầu là 3 món, khuyến khích 3–5 món.
 - Cần ít nhất một áo và một quần, hoặc một váy; các phụ kiện riêng không đủ để phối.
 - Xác nhận batch đủ điều kiện sẽ tự chuyển sang outfit. Người dùng có dữ liệu từ trước có thể bấm xem outfit.

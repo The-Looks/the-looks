@@ -56,10 +56,10 @@ it('welcomes an empty account, saves a selected mascot, and advances to the surv
   const next = screen.getByRole<HTMLButtonElement>('button', { name: 'Tiếp tục đến khảo sát' });
   expect(next.disabled).toBe(true);
   fireEvent.click(screen.getByRole('radio', { name: 'Cáo Phố Streetwear' }));
+  expect(readOnboarding(account.id).mascot).toBe('fox');
   fireEvent.click(next);
   await screen.findByRole('heading', { name: 'Khảo sát phong cách' });
   expect(screen.getByText('Phong cách', { selector: 'li' }).getAttribute('aria-current')).toBe('step');
-  expect(readOnboarding(account.id).mascot).toBe('fox');
   expect(readOnboarding('different-user').mascot).toBeUndefined();
 
   fireEvent.click(screen.getByRole('button', { name: 'Bỏ qua hướng dẫn' }));

@@ -16,7 +16,6 @@ export function MascotPage() {
   function next(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selected) return;
-    updateOnboarding(accountId, { mascot: selected });
     navigate('/onboarding');
   }
 
@@ -35,7 +34,10 @@ export function MascotPage() {
               <span className="mascot-caption">
                 <span><strong>{name}</strong><span>{style}</span></span>
                 <input type="radio" name="mascot" value={id} checked={selected === id}
-                  onChange={() => setSelected(id)} />
+                  onChange={() => {
+                    setSelected(id);
+                    updateOnboarding(accountId, { mascot: id });
+                  }} />
               </span>
             </label>
           ))}
