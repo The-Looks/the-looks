@@ -146,7 +146,7 @@ class AccessTradeTikTokCatalog implements ProductCatalog {
                             .queryParam("title_keywords", gap.keyword())
                             .queryParam("sort_field", "units_sold")
                             .queryParam("sort_order", "DESC")
-                            .queryParam("limit", 50)
+                            .queryParam("limit", 20) // giá trị đã chạy được; tài liệu AccessTrade không ghi mức tối đa
                             .build())
                     .retrieve().body(FeedResponse.class);
             if (body == null || body.data() == null || body.data().products() == null) {

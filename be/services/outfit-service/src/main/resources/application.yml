@@ -41,9 +41,11 @@ thelooks:
     wardrobe-url: ${WARDROBE_SERVICE_URL}
     billing-url: ${BILLING_SERVICE_URL}
   ai:
-    # auto = Gemini chính, Gemini model dự phòng rồi Claude; none = chỉ xếp theo điểm (dev)
+    # auto = Claude chính (cần ANTHROPIC_API_KEY), lỗi / hết credit thì Gemini rồi Gemini dự phòng; claude = chỉ Claude; none = chỉ xếp theo điểm (dev)
     provider: ${AI_PROVIDER:auto}
     model: ${AI_MODEL:claude-haiku-5-5}
+    # Mức suy nghĩ của Claude: low = trả lời nhanh nhất (mặc định); medium / high chậm hơn, kỹ hơn
+    effort: ${AI_EFFORT:low}
     # Gemini: model nhanh nhất làm chính (đổi trên Render bằng GEMINI_MODEL / GEMINI_BACKUP_MODEL, không cần sửa code)
     gemini-model: ${GEMINI_MODEL:gemini-3.5-flash-lite}
     gemini-backup-model: ${GEMINI_BACKUP_MODEL:gemini-3.1-flash-lite}

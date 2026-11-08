@@ -848,9 +848,9 @@ export interface components {
             styleTags?: string[];
             /**
              * Format: uri
-             * @description Ảnh đã cắt của riêng món này
+             * @description Ảnh đã cắt của riêng món này; null khi ảnh không còn (món thêm lúc còn lưu ảnh trên ổ đĩa Render)
              */
-            imageUrl?: string;
+            imageUrl?: string | null;
             /**
              * Format: uuid
              * @description Lần quét tạo ra món này

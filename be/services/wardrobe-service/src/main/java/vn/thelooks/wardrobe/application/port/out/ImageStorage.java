@@ -11,7 +11,7 @@ public interface ImageStorage {
     /** @return khoá ảnh để lưu vào DB */
     String store(UUID ownerId, byte[] content, String contentType);
 
-    /** URL tạm (presigned) để app tải ảnh. */
+    /** URL để app tải ảnh; null khi ảnh không còn (món cũ lưu ở nơi đã bị xoá). */
     URI url(String key, Duration validity);
 
     void delete(String key);

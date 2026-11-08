@@ -4,6 +4,8 @@ import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.errors.AnthropicException;
 import com.anthropic.models.messages.MessageCreateParams;
+import com.anthropic.models.messages.OutputConfig;
+import com.anthropic.models.messages.StructuredOutputConfig;
 import com.anthropic.models.messages.StructuredMessage;
 import com.anthropic.models.messages.StructuredMessageCreateParams;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -54,9 +56,17 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
 
     private final AnthropicClient client;
     private final String model;
+    private final OutputConfig.Effort effort;
 
-    ClaudeOutfitAdvisor(@Value("${thelooks.ai.model}") String model) {
+    ClaudeOutfitAdvisor(String model) {
+        this(model, "low");
+    }
+
+    /** @param effort mức suy nghĩ của Claude; chọn outfit từ danh sách đã chấm điểm không cần suy nghĩ sâu, "low" nhanh nhất (Haiku 5.5 mặc định "medium") */
+    @org.springframework.beans.factory.annotation.Autowired
+    ClaudeOutfitAdvisor(@Value("${thelooks.ai.model}") String model, @Value("${thelooks.ai.effort:low}") String effort) {
         this.model = model;
+        this.effort = OutputConfig.Effort.of(effort);
         this.client = AnthropicOkHttpClient.builder()
                 .fromEnv() // đọc ANTHROPIC_API_KEY
                 .timeout(Duration.ofSeconds(12))
@@ -81,7 +91,7 @@ class ClaudeOutfitAdvisor implements OutfitAiAdvisor {
                 .model(model)
                 .maxTokens(900L)
                 .system(SYSTEM)
-                .outputConfig(Picks.class)
+                .outputConfig(StructuredOutputConfig.<Picks>builder().format(Picks.class).effort(effort).build())
                 .addUserMessage(prompt(occasion, candidates, taste, limit))
                 .build();
         try {

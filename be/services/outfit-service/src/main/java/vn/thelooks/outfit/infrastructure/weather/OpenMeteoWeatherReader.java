@@ -39,6 +39,10 @@ class OpenMeteoWeatherReader implements WeatherReader {
     private final Clock clock;
     private final ConcurrentHashMap<String, Cache<Coordinates>> places = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Cache<Weather>> forecasts = new ConcurrentHashMap<>();
+    /** Open-Meteo lỗi (hay gặp: 429 hết lượt ngày vì IP Render dùng chung) thì tạm ngưng gọi, khỏi chờ ~1 giây mỗi lần gợi ý. */
+    private volatile Instant pausedUntil = Instant.EPOCH;
+    static final Duration PAUSE_AFTER_LIMIT = Duration.ofHours(1);
+    static final Duration PAUSE_AFTER_ERROR = Duration.ofMinutes(5);
 
     OpenMeteoWeatherReader(
             @Value("${thelooks.weather.url:https://api.open-meteo.com}") String url,
@@ -74,6 +78,7 @@ class OpenMeteoWeatherReader implements WeatherReader {
         String key = city == null ? "" : city.trim().toLowerCase(Locale.ROOT);
         Cache<Weather> cached = forecasts.get(key);
         if (cached != null && now.isBefore(cached.at().plus(CACHE_TTL))) return Optional.of(cached.value());
+        if (now.isBefore(pausedUntil)) return cached == null ? Optional.empty() : Optional.of(cached.value());
         try {
             Coordinates coordinates = key.isEmpty() ? new Coordinates(latitude, longitude) : coordinates(city, key, now);
             if (coordinates == null) return Optional.empty();
@@ -93,7 +98,9 @@ class OpenMeteoWeatherReader implements WeatherReader {
             forecasts.put(key, new Cache<>(weather, now));
             return Optional.of(weather);
         } catch (RestClientException e) {
-            log.warn("Không lấy được thời tiết từ Open-Meteo: {}", e.getMessage());
+            boolean limited = e instanceof org.springframework.web.client.HttpClientErrorException.TooManyRequests;
+            pausedUntil = now.plus(limited ? PAUSE_AFTER_LIMIT : PAUSE_AFTER_ERROR);
+            log.warn("Không lấy được thời tiết từ Open-Meteo, tạm ngưng tới {}: {}", pausedUntil, e.getMessage());
             return cached == null ? Optional.empty() : Optional.of(cached.value());
         }
     }
