@@ -46,48 +46,6 @@
 .home-page > .page-header h1 { font-size: var(--title-page); }
 .home-editorial-flow { display: grid; gap: 0; min-width: 0; }
 .home-editorial-flow > .stack { min-width: 0; }
-.app-page .home-editorial-flow .home-hero-card {
-  isolation: isolate;
-  min-height: clamp(470px, 42vw, 610px);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
-  border-radius: 28px;
-  background: var(--lav-soft);
-  box-shadow: 0 22px 52px #251d2f16;
-}
-.app-page .home-editorial-flow .home-hero-card > .home-hero-photo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  background: var(--asset-quick-pick) center / cover no-repeat;
-  filter: none;
-  transform: scale(1.035);
-  animation: home-editorial-drift 26s ease-in-out infinite alternate;
-}
-.home-editorial-flow .home-hero-card::after { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, #251d2fb8 0%, #251d2f80 31%, #251d2f1a 67%, transparent 100%); pointer-events: none; }
-.app-page .home-editorial-flow .home-hero-card > .home-hero-glass {
-  position: relative;
-  z-index: 2;
-  width: min(440px, calc(100% - 88px));
-  max-width: none;
-  min-height: 365px;
-  margin: 44px;
-  padding: 35px 38px;
-  border-radius: 16px;
-  background: var(--ink);
-  color: #fff;
-}
-.app-page .home-editorial-flow .home-hero-glass h2 { font-size: clamp(var(--type-38), 4.1vw, var(--type-57)); line-height: 1.04; }
-.home-editorial-flow .home-hero-glass p { max-width: 35ch; font-size: var(--text-body); }
-
 .home-story-divider { position: relative; height: 82px; overflow: hidden; }
 .home-story-divider-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--lavender) 16%, var(--lavender) 84%, transparent); }
 .home-story-divider-image { position: absolute; top: 7px; width: 112px; height: 69px; border-radius: 12px; filter: blur(5px); opacity: .32; background-position: center; background-size: cover; }
@@ -121,7 +79,6 @@
 .home-poll-copy .bar { width: 100%; max-width: 420px; margin: 0; }
 .app-page .home-poll-copy .btn-outline { margin-top: auto; }
 
-@keyframes home-editorial-drift { from { transform: scale(1.035) translateX(-1%); } to { transform: scale(1.09) translateX(1%); } }
 @media (max-width: 1220px) { .app-topbar-editorial .topbar-search { display: none; } }
 @media (max-width: 1023px) {
   .app-topbar-editorial { height: 68px; grid-template-columns: 1fr auto; padding: 0 22px; }
@@ -130,7 +87,6 @@
   .app-header-nav { display: none; }
   .app-frame-topnav .app-page { padding: 25px 22px 100px; }
   .app-mobile-nav { grid-template-columns: repeat(5, minmax(0, 1fr)); background: var(--surface); border-top-color: var(--line); }
-  .app-page .home-editorial-flow .home-hero-card { min-height: 520px; }
 }
 @media (max-width: 650px) {
   .app-topbar-editorial { padding: 0 16px; }
@@ -138,11 +94,6 @@
   .app-header-brand .brand img { width: 78px; height: 68px; }
   .app-frame-topnav .app-page { padding: 24px 16px 104px; }
   .home-page { gap: 20px; }
-  .app-page .home-editorial-flow .home-hero-card { min-height: 460px; border-radius: 21px; align-items: flex-start; }
-  .app-page .home-editorial-flow .home-hero-card > .home-hero-photo { background-position: 64% center; }
-  .home-editorial-flow .home-hero-card::after { background: linear-gradient(180deg, #251d2fc4 0%, #251d2f59 63%, transparent 100%); }
-  .app-page .home-editorial-flow .home-hero-card > .home-hero-glass { width: calc(100% - 32px); min-height: 0; margin: 16px; padding: 26px; }
-  .app-page .home-editorial-flow .home-hero-glass h2 { font-size: var(--type-38); }
   .home-story-divider { height: 58px; }
   .home-story-divider-image { width: 74px; height: 48px; }
   .app-page .home-story-reveal .home-poll-card { min-height: 330px; padding: 28px 23px; border-radius: 21px; }
@@ -152,7 +103,6 @@
   .home-poll-copy h3 { font-size: var(--type-24); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .app-page .home-editorial-flow .home-hero-card > .home-hero-photo { animation: none; }
   .scroll-reveal { opacity: 1; transform: none; transition: none; }
   .app-header-nav a, .topbar-avatar-trigger, .drawer-navigation a { transition: none; }
 }

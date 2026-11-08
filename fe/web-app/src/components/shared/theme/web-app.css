@@ -296,13 +296,6 @@ body { background: var(--bg); }
 .home-page > .page-header { animation: home-reveal .55s ease-out both; }
 .home-editorial-grid { display: grid; grid-template-columns: minmax(0, 1.52fr) minmax(290px, .78fr); align-items: stretch; gap: 18px; animation: home-reveal .65s .08s ease-out both; }
 .home-editorial-grid > .stack { min-width: 0; }
-.app-page .home-hero-card { position: relative; overflow: hidden; min-height: 370px; padding: 40px 44px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 17px; border: 1px solid var(--lavender); background: linear-gradient(110deg, #fff 0%, #fff 55%, var(--lav-soft) 100%); color: var(--ink); box-shadow: 0 22px 50px #251d2f0b; }
-.home-hero-card > :not(.home-hero-art) { position: relative; z-index: 1; max-width: 57%; }
-.app-page .home-hero-card h2 { font-size: clamp(var(--type-34), 3.2vw, var(--type-48)); line-height: 1.07; letter-spacing: -.04em; }
-.app-page .home-hero-card .muted { color: var(--muted); line-height: 1.65; }
-.app-page .home-hero-card .btn-ghost { background: var(--purple); color: #fff; border: 1px solid var(--purple); padding-inline: 24px; }
-.app-page .home-hero-card .btn-ghost:hover { background: var(--purple-dark); color: #fff; }
-.home-hero-art { position: absolute; right: 4%; top: 50%; width: min(39%, 300px); transform: translateY(-50%); box-shadow: 0 28px 60px #9440dd1f; }
 .app-page .home-poll-card { min-height: 370px; padding: 33px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 16px; border: 0; background: var(--ink); color: #fff; box-shadow: 0 22px 50px #251d2f21; }
 .home-poll-card .section-title { width: 100%; align-items: flex-start; }
 .home-poll-card .section-title h2 { color: #fff; }
@@ -374,10 +367,6 @@ body { background: var(--bg); }
   .app-page .grid-tiles { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .wardrobe-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
   .metric-grid { gap: 10px; }
-  .app-page .home-hero-card { min-height: 440px; padding: 29px; justify-content: flex-start; }
-  .home-hero-card > :not(.home-hero-art) { max-width: 100%; }
-  .app-page .home-hero-card h2 { font-size: var(--type-34); }
-  .home-hero-art { top: auto; bottom: -35px; right: 15px; width: 195px; transform: none; opacity: .8; }
   .home-metrics .metric-card { min-height: 112px; padding: 15px; }
   .home-metrics .metric-card strong { font-size: var(--type-24); }
   .app-page .home-poll-card { min-height: 275px; padding: 25px; }

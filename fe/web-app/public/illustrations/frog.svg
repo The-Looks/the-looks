@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <ellipse cx="160" cy="282" rx="52" ry="6.5" fill="#f5dce1" />
+  <!-- Vintage Chunky Boots -->
+  <g id="boots">
+    <rect x="131" y="254" width="12" height="8" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 120 268 C 120 260, 128 256, 144 256 C 150 256, 154 262, 154 270 L 118 270 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 116 270 L 156 270 C 158 275, 154 280, 148 280 L 120 280 C 116 280, 114 275, 116 270 Z"
+          fill="#354f67" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="130" y1="262" x2="142" y2="264" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="131" y1="266" x2="143" y2="268" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="177" y="254" width="12" height="8" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 166 270 C 166 262, 170 256, 176 256 C 192 256, 200 260, 200 268 L 202 270 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 164 270 L 204 270 C 206 275, 204 280, 198 280 L 170 280 C 166 280, 162 275, 164 270 Z"
+          fill="#354f67" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="178" y1="264" x2="190" y2="262" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="177" y1="268" x2="189" y2="266" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Striped Breton Long-Sleeve Shirt -->
+  <g id="shirt">
+    <!-- Left Sleeve -->
+    <path d="M 130 134 L 108 166 L 120 174 L 138 144 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="124" y1="142" x2="114" y2="156" stroke="#241d21" stroke-width="2"/>
+    <line x1="130" y1="150" x2="120" y2="164" stroke="#241d21" stroke-width="2"/>
+    <ellipse cx="114" cy="174" rx="6" ry="5.5" fill="#648653" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Three webbed frog fingers -->
+    <circle cx="109" cy="178" r="2" fill="#648653"/>
+    <circle cx="114" cy="181" r="2" fill="#648653"/>
+    <circle cx="119" cy="178" r="2" fill="#648653"/>
+    <!-- Right Sleeve (holding sketchpad) -->
+    <path d="M 190 134 L 212 166 L 200 174 L 182 144 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="196" y1="142" x2="206" y2="156" stroke="#241d21" stroke-width="2"/>
+    <line x1="190" y1="150" x2="200" y2="164" stroke="#241d21" stroke-width="2"/>
+    <ellipse cx="206" cy="174" rx="6" ry="5.5" fill="#648653" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Sketchbook / notebook -->
+    <rect x="202" y="166" width="22" height="30" rx="2" transform="rotate(-15 213 181)"
+          fill="#f5dce1" stroke="#241d21" stroke-width="2"/>
+    <line x1="206" y1="172" x2="222" y2="168" stroke="#771e35" stroke-width="2"/>
+    <!-- Shirt collar -->
+    <path d="M 142 126 C 142 118, 178 118, 178 126 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+  </g>
+  <!-- Vintage Denim Overalls -->
+  <g id="overalls">
+    <!-- Overalls Trouser Legs -->
+    <path d="M 122 178 L 198 178 L 204 254 L 168 254 L 160 206 L 152 254 L 116 254 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Wide Rolled Cuffs -->
+    <rect x="114" y="247" width="38" height="7.5" rx="1.5" fill="#5c7e9d" stroke="#241d21" stroke-width="2.2"/>
+    <rect x="168" y="247" width="38" height="7.5" rx="1.5" fill="#5c7e9d" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Overall Bib -->
+    <path d="M 136 136 L 184 136 L 188 180 L 132 180 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Bib Front Pocket -->
+    <path d="M 144 148 L 176 148 L 174 168 L 146 168 Z"
+          fill="#3b556e" stroke="#241d21" stroke-width="2"/>
+    <!-- Vintage pencil in bib pocket -->
+    <line x1="168" y1="140" x2="174" y2="152" stroke="#771e35" stroke-width="2.5" stroke-linecap="round"/>
+    <polygon points="167,138 170,140 169,141" fill="#fff7f3"/>
+    <!-- Overall Straps & Brass Buckles -->
+    <line x1="140" y1="126" x2="140" y2="140" stroke="#4a6882" stroke-width="8" stroke-linecap="round"/>
+    <line x1="140" y1="126" x2="140" y2="140" stroke="#241d21" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 100"/>
+    <rect x="136" y="136" width="8" height="6" rx="1.5" fill="#fae8d7" stroke="#241d21" stroke-width="1.8"/>
+    <line x1="180" y1="126" x2="180" y2="140" stroke="#4a6882" stroke-width="8" stroke-linecap="round"/>
+    <rect x="176" y="136" width="8" height="6" rx="1.5" fill="#fae8d7" stroke="#241d21" stroke-width="1.8"/>
+    <!-- Fold marks -->
+    <path d="M 126 226 Q 134 230 142 227" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 194 226 Q 186 230 178 227" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Frog Head & Artsy Beret -->
+  <g id="head">
+    <!-- Bulbous Frog Eyes (Dome shape on top of head) -->
+    <circle cx="136" cy="62" r="15" fill="#648653" stroke="#241d21" stroke-width="3"/>
+    <circle cx="136" cy="62" r="10" fill="#edf3e4"/>
+    <circle cx="136" cy="62" r="5" fill="#241d21"/>
+    <circle cx="134" cy="60" r="1.8" fill="#fff7f3"/>
+    <!-- Wide Frog Head -->
+    <ellipse cx="160" cy="88" rx="38" ry="24" fill="#648653" stroke="#241d21" stroke-width="3"/>
+    <!-- Pale Chin / Throat -->
+    <path d="M 138 94 C 144 104, 176 104, 182 94 C 172 108, 148 108, 138 94 Z" fill="#edf3e4"/>
+    <!-- Artsy Burgundy Beret (Tilted jauntily over right eye) -->
+    <g id="beret">
+      <!-- Right eye partially peek beneath beret -->
+      <circle cx="184" cy="62" r="15" fill="#648653" stroke="#241d21" stroke-width="3"/>
+      <circle cx="184" cy="62" r="10" fill="#edf3e4"/>
+      <circle cx="184" cy="62" r="5" fill="#241d21"/>
+      <circle cx="182" cy="60" r="1.8" fill="#fff7f3"/>
+      <!-- Beret Volume -->
+      <path d="M 152 56 C 146 36, 188 28, 206 40 C 218 48, 214 62, 198 68 C 176 74, 158 68, 152 56 Z"
+            fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+      <!-- Beret Band -->
+      <path d="M 164 64 C 174 68, 192 68, 202 62" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Beret Stem Tab -->
+      <path d="M 184 34 L 186 28" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Beret Fold mark -->
+      <path d="M 172 44 Q 186 46 196 42" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+    <!-- Rosy Frog Cheeks -->
+    <ellipse cx="132" cy="92" rx="6" ry="4" fill="#f5dce1"/>
+    <ellipse cx="188" cy="92" rx="6" ry="4" fill="#f5dce1"/>
+    <!-- Wide Quirky Smile -->
+    <path d="M 136 86 C 148 94, 172 94, 184 86" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="136" cy="86" r="1.5" fill="#241d21"/>
+    <circle cx="184" cy="86" r="1.5" fill="#241d21"/>
+    <!-- Nostril Dots -->
+    <circle cx="156" cy="80" r="1.2" fill="#241d21"/>
+    <circle cx="164" cy="80" r="1.2" fill="#241d21"/>
+  </g>
+</svg>

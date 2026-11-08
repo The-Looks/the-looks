@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <ellipse cx="160" cy="282" rx="58" ry="7" fill="#f5dce1" />
+  <!-- Rolled Denim Jeans -->
+  <g id="jeans">
+    <path d="M 120 182 C 146 185, 174 185, 200 182 L 206 254 L 170 254 L 160 206 L 150 254 L 114 254 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M 160 184 L 160 202 Q 164 206 168 202" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <line x1="134" y1="192" x2="134" y2="250" stroke="#354f67" stroke-width="2" stroke-linecap="round"/>
+    <line x1="186" y1="192" x2="186" y2="250" stroke="#354f67" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 124 228 Q 132 233 140 229" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 196 228 Q 188 233 180 229" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Selvedge Turn-up Cuffs -->
+    <rect x="113" y="249" width="38" height="7" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <line x1="147" y1="249" x2="147" y2="256" stroke="#771e35" stroke-width="2"/>
+    <rect x="169" y="249" width="38" height="7" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <line x1="173" y1="249" x2="173" y2="256" stroke="#771e35" stroke-width="2"/>
+  </g>
+  <!-- Chunky Retro Trainers -->
+  <g id="trainers">
+    <rect x="127" y="252" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 112 268 C 112 260, 122 254, 140 255 C 148 255, 154 262, 154 269 L 110 269 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 110 269 L 110 262 C 113 258, 120 256, 126 260 L 126 269 Z" fill="#771e35"/>
+    <path d="M 108 269 L 156 269 C 158 274, 154 280, 148 280 L 114 280 C 108 280, 106 274, 108 269 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <line x1="110" y1="275" x2="154" y2="275" stroke="#5b6b4e" stroke-width="2"/>
+    <line x1="130" y1="257" x2="140" y2="259" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+    <rect x="181" y="252" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 166 269 C 166 262, 172 255, 180 255 C 198 254, 208 260, 208 268 L 210 269 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 210 269 L 210 262 C 207 258, 200 256, 194 260 L 194 269 Z" fill="#771e35"/>
+    <path d="M 164 269 L 212 269 C 214 274, 212 280, 206 280 L 172 280 C 166 280, 162 274, 164 269 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <line x1="166" y1="275" x2="210" y2="275" stroke="#5b6b4e" stroke-width="2"/>
+    <line x1="180" y1="259" x2="190" y2="257" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Sporty Varsity Jacket -->
+  <g id="varsity-jacket">
+    <!-- Off-White Contrast Sleeves -->
+    <path d="M 126 126 C 108 136, 92 152, 90 172 C 89 180, 98 184, 110 178 L 126 146 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <rect x="100" y="172" width="16" height="8" rx="2" transform="rotate(-25 108 176)"
+          fill="#771e35" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="134" cy="182" rx="7" ry="6" fill="#8e5a38" stroke="#241d21" stroke-width="2.5"/>
+    <path d="M 194 126 C 212 136, 228 152, 230 172 C 231 180, 222 184, 210 178 L 194 146 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <rect x="204" y="172" width="16" height="8" rx="2" transform="rotate(25 212 176)"
+          fill="#771e35" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="186" cy="182" rx="7" ry="6" fill="#8e5a38" stroke="#241d21" stroke-width="2.5"/>
+    <!-- Burgundy Torso -->
+    <path d="M 128 120 C 112 138, 114 168, 122 184 L 198 184 C 206 168, 208 138, 192 120 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- Striped Ribbed Waistband -->
+    <rect x="120" y="180" width="80" height="9" rx="2" fill="#771e35" stroke="#241d21" stroke-width="2.5"/>
+    <line x1="120" y1="184.5" x2="200" y2="184.5" stroke="#fff7f3" stroke-width="2"/>
+    <!-- Center Snap Placket -->
+    <line x1="160" y1="120" x2="160" y2="180" stroke="#241d21" stroke-width="2.5"/>
+    <circle cx="160" cy="132" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <circle cx="160" cy="146" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <circle cx="160" cy="160" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <circle cx="160" cy="174" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <!-- Chenille Graphic Patch on Chest -->
+    <path d="M 136 142 L 146 134 L 152 142 L 146 150 Z" fill="#5b6b4e" stroke="#fff7f3" stroke-width="2"/>
+    <!-- Slanted Welt Pockets -->
+    <line x1="130" y1="166" x2="142" y2="174" stroke="#fff7f3" stroke-width="3" stroke-linecap="round"/>
+    <line x1="130" y1="166" x2="142" y2="174" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="190" y1="166" x2="178" y2="174" stroke="#fff7f3" stroke-width="3" stroke-linecap="round"/>
+    <line x1="190" y1="166" x2="178" y2="174" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Fold marks -->
+    <path d="M 124 150 Q 130 155 138 152" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 196 150 Q 190 155 182 152" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Ribbed Baseball Collar -->
+    <path d="M 140 120 C 138 108, 150 104, 160 104 C 170 104, 182 108, 180 120 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 144 112 Q 160 110 176 112" fill="none" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Bear Head & Ears -->
+  <g id="head">
+    <!-- Round Bear Ears -->
+    <circle cx="126" cy="62" r="14" fill="#8e5a38" stroke="#241d21" stroke-width="3"/>
+    <circle cx="126" cy="62" r="8" fill="#fae8d7"/>
+    <circle cx="194" cy="62" r="14" fill="#8e5a38" stroke="#241d21" stroke-width="3"/>
+    <circle cx="194" cy="62" r="8" fill="#fae8d7"/>
+    <!-- Broad Bear Head -->
+    <path d="M 124 74 C 114 88, 116 104, 130 112 C 144 118, 176 118, 190 112 C 204 104, 206 88, 196 74 C 188 64, 132 64, 124 74 Z"
+          fill="#8e5a38" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- Cream Snout Oval -->
+    <ellipse cx="160" cy="95" rx="18" ry="14" fill="#fae8d7" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Cheeks Blush -->
+    <ellipse cx="132" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <ellipse cx="188" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <!-- Friendly Bear Eyes -->
+    <ellipse cx="144" cy="80" rx="4" ry="5" fill="#241d21"/>
+    <circle cx="143" cy="78" r="1.5" fill="#fff7f3"/>
+    <ellipse cx="176" cy="80" rx="4" ry="5" fill="#241d21"/>
+    <circle cx="175" cy="78" r="1.5" fill="#fff7f3"/>
+    <path d="M 140 73 Q 146 71 150 74" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 180 73 Q 174 71 170 74" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dark Heart/Oval Nose -->
+    <ellipse cx="160" cy="91" rx="6" ry="4.5" fill="#241d21"/>
+    <circle cx="158" cy="90" r="1" fill="#fff7f3"/>
+    <!-- Warm Smiling Mouth -->
+    <path d="M 160 95 L 160 99" stroke="#241d21" stroke-width="2"/>
+    <path d="M 153 99 Q 160 104 167 99" fill="none" stroke="#241d21" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+</svg>
