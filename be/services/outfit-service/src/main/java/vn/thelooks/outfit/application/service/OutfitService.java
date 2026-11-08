@@ -51,6 +51,7 @@ import vn.thelooks.outfit.domain.service.OutfitRecommender;
 class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutfitUseCase,
         MarkOutfitWornUseCase, GetOutfitsQuery, RateSuggestionUseCase, GetAiUsageQuery {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OutfitService.class);
     static final ZoneId VIETNAM = ZoneId.of("Asia/Ho_Chi_Minh");
     /** Số ứng viên tốt nhất gửi cho AI chọn lại. */
     static final int AI_CANDIDATES = 20;
@@ -93,13 +94,17 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         if (occasion == null) {
             throw new InvalidOutfitException("Cần chọn dịp");
         }
-        return advise(ownerId, occasion, prepare(ownerId, occasion), limit);
+        long start = System.nanoTime();
+        Prepared prepared = prepare(ownerId, occasion);
+        return timed(start, "gợi ý " + occasion, advise(ownerId, occasion, prepared, limit, start));
     }
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED) // gọi AI vài giây, không giữ kết nối DB
     public Optional<OutfitSuggestion> quickPick(UUID ownerId) {
-        return advise(ownerId, null, prepare(ownerId, null), 1).stream().findFirst();
+        long start = System.nanoTime();
+        Prepared prepared = prepare(ownerId, null);
+        return timed(start, "chọn nhanh", advise(ownerId, null, prepared, 1, start)).stream().findFirst();
     }
 
     /**
@@ -107,7 +112,13 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
      * và tổng chi phí tháng chưa vượt ngân sách.
      * Hết lượt → vẫn có gợi ý theo điểm của OutfitRecommender, chỉ không qua AI.
      */
-    private List<OutfitSuggestion> advise(UUID ownerId, Occasion occasion, Prepared prepared, int limit) {
+    /** Log thời gian để biết chậm ở đâu: lấy dữ liệu (wardrobe, billing, thời tiết, DB) hay AI. */
+    private static List<OutfitSuggestion> timed(long start, String what, List<OutfitSuggestion> result) {
+        log.info("Outfit {}: tổng {} ms", what, (System.nanoTime() - start) / 1_000_000);
+        return result;
+    }
+
+    private List<OutfitSuggestion> advise(UUID ownerId, Occasion occasion, Prepared prepared, int limit, long start) {
         List<OutfitSuggestion> candidates = prepared.candidates();
         if (candidates.isEmpty()) {
             return List.of();
@@ -116,9 +127,13 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
         boolean withinLimits = aiUsage.callsSince(ownerId, startOfDay(now)) < plans.aiSuggestionsPerDay()
                 && aiUsage.costSince(startOfMonth(now)) < aiMonthlyBudgetUsd;
         if (!withinLimits) {
+            log.info("Outfit: hết lượt AI hôm nay hoặc hết ngân sách tháng, xếp theo điểm");
             return OutfitAiAdvisor.Advice.withoutAi(candidates, limit).suggestions();
         }
+        long aiStart = System.nanoTime();
         OutfitAiAdvisor.Advice advice = aiAdvisor.choose(occasion, candidates, prepared.taste(), limit);
+        log.info("Outfit AI: chuẩn bị {} ms, AI {} ms ({})", (aiStart - start) / 1_000_000, (System.nanoTime() - aiStart) / 1_000_000,
+                advice.usage() == null ? "không qua AI" : advice.usage().model());
         if (advice.usage() != null) {
             aiUsage.record(ownerId, advice.usage(), now);
         }
