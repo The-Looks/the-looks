@@ -256,7 +256,7 @@ function mockSuggestions(occasion?: string): OutfitSuggestion[] {
     }));
 }
 
-let preferences: { gender?: string | null; styles?: string[]; budget?: string | null } = {
+let preferences: { gender?: string | null; styles?: string[]; budget?: string | null; colors?: string[] } = {
   gender: null,
   styles: [],
   budget: null,

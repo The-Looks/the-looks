@@ -370,6 +370,11 @@ components:
           type: [string, 'null']
           enum: [LOW, MID, HIGH, null]
           description: Giá một món. LOW < 200.000đ, MID 200.000–500.000đ, HIGH > 500.000đ, null = không giới hạn
+        colors:
+          type: array
+          maxItems: 8
+          items: { type: string, pattern: '^[a-z][a-z -]{0,19}$' }
+          description: Màu yêu thích, cùng nhãn màu AI gán cho món đồ (white, black, beige…). Được cộng điểm khi chấm outfit.
     ShoppingSuggestion:
       type: object
       required: [gap, products]

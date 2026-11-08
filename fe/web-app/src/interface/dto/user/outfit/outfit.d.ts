@@ -908,6 +908,8 @@ export interface components {
              * @enum {string|null}
              */
             budget?: "LOW" | "MID" | "HIGH" | null;
+            /** @description Màu yêu thích, cùng nhãn màu AI gán cho món đồ (white, black, beige…). Được cộng điểm khi chấm outfit. */
+            colors?: string[];
         };
         ShoppingSuggestion: {
             gap: {

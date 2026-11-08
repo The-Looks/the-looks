@@ -152,8 +152,9 @@ class OutfitService implements SuggestOutfitsUseCase, QuickPickUseCase, SaveOutf
                 .orElseGet(() -> Set.of(OutfitRecommender.seasonOf(LocalDate.ofInstant(now, VIETNAM).getMonth())));
         List<ClosetItem> closet = wardrobe.confirmedItems(ownerId);
         Map<String, Feedback> votes = feedback.byOwner(ownerId);
+        var stated = preferences.find(ownerId);
         StyleProfile taste = StyleProfile.learn(closet, votes, outfits.findByOwner(ownerId), wearLogs.wearCountByItem(ownerId))
-                .withStated(preferences.find(ownerId).styles());
+                .withStated(stated.styles(), stated.colors());
         List<OutfitSuggestion> suggestions = recommender.recommend(closet, wearLogs.lastWornAtByItem(ownerId), votes, taste,
                 occasion, now, seasons, AI_CANDIDATES);
         return new Prepared(today.map(w -> withWeatherNote(suggestions, w)).orElse(suggestions), taste);

@@ -35,7 +35,7 @@ class PreferencesController {
 
     @PutMapping
     Body save(@AuthenticationPrincipal Jwt jwt, @RequestBody Body body) {
-        return Body.from(preferences.save(CurrentUser.id(jwt), new StylePreferences(body.gender(), body.styles(), body.budget())));
+        return Body.from(preferences.save(CurrentUser.id(jwt), new StylePreferences(body.gender(), body.styles(), body.budget(), body.colors())));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -43,10 +43,10 @@ class PreferencesController {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
-    record Body(Gender gender, Set<String> styles, Budget budget) {
+    record Body(Gender gender, Set<String> styles, Budget budget, Set<String> colors) {
 
         static Body from(StylePreferences p) {
-            return new Body(p.gender(), p.styles(), p.budget());
+            return new Body(p.gender(), p.styles(), p.budget(), p.colors());
         }
     }
 }

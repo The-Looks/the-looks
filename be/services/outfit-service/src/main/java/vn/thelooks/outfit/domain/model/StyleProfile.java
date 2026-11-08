@@ -73,16 +73,21 @@ public record StyleProfile(Map<String, Double> styles, Map<String, Double> color
     }
 
     /**
-     * Thêm phong cách người dùng tự khai: là gu ban đầu khi chưa đủ hành vi để đoán. Hành vi thật vẫn được ưu tiên:
-     * phong cách đã học được điểm cao hơn thì giữ, người dùng hay né (điểm âm) thì không bị ghi đè.
+     * Thêm phong cách và màu người dùng tự khai: là gu ban đầu khi chưa đủ hành vi để đoán. Hành vi thật vẫn được ưu tiên:
+     * điểm đã học cao hơn thì giữ, người dùng hay né (điểm âm) thì không bị ghi đè.
      */
-    public StyleProfile withStated(Set<String> stated) {
-        if (stated.isEmpty()) {
+    public StyleProfile withStated(Set<String> statedStyles, Set<String> statedColors) {
+        if (statedStyles.isEmpty() && statedColors.isEmpty()) {
             return this;
         }
-        Map<String, Double> merged = new HashMap<>(known() ? styles : Map.of());
-        stated.forEach(s -> merged.merge(key(s), STATED, (learned, given) -> learned < 0 ? learned : Math.max(learned, given)));
-        return new StyleProfile(merged, known() ? colors : Map.of(), Math.max(signals, MIN_SIGNALS));
+        return new StyleProfile(merge(known() ? styles : Map.of(), statedStyles), merge(known() ? colors : Map.of(), statedColors),
+                Math.max(signals, MIN_SIGNALS));
+    }
+
+    private static Map<String, Double> merge(Map<String, Double> learned, Set<String> stated) {
+        Map<String, Double> merged = new HashMap<>(learned);
+        stated.forEach(s -> merged.merge(key(s), STATED, (had, given) -> had < 0 ? had : Math.max(had, given)));
+        return merged;
     }
 
     public boolean known() {
