@@ -20,7 +20,10 @@ import vn.thelooks.outfit.domain.model.Occasion;
 import vn.thelooks.outfit.domain.model.OutfitSuggestion;
 import vn.thelooks.outfit.domain.model.StyleProfile;
 
-/** Uses Gemini to rank real wardrobe candidates, then another Gemini model and Claude on failure. */
+/**
+ * Chế độ auto: Claude chọn outfit trước (nhanh); Claude lỗi (hết credit, quá giới hạn, mất kết nối) thì Gemini,
+ * rồi Gemini dự phòng; tất cả lỗi thì vẫn trả gợi ý xếp theo điểm.
+ */
 @Component
 @ConditionalOnProperty(name = "thelooks.ai.provider", havingValue = "auto", matchIfMissing = true)
 class GeminiOutfitAdvisor implements OutfitAiAdvisor {
@@ -32,6 +35,7 @@ class GeminiOutfitAdvisor implements OutfitAiAdvisor {
     private final String backup;
     private final OutfitAiAdvisor claude;
 
+    @org.springframework.beans.factory.annotation.Autowired
     GeminiOutfitAdvisor(ObjectMapper mapper, @Value("${GEMINI_API_KEY:}") String key,
             @Value("${thelooks.ai.gemini-model:gemini-3.5-flash-lite}") String primary,
             @Value("${thelooks.ai.gemini-backup-model:gemini-3.1-flash-lite}") String backup,
@@ -44,14 +48,26 @@ class GeminiOutfitAdvisor implements OutfitAiAdvisor {
         this.claude = claudeKey.isBlank() ? null : new ClaudeOutfitAdvisor(claudeModel);
     }
 
+    /** Cho test: thay Claude bằng bản giả. */
+    GeminiOutfitAdvisor(ObjectMapper mapper, String key, String primary, String backup, OutfitAiAdvisor claude) {
+        this.mapper = mapper;
+        this.key = key;
+        this.primary = primary;
+        this.backup = backup;
+        this.claude = claude;
+    }
+
     @Override
     public Advice choose(Occasion occasion, List<OutfitSuggestion> candidates, StyleProfile taste, int limit) {
         if (candidates.isEmpty() || limit <= 0) return Advice.withoutAi(candidates, limit);
+        if (claude != null) {
+            Advice advice = claude.choose(occasion, candidates, taste, limit);
+            if (advice.usage() != null) return advice; // usage null = Claude lỗi, đã tự xếp theo điểm
+        }
         if (!key.isBlank()) for (String model : List.of(primary, backup)) {
             try { return call(model, occasion, candidates, taste, limit); }
             catch (Exception ex) { log.warn("Gemini outfit advice failed with {}: {}", model, ex.getMessage()); }
         }
-        if (claude != null) return claude.choose(occasion, candidates, taste, limit);
         // The recommender already scored real wardrobe combinations; keep them available when AI is down.
         return Advice.withoutAi(candidates, limit);
     }

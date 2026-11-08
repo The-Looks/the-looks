@@ -33,15 +33,16 @@ Cập nhật lần cuối: 01/11/2026 (sau review toàn bộ PR)
 
 Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên máy dev, file này không commit).
 
-- [ ] **Gemini (AI chính: gợi ý outfit + nhận diện quần áo)** · Tuấn · trước khi deploy bản có Gemini
+- [x] **Gemini (AI dự phòng khi Claude lỗi: gợi ý outfit + nhận diện quần áo)** · Tuấn · trước khi deploy bản có Gemini
   1. Tạo key ở https://aistudio.google.com → Get API key. Bật thanh toán / đặt hạn mức chi tiêu trong Google Cloud.
   2. Render → `thelooks-wardrobe` và `thelooks-outfit` → Environment: `GEMINI_API_KEY` (chung một key), `AI_PROVIDER=auto`.
   3. Kiểm tra tên model trong `thelooks.ai.gemini-model` / `gemini-backup-model` còn đúng với danh sách model của Google;
-     sai tên thì mọi lần gọi lỗi rồi mới chuyển sang Claude (chậm thêm vài giây).
-- [ ] **Claude làm AI chính (nhanh hơn Gemini)** · Tuấn
+     sai tên thì khi Claude lỗi sẽ không có AI dự phòng.
+- [ ] **Claude làm AI chính, Gemini dự phòng** · Tuấn
   1. Tạo key ở https://console.anthropic.com → API Keys, **nạp credit** (Plans & Billing) và đặt **giới hạn chi tiêu tháng**.
   2. Render → **cả** `thelooks-outfit` **và** `thelooks-wardrobe` → Environment, kiểm tra tận mắt (sửa `render.yaml`
-     không tự đổi biến của service đã tạo): `AI_PROVIDER` = `claude` (không phải `auto`), `ANTHROPIC_API_KEY` = key → Save.
+     không tự đổi biến của service đã tạo): `AI_PROVIDER` = `auto`, `ANTHROPIC_API_KEY` = key, giữ `GEMINI_API_KEY` → Save.
+     Thứ tự: Claude → (Claude lỗi / hết credit / quá giới hạn) Gemini → Gemini dự phòng.
   3. Tuỳ chọn: `AI_MODEL` (mặc định `claude-haiku-5-5`, nhanh nhất; `claude-sonnet-5-5` kỹ hơn nhưng chậm và đắt hơn ~20 lần),
      `AI_EFFORT` (mặc định `low` = nhanh nhất; `medium` / `high` chậm hơn). Ngân sách app: `AI_MONTHLY_BUDGET_USD`, mặc định 25.
   4. Kiểm tra: trang Admin → Trạng thái hệ thống phải ghi AI = `claude`.
