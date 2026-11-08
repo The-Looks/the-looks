@@ -13,7 +13,7 @@ export function GoogleCallbackPage() {
     if (!isAuthenticated) void session.refresh().then((active) => { if (!active) setFailed(true); });
   }, [isAuthenticated]);
 
-  if (isAuthenticated) return <Navigate to="/" replace />;
+  if (isAuthenticated) return <Navigate to="/onboarding/check" replace />;
   return (
     <main className="auth-page">
       <Card className="auth-card">

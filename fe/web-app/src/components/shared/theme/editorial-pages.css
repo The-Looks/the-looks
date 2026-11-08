@@ -9,7 +9,7 @@
   position: relative;
   margin: 0;
   padding: 5px 0 clamp(23px, 2.6vw, 35px);
-  border-bottom: 1px solid #dfd1e7;
+  border-bottom: 1px solid var(--line);
 }
 .app-frame-topnav .app-page > .stack-lg:not(.home-page) > .page-header::after {
   content: '';
@@ -32,7 +32,7 @@
 .app-frame-topnav .app-page > .stack-lg:not(.home-page) > .page-header .back:hover { transform: translateX(-3px); }
 .app-frame-topnav .app-page > .stack-lg:not(.home-page) > .page-header .eyebrow { color: var(--purple); }
 .app-frame-topnav .app-page > .stack-lg:not(.home-page) > .page-header h1 {
-  font-size: clamp(var(--type-29), 3vw, var(--type-38));
+  font-size: var(--title-page);
   line-height: 1.12;
   letter-spacing: -.05em;
 }
@@ -47,8 +47,7 @@
   padding: 35px 24px;
   border: 1px solid #e7dbea;
   border-radius: 24px;
-  background: radial-gradient(circle at 85% 5%, #f1e7fa8c, transparent 36%), #fff;
-  box-shadow: 0 15px 38px #251d2f08;
+  background: var(--surface);
 }
 .app-frame-topnav .app-page .empty .empty-ico {
   width: 52px;
@@ -100,7 +99,7 @@
 .app-frame-topnav .app-page .wardrobe-item-card .tile { aspect-ratio: 4 / 5; }
 .app-frame-topnav .app-page .wardrobe-item-card .tile img { width: 100%; height: 100%; object-fit: cover; }
 .app-frame-topnav .app-page .wardrobe-item-meta { padding: 15px 16px 17px; gap: 8px; }
-.app-frame-topnav .app-page .wardrobe-item-meta strong { font-size: var(--type-14); }
+.app-frame-topnav .app-page .wardrobe-item-meta strong { font-size: var(--text-body); }
 
 .app-frame-topnav .app-page .saved-outfit-list,
 .app-frame-topnav .app-page .poll-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
@@ -129,7 +128,7 @@
 .saved-outfit-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, #251d2f6d, transparent 58%); pointer-events: none; }
 .saved-outfit-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.16,1,.3,1); }
 .saved-outfit-card:hover .saved-outfit-cover img { transform: scale(1.06); }
-.saved-outfit-cover span { position: relative; z-index: 1; color: #fff; font: var(--weight-extrabold) var(--type-12) var(--font-head); letter-spacing: .16em; }
+.saved-outfit-cover span { position: relative; z-index: 1; padding: 4px 8px; background: var(--ink); color: var(--on-accent); font: var(--weight-bold) var(--text-label) var(--font-head); }
 .saved-outfit-info { min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 18px; padding: 22px; }
 .saved-outfit-info .spread { align-items: flex-start; }
 .saved-outfit-info .spread .small { white-space: nowrap; }
@@ -150,7 +149,7 @@
   box-shadow: 0 10px 28px #251d2f09;
   transition: transform .4s cubic-bezier(.16,1,.3,1), box-shadow .4s cubic-bezier(.16,1,.3,1), border-color .4s;
 }
-.poll-list-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--purple), var(--pink)); }
+.poll-list-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--purple); }
 .poll-list-card h3 { max-width: 22ch; font-size: clamp(var(--type-17), 1.6vw, var(--type-22)); line-height: 1.3; }
 .poll-list-card .bar { margin-top: auto; }
 .poll-list-card .small { line-height: 1.5; }
@@ -184,7 +183,7 @@
   .app-frame-topnav .app-page .suggestion-results { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {
-  .app-frame-topnav .app-page > .stack-lg:not(.home-page) > .page-header .spread { align-items: flex-start; gap: 13px; }
+  .app-frame-topnav .app-page > .stack-lg:not(.home-page) > .page-header .spread { align-items: flex-start; flex-wrap: wrap; gap: 13px; }
   .app-frame-topnav .app-page > .stack-lg:not(.home-page) > .page-header .spread .btn { flex: none; }
   .app-frame-topnav .app-page .occasion-grid { grid-template-columns: 1fr; }
   .app-frame-topnav .app-page .wardrobe-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
@@ -197,7 +196,7 @@
   .app-frame-topnav .app-page .poll-list-card { padding: 20px; }
   .app-frame-topnav .app-page .profile-grid .card { padding: 21px; }
   .app-mobile-nav a { min-width: 0; }
-  .app-mobile-nav a span { font-size: 10px; }
+  .app-mobile-nav a span { font-size: var(--text-caption); }
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal .reveal-list > * { opacity: 1; transform: none; transition: none; }

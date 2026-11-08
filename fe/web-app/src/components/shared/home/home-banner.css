@@ -1,0 +1,40 @@
+.home-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  align-items: center;
+  overflow: hidden;
+  background: var(--pink-soft);
+  border-radius: var(--r-lg);
+}
+
+.home-banner-copy {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  padding: clamp(24px, 4vw, 60px);
+  color: var(--ink);
+}
+
+.home-banner-copy h2 {
+  font-size: clamp(var(--type-26), 4vw, var(--type-52));
+  line-height: 1.1;
+}
+
+.home-banner-copy p {
+  max-width: 34ch;
+  margin: 0;
+  font-size: var(--text-body);
+}
+
+.home-banner-copy .btn { min-height: 44px; }
+
+.home-banner-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 600px) {
+  .home-banner { grid-template-columns: minmax(0, 1fr); }
+  .home-banner-copy { gap: 12px; }
+}

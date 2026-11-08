@@ -3,6 +3,12 @@
 .wardrobe-filters input, .wardrobe-filters select { width: 100%; min-height: 40px; }
 .wardrobe-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .wardrobe-pagination span { font-variant-numeric: tabular-nums; }
+.app-frame-topnav .app-page .empty .empty-ico:has(.wardrobe-empty-art) {
+  width: min(100%, 240px);
+  height: auto;
+  background: transparent;
+}
+.wardrobe-empty-art { display: block; width: 100%; }
 @media (max-width: 900px) { .wardrobe-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .wardrobe-filters > :first-child, .wardrobe-filters > button { grid-column: 1 / -1; } }
 

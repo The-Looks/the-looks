@@ -1,5 +1,5 @@
 import { delay, http, HttpResponse, type HttpHandler } from 'msw';
-import type { Category, OutfitSuggestion, Poll, SavedOutfit, Scan, WardrobeItem } from '../../../interface/dto/types';
+import type { Category, OutfitSuggestion, Poll, SavedOutfit, Scan, StylePreferences, WardrobeItem } from '../../../interface/dto/types';
 import { readWardrobeFilters } from '../../user/wardrobe/filters';
 import { DEMO_USER, sampleCloset } from './data';
 
@@ -13,6 +13,18 @@ const problem = (status: number, detail: string) =>
 // ---------------- auth ----------------
 let refreshActive = false;
 let activeUser = DEMO_USER;
+const registered = new Map<string, typeof DEMO_USER>();
+const accountSetup = new Map<string, { closet: WardrobeItem[]; preferences: StylePreferences }>();
+
+function switchMockAccount(user: typeof DEMO_USER) {
+  if (activeUser.id !== user.id) {
+    accountSetup.set(activeUser.id, { closet, preferences });
+    const setup = accountSetup.get(user.id);
+    closet = setup?.closet ?? [];
+    preferences = setup?.preferences ?? {};
+  }
+  activeUser = user;
+}
 // MSW handlers are recreated on a full OAuth redirect. Persist only the demo identity,
 // never a token, so the mock callback can restore its session via /refresh.
 const mockSessionKey = 'thelooks:mock-auth-session';
@@ -24,7 +36,9 @@ function restoreMockSession() {
   const saved = sessionStorage.getItem(mockSessionKey);
   if (!saved) return false;
   try {
-    activeUser = JSON.parse(saved) as typeof DEMO_USER;
+    const user = JSON.parse(saved) as typeof DEMO_USER;
+    if (user.id !== DEMO_USER.id) registered.set(user.email.toLowerCase(), user);
+    switchMockAccount(user);
     refreshActive = true;
     return true;
   } catch {
@@ -38,16 +52,18 @@ const auth: HttpHandler[] = [
   http.post('*/api/public/auth/register', async ({ request }) => {
     const body = (await request.json()) as { email: string; username: string; password: string };
     if (body.password.length < 8) return problem(400, 'Mật khẩu phải có ít nhất 8 ký tự');
-    return HttpResponse.json({ ...DEMO_USER, email: body.email, username: body.username }, { status: 201 });
+    const user = { ...DEMO_USER, id: crypto.randomUUID(), email: body.email, username: body.username, createdAt: new Date().toISOString() };
+    registered.set(user.email.toLowerCase(), user);
+    return HttpResponse.json(user, { status: 201 });
   }),
   http.post('*/api/public/auth/login', async ({ request }) => {
     const body = (await request.json()) as { email?: string; password?: string };
     await delay(300);
     if (!body.email || !body.password) return problem(401, 'Sai email hoặc mật khẩu');
     refreshActive = true;
-    activeUser = body.email.toLowerCase() === 'admin@thelooks.local'
+    switchMockAccount(body.email.toLowerCase() === 'admin@thelooks.local'
       ? { ...DEMO_USER, email: body.email, username: 'Quản trị viên', roles: ['USER', 'ADMIN'], permissions: ['ACCOUNT_READ_SELF', 'ADMIN_ACCESS', 'USER_MANAGE', 'ROLE_MANAGE', 'AUDIT_READ', 'REPORT_MODERATE', 'USER_DELETE', 'BILLING_STATS_READ', 'AI_USAGE_READ', 'AFFILIATE_STATS_READ'] }
-      : { ...DEMO_USER, email: body.email, roles: ['USER'], permissions: ['ACCOUNT_READ_SELF'] };
+      : registered.get(body.email.toLowerCase()) ?? { ...DEMO_USER, email: body.email });
     rememberMockSession();
     return HttpResponse.json({ expiresAt: new Date(Date.now() + 30 * 60_000).toISOString() });
   }),
@@ -57,13 +73,13 @@ const auth: HttpHandler[] = [
   }),
   http.post('*/api/public/auth/logout', () => {
     refreshActive = false;
-    activeUser = DEMO_USER;
+    switchMockAccount(DEMO_USER);
     sessionStorage.removeItem(mockSessionKey);
     return new HttpResponse(null, { status: 204 });
   }),
   http.get('*/api/public/auth/google/start', ({ request }) => {
     refreshActive = true;
-    activeUser = DEMO_USER;
+    switchMockAccount(DEMO_USER);
     rememberMockSession();
     return HttpResponse.redirect(new URL('/auth/callback', request.url).toString(), 302);
   }),
@@ -145,6 +161,7 @@ const wardrobe: HttpHandler[] = [
   }),
   // Giả lập quét ảnh: mỗi ảnh ra 1–3 món sau ~2 giây (ảnh mock không cắt được nên dùng lại ảnh gốc)
   http.post('*/api/app/wardrobe/scans', async ({ request }) => {
+    const owner = activeUser.id;
     const form = await request.formData();
     const images = form.getAll('images').filter((f): f is File => f instanceof File);
     if (images.length === 0) return problem(400, 'Thiếu ảnh');
@@ -173,7 +190,9 @@ const wardrobe: HttpHandler[] = [
           createdAt: new Date().toISOString(),
         })),
       );
-      closet = [...created, ...closet];
+      const prior = accountSetup.get(owner);
+      if (owner === activeUser.id) closet = [...created, ...closet];
+      else if (prior) prior.closet = [...created, ...prior.closet];
       scans.set(scan.id, { ...scan, status: 'DONE', items: created });
     }, 2000);
     return HttpResponse.json(scan, { status: 202 });
@@ -258,7 +277,7 @@ function mockSuggestions(occasion?: string): OutfitSuggestion[] {
     }));
 }
 
-let preferences: { gender?: string | null; styles?: string[]; budget?: string | null; colors?: string[] } = {
+let preferences: StylePreferences = {
   gender: null,
   styles: [],
   budget: null,

@@ -1,0 +1,737 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 570" width="960" height="570">
+  <defs>
+    <g id="char-cat">
+  <ellipse cx="160" cy="282" rx="52" ry="6.5" fill="#f5dce1" />
+  <!-- Tail -->
+  <path d="M 124 205 C 100 210, 72 205, 66 185 C 60 162, 72 138, 88 130"
+        fill="none" stroke="#241d21" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 124 205 C 100 210, 72 205, 66 185 C 60 162, 72 138, 88 130"
+        fill="none" stroke="#fff7f3" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 72 152 C 75 142, 80 134, 88 130"
+        fill="none" stroke="#d99b68" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- Trousers -->
+  <g id="cat-trousers">
+    <path d="M 125 168 C 148 171, 172 171, 195 168 L 200 262 L 168 262 L 160 196 L 152 262 L 120 262 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="136" y1="184" x2="136" y2="258" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="184" y1="184" x2="184" y2="258" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="119" y="256" width="34" height="6.5" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <rect x="167" y="256" width="34" height="6.5" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <path d="M 157 192 Q 160 198 163 192" fill="none" stroke="#3b3238" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 127 236 Q 133 240 141 237" fill="none" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 179 236 Q 187 240 193 237" fill="none" stroke="#3b3238" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Socks & Loafers -->
+  <rect x="130" y="260" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+  <path d="M 122 266 C 122 266, 128 264, 142 264 C 148 264, 150 268, 150 273 C 150 278, 146 280, 138 280 L 124 280 C 120 280, 120 275, 120 272 Z"
+        fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+  <line x1="120" y1="280" x2="150" y2="280" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+  <rect x="132" y="266" width="8" height="4" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+  <rect x="178" y="260" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+  <path d="M 170 266 C 170 266, 176 264, 190 264 C 196 264, 198 268, 198 273 C 198 278, 194 280, 186 280 L 172 280 C 168 280, 168 275, 168 272 Z"
+        fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+  <line x1="168" y1="280" x2="198" y2="280" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+  <rect x="180" y="266" width="8" height="4" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+  <!-- Tote Bag -->
+  <g id="cat-tote-bag">
+    <path d="M 92 182 L 120 182 L 122 228 C 122 231, 119 234, 116 234 L 96 234 C 93 234, 90 231, 90 228 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <rect x="98" y="194" width="16" height="18" rx="2" fill="#771e35" stroke="#241d21" stroke-width="2"/>
+    <line x1="93" y1="187" x2="119" y2="187" stroke="#241d21" stroke-width="1.5" stroke-dasharray="2 2"/>
+    <path d="M 97 182 C 97 165, 102 152, 107 150 C 112 152, 115 165, 115 182"
+          fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <!-- Minimalist Ivory Knit -->
+  <g id="cat-knit-sweater">
+    <path d="M 132 124 C 122 135, 112 148, 104 165 L 118 174 C 125 158, 134 146, 142 138 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="103" y="166" width="16" height="7.5" rx="2" transform="rotate(-30 111 170)"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="111" cy="179" rx="6" ry="5.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <line x1="109" y1="181" x2="109" y2="184" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="113" y1="181" x2="113" y2="184" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 188 124 C 198 135, 208 148, 214 162 L 202 173 C 196 158, 187 146, 178 138 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="200" y="164" width="16" height="7.5" rx="2" transform="rotate(35 208 168)"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="199" cy="178" rx="6" ry="5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <path d="M 134 122 C 124 135, 122 152, 124 172 L 196 172 C 198 152, 196 135, 186 122 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="123" y="167" width="74" height="7.5" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+    <line x1="135" y1="167" x2="135" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="147" y1="167" x2="147" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="160" y1="167" x2="160" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="173" y1="167" x2="173" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="185" y1="167" x2="185" y2="174" stroke="#241d21" stroke-width="1.5"/>
+    <path d="M 129 146 Q 138 151 147 147" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 191 146 Q 182 151 173 147" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 152 158 Q 160 162 168 158" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 139 122 C 137 112, 139 104, 144 102 C 153 100, 167 100, 176 102 C 181 104, 183 112, 181 122 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="149" y1="103" x2="149" y2="121" stroke="#241d21" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="160" y1="102" x2="160" y2="121" stroke="#241d21" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="171" y1="103" x2="171" y2="121" stroke="#241d21" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 142 111 Q 160 114 178 111" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Head & Ears -->
+  <g id="cat-head">
+    <path d="M 132 72 L 123 40 C 129 38, 140 44, 150 56 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="129,66 127,47 143,57" fill="#f5dce1"/>
+    <path d="M 170 56 C 180 44, 191 38, 197 40 L 188 72 Z"
+          fill="#d99b68" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="191,66 193,47 177,57" fill="#f5dce1"/>
+    <path d="M 130 76 C 122 84, 124 96, 134 102 C 146 109, 174 109, 186 102 C 196 96, 198 84, 190 76 C 182 66, 138 66, 130 76 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 174 60 C 184 66, 194 76, 193 84 C 192 90, 187 96, 180 94 C 174 88, 172 72, 174 60 Z"
+          fill="#d99b68"/>
+    <ellipse cx="138" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="182" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <path d="M 142 80 Q 148 76 154 80" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 166 80 Q 172 76 178 80" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 142 80 L 139 77" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 178 80 L 181 77" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="158,86 162,86 160,89" fill="#771e35"/>
+    <path d="M 156 91 Q 160 93 164 91" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 132 86 Q 116 84 108 88" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 132 91 Q 118 93 110 97" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 188 86 Q 204 84 212 88" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 188 91 Q 202 93 210 97" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+    </g>
+    <g id="char-rabbit">
+  <ellipse cx="160" cy="282" rx="48" ry="6" fill="#f5dce1" />
+  <!-- Fluffy Round Tail -->
+  <circle cx="118" cy="226" r="14" fill="#fff7f3" stroke="#241d21" stroke-width="2.8"/>
+  <path d="M 112 222 Q 116 218 122 222" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Mary Jane Shoes & Socks -->
+  <g id="rabbit-feet">
+    <rect x="134" y="252" width="12" height="14" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <path d="M 126 266 C 126 266, 132 263, 144 263 C 150 263, 152 267, 152 273 C 152 278, 148 280, 140 280 L 126 280 C 122 280, 122 275, 122 272 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="124" y1="280" x2="152" y2="280" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+    <line x1="130" y1="267" x2="142" y2="267" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="142" cy="267" r="1.5" fill="#fff7f3"/>
+    <rect x="174" y="252" width="12" height="14" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <path d="M 168 266 C 168 266, 174 263, 186 263 C 192 263, 194 267, 194 273 C 194 278, 190 280, 182 280 L 168 280 C 164 280, 164 275, 164 272 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="166" y1="280" x2="194" y2="280" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+    <line x1="172" y1="267" x2="184" y2="267" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="184" cy="267" r="1.5" fill="#fff7f3"/>
+  </g>
+  <!-- Romantic Dress -->
+  <g id="rabbit-dress">
+    <!-- Petticoat Ruffle Hem -->
+    <path d="M 112 248 Q 120 252 128 248 Q 136 252 144 248 Q 152 252 160 248 Q 168 252 176 248 Q 184 252 192 248 Q 200 252 208 248 L 204 238 L 116 238 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Flared A-Line Skirt -->
+    <path d="M 136 172 L 184 172 L 210 242 C 176 248, 144 248, 110 242 Z"
+          fill="#f5dce1" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Burgundy Velvet Hem Ribbon -->
+    <path d="M 113 234 C 145 240, 175 240, 207 234 L 209 238 C 177 244, 143 244, 111 238 Z" fill="#771e35"/>
+    <!-- Skirt Folds -->
+    <path d="M 142 184 Q 138 210 134 236" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 160 182 Q 160 210 160 238" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 178 184 Q 182 210 186 236" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Bodice -->
+    <path d="M 138 126 C 130 142, 132 160, 136 174 L 184 174 C 188 160, 190 142, 182 126 Z"
+          fill="#f5dce1" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="160" y1="130" x2="160" y2="172" stroke="#241d21" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <circle cx="160" cy="144" r="2" fill="#771e35"/>
+    <circle cx="160" cy="156" r="2" fill="#771e35"/>
+    <circle cx="160" cy="166" r="2" fill="#771e35"/>
+    <!-- Puff Sleeves -->
+    <ellipse cx="124" cy="138" rx="12" ry="14" fill="#f5dce1" stroke="#241d21" stroke-width="2.8"/>
+    <rect x="114" y="148" width="16" height="4" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <ellipse cx="196" cy="138" rx="12" ry="14" fill="#f5dce1" stroke="#241d21" stroke-width="2.8"/>
+    <rect x="190" y="148" width="16" height="4" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <!-- White Paws holding a delicate vintage book -->
+    <path d="M 124 152 L 138 168 L 150 162 L 132 148 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 196 152 L 182 168 L 170 162 L 188 148 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Vintage Book in Paws -->
+    <rect x="142" y="156" width="36" height="24" rx="2" fill="#4a6882" stroke="#241d21" stroke-width="2.5"/>
+    <rect x="146" y="158" width="28" height="20" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <path d="M 160 156 L 160 180" stroke="#771e35" stroke-width="2"/>
+    <circle cx="140" cy="168" r="5" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <circle cx="180" cy="168" r="5" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <!-- Peter Pan Collar -->
+    <path d="M 160 126 C 150 124, 136 128, 138 136 C 142 142, 154 138, 160 130 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 160 126 C 170 124, 184 128, 182 136 C 178 142, 166 138, 160 130 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Velvet Neck Bow -->
+    <ellipse cx="153" cy="130" rx="6" ry="4" transform="rotate(-15 153 130)" fill="#771e35" stroke="#241d21" stroke-width="1.8"/>
+    <ellipse cx="167" cy="130" rx="6" ry="4" transform="rotate(15 167 130)" fill="#771e35" stroke="#241d21" stroke-width="1.8"/>
+    <circle cx="160" cy="130" r="3" fill="#771e35" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 158 132 L 154 140" stroke="#771e35" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 162 132 L 166 140" stroke="#771e35" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Rabbit Head & Ears -->
+  <g id="rabbit-head">
+    <!-- Big Hair Bow behind ears -->
+    <path d="M 132 58 C 118 52, 114 68, 126 74 C 138 78, 146 68, 148 64 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 188 58 C 202 52, 206 68, 194 74 C 182 78, 174 68, 172 64 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="160" cy="64" r="5" fill="#771e35" stroke="#241d21" stroke-width="2"/>
+    <!-- Left Rabbit Ear (Upright) -->
+    <path d="M 144 68 C 136 48, 130 26, 142 16 C 152 6, 160 26, 154 66 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 143 56 C 138 42, 136 28, 144 22 C 148 18, 153 28, 150 56 Z" fill="#f5dce1"/>
+    <!-- Right Rabbit Ear (Playfully tilted tip) -->
+    <path d="M 166 66 C 162 38, 168 18, 180 18 C 188 18, 194 28, 188 40 C 184 48, 186 56, 176 68 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 170 58 C 168 40, 172 26, 178 24 C 182 24, 184 32, 180 42 C 178 48, 178 54, 172 58 Z" fill="#f5dce1"/>
+    <!-- Head Silhouette -->
+    <ellipse cx="160" cy="88" rx="32" ry="26" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <!-- Rosy Cheeks -->
+    <ellipse cx="138" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <ellipse cx="182" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <!-- Sweet Gentle Eyes -->
+    <ellipse cx="145" cy="86" rx="4.5" ry="5.5" fill="#241d21"/>
+    <circle cx="144" cy="84" r="1.8" fill="#fff7f3"/>
+    <circle cx="147" cy="88" r="0.8" fill="#fff7f3"/>
+    <ellipse cx="175" cy="86" rx="4.5" ry="5.5" fill="#241d21"/>
+    <circle cx="174" cy="84" r="1.8" fill="#fff7f3"/>
+    <circle cx="177" cy="88" r="0.8" fill="#fff7f3"/>
+    <!-- Cute Eyelashes -->
+    <path d="M 141 81 L 138 78" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 179 81 L 182 78" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Bunny Nose & Mouth -->
+    <polygon points="158,92 162,92 160,95" fill="#771e35"/>
+    <path d="M 156 97 Q 160 99 164 97" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Whiskers -->
+    <line x1="134" y1="92" x2="120" y2="92" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="134" y1="96" x2="122" y2="99" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="186" y1="92" x2="200" y2="92" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="186" y1="96" x2="198" y2="99" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+    </g>
+    <g id="char-bear">
+  <ellipse cx="160" cy="282" rx="58" ry="7" fill="#f5dce1" />
+  <!-- Rolled Denim Jeans -->
+  <g id="bear-jeans">
+    <path d="M 120 182 C 146 185, 174 185, 200 182 L 206 254 L 170 254 L 160 206 L 150 254 L 114 254 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="M 160 184 L 160 202 Q 164 206 168 202" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <line x1="134" y1="192" x2="134" y2="250" stroke="#354f67" stroke-width="2" stroke-linecap="round"/>
+    <line x1="186" y1="192" x2="186" y2="250" stroke="#354f67" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 124 228 Q 132 233 140 229" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 196 228 Q 188 233 180 229" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Selvedge Turn-up Cuffs -->
+    <rect x="113" y="249" width="38" height="7" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <line x1="147" y1="249" x2="147" y2="256" stroke="#771e35" stroke-width="2"/>
+    <rect x="169" y="249" width="38" height="7" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <line x1="173" y1="249" x2="173" y2="256" stroke="#771e35" stroke-width="2"/>
+  </g>
+  <!-- Chunky Retro Trainers -->
+  <g id="bear-trainers">
+    <rect x="127" y="252" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 112 268 C 112 260, 122 254, 140 255 C 148 255, 154 262, 154 269 L 110 269 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 110 269 L 110 262 C 113 258, 120 256, 126 260 L 126 269 Z" fill="#771e35"/>
+    <path d="M 108 269 L 156 269 C 158 274, 154 280, 148 280 L 114 280 C 108 280, 106 274, 108 269 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <line x1="110" y1="275" x2="154" y2="275" stroke="#5b6b4e" stroke-width="2"/>
+    <line x1="130" y1="257" x2="140" y2="259" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+    <rect x="181" y="252" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 166 269 C 166 262, 172 255, 180 255 C 198 254, 208 260, 208 268 L 210 269 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 210 269 L 210 262 C 207 258, 200 256, 194 260 L 194 269 Z" fill="#771e35"/>
+    <path d="M 164 269 L 212 269 C 214 274, 212 280, 206 280 L 172 280 C 166 280, 162 274, 164 269 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <line x1="166" y1="275" x2="210" y2="275" stroke="#5b6b4e" stroke-width="2"/>
+    <line x1="180" y1="259" x2="190" y2="257" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Sporty Varsity Jacket -->
+  <g id="bear-varsity-jacket">
+    <!-- Off-White Contrast Sleeves -->
+    <path d="M 126 126 C 108 136, 92 152, 90 172 C 89 180, 98 184, 110 178 L 126 146 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <rect x="100" y="172" width="16" height="8" rx="2" transform="rotate(-25 108 176)"
+          fill="#771e35" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="134" cy="182" rx="7" ry="6" fill="#8e5a38" stroke="#241d21" stroke-width="2.5"/>
+    <path d="M 194 126 C 212 136, 228 152, 230 172 C 231 180, 222 184, 210 178 L 194 146 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <rect x="204" y="172" width="16" height="8" rx="2" transform="rotate(25 212 176)"
+          fill="#771e35" stroke="#241d21" stroke-width="2.2"/>
+    <ellipse cx="186" cy="182" rx="7" ry="6" fill="#8e5a38" stroke="#241d21" stroke-width="2.5"/>
+    <!-- Burgundy Torso -->
+    <path d="M 128 120 C 112 138, 114 168, 122 184 L 198 184 C 206 168, 208 138, 192 120 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- Striped Ribbed Waistband -->
+    <rect x="120" y="180" width="80" height="9" rx="2" fill="#771e35" stroke="#241d21" stroke-width="2.5"/>
+    <line x1="120" y1="184.5" x2="200" y2="184.5" stroke="#fff7f3" stroke-width="2"/>
+    <!-- Center Snap Placket -->
+    <line x1="160" y1="120" x2="160" y2="180" stroke="#241d21" stroke-width="2.5"/>
+    <circle cx="160" cy="132" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <circle cx="160" cy="146" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <circle cx="160" cy="160" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <circle cx="160" cy="174" r="2.5" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <!-- Chenille Graphic Patch on Chest -->
+    <path d="M 136 142 L 146 134 L 152 142 L 146 150 Z" fill="#5b6b4e" stroke="#fff7f3" stroke-width="2"/>
+    <!-- Slanted Welt Pockets -->
+    <line x1="130" y1="166" x2="142" y2="174" stroke="#fff7f3" stroke-width="3" stroke-linecap="round"/>
+    <line x1="130" y1="166" x2="142" y2="174" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="190" y1="166" x2="178" y2="174" stroke="#fff7f3" stroke-width="3" stroke-linecap="round"/>
+    <line x1="190" y1="166" x2="178" y2="174" stroke="#241d21" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Fold marks -->
+    <path d="M 124 150 Q 130 155 138 152" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 196 150 Q 190 155 182 152" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Ribbed Baseball Collar -->
+    <path d="M 140 120 C 138 108, 150 104, 160 104 C 170 104, 182 108, 180 120 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 144 112 Q 160 110 176 112" fill="none" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Bear Head & Ears -->
+  <g id="bear-head">
+    <!-- Round Bear Ears -->
+    <circle cx="126" cy="62" r="14" fill="#8e5a38" stroke="#241d21" stroke-width="3"/>
+    <circle cx="126" cy="62" r="8" fill="#fae8d7"/>
+    <circle cx="194" cy="62" r="14" fill="#8e5a38" stroke="#241d21" stroke-width="3"/>
+    <circle cx="194" cy="62" r="8" fill="#fae8d7"/>
+    <!-- Broad Bear Head -->
+    <path d="M 124 74 C 114 88, 116 104, 130 112 C 144 118, 176 118, 190 112 C 204 104, 206 88, 196 74 C 188 64, 132 64, 124 74 Z"
+          fill="#8e5a38" stroke="#241d21" stroke-width="3.2" stroke-linejoin="round"/>
+    <!-- Cream Snout Oval -->
+    <ellipse cx="160" cy="95" rx="18" ry="14" fill="#fae8d7" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Cheeks Blush -->
+    <ellipse cx="132" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <ellipse cx="188" cy="94" rx="6" ry="4" fill="#f5dce1"/>
+    <!-- Friendly Bear Eyes -->
+    <ellipse cx="144" cy="80" rx="4" ry="5" fill="#241d21"/>
+    <circle cx="143" cy="78" r="1.5" fill="#fff7f3"/>
+    <ellipse cx="176" cy="80" rx="4" ry="5" fill="#241d21"/>
+    <circle cx="175" cy="78" r="1.5" fill="#fff7f3"/>
+    <path d="M 140 73 Q 146 71 150 74" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 180 73 Q 174 71 170 74" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dark Heart/Oval Nose -->
+    <ellipse cx="160" cy="91" rx="6" ry="4.5" fill="#241d21"/>
+    <circle cx="158" cy="90" r="1" fill="#fff7f3"/>
+    <!-- Warm Smiling Mouth -->
+    <path d="M 160 95 L 160 99" stroke="#241d21" stroke-width="2"/>
+    <path d="M 153 99 Q 160 104 167 99" fill="none" stroke="#241d21" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+    </g>
+    <g id="char-fox">
+  <ellipse cx="160" cy="282" rx="55" ry="6.5" fill="#f5dce1" />
+  <!-- Big Fluffy Fox Tail -->
+  <g id="fox-tail">
+    <path d="M 185 205 C 210 215, 255 220, 268 185 C 278 155, 260 120, 235 110 C 220 104, 212 112, 215 125 C 222 155, 202 185, 175 195 Z"
+          fill="#cf5c2e" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 235 110 C 248 116, 262 130, 266 148 C 258 146, 250 152, 245 145 C 242 140, 236 142, 232 136 C 228 132, 222 136, 218 128 C 216 122, 220 112, 235 110 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 248 180 Q 252 172 245 168" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 256 160 Q 260 152 254 148" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Denim Pants -->
+  <g id="fox-pants">
+    <path d="M 124 182 C 148 184, 172 184, 196 182 L 202 252 L 168 252 L 160 204 L 152 252 L 118 252 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 160 183 L 160 200 Q 163 204 167 200" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <line x1="137" y1="192" x2="137" y2="248" stroke="#354f67" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="183" y1="192" x2="183" y2="248" stroke="#354f67" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 126 226 Q 134 230 142 227" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 194 226 Q 186 230 178 227" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <rect x="117" y="247" width="36" height="6.5" rx="1.5" fill="#5a7b97" stroke="#241d21" stroke-width="2"/>
+    <rect x="167" y="247" width="36" height="6.5" rx="1.5" fill="#5a7b97" stroke="#241d21" stroke-width="2"/>
+  </g>
+  <!-- Sneakers -->
+  <g id="fox-sneakers">
+    <rect x="129" y="250" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 116 266 C 116 260, 126 254, 142 255 C 150 255, 154 262, 154 269 L 114 269 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 114 269 L 114 262 C 116 258, 124 256, 128 260 L 128 269 Z" fill="#771e35"/>
+    <path d="M 134 259 L 140 263 L 146 259" fill="none" stroke="#771e35" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 112 269 L 156 269 C 158 274, 154 280, 148 280 L 116 280 C 112 280, 110 274, 112 269 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <line x1="114" y1="275" x2="154" y2="275" stroke="#771e35" stroke-width="1.8"/>
+    <line x1="134" y1="256" x2="142" y2="258" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+    <line x1="135" y1="260" x2="143" y2="262" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+    <rect x="179" y="250" width="12" height="6" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 166 269 C 166 262, 170 255, 178 255 C 194 254, 204 260, 204 266 L 206 269 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 206 269 L 206 262 C 204 258, 196 256, 192 260 L 192 269 Z" fill="#771e35"/>
+    <path d="M 186 259 L 180 263 L 174 259" fill="none" stroke="#771e35" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 164 269 L 208 269 C 210 274, 208 280, 204 280 L 172 280 C 166 280, 162 274, 164 269 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <line x1="166" y1="275" x2="206" y2="275" stroke="#771e35" stroke-width="1.8"/>
+    <line x1="178" y1="258" x2="186" y2="256" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+    <line x1="177" y1="262" x2="185" y2="260" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Burgundy Bomber Jacket -->
+  <g id="fox-bomber-jacket">
+    <path d="M 126 126 C 110 134, 96 150, 94 168 C 93 176, 102 182, 114 176 L 128 142 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="97" y="152" width="10" height="14" rx="1.5" fill="#5e1528" stroke="#241d21" stroke-width="1.8"/>
+    <line x1="97" y1="156" x2="107" y2="156" stroke="#fff7f3" stroke-width="1.5"/>
+    <rect x="106" y="172" width="14" height="7.5" rx="1.5" transform="rotate(-25 113 175)"
+          fill="#f5dce1" stroke="#241d21" stroke-width="2"/>
+    <ellipse cx="140" cy="154" rx="6" ry="5.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <path d="M 194 126 C 210 134, 224 150, 226 168 C 227 176, 218 182, 206 176 L 192 142 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="200" y="172" width="14" height="7.5" rx="1.5" transform="rotate(25 207 175)"
+          fill="#f5dce1" stroke="#241d21" stroke-width="2"/>
+    <ellipse cx="196" cy="179" rx="6" ry="5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <path d="M 132 120 C 114 138, 116 168, 124 184 L 196 184 C 204 168, 206 138, 188 120 Z"
+          fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="122" y="180" width="76" height="8.5" rx="2" fill="#f5dce1" stroke="#241d21" stroke-width="2.5"/>
+    <line x1="134" y1="180" x2="134" y2="188" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="146" y1="180" x2="146" y2="188" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="160" y1="180" x2="160" y2="188" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="174" y1="180" x2="174" y2="188" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="186" y1="180" x2="186" y2="188" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="160" y1="118" x2="160" y2="180" stroke="#fff7f3" stroke-width="3" stroke-linecap="round"/>
+    <line x1="160" y1="118" x2="160" y2="180" stroke="#241d21" stroke-width="1" stroke-dasharray="2 1.5"/>
+    <rect x="158" y="146" width="4" height="8" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="176" y1="164" x2="190" y2="170" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 126 150 Q 134 156 144 152" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 194 150 Q 186 156 176 152" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 132 170 Q 142 173 150 169" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 142 120 C 140 110, 150 106, 160 106 C 170 106, 180 110, 178 120 Z"
+          fill="#f5dce1" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <line x1="151" y1="108" x2="151" y2="119" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="160" y1="106" x2="160" y2="119" stroke="#241d21" stroke-width="1.5"/>
+    <line x1="169" y1="108" x2="169" y2="119" stroke="#241d21" stroke-width="1.5"/>
+  </g>
+  <!-- Head & Face -->
+  <g id="fox-head">
+    <path d="M 134 76 L 118 36 C 128 34, 144 42, 154 58 Z"
+          fill="#cf5c2e" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 118 36 L 126 35 L 124 48 L 118 36 Z" fill="#241d21"/>
+    <polygon points="132,68 126,46 144,56" fill="#f5dce1"/>
+    <path d="M 134 62 Q 138 56 136 50" fill="none" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 166 58 C 176 42, 192 34, 202 36 L 186 76 Z"
+          fill="#cf5c2e" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 202 36 L 194 35 L 196 48 L 202 36 Z" fill="#241d21"/>
+    <polygon points="188,68 194,46 176,56" fill="#f5dce1"/>
+    <path d="M 186 62 Q 182 56 184 50" fill="none" stroke="#fff7f3" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 136 68 C 118 72, 110 88, 120 98 C 132 108, 148 114, 160 114 C 172 114, 188 108, 200 98 C 210 88, 202 72, 184 68 Z"
+          fill="#cf5c2e" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M 120 98 C 114 90, 122 78, 134 82 C 144 86, 152 94, 160 94 C 168 94, 176 86, 186 82 C 198 78, 206 90, 200 98 C 190 108, 174 114, 160 114 C 146 114, 130 108, 120 98 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <ellipse cx="132" cy="94" rx="5.5" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="188" cy="94" rx="5.5" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="145" cy="83" rx="4.5" ry="5.5" transform="rotate(-8 145 83)" fill="#241d21"/>
+    <circle cx="144" cy="81" r="1.6" fill="#fff7f3"/>
+    <path d="M 139 77 Q 146 75 152 79" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="175" cy="83" rx="4.5" ry="5.5" transform="rotate(8 175 83)" fill="#241d21"/>
+    <circle cx="174" cy="81" r="1.6" fill="#fff7f3"/>
+    <path d="M 181 77 Q 174 75 168 79" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 156 94 C 156 92, 164 92, 164 94 C 164 97, 160 99, 160 99 C 160 99, 156 97, 156 94 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="1"/>
+    <circle cx="159" cy="94" r="0.8" fill="#fff7f3"/>
+    <path d="M 157 101 Q 161 104 166 102" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+  </g>
+    </g>
+    <g id="char-frog">
+  <ellipse cx="160" cy="282" rx="52" ry="6.5" fill="#f5dce1" />
+  <!-- Vintage Chunky Boots -->
+  <g id="frog-boots">
+    <rect x="131" y="254" width="12" height="8" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 120 268 C 120 260, 128 256, 144 256 C 150 256, 154 262, 154 270 L 118 270 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 116 270 L 156 270 C 158 275, 154 280, 148 280 L 120 280 C 116 280, 114 275, 116 270 Z"
+          fill="#354f67" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="130" y1="262" x2="142" y2="264" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="131" y1="266" x2="143" y2="268" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="177" y="254" width="12" height="8" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 166 270 C 166 262, 170 256, 176 256 C 192 256, 200 260, 200 268 L 202 270 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M 164 270 L 204 270 C 206 275, 204 280, 198 280 L 170 280 C 166 280, 162 275, 164 270 Z"
+          fill="#354f67" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="178" y1="264" x2="190" y2="262" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="177" y1="268" x2="189" y2="266" stroke="#fff7f3" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Striped Breton Long-Sleeve Shirt -->
+  <g id="frog-shirt">
+    <!-- Left Sleeve -->
+    <path d="M 130 134 L 108 166 L 120 174 L 138 144 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="124" y1="142" x2="114" y2="156" stroke="#241d21" stroke-width="2"/>
+    <line x1="130" y1="150" x2="120" y2="164" stroke="#241d21" stroke-width="2"/>
+    <ellipse cx="114" cy="174" rx="6" ry="5.5" fill="#648653" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Three webbed frog fingers -->
+    <circle cx="109" cy="178" r="2" fill="#648653"/>
+    <circle cx="114" cy="181" r="2" fill="#648653"/>
+    <circle cx="119" cy="178" r="2" fill="#648653"/>
+    <!-- Right Sleeve (holding sketchpad) -->
+    <path d="M 190 134 L 212 166 L 200 174 L 182 144 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="196" y1="142" x2="206" y2="156" stroke="#241d21" stroke-width="2"/>
+    <line x1="190" y1="150" x2="200" y2="164" stroke="#241d21" stroke-width="2"/>
+    <ellipse cx="206" cy="174" rx="6" ry="5.5" fill="#648653" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Sketchbook / notebook -->
+    <rect x="202" y="166" width="22" height="30" rx="2" transform="rotate(-15 213 181)"
+          fill="#f5dce1" stroke="#241d21" stroke-width="2"/>
+    <line x1="206" y1="172" x2="222" y2="168" stroke="#771e35" stroke-width="2"/>
+    <!-- Shirt collar -->
+    <path d="M 142 126 C 142 118, 178 118, 178 126 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+  </g>
+  <!-- Vintage Denim Overalls -->
+  <g id="frog-overalls">
+    <!-- Overalls Trouser Legs -->
+    <path d="M 122 178 L 198 178 L 204 254 L 168 254 L 160 206 L 152 254 L 116 254 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Wide Rolled Cuffs -->
+    <rect x="114" y="247" width="38" height="7.5" rx="1.5" fill="#5c7e9d" stroke="#241d21" stroke-width="2.2"/>
+    <rect x="168" y="247" width="38" height="7.5" rx="1.5" fill="#5c7e9d" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Overall Bib -->
+    <path d="M 136 136 L 184 136 L 188 180 L 132 180 Z"
+          fill="#4a6882" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Bib Front Pocket -->
+    <path d="M 144 148 L 176 148 L 174 168 L 146 168 Z"
+          fill="#3b556e" stroke="#241d21" stroke-width="2"/>
+    <!-- Vintage pencil in bib pocket -->
+    <line x1="168" y1="140" x2="174" y2="152" stroke="#771e35" stroke-width="2.5" stroke-linecap="round"/>
+    <polygon points="167,138 170,140 169,141" fill="#fff7f3"/>
+    <!-- Overall Straps & Brass Buckles -->
+    <line x1="140" y1="126" x2="140" y2="140" stroke="#4a6882" stroke-width="8" stroke-linecap="round"/>
+    <line x1="140" y1="126" x2="140" y2="140" stroke="#241d21" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 100"/>
+    <rect x="136" y="136" width="8" height="6" rx="1.5" fill="#fae8d7" stroke="#241d21" stroke-width="1.8"/>
+    <line x1="180" y1="126" x2="180" y2="140" stroke="#4a6882" stroke-width="8" stroke-linecap="round"/>
+    <rect x="176" y="136" width="8" height="6" rx="1.5" fill="#fae8d7" stroke="#241d21" stroke-width="1.8"/>
+    <!-- Fold marks -->
+    <path d="M 126 226 Q 134 230 142 227" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 194 226 Q 186 230 178 227" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Frog Head & Artsy Beret -->
+  <g id="frog-head">
+    <!-- Bulbous Frog Eyes (Dome shape on top of head) -->
+    <circle cx="136" cy="62" r="15" fill="#648653" stroke="#241d21" stroke-width="3"/>
+    <circle cx="136" cy="62" r="10" fill="#edf3e4"/>
+    <circle cx="136" cy="62" r="5" fill="#241d21"/>
+    <circle cx="134" cy="60" r="1.8" fill="#fff7f3"/>
+    <!-- Wide Frog Head -->
+    <ellipse cx="160" cy="88" rx="38" ry="24" fill="#648653" stroke="#241d21" stroke-width="3"/>
+    <!-- Pale Chin / Throat -->
+    <path d="M 138 94 C 144 104, 176 104, 182 94 C 172 108, 148 108, 138 94 Z" fill="#edf3e4"/>
+    <!-- Artsy Burgundy Beret (Tilted jauntily over right eye) -->
+    <g id="frog-beret">
+      <!-- Right eye partially peek beneath beret -->
+      <circle cx="184" cy="62" r="15" fill="#648653" stroke="#241d21" stroke-width="3"/>
+      <circle cx="184" cy="62" r="10" fill="#edf3e4"/>
+      <circle cx="184" cy="62" r="5" fill="#241d21"/>
+      <circle cx="182" cy="60" r="1.8" fill="#fff7f3"/>
+      <!-- Beret Volume -->
+      <path d="M 152 56 C 146 36, 188 28, 206 40 C 218 48, 214 62, 198 68 C 176 74, 158 68, 152 56 Z"
+            fill="#771e35" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+      <!-- Beret Band -->
+      <path d="M 164 64 C 174 68, 192 68, 202 62" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Beret Stem Tab -->
+      <path d="M 184 34 L 186 28" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Beret Fold mark -->
+      <path d="M 172 44 Q 186 46 196 42" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+    <!-- Rosy Frog Cheeks -->
+    <ellipse cx="132" cy="92" rx="6" ry="4" fill="#f5dce1"/>
+    <ellipse cx="188" cy="92" rx="6" ry="4" fill="#f5dce1"/>
+    <!-- Wide Quirky Smile -->
+    <path d="M 136 86 C 148 94, 172 94, 184 86" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="136" cy="86" r="1.5" fill="#241d21"/>
+    <circle cx="184" cy="86" r="1.5" fill="#241d21"/>
+    <!-- Nostril Dots -->
+    <circle cx="156" cy="80" r="1.2" fill="#241d21"/>
+    <circle cx="164" cy="80" r="1.2" fill="#241d21"/>
+  </g>
+    </g>
+    <g id="char-penguin">
+  <ellipse cx="160" cy="282" rx="50" ry="6.5" fill="#f5dce1" />
+  <!-- Amber Webbed Feet -->
+  <g id="penguin-feet">
+    <path d="M 124 270 C 122 266, 126 262, 134 262 C 144 262, 148 268, 148 274 C 148 279, 142 281, 134 281 L 122 281 C 118 281, 118 276, 120 272 Z"
+          fill="#db812a" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="120" y1="281" x2="148" y2="281" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 124 274 L 128 278" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 134 274 L 138 278" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 172 270 C 172 266, 176 262, 186 262 C 194 262, 198 268, 198 274 C 198 279, 194 281, 186 281 L 172 281 C 168 281, 168 276, 170 272 Z"
+          fill="#db812a" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="168" y1="281" x2="198" y2="281" stroke="#241d21" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 178 274 L 182 278" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 188 274 L 192 278" stroke="#241d21" stroke-width="1.8"/>
+  </g>
+  <!-- Tailored Trousers -->
+  <g id="penguin-trousers">
+    <rect x="132" y="254" width="10" height="10" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <rect x="178" y="254" width="10" height="10" fill="#fff7f3" stroke="#241d21" stroke-width="1.8"/>
+    <path d="M 126 182 L 194 182 L 198 256 L 168 256 L 160 204 L 152 256 L 122 256 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="137" y1="190" x2="137" y2="252" stroke="#3b3238" stroke-width="1.8"/>
+    <line x1="183" y1="190" x2="183" y2="252" stroke="#3b3238" stroke-width="1.8"/>
+    <rect x="121" y="250" width="32" height="6" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <rect x="167" y="250" width="32" height="6" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+  </g>
+  <!-- Penguin Body & Flippers (Ink Silhouette) -->
+  <g id="penguin-body">
+    <!-- Left Flipper (resting gracefully on hip) -->
+    <path d="M 124 122 C 108 132, 94 154, 102 176 C 106 184, 114 186, 122 178 L 132 144 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Right Flipper (dapper posture) -->
+    <path d="M 196 122 C 212 132, 226 154, 218 176 C 214 184, 206 186, 198 178 L 188 144 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Penguin Main Torso -->
+    <path d="M 132 110 C 118 126, 118 160, 124 184 L 196 184 C 202 160, 202 126, 188 110 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Crisp White Belly / Front -->
+    <path d="M 142 114 C 134 130, 134 164, 138 184 L 182 184 C 186 164, 186 130, 178 114 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+  </g>
+  <!-- Collared Shirt & Preppy Plaid Vest -->
+  <g id="penguin-preppy-vest">
+    <!-- Crisp Collared Shirt Points -->
+    <polygon points="144,116 160,132 152,112" fill="#fff7f3" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="176,116 160,132 168,112" fill="#fff7f3" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Burgundy Knotted Necktie -->
+    <polygon points="158,124 162,124 163,142 160,146 157,142" fill="#771e35" stroke="#241d21" stroke-width="1.8"/>
+    <!-- Moss Knit Vest Body -->
+    <path d="M 134 128 L 148 128 L 160 148 L 172 128 L 186 128 C 190 144, 190 166, 188 182 L 132 182 C 130 166, 130 144, 134 128 Z"
+          fill="#5b6b4e" stroke="#241d21" stroke-width="2.8" stroke-linejoin="round"/>
+    <!-- Burgundy Argyle / Plaid Pattern Lines -->
+    <line x1="140" y1="134" x2="160" y2="164" stroke="#771e35" stroke-width="2"/>
+    <line x1="160" y1="164" x2="180" y2="134" stroke="#771e35" stroke-width="2"/>
+    <line x1="160" y1="134" x2="140" y2="164" stroke="#771e35" stroke-width="2"/>
+    <line x1="180" y1="164" x2="160" y2="134" stroke="#771e35" stroke-width="2"/>
+    <!-- Off-White Fine Argyle Grid Lines -->
+    <line x1="148" y1="130" x2="172" y2="168" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <line x1="172" y1="130" x2="148" y2="168" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <line x1="148" y1="168" x2="160" y2="182" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <line x1="172" y1="168" x2="160" y2="182" stroke="#fff7f3" stroke-width="1.2" stroke-dasharray="2 2"/>
+    <!-- Vest V-Neck Trim & Hem -->
+    <path d="M 148 128 L 160 148 L 172 128" fill="none" stroke="#771e35" stroke-width="2.2" stroke-linejoin="round"/>
+    <line x1="132" y1="182" x2="188" y2="182" stroke="#771e35" stroke-width="3"/>
+    <!-- Vest Fold marks -->
+    <path d="M 136 158 Q 142 162 148 160" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 184 158 Q 178 162 172 160" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <!-- Penguin Head & Face -->
+  <g id="penguin-head">
+    <!-- Teardrop Head Outline -->
+    <path d="M 136 78 C 132 58, 142 42, 160 42 C 178 42, 188 58, 184 78 C 182 98, 178 114, 160 114 C 142 114, 138 98, 136 78 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Crisp White Face Mask -->
+    <path d="M 142 78 C 140 64, 148 54, 160 54 C 172 54, 180 64, 178 78 C 176 96, 172 108, 160 108 C 148 108, 144 96, 142 78 Z"
+          fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Rosy Cheeks -->
+    <ellipse cx="145" cy="88" rx="5" ry="3" fill="#f5dce1"/>
+    <ellipse cx="175" cy="88" rx="5" ry="3" fill="#f5dce1"/>
+    <!-- Preppy Sharp Eyes -->
+    <ellipse cx="148" cy="76" rx="3.5" ry="4.5" fill="#241d21"/>
+    <circle cx="147" cy="74" r="1.4" fill="#fff7f3"/>
+    <ellipse cx="172" cy="76" rx="3.5" ry="4.5" fill="#241d21"/>
+    <circle cx="171" cy="74" r="1.4" fill="#fff7f3"/>
+    <path d="M 144 70 Q 148 68 152 70" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 176 70 Q 172 68 168 70" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Amber Triangular Beak -->
+    <polygon points="154,82 166,82 160,92" fill="#db812a" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="156" y1="86" x2="164" y2="86" stroke="#241d21" stroke-width="1.2"/>
+  </g>
+    </g>
+  </defs>
+
+  <!-- Pastel Blush Background Set -->
+  <rect width="960" height="570" fill="#fbe4ea" />
+
+  <!-- Campus Wardrobe Club Room Architecture -->
+  <!-- Back Wall Panels -->
+  <rect x="0" y="0" width="960" height="420" fill="url(#wall-grad)" />
+
+  <!-- Wall Moulding / Wainscoting panels -->
+  <g stroke="#e2bac5" stroke-width="2" fill="none">
+    <rect x="30" y="40" width="120" height="180" rx="4"/>
+    <rect x="180" y="40" width="120" height="180" rx="4"/>
+    <rect x="330" y="40" width="300" height="180" rx="4"/>
+    <rect x="660" y="40" width="120" height="180" rx="4"/>
+    <rect x="810" y="40" width="120" height="180" rx="4"/>
+  </g>
+  <!-- Club Crest / Pennant Banner in Center Panel -->
+  <g transform="translate(480, 80)">
+    <polygon points="-50,0 50,0 50,55 0,85 -50,55" fill="#771e35" stroke="#241d21" stroke-width="3" />
+    <polygon points="-42,6 42,6 42,50 0,76 -42,50" fill="none" stroke="#fff7f3" stroke-width="2" />
+    <circle cx="0" cy="36" r="16" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <!-- Crest Icon -->
+    <path d="M -8 38 L 0 26 L 8 38 Z" fill="#771e35" />
+    <circle cx="0" cy="42" r="3" fill="#e8a838" />
+  </g>
+
+  <!-- Wooden Picture Rail / Dado Rail -->
+  <rect x="0" y="240" width="960" height="10" fill="#dab2bd" stroke="#241d21" stroke-width="1.5" />
+
+  <!-- Hardwood Parquet Floor with Skirting Board -->
+  <rect x="0" y="420" width="960" height="150" fill="url(#floor-grad)" />
+  <rect x="0" y="414" width="960" height="12" fill="#fff7f3" stroke="#241d21" stroke-width="2" />
+
+  <!-- Floor perspective lines -->
+  <path d="M 0 570 L 120 426 M 220 570 L 300 426 M 460 570 L 480 426 M 700 570 L 660 426 M 940 570 L 840 426" stroke="#d5b0ba" stroke-width="2" />
+
+  <!-- Wardrobe Furniture & Club Props -->
+  <!-- Left Side: Floor Standing Mirror in Gilded Frame -->
+  <g transform="translate(40, 160)">
+    <!-- Mirror Stand -->
+    <line x1="20" y1="280" x2="35" y2="120" stroke="#241d21" stroke-width="4" stroke-linecap="round"/>
+    <line x1="90" y1="280" x2="75" y2="120" stroke="#241d21" stroke-width="4" stroke-linecap="round"/>
+    <!-- Mirror Frame -->
+    <rect x="25" y="60" width="60" height="210" rx="30" fill="#fff7f3" stroke="#241d21" stroke-width="4"/>
+    <rect x="31" y="66" width="48" height="198" rx="24" fill="#dce6ee" stroke="#241d21" stroke-width="1.8"/>
+    <!-- Mirror shine reflections -->
+    <path d="M 40 85 L 68 150 M 42 165 L 62 210" stroke="#fff7f3" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Center-Right Background: Rolling Garment Rack -->
+  <g transform="translate(670, 190)">
+    <!-- Rail frame -->
+    <rect x="30" y="220" width="200" height="6" rx="2" fill="#241d21"/>
+    <line x1="50" y1="220" x2="50" y2="40" stroke="#241d21" stroke-width="4"/>
+    <line x1="210" y1="220" x2="210" y2="40" stroke="#241d21" stroke-width="4"/>
+    <line x1="40" y1="40" x2="220" y2="40" stroke="#241d21" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Wheels -->
+    <circle cx="50" cy="226" r="5" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <circle cx="210" cy="226" r="5" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <!-- Hanging garments on rail -->
+    <!-- Hanger 1 & Denim Jacket -->
+    <path d="M 75 42 L 85 55 L 65 55 Z" stroke="#241d21" stroke-width="2" fill="none"/>
+    <path d="M 62 55 L 88 55 L 94 130 L 56 130 Z" fill="#4a6fa5" stroke="#241d21" stroke-width="2.5"/>
+    <!-- Hanger 2 & Wine Coat -->
+    <path d="M 115 42 L 125 55 L 105 55 Z" stroke="#241d21" stroke-width="2" fill="none"/>
+    <path d="M 102 55 L 128 55 L 132 155 L 98 155 Z" fill="#771e35" stroke="#241d21" stroke-width="2.5"/>
+    <!-- Hanger 3 & Cream Trench -->
+    <path d="M 155 42 L 165 55 L 145 55 Z" stroke="#241d21" stroke-width="2" fill="none"/>
+    <path d="M 142 55 L 168 55 L 174 165 L 138 165 Z" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+    <!-- Hanger 4 & Pink Cardigan -->
+    <path d="M 190 42 L 200 55 L 180 55 Z" stroke="#241d21" stroke-width="2" fill="none"/>
+    <path d="M 178 55 L 204 55 L 208 125 L 174 125 Z" fill="#f5dce1" stroke="#241d21" stroke-width="2.5"/>
+  </g>
+
+  <!-- Large Soft Circular Club Rug -->
+  <ellipse cx="480" cy="465" rx="410" ry="60" fill="#fff7f3" opacity="0.4" stroke="#d5b0ba" stroke-width="3" stroke-dasharray="6 4"/>
+
+  <!-- Six Mascots Arranged Across the Campus Wardrobe Club Set -->
+  <!-- 1. Cat Mascot (Left-center stylish) -->
+  <g transform="translate(4, 198) scale(0.91)">
+    <use href="#char-cat"/>
+  </g>
+
+  <!-- 2. Rabbit Mascot (Dainty in pink dress & bow) -->
+  <g transform="translate(149, 205) scale(0.88)">
+    <use href="#char-rabbit"/>
+  </g>
+
+  <!-- 3. Bear Mascot (Chunky center-left in varsity jacket) -->
+  <g transform="translate(286, 194) scale(0.93)">
+    <use href="#char-bear"/>
+  </g>
+
+  <!-- 4. Fox Mascot (Dapper orange fox) -->
+  <g transform="translate(435, 190) scale(0.92)">
+    <use href="#char-fox"/>
+  </g>
+
+  <!-- 5. Frog Mascot (Beret and denim cool) -->
+  <g transform="translate(602, 200) scale(0.9)">
+    <use href="#char-frog"/>
+  </g>
+
+  <!-- 6. Penguin Mascot (Charcoal & plaid vest with loafers) -->
+  <g transform="translate(715, 197) scale(0.93)">
+    <use href="#char-penguin"/>
+  </g>
+</svg>

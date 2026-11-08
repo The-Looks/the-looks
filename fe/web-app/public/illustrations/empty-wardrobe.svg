@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="320" height="320">
+  <ellipse cx="160" cy="286" rx="110" ry="8" fill="#f5dce1" />
+
+  <!-- Modern Tubular Minimalist Wardrobe Rack -->
+  <g id="rack">
+    <!-- Base feet with casters -->
+    <line x1="84" y1="274" x2="116" y2="274" stroke="#241d21" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="88" cy="278" r="3" fill="#241d21"/>
+    <circle cx="112" cy="278" r="3" fill="#241d21"/>
+    <line x1="264" y1="274" x2="296" y2="274" stroke="#241d21" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="268" cy="278" r="3" fill="#241d21"/>
+    <circle cx="292" cy="278" r="3" fill="#241d21"/>
+    <!-- Bottom Slatted Shelf -->
+    <path d="M 96 254 L 284 254 L 280 262 L 100 262 Z" fill="#5b6b4e" stroke="#241d21" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="125" y1="254" x2="125" y2="262" stroke="#241d21" stroke-width="1.8"/>
+    <line x1="155" y1="254" x2="155" y2="262" stroke="#241d21" stroke-width="1.8"/>
+    <line x1="185" y1="254" x2="185" y2="262" stroke="#241d21" stroke-width="1.8"/>
+    <line x1="215" y1="254" x2="215" y2="262" stroke="#241d21" stroke-width="1.8"/>
+    <line x1="245" y1="254" x2="245" y2="262" stroke="#241d21" stroke-width="1.8"/>
+    <!-- Storage Box on Shelf -->
+    <rect x="220" y="228" width="46" height="26" rx="2" fill="#771e35" stroke="#241d21" stroke-width="2.2"/>
+    <rect x="218" y="224" width="50" height="7" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2"/>
+    <rect x="238" y="238" width="10" height="5" rx="1" fill="#fff7f3" stroke="#241d21" stroke-width="1.5"/>
+    <!-- Main Frame Uprights and Top Hanging Rail -->
+    <path d="M 100 254 L 100 68 C 100 56, 112 56, 124 56 L 256 56 C 268 56, 280 56, 280 68 L 280 254"
+          fill="none" stroke="#241d21" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Brass End Caps -->
+    <circle cx="100" cy="56" r="4" fill="#771e35"/>
+    <circle cx="280" cy="56" r="4" fill="#771e35"/>
+  </g>
+
+  <!-- Empty Clothes Hangers (Spaced along rail, showing generous open wardrobe space) -->
+  <g id="hangers">
+    <!-- Hanger 1 -->
+    <path d="M 152 56 C 152 48, 146 44, 142 48 C 140 50, 142 54, 144 56 L 144 68 L 122 84 C 120 86, 122 88, 126 88 L 162 88 C 166 88, 168 86, 166 84 Z"
+          fill="#fae8d7" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="126" y1="88" x2="162" y2="88" stroke="#241d21" stroke-width="2"/>
+    <!-- Hanger 2 -->
+    <path d="M 200 56 C 200 48, 194 44, 190 48 C 188 50, 190 54, 192 56 L 192 68 L 170 84 C 168 86, 170 88, 174 88 L 210 88 C 214 88, 216 86, 214 84 Z"
+          fill="#fae8d7" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="174" y1="88" x2="210" y2="88" stroke="#241d21" stroke-width="2"/>
+    <!-- Hanger 3 -->
+    <path d="M 248 56 C 248 48, 242 44, 238 48 C 236 50, 238 54, 240 56 L 240 68 L 218 84 C 216 86, 218 88, 222 88 L 258 88 C 262 88, 264 86, 262 84 Z"
+          fill="#fae8d7" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="222" y1="88" x2="258" y2="88" stroke="#241d21" stroke-width="2"/>
+  </g>
+
+  <!-- Mascot (Chic Cat) Interacting with Rack: Reaching up to place an empty hanger, admiring open space -->
+  <g id="mascot-cat" transform="translate(-85, 20) scale(0.96)">
+    <!-- Cat Tail -->
+    <path d="M 124 205 C 95 210, 68 225, 62 250 C 56 270, 78 278, 86 260 C 92 245, 80 230, 72 210 C 64 190, 72 168, 88 156"
+          fill="none" stroke="#241d21" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 124 205 C 95 210, 68 225, 62 250 C 56 270, 78 278, 86 260 C 92 245, 80 230, 72 210 C 64 190, 72 168, 88 156"
+          fill="none" stroke="#fff7f3" stroke-width="5.5" stroke-linecap="round"/>
+    <!-- Trousers -->
+    <path d="M 125 168 C 148 171, 172 171, 195 168 L 200 262 L 168 262 L 160 196 L 152 262 L 120 262 Z"
+          fill="#241d21" stroke="#241d21" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="119" y="256" width="34" height="6.5" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <rect x="167" y="256" width="34" height="6.5" rx="1.5" fill="#2c2429" stroke="#241d21" stroke-width="2"/>
+    <!-- Loafers -->
+    <path d="M 122 266 C 122 266, 128 264, 142 264 C 148 264, 150 268, 150 273 C 150 278, 146 280, 138 280 L 124 280 Z" fill="#771e35" stroke="#241d21" stroke-width="2.5"/>
+    <path d="M 170 266 C 170 266, 176 264, 190 264 C 196 264, 198 268, 198 273 C 198 278, 194 280, 186 280 L 172 280 Z" fill="#771e35" stroke="#241d21" stroke-width="2.5"/>
+    <!-- Left Hand Resting on Hip -->
+    <path d="M 132 124 C 120 135, 110 148, 106 165 L 118 174 C 124 158, 132 146, 140 138 Z" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <ellipse cx="112" cy="176" rx="6" ry="5.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Right Arm Reaching High Up Holding a Hanger onto the Rail! -->
+    <path d="M 188 124 C 200 108, 208 86, 214 62 L 202 58 C 196 82, 188 104, 178 120 Z" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <ellipse cx="208" cy="56" rx="6" ry="5.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.2"/>
+    <!-- Hanger held in cat's paw -->
+    <path d="M 212 44 C 212 36, 206 32, 202 36 C 200 38, 202 42, 204 44 L 204 54 L 186 66 L 222 66 Z" fill="#fae8d7" stroke="#241d21" stroke-width="2" stroke-linejoin="round"/>
+    <!-- Knit Torso -->
+    <path d="M 134 122 C 124 135, 122 152, 124 172 L 196 172 C 198 152, 196 135, 186 122 Z" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <rect x="123" y="167" width="74" height="7.5" rx="1.5" fill="#fff7f3" stroke="#241d21" stroke-width="2.5"/>
+    <path d="M 139 122 C 137 112, 139 104, 144 102 C 153 100, 167 100, 176 102 C 181 104, 183 112, 181 122 Z" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <!-- Head Looking Up and Smiling with Excitement -->
+    <path d="M 132 72 L 123 40 C 129 38, 140 44, 150 56 Z" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <polygon points="129,66 127,47 143,57" fill="#f5dce1"/>
+    <path d="M 170 56 C 180 44, 191 38, 197 40 L 188 72 Z" fill="#d99b68" stroke="#241d21" stroke-width="3"/>
+    <polygon points="191,66 193,47 177,57" fill="#f5dce1"/>
+    <path d="M 130 76 C 122 84, 124 96, 134 102 C 146 109, 174 109, 186 102 C 196 96, 198 84, 190 76 Z" fill="#fff7f3" stroke="#241d21" stroke-width="3"/>
+    <ellipse cx="138" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <ellipse cx="182" cy="88" rx="6" ry="3.5" fill="#f5dce1"/>
+    <!-- Eyes Looking Up Happily -->
+    <path d="M 142 78 Q 148 72 154 78" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M 166 78 Q 172 72 178 78" fill="none" stroke="#241d21" stroke-width="2.5" stroke-linecap="round"/>
+    <polygon points="158,84 162,84 160,87" fill="#771e35"/>
+    <path d="M 156 89 Q 160 93 164 89" fill="none" stroke="#241d21" stroke-width="2" stroke-linecap="round"/>
+    <path d="M 132 84 Q 116 82 108 86" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M 188 84 Q 204 82 212 86" fill="none" stroke="#241d21" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Fashion Sparkles in the Open Wardrobe Space -->
+  <g id="sparkles">
+    <path d="M 175 125 L 178 133 L 186 136 L 178 139 L 175 147 L 172 139 L 164 136 L 172 133 Z" fill="#771e35"/>
+    <path d="M 225 155 L 227 161 L 233 163 L 227 165 L 225 171 L 223 165 L 217 163 L 223 161 Z" fill="#4a6882"/>
+    <path d="M 195 185 L 197 190 L 202 192 L 197 194 L 195 199 L 193 194 L 188 192 L 193 190 Z" fill="#5b6b4e"/>
+  </g>
+</svg>

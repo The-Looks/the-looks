@@ -70,7 +70,9 @@ export function WardrobePage() {
     {filters.sort === 'LEAST_RECENTLY_WORN' && <p className="small muted">Món chưa mặc được xếp trước, tiếp theo là món có lần mặc gần nhất cách đây lâu nhất.</p>}
     {result.isPending && <Spinner />}
     {result.isError && <Notice tone="error">{errorMessage(result.error)} <Button kind="outline" small onClick={() => void result.refetch()}>Thử lại</Button></Notice>}
-    {data && data.items.length === 0 && <EmptyState icon={<SkinOutlined />} title={active || filters.page > 0 ? 'Không tìm thấy món đồ' : 'Tủ đồ đang trống'}>
+    {data && data.items.length === 0 && <EmptyState
+      icon={active || filters.page > 0 ? <SkinOutlined /> : <img className="wardrobe-empty-art" src="/illustrations/empty-wardrobe.svg" alt="" />}
+      title={active || filters.page > 0 ? 'Không tìm thấy món đồ' : 'Tủ đồ đang trống'}>
       <p>{active || filters.page > 0 ? 'Thử thay đổi bộ lọc hoặc quay về trang đầu.' : 'Chụp vài món bạn mặc nhiều nhất để bắt đầu.'}</p>
       {filters.page > 0 ? <Button onClick={() => change('page', '0')}>Về trang đầu</Button> : active ? <Button onClick={() => setParams({})}>Xoá bộ lọc</Button> : <ButtonLink to="/wardrobe/add" small>Thêm món đầu tiên</ButtonLink>}
     </EmptyState>}

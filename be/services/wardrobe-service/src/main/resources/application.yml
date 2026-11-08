@@ -44,7 +44,7 @@ thelooks:
     billing-url: ${BILLING_SERVICE_URL}
     outfit-url: ${OUTFIT_SERVICE_URL:http://localhost:8083}
   ai:
-    # auto = Gemini vision chính, Gemini model dự phòng rồi Claude; none = nhận diện giả (dev)
+    # auto = Claude chính (cần ANTHROPIC_API_KEY), lỗi / hết credit thì Gemini rồi Gemini dự phòng; claude = chỉ Claude; none = nhận diện giả (dev)
     provider: ${AI_PROVIDER:auto}
     model: ${AI_MODEL:claude-haiku-5-5}
     # Mức suy nghĩ của Claude: low = trả lời nhanh nhất (mặc định); medium / high chậm hơn, kỹ hơn

@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { GoogleOutlined } from '@ant-design/icons';
 import { Divider } from 'antd';
 import { useState, type FormEvent } from 'react';
-import { Link, Navigate, useLocation, useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useOutletContext, useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import { authRequests } from '../../../services/guest/auth/requests';
 import { session, useSession } from '../../../services/shared/session';
@@ -16,7 +16,6 @@ import type { AuthTransitionContext } from '../../../components/guest/auth/AuthT
 export function LoginPage() {
   const mockAuth = import.meta.env.DEV && (import.meta.env.VITE_MOCK_SERVICES?.split(',').map((service) => service.trim()).includes('auth') ?? false);
   const { isAuthenticated } = useSession();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const { previousPath } = useOutletContext<AuthTransitionContext>();
@@ -29,7 +28,6 @@ export function LoginPage() {
     mutationFn: () => authRequests.login(email, password),
     onSuccess: (res) => {
       session.start(res.expiresAt);
-      navigate(from, { replace: true });
     },
   });
 
@@ -37,11 +35,10 @@ export function LoginPage() {
     mutationFn: () => authRequests.login('google-demo@thelooks.vn', 'mock-google-login'),
     onSuccess: (res) => {
       session.start(res.expiresAt);
-      navigate(from, { replace: true });
     },
   });
 
-  if (isAuthenticated) return <Navigate to={from} replace />;
+  if (isAuthenticated) return <Navigate to="/onboarding/check" state={{ from }} replace />;
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -52,7 +49,7 @@ export function LoginPage() {
     <main className="login-scene">
       <section className={`auth-panel login-panel${fromRegister ? ' login-panel-return' : ''}`}>
         <AuthHeader to="/" label="Trang chủ" />
-        <div className="stack"><span className="eyebrow">CHÀO MỪNG ĐẾN THE LOOKS</span><h2>Đăng nhập</h2><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
+        <div className="stack"><h1>Đăng nhập</h1><p className="muted">Tiếp tục hành trình phong cách của bạn.</p></div>
         <form className="stack" onSubmit={submit}>
           <Field id="login-email" label="Email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           <PasswordField id="login-password" label="Mật khẩu" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />

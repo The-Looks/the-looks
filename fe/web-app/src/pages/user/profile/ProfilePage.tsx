@@ -31,7 +31,7 @@ export function ProfilePage() {
   const [passwordSaved, setPasswordSaved] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const me = useQuery({ queryKey: ['me'], queryFn: () => unwrap(authApi.GET('/api/app/me')) });
-  const profile = useQuery({ queryKey: ['me', 'profile'], queryFn: profileRequests.get });
+  const profile = useQuery({ queryKey: profileKey, queryFn: profileRequests.get });
   const authMethods = useQuery({ queryKey: ['me', 'auth-methods'], queryFn: () => unwrap(authApi.GET('/api/app/me/auth-methods')) });
   const wardrobe = useQuery({ queryKey: ['wardrobe', 'list', undefined, undefined], queryFn: () => unwrap(wardrobeApi.GET('/api/app/wardrobe/items')) });
   const outfits = useQuery({ queryKey: ['outfits'], queryFn: () => unwrap(outfitApi.GET('/api/app/outfits')) });
@@ -71,7 +71,7 @@ export function ProfilePage() {
 
   const uploadAvatar = async (file: File) => {
     setUploadingAvatar(true); setProfileError('');
-    try { qc.setQueryData(['me', 'profile'], await profileRequests.uploadAvatar(file)); }
+    try { qc.setQueryData(profileKey, await profileRequests.uploadAvatar(file)); }
     catch (error) { setProfileError(errorMessage(error)); }
     finally { setUploadingAvatar(false); }
   };
@@ -94,8 +94,8 @@ export function ProfilePage() {
     {me.isError && <Notice tone="error">{errorMessage(me.error)}</Notice>}
     {me.data && <ScrollReveal><div className="profile-grid">
       <Card>
-        <div className="profile-identity"><Avatar size={72} className="user-avatar"
-          src={profile.data?.hasAvatar ? `/api/app/me/avatar?v=${encodeURIComponent(profile.data.avatarUpdatedAt ?? '')}` : undefined}>
+        <div className="profile-identity"><Avatar size={72} className="user-avatar" alt=""
+          src={accountAvatarSource(me.data.id, profile.data)}>
           {(profile.data?.username ?? me.data.username).slice(0, 1).toUpperCase()}</Avatar>
           <div><h2>{profile.data?.username ?? me.data.username}</h2><p className="muted">{me.data.email}</p>
             <p className="small muted">{profile.data?.city || 'Chưa chọn thành phố'} · Tham gia từ {formatDate(me.data.createdAt)}</p></div></div>
@@ -131,7 +131,7 @@ export function ProfilePage() {
           onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadAvatar(file); event.target.value = ''; }} />
         {profile.data?.hasAvatar && <Button kind="outline" disabled={uploadingAvatar} onClick={async () => {
           setProfileError('');
-          try { qc.setQueryData(['me', 'profile'], await profileRequests.removeAvatar()); }
+          try { qc.setQueryData(profileKey, await profileRequests.removeAvatar()); }
           catch (error) { setProfileError(errorMessage(error)); }
         }}>Xóa ảnh đại diện</Button>}
       </div>
