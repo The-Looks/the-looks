@@ -20,7 +20,7 @@ export function ShoppingCard({ occasion }: { occasion: Occasion }) {
         <Badge>Liên kết tiếp thị</Badge>
       </div>
       <p className="small muted">
-        Có thêm một món {gap.label} là phối được trọn bộ. The Looks có thể nhận hoa hồng khi bạn mua qua các liên kết
+        Gợi ý theo dịp, phong cách và màu bạn thích. The Looks có thể nhận hoa hồng khi bạn mua qua các liên kết
         này, giá của bạn không đổi.
       </p>
       {open.isError && <Notice tone="error">{errorMessage(open.error)}</Notice>}
@@ -44,10 +44,10 @@ export function ShoppingCard({ occasion }: { occasion: Occasion }) {
               </strong>
             </p>
             <p className="small muted" style={{ margin: 0 }}>
-              {p.shopName} · đã bán {p.unitsSold.toLocaleString('vi-VN')}
+              {p.shopName}{p.unitsSold > 0 && ` · đã bán ${p.unitsSold.toLocaleString('vi-VN')}`}
             </p>
             <Button small block kind="outline" disabled={open.isPending} onClick={() => open.mutate(p.id)}>
-              {open.isPending && open.variables === p.id ? 'Đang mở…' : `Xem trên ${SOURCE_LABEL[p.source] ?? 'sàn'}`}
+              {open.isPending && open.variables === p.id ? 'Đang mở…' : `Xem trên ${SOURCE_LABEL[p.source] ?? (p.shopName || 'sàn')}`}
             </Button>
           </Card>
         ))}

@@ -6,7 +6,7 @@ import java.util.Optional;
 import vn.thelooks.outfit.domain.model.ProductOffer;
 import vn.thelooks.outfit.domain.model.WardrobeGap;
 
-/** Sàn bán hàng qua mạng affiliate. Cài đặt: TikTok Shop qua AccessTrade. Chưa cấu hình thì trả rỗng. */
+/** Sàn bán hàng qua mạng affiliate. Cài đặt: TikTok Shop và datafeeds các chiến dịch AccessTrade. Chưa cấu hình thì trả rỗng. */
 public interface ProductCatalog {
 
     /** Sản phẩm đúng loại, còn hàng, bán chạy trước. Lỗi mạng: trả rỗng. */

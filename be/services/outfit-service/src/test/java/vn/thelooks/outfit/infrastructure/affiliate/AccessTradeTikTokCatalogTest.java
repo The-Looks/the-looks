@@ -110,10 +110,10 @@ class AccessTradeTikTokCatalogTest {
     void prefersProductsWithinBudgetButNeverReturnsNothing() throws Exception {
         var catalog = start("secret");
         var cheap = new WardrobeGap("SHOES", "sneaker", "giày", null,
-                vn.thelooks.outfit.domain.model.StylePreferences.Budget.LOW);
+                vn.thelooks.outfit.domain.model.StylePreferences.Budget.LOW, null);
         assertThat(catalog.search(cheap, 3)).extracting(o -> o.id()).containsExactly("1"); // 300k > 200k nhưng là món duy nhất
         var mid = new WardrobeGap("SHOES", "sneaker", "giày", null,
-                vn.thelooks.outfit.domain.model.StylePreferences.Budget.MID);
+                vn.thelooks.outfit.domain.model.StylePreferences.Budget.MID, null);
         assertThat(catalog.search(mid, 3)).extracting(o -> o.id()).containsExactly("1");
     }
 

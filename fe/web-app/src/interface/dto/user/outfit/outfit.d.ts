@@ -318,7 +318,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Gợi ý mua thêm - món tủ đồ còn thiếu cho dịp này + sản phẩm trên sàn (link affiliate) */
+        /**
+         * Gợi ý mua thêm - món tủ đồ còn thiếu cho dịp này + sản phẩm trên sàn (link affiliate)
+         * @description Món còn thiếu: thiếu hẳn áo / quần / giày, hoặc có nhưng không món nào hợp dịp / phong cách đã chọn. Tối đa 6 sản phẩm, lấy lần lượt từ TikTok Shop và datafeeds các chiến dịch AccessTrade đã duyệt; màu yêu thích lên trước.
+         */
         get: {
             parameters: {
                 query: {
@@ -915,7 +918,7 @@ export interface components {
             gap: {
                 /** @enum {string} */
                 category: "TOP" | "BOTTOM" | "SHOES";
-                /** @description Tên tiếng Việt, vd "giày" */
+                /** @description Tên tiếng Việt, vd "giày" hoặc "áo đi làm" */
                 label: string;
             };
             products: components["schemas"]["ProductOffer"][];

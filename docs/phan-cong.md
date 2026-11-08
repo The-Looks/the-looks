@@ -50,7 +50,7 @@ Cách làm: mỗi việc một nhánh `feature/<tên>`, commit nhỏ, mở PR, n
 | 1.12 | ~~Gợi ý dọn tủ~~ (xong 08/11): mục *Gợi ý dọn tủ* trên trang thống kê (gói có `WARDROBE_STATS`), món ≥ 90 ngày chưa mặc, nút *Cất đi* / *Đã bán* / *Cất đi cả N món* | | | |
 | 1.8 | ~~Xoá ảnh khi xoá tài khoản~~ (đã có từ PR #44 của Phát) | | | |
 | 1.10 | **Thử AI nhận diện**: đã gom 250 ảnh thật + bộ chạy thử (`docs/ai-eval/README.md`); còn chạy 1 lệnh với key AI để ra `docs/ai-nhan-dien.md` | Ít code | 29/11 | Bảng kết quả trong `docs/ai-nhan-dien.md` cho báo cáo EXE |
-| 1.9 | **Affiliate nguồn Shopee**: chỉ làm khi AccessTrade **đã duyệt** chiến dịch Shopee (đang chờ). Nguồn `ProductCatalog` thứ hai theo mẫu `AccessTradeTikTokCatalog` | BE + test | Khi được duyệt | Gợi ý mua thêm có cả sản phẩm Shopee |
+| 1.9 | **Affiliate thêm nguồn**: từ 08/11 đã lấy sản phẩm từ datafeeds mọi chiến dịch AccessTrade đã duyệt + gợi ý theo dịp / phong cách / màu (PR gợi ý mua sắm). Shopee tự có khi AccessTrade duyệt chiến dịch Shopee (đang chờ) | | Khi được duyệt | Gợi ý mua thêm có cả sản phẩm Shopee |
 
 ## Phát (Member 3) · Đăng nhập, Ask Friends, admin
 

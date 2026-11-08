@@ -51,6 +51,8 @@ thelooks:
   affiliate:
     # "Gợi ý mua thêm" trên TikTok Shop qua AccessTrade. Để trống = tắt tính năng
     accesstrade-api-key: ${ACCESSTRADE_API_KEY:}
+    # Chiến dịch lấy datafeeds (merchant, cách nhau dấu phẩy). Để trống = mọi chiến dịch đã duyệt trừ TikTok Shop
+    accesstrade-campaigns: ${ACCESSTRADE_CAMPAIGNS:}
   weather:
     # Mặc định TP.HCM (đổi bằng WEATHER_LAT / WEATHER_LON khi chạy cho cơ sở khác)
     latitude: ${WEATHER_LAT:10.8231}

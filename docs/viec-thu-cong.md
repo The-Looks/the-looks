@@ -127,6 +127,10 @@ Khoá đặt vào biến môi trường trên máy chủ (hoặc `be/.env` trên
   2. Render → `thelooks-outfit` → Environment: `ACCESSTRADE_API_KEY` = key mới → Save.
   3. Xem lượt bấm: Neon, database `thelooks_outfit`, bảng `affiliate_click`; hoa hồng xem trên AccessTrade (đối chiếu theo `sub1`).
   Rút tiền: AccessTrade chỉ mở **Thông tin thanh toán** khi hoa hồng trên 200.000đ.
+  4. Từ 08/11 gợi ý lấy thêm sản phẩm từ **mọi chiến dịch đã duyệt** (datafeeds), không chỉ TikTok Shop. Không cần làm gì;
+     xem log `thelooks-outfit` dòng `AccessTrade datafeeds: N sản phẩm từ … chiến dịch` (tải nền ở lần gợi ý đầu, làm mới 12 giờ).
+     Muốn chỉ dùng vài chiến dịch thời trang: thêm biến `ACCESSTRADE_CAMPAIGNS` = merchant cách nhau dấu phẩy (vd `coolmate,yody`).
+     Đăng ký thêm chiến dịch thời trang trên AccessTrade → được duyệt là tự có sản phẩm, không cần sửa code.
 - [ ] **Phí giao dịch** (luồng doanh thu 3) · nhóm · chưa chốt
   Cần: % phí trên đơn mua qua đối tác, đối tác đầu tiên.
 
