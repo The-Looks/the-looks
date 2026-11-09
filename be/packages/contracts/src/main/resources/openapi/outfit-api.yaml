@@ -395,15 +395,27 @@ components:
           description: Màu yêu thích, cùng nhãn màu AI gán cho món đồ (white, black, beige…). Được cộng điểm khi chấm outfit.
     ShoppingSuggestion:
       type: object
-      required: [gap, products]
+      required: [gap, products, look]
       properties:
         gap:
-          type: object
+          type: [object, 'null']
+          description: Món tủ đồ còn thiếu; null khi tủ đã đủ món hợp dịp
           required: [category, label]
           properties:
             category: { type: string, enum: [TOP, BOTTOM, SHOES] }
             label: { type: string, description: 'Tên tiếng Việt, vd "giày" hoặc "áo đi làm"' }
-        products: { type: array, items: { $ref: '#/components/schemas/ProductOffer' } }
+        products: { type: array, items: { $ref: '#/components/schemas/ProductOffer' }, description: Sản phẩm cho món còn thiếu }
+        look:
+          type: array
+          description: Bộ đồ hợp dịp để mua (áo, quần, giày, phụ kiện), mỗi món một sản phẩm
+          items:
+            type: object
+            required: [category, label, owned, product]
+            properties:
+              category: { type: string, enum: [TOP, BOTTOM, SHOES, ACCESSORY] }
+              label: { type: string, description: 'vd "áo đi học"' }
+              owned: { type: boolean, description: Tủ đồ đã có món loại này hợp dịp }
+              product: { $ref: '#/components/schemas/ProductOffer' }
     ProductOffer:
       type: object
       required: [id, title, minPriceVnd, maxPriceVnd, shopName, unitsSold, source]

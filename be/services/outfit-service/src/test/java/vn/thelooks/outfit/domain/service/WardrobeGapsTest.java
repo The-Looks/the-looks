@@ -90,4 +90,18 @@ class WardrobeGapsTest {
         assertThat(date.category()).isEqualTo("SHOES");
         assertThat(date.keyword()).isEqualTo("mary jane");
     }
+
+    @Test
+    void alwaysSuggestsAFullLookForTheOccasionAndMarksWhatTheClosetAlreadyHas() {
+        var closet = List.of(tagged("TOP", "casual"), tagged("BOTTOM", "casual"), tagged("SHOES", "sporty"));
+        var look = WardrobeGaps.look(closet, Occasion.SCHOOL, new StylePreferences(Gender.MALE, null, null, null));
+        assertThat(look).extracting(p -> p.gap().category()).containsExactly("TOP", "BOTTOM", "SHOES", "ACCESSORY");
+        assertThat(look).extracting(WardrobeGaps.Piece::owned).containsExactly(true, true, true, false);
+        assertThat(look).extracting(p -> p.gap().keyword()).containsExactly("ao thun nam", "quan jeans nam", "sneaker", "tui tote");
+        assertThat(look.getFirst().gap().label()).isEqualTo("áo đi học");
+
+        var office = WardrobeGaps.look(List.of(), Occasion.WORK, StylePreferences.NONE);
+        assertThat(office).noneMatch(WardrobeGaps.Piece::owned);
+        assertThat(office).extracting(p -> p.gap().keyword()).containsExactly("so mi", "quan tay", "loafer", "tui xach");
+    }
 }

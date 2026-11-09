@@ -55,17 +55,25 @@ class ShoppingService implements ShopForGapUseCase {
 
     @Override
     public Optional<Suggestion> suggest(UUID ownerId, Occasion occasion) {
-        var gap = WardrobeGaps.find(wardrobe.confirmedItems(ownerId), occasion, preferences.find(ownerId));
-        if (gap.isEmpty()) {
-            log.info("Gợi ý mua thêm ({}): tủ đồ không thiếu món nào", occasion);
-            return Optional.empty();
-        }
-        List<List<ProductOffer>> found = catalogs.stream().map(c -> c.search(gap.get(), PRODUCTS * 3)).toList();
-        // Để biết vì sao không có thẻ: từ khoá nào, mỗi nguồn (TikTok, datafeeds) trả bao nhiêu sản phẩm
-        log.info("Gợi ý mua thêm ({}): thiếu {} '{}', sản phẩm theo nguồn {}", occasion, gap.get().category(),
-                gap.get().keyword(), found.stream().map(List::size).toList());
-        Suggestion suggestion = new Suggestion(gap.get(), withoutBlocked(byColor(interleave(found), gap.get().colors())));
-        return suggestion.products().isEmpty() ? Optional.empty() : Optional.of(suggestion);
+        var closet = wardrobe.confirmedItems(ownerId);
+        var prefs = preferences.find(ownerId);
+        var gap = WardrobeGaps.find(closet, occasion, prefs);
+        List<ProductOffer> gapProducts = gap.map(g -> search(g, PRODUCTS)).orElse(List.of());
+        // Bộ đồ hợp dịp: tìm song song 4 món (áo, quần, giày, phụ kiện), mỗi món lấy sản phẩm đầu tiên
+        List<LookItem> look = WardrobeGaps.look(closet, occasion, prefs).parallelStream()
+                .map(p -> search(p.gap(), 1).stream().findFirst().map(o -> new LookItem(p.gap(), p.owned(), o)))
+                .flatMap(Optional::stream).toList();
+        log.info("Gợi ý mua thêm ({}): thiếu {}, {} sản phẩm cho món thiếu, bộ hợp dịp {}/4 món", occasion,
+                gap.map(g -> g.category() + " '" + g.keyword() + "'").orElse("không"), gapProducts.size(), look.size());
+        return gapProducts.isEmpty() && look.isEmpty()
+                ? Optional.empty()
+                : Optional.of(new Suggestion(gap.filter(g -> !gapProducts.isEmpty()).orElse(null), gapProducts, look));
+    }
+
+    /** Lấy từ mọi nguồn (TikTok, datafeeds), xếp màu yêu thích trước, bỏ sản phẩm admin chặn. */
+    private List<ProductOffer> search(vn.thelooks.outfit.domain.model.WardrobeGap gap, int limit) {
+        List<List<ProductOffer>> found = catalogs.stream().map(c -> c.search(gap, limit * 3)).toList();
+        return withoutBlocked(byColor(interleave(found), gap.colors())).stream().limit(limit).toList();
     }
 
     @Override
