@@ -104,4 +104,15 @@ class WardrobeGapsTest {
         assertThat(office).noneMatch(WardrobeGaps.Piece::owned);
         assertThat(office).extracting(p -> p.gap().keyword()).containsExactly("so mi", "quan tay", "loafer", "tui xach");
     }
+
+    @Test
+    void fallsBackToCommonKeywordKeepingLabelAndGender() {
+        var prefs = new StylePreferences(Gender.FEMALE, java.util.Set.of(), null, java.util.Set.of());
+        var look = WardrobeGaps.look(List.of(), Occasion.WEDDING, prefs);
+        assertThat(look).extracting(p -> WardrobeGaps.fallback(p.gap()).map(WardrobeGap::keyword).orElse("-"))
+                .containsExactly("ao thun nu", "quan jeans nu", "sneaker", "balo");
+        assertThat(WardrobeGaps.fallback(look.get(2).gap()).orElseThrow().label()).isEqualTo(look.get(2).gap().label());
+        var common = WardrobeGaps.fallback(look.getFirst().gap()).orElseThrow();
+        assertThat(WardrobeGaps.fallback(common)).isEmpty();
+    }
 }
