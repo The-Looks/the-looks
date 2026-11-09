@@ -952,7 +952,7 @@ export interface components {
              * @enum {string|null}
              */
             gender?: "MALE" | "FEMALE" | "OTHER" | null;
-            styles?: ("feminine" | "sporty" | "minimal" | "streetwear" | "vintage" | "office")[];
+            styles?: ("feminine" | "sporty" | "minimal" | "streetwear" | "vintage" | "office" | "casual" | "preppy" | "elegant" | "smart-casual" | "trendy" | "romantic")[];
             /**
              * @description Giá một món. LOW < 200.000đ, MID 200.000–500.000đ, HIGH > 500.000đ, null = không giới hạn
              * @enum {string|null}

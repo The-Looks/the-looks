@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 public record StylePreferences(Gender gender, Set<String> styles, Budget budget, Set<String> colors) {
 
     /** Cùng bộ nhãn với styleTags AI gán cho món đồ, để so được với tủ đồ. */
-    public static final Set<String> STYLES = Set.of("feminine", "sporty", "minimal", "streetwear", "vintage", "office");
+    public static final Set<String> STYLES = Set.of("feminine", "sporty", "minimal", "streetwear", "vintage", "office",
+            "casual", "preppy", "elegant", "smart-casual", "trendy", "romantic");
     public static final StylePreferences NONE = new StylePreferences(null, Set.of(), null, Set.of());
     public static final int MAX_COLORS = 8;
     private static final Pattern COLOR = Pattern.compile("[a-z][a-z -]{0,19}");

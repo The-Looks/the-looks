@@ -383,7 +383,7 @@ components:
         gender: { type: [string, 'null'], enum: [MALE, FEMALE, OTHER, null], description: null = không muốn nói }
         styles:
           type: array
-          items: { type: string, enum: [feminine, sporty, minimal, streetwear, vintage, office] }
+          items: { type: string, enum: [feminine, sporty, minimal, streetwear, vintage, office, casual, preppy, elegant, smart-casual, trendy, romantic] }
         budget:
           type: [string, 'null']
           enum: [LOW, MID, HIGH, null]
