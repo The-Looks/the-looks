@@ -155,6 +155,21 @@ public final class WardrobeGaps {
         });
     }
 
+    /** Từ khoá phổ biến theo loại món, luôn có hàng trên sàn; dùng khi từ khoá theo phong cách không ra sản phẩm nào. */
+    private static final Map<String, String> FALLBACK = Map.of(
+            "TOP", "ao thun", "BOTTOM", "quan jeans", "SHOES", "sneaker", "ACCESSORY", "balo");
+
+    /** Cùng món, cùng nhãn, nhưng tìm bằng từ khoá phổ biến; rỗng khi đã là từ khoá phổ biến hoặc loại món lạ. */
+    public static Optional<WardrobeGap> fallback(WardrobeGap gap) {
+        String base = FALLBACK.get(gap.category());
+        if (base == null) {
+            return Optional.empty();
+        }
+        String keyword = gap.category().equals("ACCESSORY") ? base : withGender(base, gap.category(), gap.gender());
+        return keyword.equals(gap.keyword()) ? Optional.empty()
+                : Optional.of(new WardrobeGap(gap.category(), keyword, gap.label(), gap.gender(), gap.budget(), gap.colors()));
+    }
+
     private static String withGender(String keyword, String category, Gender gender) {
         if (category.equals("SHOES") || gender == null || gender == Gender.OTHER || keyword.startsWith("chan vay") || keyword.startsWith("ao kieu")) {
             return keyword;

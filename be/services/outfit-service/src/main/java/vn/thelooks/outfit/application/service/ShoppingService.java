@@ -70,8 +70,16 @@ class ShoppingService implements ShopForGapUseCase {
                 : Optional.of(new Suggestion(gap.filter(g -> !gapProducts.isEmpty()).orElse(null), gapProducts, look));
     }
 
-    /** Lấy từ mọi nguồn (TikTok, datafeeds), xếp màu yêu thích trước, bỏ sản phẩm admin chặn. */
+    /**
+     * Lấy từ mọi nguồn (TikTok, datafeeds), xếp màu yêu thích trước, bỏ sản phẩm admin chặn. Từ khoá theo phong cách
+     * hay ra 0 sản phẩm (sàn tìm gần đúng, ví dụ "giay cao got" ra khăn giấy) nên khi đó tìm lại bằng từ khoá phổ biến.
+     */
     private List<ProductOffer> search(vn.thelooks.outfit.domain.model.WardrobeGap gap, int limit) {
+        List<ProductOffer> found = searchOnce(gap, limit);
+        return found.isEmpty() ? WardrobeGaps.fallback(gap).map(g -> searchOnce(g, limit)).orElse(found) : found;
+    }
+
+    private List<ProductOffer> searchOnce(vn.thelooks.outfit.domain.model.WardrobeGap gap, int limit) {
         List<List<ProductOffer>> found = catalogs.stream().map(c -> c.search(gap, limit * 3)).toList();
         return withoutBlocked(byColor(interleave(found), gap.colors())).stream().limit(limit).toList();
     }
