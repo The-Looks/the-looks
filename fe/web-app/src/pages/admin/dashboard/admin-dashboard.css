@@ -19,7 +19,6 @@
 .admin-topbar-title > span { min-width: 0; overflow: hidden; color: var(--muted); font-size: var(--text-caption); text-overflow: ellipsis; white-space: nowrap; }
 .admin-topbar-back { display: inline-flex; flex: none; align-items: center; gap: 5px; color: var(--purple); font: var(--weight-semibold) var(--text-caption) var(--font-body); text-decoration: none; white-space: nowrap; }
 .admin-topbar-back:hover { text-decoration: none; }
-.admin-topbar-title { display: grid; gap: 4px; }
 .admin-topbar-title > span { color: var(--muted); font-size: var(--text-caption); }
 .admin-topbar-actions { display: flex; align-items: center; gap: 22px; color: var(--muted); }
 .admin-menu-button { display: none; }
