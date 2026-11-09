@@ -27,6 +27,8 @@ import vn.thelooks.outfit.domain.service.WardrobeGaps;
 @Service
 class ShoppingService implements ShopForGapUseCase {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ShoppingService.class);
+
     static final int PRODUCTS = 6;
     /** Tên màu tiếng Việt hay gặp trong tên sản phẩm, để xếp sản phẩm đúng màu người dùng thích lên trước. */
     static final Map<String, List<String>> COLOR_WORDS = Map.of(
@@ -53,10 +55,17 @@ class ShoppingService implements ShopForGapUseCase {
 
     @Override
     public Optional<Suggestion> suggest(UUID ownerId, Occasion occasion) {
-        return WardrobeGaps.find(wardrobe.confirmedItems(ownerId), occasion, preferences.find(ownerId))
-                .map(gap -> new Suggestion(gap, withoutBlocked(byColor(interleave(catalogs.stream()
-                        .map(c -> c.search(gap, PRODUCTS * 3)).toList()), gap.colors()))))
-                .filter(s -> !s.products().isEmpty());
+        var gap = WardrobeGaps.find(wardrobe.confirmedItems(ownerId), occasion, preferences.find(ownerId));
+        if (gap.isEmpty()) {
+            log.info("Gợi ý mua thêm ({}): tủ đồ không thiếu món nào", occasion);
+            return Optional.empty();
+        }
+        List<List<ProductOffer>> found = catalogs.stream().map(c -> c.search(gap.get(), PRODUCTS * 3)).toList();
+        // Để biết vì sao không có thẻ: từ khoá nào, mỗi nguồn (TikTok, datafeeds) trả bao nhiêu sản phẩm
+        log.info("Gợi ý mua thêm ({}): thiếu {} '{}', sản phẩm theo nguồn {}", occasion, gap.get().category(),
+                gap.get().keyword(), found.stream().map(List::size).toList());
+        Suggestion suggestion = new Suggestion(gap.get(), withoutBlocked(byColor(interleave(found), gap.get().colors())));
+        return suggestion.products().isEmpty() ? Optional.empty() : Optional.of(suggestion);
     }
 
     @Override
