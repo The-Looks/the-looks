@@ -18,7 +18,8 @@ import vn.thelooks.wardrobe.domain.model.BoundingBox;
 @Component
 class ImageIoImageCropper implements ImageCropper {
 
-    static final double CROP_PADDING = 0.05;
+    /** Nới khung AI mỗi phía 12% kích thước món: khung AI thường sát quá, làm mất mép áo, mũi giày. */
+    static final double CROP_PADDING = 0.12;
 
     @Override
     public NormalizedImage normalize(byte[] image, String contentType) {
