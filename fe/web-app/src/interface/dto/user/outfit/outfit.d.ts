@@ -998,10 +998,10 @@ export interface components {
             source: string;
         };
         /**
-         * @description đi học, đi làm, đi chơi, hẹn hò
+         * @description đi học, đi làm, đi chơi, hẹn hò, đi tiệc, du lịch, tập thể thao, dự tiệc cưới, phỏng vấn
          * @enum {string}
          */
-        Occasion: "SCHOOL" | "WORK" | "HANGOUT" | "DATE";
+        Occasion: "SCHOOL" | "WORK" | "HANGOUT" | "DATE" | "PARTY" | "TRAVEL" | "SPORT" | "WEDDING" | "INTERVIEW";
         OutfitItem: {
             /** Format: uuid */
             id: string;

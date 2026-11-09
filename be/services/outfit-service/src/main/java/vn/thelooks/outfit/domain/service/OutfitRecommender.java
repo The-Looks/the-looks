@@ -37,6 +37,11 @@ public class OutfitRecommender {
 
     // ponytail: bảng tag/màu cố định theo nhãn AI trả về; chuyển vào DB/config khi nhãn AI ổn định
     private static final Map<Occasion, Set<String>> OCCASION_TAGS = Map.of(
+            Occasion.PARTY, Set.of("trendy", "elegant", "streetwear", "romantic", "feminine"),
+            Occasion.TRAVEL, Set.of("casual", "basic", "sporty", "minimal", "streetwear"),
+            Occasion.SPORT, Set.of("sporty", "basic", "casual"),
+            Occasion.WEDDING, Set.of("elegant", "formal", "romantic", "feminine", "smart-casual"),
+            Occasion.INTERVIEW, Set.of("formal", "office", "smart-casual", "minimal"),
             Occasion.SCHOOL, Set.of("casual", "basic", "sporty", "streetwear", "preppy"),
             Occasion.WORK, Set.of("formal", "office", "smart-casual", "minimal", "elegant"),
             Occasion.HANGOUT, Set.of("casual", "streetwear", "sporty", "trendy", "basic"),

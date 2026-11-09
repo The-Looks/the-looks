@@ -33,7 +33,7 @@ export function SavedOutfitsPage() {
       {outfits.data?.length === 0 && (
         <EmptyState icon={<HeartOutlined />} title="Chưa có outfit nào">
           <p>Lưu gợi ý bạn thích để mặc lại hoặc rủ bạn bè bình chọn.</p>
-          <ButtonLink to="/outfits/suggest" small>Khám phá LOOKSY AI</ButtonLink>
+          <ButtonLink to="/outfits/suggest" small>Khám phá THE LOOKS AI</ButtonLink>
         </EmptyState>
       )}
       <ScrollReveal><div className="grid-cards saved-outfit-list reveal-list">

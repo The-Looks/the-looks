@@ -5,7 +5,7 @@ import { Brand } from '../ui/index';
 
 const appLinks = [
   { to: '/wardrobe', label: 'Tủ đồ' },
-  { to: '/outfits/suggest', label: 'LOOKSY AI' },
+  { to: '/outfits/suggest', label: 'THE LOOKS AI' },
   { to: '/polls', label: 'Bình chọn' },
   { to: '/plans', label: 'Gói thành viên' },
 ];

@@ -7,7 +7,7 @@ import { brand } from '../../../services/shared/brand';
 
 const features = [
   { title: 'Tủ đồ của bạn', description: 'Sắp xếp những món bạn đang có để tìm lại nhanh hơn và phối theo cách mới.' },
-  { title: 'LOOKSY AI', description: 'Nhận gợi ý outfit theo dịp từ chính tủ đồ của bạn, mỗi ngày một cảm hứng.' },
+  { title: 'THE LOOKS AI', description: 'Nhận gợi ý outfit theo dịp từ chính tủ đồ của bạn, mỗi ngày một cảm hứng.' },
   { title: 'Hỏi bạn bè', description: 'Tạo link bình chọn, gửi qua Zalo và nhận ý kiến mà bạn bè không cần đăng nhập.' },
 ];
 
@@ -34,7 +34,7 @@ export function PublicHomePage() {
               <span className="public-home-preview-label">Quick Pick</span>
               <h2>Hôm nay mặc gì?</h2>
               <p>Khám phá cách phối đồ mới từ tủ đồ của bạn.</p>
-              <Link to="/register">Khám phá LOOKSY AI <ArrowRightOutlined /></Link>
+              <Link to="/register">Khám phá THE LOOKS AI <ArrowRightOutlined /></Link>
             </div>
           </div>
         </section>
@@ -56,7 +56,7 @@ export function PublicHomePage() {
           <div><h2 id="steps-title">Ba bước để phối đồ</h2><p>Chụp vài món đồ, chọn dịp bạn muốn mặc và để THE LOOKS giúp bạn có thêm lựa chọn.</p><ButtonLink to="/register" small>Tạo tài khoản <ArrowRightOutlined /></ButtonLink></div>
           <ol>
             <li><span><SkinOutlined /></span><div><strong>Thêm món đồ</strong><p>Lưu những món bạn đang có vào tủ đồ số.</p></div></li>
-            <li><span><AppstoreOutlined /></span><div><strong>Nhận gợi ý</strong><p>LOOKSY AI phối outfit theo dịp và phong cách.</p></div></li>
+            <li><span><AppstoreOutlined /></span><div><strong>Nhận gợi ý</strong><p>THE LOOKS AI phối outfit theo dịp và phong cách.</p></div></li>
             <li><span><HeartOutlined /></span><div><strong>Chia sẻ lựa chọn</strong><p>Gửi link để bạn bè bình chọn mà không cần tài khoản.</p></div></li>
           </ol>
         </section>

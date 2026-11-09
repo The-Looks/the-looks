@@ -65,7 +65,7 @@ export function WearCalendarPage() {
     : <Notice tone="error">{errorMessage(calendar.error)} <Button onClick={() => void calendar.refetch()}>Thử lại</Button></Notice>;
   else if (outfits.data?.length === 0) content = <EmptyState icon={<CalendarOutlined />} title="Chưa có outfit đã lưu">
     <p>Lưu vài outfit bạn thích trước, rồi quay lại để xếp lịch.</p>
-    <ButtonLink to="/outfits/suggest" small>Nhờ LOOKSY AI gợi ý</ButtonLink>
+    <ButtonLink to="/outfits/suggest" small>Nhờ THE LOOKS AI gợi ý</ButtonLink>
   </EmptyState>;
   else {
     const byDate = new Map((calendar.data ?? []).map((d) => [d.date, d]));

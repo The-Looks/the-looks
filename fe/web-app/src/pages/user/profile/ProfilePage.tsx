@@ -113,7 +113,7 @@ export function ProfilePage() {
       </Card>
       <Card>
         <h2>Phong cách của bạn</h2>
-        <p className="muted">{preferences.data?.styles?.length ? preferences.data.styles.join(', ') : 'Chọn phong cách yêu thích để LOOKSY AI gợi ý gần với gu của bạn hơn.'}</p>
+        <p className="muted">{preferences.data?.styles?.length ? preferences.data.styles.join(', ') : 'Chọn phong cách yêu thích để THE LOOKS AI gợi ý gần với gu của bạn hơn.'}</p>
         {preferences.data && <p className="small muted">Giới tính: {preferences.data.gender ?? 'Chưa chọn'} · Ngân sách: {preferences.data.budget ?? 'Chưa chọn'}</p>}
         <ButtonLink to="/profile/style" kind="ghost" small><UserOutlined /> Chỉnh sửa phong cách</ButtonLink>
         <div className="divider" />

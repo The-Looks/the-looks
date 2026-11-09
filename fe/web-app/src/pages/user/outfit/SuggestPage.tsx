@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { AppstoreOutlined, BookOutlined, CoffeeOutlined, HeartOutlined, LaptopOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, BookOutlined, CoffeeOutlined, CompassOutlined, CrownOutlined, HeartOutlined, LaptopOutlined, SolutionOutlined, StarOutlined, TrophyOutlined } from '@ant-design/icons';
 import { ApiError, errorMessage } from '../../../services/shared/api/client';
 import type { Occasion } from '../../../interface/dto/types';
 import { ButtonLink, EmptyState, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
@@ -10,6 +10,7 @@ import { SaveButton } from '../../../components/user/outfit/SaveButton';
 import { ShoppingCard } from '../../../components/user/outfit/ShoppingCard';
 import { OCCASIONS, occasionLabel } from '../../../services/user/outfit/occasions';
 import { WeatherChip } from '../../../components/user/outfit/WeatherChip';
+import { QuickPickCard } from '../../../components/user/outfit/QuickPickCard';
 import { ScrollReveal } from '../../../components/shared/home/HomeStory';
 
 const occasionIcons = {
@@ -17,6 +18,11 @@ const occasionIcons = {
   WORK: <LaptopOutlined />,
   HANGOUT: <CoffeeOutlined />,
   DATE: <HeartOutlined />,
+  PARTY: <StarOutlined />,
+  TRAVEL: <CompassOutlined />,
+  SPORT: <TrophyOutlined />,
+  WEDDING: <CrownOutlined />,
+  INTERVIEW: <SolutionOutlined />,
 } as const;
 
 export function SuggestPage() {
@@ -38,6 +44,7 @@ export function SuggestPage() {
         }
       />
       <WeatherChip />
+      <QuickPickCard compact />
 
       <ScrollReveal><div className="grid-cards occasion-grid reveal-list" role="radiogroup" aria-label="Chọn dịp">
         {OCCASIONS.map((o) => (

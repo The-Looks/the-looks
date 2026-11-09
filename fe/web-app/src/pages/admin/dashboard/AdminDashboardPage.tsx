@@ -54,7 +54,7 @@ function AiUsagePanel() {
   const usage = useAiUsage();
   const report = usage.data;
   const percent = report?.budgetUsd ? Math.min(100, Math.round(report.costUsd / report.budgetUsd * 100)) : 0;
-  return <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Chi phí LOOKSY AI</h2><p>Dữ liệu từ outfit-service trong tháng hiện tại</p></div></div>
+  return <Card className="admin-panel"><div className="admin-panel-heading"><div><h2>Chi phí THE LOOKS AI</h2><p>Dữ liệu từ outfit-service trong tháng hiện tại</p></div></div>
     {usage.isPending && <p>Đang tải chi phí AI…</p>}
     {usage.isError && <p role="alert">{errorMessage(usage.error)}</p>}
     {report && <><div className="admin-progress-label">{report.month} <strong>${report.costUsd.toFixed(2)} / ${report.budgetUsd.toFixed(2)}</strong></div>

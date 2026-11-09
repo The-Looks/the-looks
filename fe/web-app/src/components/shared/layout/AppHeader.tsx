@@ -16,7 +16,7 @@ import { Brand } from '../ui/index';
 export const APP_NAV = [
   { to: '/', label: brand.content.home, icon: <HomeOutlined /> },
   { to: '/wardrobe', label: brand.content.wardrobe, icon: <SkinOutlined /> },
-  { to: '/outfits/suggest', label: 'LOOKSY AI', icon: <AppstoreOutlined /> },
+  { to: '/outfits/suggest', label: 'THE LOOKS AI', icon: <AppstoreOutlined /> },
   { to: '/outfits', label: 'Outfit đã lưu', icon: <HeartOutlined /> },
   { to: '/polls', label: brand.content.voting, icon: <CheckSquareOutlined /> },
 ] as const;

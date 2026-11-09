@@ -1,11 +1,16 @@
 package vn.thelooks.outfit.domain.model;
 
-/** Dịp mặc: đi học, đi làm, đi chơi, hẹn hò. */
+/** Dịp mặc. Lưu trong DB bằng tên hằng (varchar 20), thêm dịp mới không cần migration. */
 public enum Occasion {
     SCHOOL("đi học"),
     WORK("đi làm"),
     HANGOUT("đi chơi"),
-    DATE("hẹn hò");
+    DATE("hẹn hò"),
+    PARTY("đi tiệc"),
+    TRAVEL("du lịch"),
+    SPORT("tập thể thao"),
+    WEDDING("dự tiệc cưới"),
+    INTERVIEW("phỏng vấn");
 
     private final String label;
 
