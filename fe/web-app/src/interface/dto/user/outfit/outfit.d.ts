@@ -962,13 +962,25 @@ export interface components {
             colors?: string[];
         };
         ShoppingSuggestion: {
+            /** @description Món tủ đồ còn thiếu; null khi tủ đã đủ món hợp dịp */
             gap: {
                 /** @enum {string} */
                 category: "TOP" | "BOTTOM" | "SHOES";
                 /** @description Tên tiếng Việt, vd "giày" hoặc "áo đi làm" */
                 label: string;
-            };
+            } | null;
+            /** @description Sản phẩm cho món còn thiếu */
             products: components["schemas"]["ProductOffer"][];
+            /** @description Bộ đồ hợp dịp để mua (áo, quần, giày, phụ kiện), mỗi món một sản phẩm */
+            look: {
+                /** @enum {string} */
+                category: "TOP" | "BOTTOM" | "SHOES" | "ACCESSORY";
+                /** @description vd "áo đi học" */
+                label: string;
+                /** @description Tủ đồ đã có món loại này hợp dịp */
+                owned: boolean;
+                product: components["schemas"]["ProductOffer"];
+            }[];
         };
         ProductOffer: {
             id: string;
