@@ -68,7 +68,7 @@
 .home-wardrobe-section > .card > .spread, .home-wardrobe-section > .card > .muted, .home-wardrobe-section > .card > div:last-child { display: none; }
 .home-wardrobe-section .grid-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .home-wardrobe-section .tile { aspect-ratio: .86; border: 0; border-radius: 13px; overflow: hidden; background: linear-gradient(135deg, var(--lav-soft), #e7d6f5); }
-.home-wardrobe-section .tile img { width: 100%; height: 100%; object-fit: cover; }
+.home-wardrobe-section .tile img { width: 100%; height: 100%; object-fit: contain; }
 .home-wardrobe-section .tile-label { font-size: var(--text-caption); }
 .public-dashboard-note { margin-top: -14px; color: var(--muted); font-size: var(--text-caption); }
 .public-dashboard-note a { font-weight: var(--weight-bold); }

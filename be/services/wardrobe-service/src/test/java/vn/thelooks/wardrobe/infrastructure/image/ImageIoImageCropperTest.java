@@ -78,7 +78,7 @@ class ImageIoImageCropperTest {
         var normalized = cropper.normalize(jpeg(400, 200), "image/jpeg");
         byte[] crop = cropper.crop(normalized, new BoundingBox(0.5, 0, 0.5, 1));
         var img = ImageIO.read(new ByteArrayInputStream(crop));
-        assertThat(img.getWidth()).isEqualTo(210); // 200px + 5% của cạnh về phía trái (phía phải đã chạm mép)
+        assertThat(img.getWidth()).isEqualTo(224); // 200px + 12% của cạnh về phía trái (phía phải đã chạm mép)
         assertThat(img.getHeight()).isEqualTo(200);
     }
 

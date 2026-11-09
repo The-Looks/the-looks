@@ -415,7 +415,8 @@ a.card:hover {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* Ảnh món đồ đã cắt sẵn theo món: hiện trọn, không xén thêm khi tỉ lệ khác ô (giày ngang, áo dọc) */
+  object-fit: contain;
 }
 .tile-emoji {
   font-size: var(--type-30);
