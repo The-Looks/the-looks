@@ -37,24 +37,24 @@ public final class WardrobeGaps {
             "TOP", new String[] {"babydoll", "croptop"},
             "BOTTOM", new String[] {"culottes", "jeans nu"},
             "SHOES", new String[] {"mary jane", "sneaker"});
-    private static final Map<String, String> LABEL = Map.of("TOP", "áo", "BOTTOM", "quần", "SHOES", "giày");
+    private static final Map<String, String> LABEL = Map.of("TOP", "áo", "BOTTOM", "quần", "SHOES", "giày", "ACCESSORY", "phụ kiện");
 
-    /** phong cách → [áo, quần, giày, tên tiếng Việt]. */
+    /** phong cách → [áo, quần, giày, tên tiếng Việt, phụ kiện]. */
     private static final Map<String, String[]> BY_STYLE = Map.ofEntries(
-            Map.entry("office", new String[] {"so mi", "quan tay", "loafer", "công sở"}),
-            Map.entry("formal", new String[] {"so mi", "quan tay", "giay tay", "lịch sự"}),
-            Map.entry("smart-casual", new String[] {"polo", "quan kaki", "loafer", "lịch sự"}),
-            Map.entry("elegant", new String[] {"ao kieu", "quan ong rong", "giay cao got", "thanh lịch"}),
-            Map.entry("minimal", new String[] {"ao thun tron", "quan kaki", "sneaker trang", "tối giản"}),
-            Map.entry("streetwear", new String[] {"ao thun oversize", "quan baggy", "sneaker", "streetwear"}),
-            Map.entry("trendy", new String[] {"ao thun oversize", "quan baggy", "sneaker", "cá tính"}),
-            Map.entry("sporty", new String[] {"ao the thao", "quan jogger", "giay chay bo", "thể thao"}),
-            Map.entry("casual", new String[] {"ao thun", "quan jeans", "sneaker", "thường ngày"}),
-            Map.entry("basic", new String[] {"ao thun", "quan jeans", "sneaker", "basic"}),
-            Map.entry("preppy", new String[] {"ao polo", "quan kaki", "loafer", "preppy"}),
-            Map.entry("feminine", new String[] {"ao kieu", "chan vay", "mary jane", "nữ tính"}),
-            Map.entry("romantic", new String[] {"ao kieu", "chan vay", "mary jane", "dịu dàng"}),
-            Map.entry("vintage", new String[] {"so mi vintage", "quan ong rong", "giay oxford", "vintage"}));
+            Map.entry("office", new String[] {"so mi", "quan tay", "loafer", "công sở", "tui xach"}),
+            Map.entry("formal", new String[] {"so mi", "quan tay", "giay tay", "lịch sự", "that lung"}),
+            Map.entry("smart-casual", new String[] {"polo", "quan kaki", "loafer", "lịch sự", "dong ho"}),
+            Map.entry("elegant", new String[] {"ao kieu", "quan ong rong", "giay cao got", "thanh lịch", "tui xach"}),
+            Map.entry("minimal", new String[] {"ao thun tron", "quan kaki", "sneaker trang", "tối giản", "tui tote"}),
+            Map.entry("streetwear", new String[] {"ao thun oversize", "quan baggy", "sneaker", "streetwear", "mu luoi trai"}),
+            Map.entry("trendy", new String[] {"ao thun oversize", "quan baggy", "sneaker", "cá tính", "kinh mat"}),
+            Map.entry("sporty", new String[] {"ao the thao", "quan jogger", "giay chay bo", "thể thao", "balo"}),
+            Map.entry("casual", new String[] {"ao thun", "quan jeans", "sneaker", "thường ngày", "tui tote"}),
+            Map.entry("basic", new String[] {"ao thun", "quan jeans", "sneaker", "basic", "mu luoi trai"}),
+            Map.entry("preppy", new String[] {"ao polo", "quan kaki", "loafer", "preppy", "that lung"}),
+            Map.entry("feminine", new String[] {"ao kieu", "chan vay", "mary jane", "nữ tính", "kep toc"}),
+            Map.entry("romantic", new String[] {"ao kieu", "chan vay", "mary jane", "dịu dàng", "vong co"}),
+            Map.entry("vintage", new String[] {"so mi vintage", "quan ong rong", "giay oxford", "vintage", "kinh mat"}));
     private static final List<String> PARTS = List.of("TOP", "BOTTOM", "SHOES");
 
     private WardrobeGaps() {
@@ -102,6 +102,36 @@ public final class WardrobeGaps {
             }
         }
         return Optional.empty();
+    }
+
+    /** Một món trong bộ gợi ý mua: owned = tủ đồ đã có món loại này hợp dịp / gu (vẫn gợi ý để có thêm lựa chọn). */
+    public record Piece(WardrobeGap gap, boolean owned) {
+    }
+
+    /**
+     * Bộ đồ hợp dịp để gợi ý mua: áo, quần, giày, phụ kiện theo phong cách của dịp (và gu đã khảo sát).
+     * Luôn trả đủ 4 món, kể cả khi tủ đồ đã có, để người dùng có thêm lựa chọn; món tủ còn thiếu đánh dấu owned = false.
+     */
+    public static List<Piece> look(List<ClosetItem> closet, Occasion occasion, StylePreferences prefs) {
+        String style = targetStyle(occasion, prefs);
+        if (style == null) style = "casual";
+        Set<String> wanted = new HashSet<>(occasion == null ? Set.of() : OutfitRecommender.occasionTags(occasion));
+        wanted.add(style);
+        String[] words = BY_STYLE.get(style);
+        String suffix = occasion == null ? words[3] : occasion.label();
+        List<Piece> pieces = new java.util.ArrayList<>();
+        String[] categories = {"TOP", "BOTTOM", "SHOES", "ACCESSORY"};
+        int[] word = {0, 1, 2, 4};
+        for (int i = 0; i < categories.length; i++) {
+            String category = categories[i];
+            boolean owned = closet.stream().anyMatch(item -> category(item).equals(category) && fits(item, wanted))
+                    || (!category.equals("SHOES") && !category.equals("ACCESSORY")
+                        && closet.stream().anyMatch(item -> category(item).equals("DRESS") && fits(item, wanted)));
+            String keyword = category.equals("ACCESSORY") ? words[4] : withGender(words[word[i]], category, prefs.gender());
+            pieces.add(new Piece(new WardrobeGap(category, keyword, LABEL.get(category) + " " + suffix,
+                    prefs.gender(), prefs.budget(), prefs.colors()), owned));
+        }
+        return pieces;
     }
 
     /** Phong cách người dùng chọn hợp dịp này; không có thì phong cách tiêu biểu của dịp. */

@@ -311,6 +311,11 @@ const outfit: HttpHandler[] = [
         unitsSold: 1000 * n,
         source: 'TIKTOK_SHOP',
       })),
+      look: [['TOP', 'áo đi học', 'Áo thun basic', true], ['BOTTOM', 'quần đi học', 'Quần jeans ống suông', true],
+        ['SHOES', 'giày đi học', 'Giày sneaker trắng', false], ['ACCESSORY', 'phụ kiện đi học', 'Túi tote canvas', false]]
+        .map(([category, label, title, owned], n) => ({ category, label, owned, product: {
+          id: `look-${n}`, title: `${title} (dữ liệu giả lập)`, imageUrl: null, minPriceVnd: 150000 + n * 50000,
+          maxPriceVnd: 150000 + n * 50000, shopName: 'Shop mẫu', unitsSold: 500, source: 'TIKTOK_SHOP' } })),
     }),
   ),
   http.post('*/api/app/outfits/shopping/:id/open', () => HttpResponse.json({ url: 'https://shop.tiktok.com/' })),

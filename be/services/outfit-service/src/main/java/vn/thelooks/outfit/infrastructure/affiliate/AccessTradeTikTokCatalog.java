@@ -42,7 +42,9 @@ class AccessTradeTikTokCatalog implements ProductCatalog {
     static final Map<String, Set<String>> CATEGORY_WORDS = Map.of(
             "TOP", Set.of("t-shirt", "shirts", "polo", "blouse", "tops", "tanks", "hoodies", "sweatshirts"),
             "BOTTOM", Set.of("jeans", "pants", "trousers", "shorts", "skirts", "leggings"),
-            "SHOES", Set.of("trainers", "shoes", "sneakers", "sandals", "flip flops", "boots", "slip-ons", "loafers", "heels", "mary jane"));
+            "SHOES", Set.of("trainers", "shoes", "sneakers", "sandals", "flip flops", "boots", "slip-ons", "loafers", "heels", "mary jane"),
+            "ACCESSORY", Set.of("bag", "backpack", "tote", "hat", "cap", "belt", "watch", "sunglasses", "eyewear", "necklace",
+                    "bracelet", "earring", "jewelry", "hair"));
 
     private record Cached(Instant at, List<ProductOffer> offers) {
     }

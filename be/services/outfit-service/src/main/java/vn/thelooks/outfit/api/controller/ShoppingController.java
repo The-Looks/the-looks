@@ -31,13 +31,15 @@ class ShoppingController {
         this.shop = shop;
     }
 
-    /** 204 khi tủ đồ đủ món cho dịp này hoặc không tìm được sản phẩm. */
+    /** Món còn thiếu (nếu có) + bộ đồ hợp dịp để mua; 204 khi không tìm được sản phẩm nào. */
     @GetMapping
     ResponseEntity<ShoppingResponse> suggest(@AuthenticationPrincipal Jwt jwt, @RequestParam Occasion occasion) {
         return shop.suggest(CurrentUser.id(jwt), occasion)
                 .map(s -> ResponseEntity.ok(new ShoppingResponse(
-                        new Gap(s.gap().category(), s.gap().label()),
-                        s.products().stream().map(Product::from).toList())))
+                        s.gap() == null ? null : new Gap(s.gap().category(), s.gap().label()),
+                        s.products().stream().map(Product::from).toList(),
+                        s.look().stream().map(i -> new LookItem(i.piece().category(), i.piece().label(), i.owned(),
+                                Product.from(i.product()))).toList())))
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
@@ -62,7 +64,10 @@ class ShoppingController {
     static class ProductExpiredException extends RuntimeException {
     }
 
-    record ShoppingResponse(Gap gap, List<Product> products) {
+    record ShoppingResponse(Gap gap, List<Product> products, List<LookItem> look) {
+    }
+
+    record LookItem(String category, String label, boolean owned, Product product) {
     }
 
     record Gap(String category, String label) {
