@@ -58,7 +58,7 @@ export function PublicPollPage() {
                   <div className="guest-options" role="radiogroup" aria-label="Chọn outfit">
                     {(['A', 'B'] as const).map((value) => {
                       const option = value === 'A' ? poll.data.optionA : poll.data.optionB;
-                      const image = option?.imageUrls?.[0];
+                      const images = option?.imageUrls ?? [];
                       return (
                         <button
                           key={value}
@@ -69,8 +69,10 @@ export function PublicPollPage() {
                           disabled={vote.isPending}
                           onClick={() => setChoice(value)}
                         >
-                          {image ? <img src={image} alt={`Outfit ${value}`} /> : <AssetPlaceholder label={`Ảnh outfit ${value}`} assetPath={`assets/polls/${code}-${value.toLowerCase()}.jpg`} />}
-                          <span className="guest-option-label"><span className="guest-radio">{choice === value && <CheckCircleFilled />}</span><span><strong>Set {value}</strong><small>Chạm để chọn Set {value}</small></span></span>
+                          {images.length ? <div className={`guest-outfit-images${images.length === 1 ? ' single' : ''}`}>
+                            {images.map((image, index) => <img key={`${image}-${index}`} src={image} alt={`Món ${index + 1} của Set ${value}`} />)}
+                          </div> : <AssetPlaceholder label={`Ảnh outfit ${value}`} assetPath={`assets/polls/${code}-${value.toLowerCase()}.jpg`} />}
+                          <span className="guest-option-label"><span className="guest-radio">{choice === value && <CheckCircleFilled />}</span><span><strong>Set {value}</strong><small>{images.length ? `${images.length} món · ` : ''}Chạm để chọn Set {value}</small></span></span>
                         </button>
                       );
                     })}

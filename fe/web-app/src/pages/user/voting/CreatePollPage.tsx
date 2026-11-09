@@ -2,12 +2,39 @@ import { useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { errorMessage } from '../../../services/shared/api/client';
 import { formatDate } from '../../../services/shared/format';
+import { categoryLabel } from '../../../services/shared/labels';
 import { Button, Card, Field, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
+import type { SavedOutfit, WardrobeItem } from '../../../interface/dto/types';
+import { occasionLabel } from '../../../services/user/outfit/occasions';
+import { useWardrobe } from '../../../hooks/user/wardrobe/api';
 import { useCreatePoll, useOutfitChoices } from '../../../hooks/user/voting/api';
+
+function outfitLabel(outfit: SavedOutfit, items: WardrobeItem[]) {
+  const pieces = outfit.itemIds.map((id) => items.find((item) => item.id === id)?.category).filter(Boolean).map(categoryLabel);
+  return `${occasionLabel(outfit.occasion) ?? 'Tự phối'} · ${pieces.length ? pieces.join(' + ') : `${outfit.itemIds.length} món`} · lưu ${formatDate(outfit.createdAt)}`;
+}
+
+function OutfitPreview({ outfit, items }: { outfit?: SavedOutfit; items: WardrobeItem[] }) {
+  if (!outfit) return null;
+  return (
+    <div className="poll-outfit-preview">
+      <div className="poll-outfit-images">
+        {outfit.itemIds.map((id, index) => {
+          const item = items.find((entry) => entry.id === id);
+          return item?.imageUrl
+            ? <img key={id} src={item.imageUrl} alt={`${categoryLabel(item.category)} trong outfit, món ${index + 1}`} />
+            : <span key={id}>{categoryLabel(item?.category)}</span>;
+        })}
+      </div>
+      <span>{outfitLabel(outfit, items)}</span>
+    </div>
+  );
+}
 
 export function CreatePollPage() {
   const [params] = useSearchParams();
   const outfits = useOutfitChoices();
+  const wardrobe = useWardrobe();
   const create = useCreatePoll();
   const [a, setA] = useState(params.get('outfit') ?? '');
   const [b, setB] = useState('');
@@ -41,9 +68,10 @@ export function CreatePollPage() {
     }
   };
 
+  const items = wardrobe.data ?? [];
   const options = outfits.data?.map((o) => (
     <option key={o.id} value={o.id}>
-      {o.itemIds.length} món · lưu {formatDate(o.createdAt)}
+      {outfitLabel(o, items)}
     </option>
   ));
 
@@ -72,6 +100,7 @@ export function CreatePollPage() {
                 <option value="">Chọn outfit đã lưu</option>
                 {options}
               </select>
+              <OutfitPreview outfit={outfits.data?.find((o) => o.id === a)} items={items} />
             </div>
             <div className="field">
               <label htmlFor="poll-b">Outfit B</label>
@@ -79,6 +108,7 @@ export function CreatePollPage() {
                 <option value="">Chọn outfit đã lưu</option>
                 {options}
               </select>
+              <OutfitPreview outfit={outfits.data?.find((o) => o.id === b)} items={items} />
             </div>
             {a && a === b && <Notice tone="warn">Hãy chọn 2 outfit khác nhau.</Notice>}
             {create.isError && <Notice tone="error">{errorMessage(create.error)}</Notice>}

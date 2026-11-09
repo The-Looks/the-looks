@@ -94,6 +94,7 @@
 .guest-option:hover:not(:disabled), .guest-option:focus-visible { transform: translateY(-4px); border-color: var(--lavender); box-shadow: 0 15px 34px #251d2f16; }
 .guest-option.selected { border-color: var(--purple); box-shadow: inset 0 0 0 1px var(--purple), 0 15px 34px #9440dd1a; }
 .guest-option img, .guest-option .asset-placeholder { width: 100%; height: clamp(220px, 24vw, 335px); min-height: 220px; border-radius: 12px; object-fit: cover; }
+.guest-outfit-images { height: clamp(220px, 24vw, 335px); }
 .guest-option .asset-placeholder { background: linear-gradient(135deg, #efe0f7, #f9eef2 52%, #f2e6f9); }
 .guest-option-label { min-height: 60px; padding: 10px 6px 4px; }
 .guest-option-label > span:last-child { display: grid; gap: 3px; }
