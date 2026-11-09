@@ -4,20 +4,12 @@ import { errorMessage } from '../../../services/shared/api/client';
 import type { StylePreferences } from '../../../interface/dto/types';
 import { Button, Card, Chip, Notice, PageHeader, Spinner } from '../../../components/shared/ui/index';
 import { usePreferences, useSavePreferences } from '../../../hooks/user/outfit/api';
-import { COLORS, STYLE_QUIZ, quizStyles, type Style } from '../../../services/user/outfit/styleQuiz';
+import { COLORS, STYLE_QUIZ, STYLES, quizStyles, type Style } from '../../../services/user/outfit/styleQuiz';
 
 const GENDERS: { value: NonNullable<StylePreferences['gender']>; label: string }[] = [
   { value: 'FEMALE', label: 'Nữ' },
   { value: 'MALE', label: 'Nam' },
   { value: 'OTHER', label: 'Khác' },
-];
-const STYLES: { value: Style; label: string }[] = [
-  { value: 'feminine', label: 'Nữ tính' },
-  { value: 'sporty', label: 'Năng động' },
-  { value: 'minimal', label: 'Tối giản' },
-  { value: 'streetwear', label: 'Streetwear' },
-  { value: 'vintage', label: 'Vintage' },
-  { value: 'office', label: 'Công sở' },
 ];
 const BUDGETS: { value: NonNullable<StylePreferences['budget']>; label: string }[] = [
   { value: 'LOW', label: 'Dưới 200k' },
@@ -35,7 +27,7 @@ export function StylePreferencesPage() {
   const save = useSavePreferences();
   const [form, setForm] = useState<StylePreferences>({ gender: null, styles: [], budget: null, colors: [] });
   const [quizOpen, setQuizOpen] = useState(onboarding && !current.data?.styles?.length);
-  const [answers, setAnswers] = useState<(Style | undefined)[]>([]);
+  const [answers, setAnswers] = useState<Style[][]>([]);
   const [quizResult, setQuizResult] = useState<Style[]>([]);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -49,9 +41,11 @@ export function StylePreferencesPage() {
   const colors = form.colors ?? [];
   const toggleColor = (c: string) =>
     setForm((f) => ({ ...f, colors: colors.includes(c) ? colors.filter((x) => x !== c) : [...colors, c] }));
+  // Mỗi câu chọn được nhiều đáp án: bấm lần nữa để bỏ chọn
   const answer = (question: number, style: Style) => setAnswers((current) => {
     const next = [...current];
-    next[question] = style;
+    const picked = next[question] ?? [];
+    next[question] = picked.includes(style) ? picked.filter((s) => s !== style) : [...picked, style];
     return next;
   });
   const finishQuiz = () => {
@@ -101,14 +95,14 @@ export function StylePreferencesPage() {
         {quizOpen && <div className="stack">
           {STYLE_QUIZ.map((q, index) => (
             <div key={q.question} className="field">
-              <label id={`quiz-${index}`}>{index + 1}. {q.question}</label>
-              <div className="row" role="radiogroup" aria-labelledby={`quiz-${index}`}>
-                {q.answers.map((a) => <Chip key={a.label} active={answers[index] === a.style} onClick={() => answer(index, a.style)}>{a.label}</Chip>)}
+              <label id={`quiz-${index}`}>{index + 1}. {q.question} <span className="small muted">(chọn được nhiều)</span></label>
+              <div className="row" role="group" aria-labelledby={`quiz-${index}`}>
+                {q.answers.map((a) => <Chip key={a.label} active={answers[index]?.includes(a.style)} onClick={() => answer(index, a.style)}>{a.label}</Chip>)}
               </div>
             </div>
           ))}
           <div className="row">
-            <Button onClick={finishQuiz} disabled={STYLE_QUIZ.some((_, index) => !answers[index])}>Xem phong cách của tôi</Button>
+            <Button onClick={finishQuiz} disabled={STYLE_QUIZ.some((_, index) => !answers[index]?.length)}>Xem phong cách của tôi</Button>
             <Button kind="ghost" onClick={() => setQuizOpen(false)}>Để sau</Button>
           </div>
         </div>}
