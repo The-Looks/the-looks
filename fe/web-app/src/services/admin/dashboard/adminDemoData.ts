@@ -35,9 +35,9 @@ export const adminProducts: AdminProduct[] = [
 ];
 
 export const adminAudit = [
-  { key: '1', time: '14/10/2026 · 10:45', actor: 'Admin LOOKSY', action: 'Mở khóa tài khoản', target: 'Vũ Hoàng Mai', result: 'Thành công' },
-  { key: '2', time: '14/10/2026 · 09:52', actor: 'Admin LOOKSY', action: 'Xác minh tài khoản', target: 'Lê Gia Hân', result: 'Thành công' },
-  { key: '3', time: '13/10/2026 · 17:05', actor: 'Admin LOOKSY', action: 'Khóa tài khoản', target: 'Lê Hoàng Mai', result: 'Thành công' },
-  { key: '4', time: '13/10/2026 · 15:22', actor: 'Admin LOOKSY', action: 'Gỡ thông báo', target: 'Trần Minh Anh', result: 'Thành công' },
-  { key: '5', time: '12/10/2026 · 15:12', actor: 'Admin LOOKSY', action: 'Cập nhật trạng thái', target: 'Ngô Phương Vy', result: 'Thành công' },
+  { key: '1', time: '14/10/2026 · 10:45', actor: 'Admin THE LOOKS', action: 'Mở khóa tài khoản', target: 'Vũ Hoàng Mai', result: 'Thành công' },
+  { key: '2', time: '14/10/2026 · 09:52', actor: 'Admin THE LOOKS', action: 'Xác minh tài khoản', target: 'Lê Gia Hân', result: 'Thành công' },
+  { key: '3', time: '13/10/2026 · 17:05', actor: 'Admin THE LOOKS', action: 'Khóa tài khoản', target: 'Lê Hoàng Mai', result: 'Thành công' },
+  { key: '4', time: '13/10/2026 · 15:22', actor: 'Admin THE LOOKS', action: 'Gỡ thông báo', target: 'Trần Minh Anh', result: 'Thành công' },
+  { key: '5', time: '12/10/2026 · 15:12', actor: 'Admin THE LOOKS', action: 'Cập nhật trạng thái', target: 'Ngô Phương Vy', result: 'Thành công' },
 ];

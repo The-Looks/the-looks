@@ -430,8 +430,8 @@ components:
         source: { type: string, description: 'Sàn bán, vd TIKTOK_SHOP' }
     Occasion:
       type: string
-      enum: [SCHOOL, WORK, HANGOUT, DATE]
-      description: đi học, đi làm, đi chơi, hẹn hò
+      enum: [SCHOOL, WORK, HANGOUT, DATE, PARTY, TRAVEL, SPORT, WEDDING, INTERVIEW]
+      description: đi học, đi làm, đi chơi, hẹn hò, đi tiệc, du lịch, tập thể thao, dự tiệc cưới, phỏng vấn
     OutfitItem:
       type: object
       required: [id, category]

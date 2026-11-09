@@ -73,7 +73,8 @@ public final class WardrobeGaps {
                 : null;
         if (missing != null) {
             Map<String, String[]> words = prefs.gender() == Gender.MALE ? MALE : prefs.gender() == Gender.FEMALE ? FEMALE : NEUTRAL;
-            String keyword = words.get(missing)[occasion == Occasion.WORK ? 0 : 1];
+            boolean dressy = occasion == Occasion.WORK || occasion == Occasion.INTERVIEW || occasion == Occasion.WEDDING;
+            String keyword = words.get(missing)[dressy ? 0 : 1];
             return Optional.of(new WardrobeGap(missing, keyword, LABEL.get(missing), prefs.gender(), prefs.budget(), prefs.colors()));
         }
         return styleGap(closet, occasion, prefs);
@@ -144,6 +145,11 @@ public final class WardrobeGaps {
         return chosen.stream().filter(tags::contains).findFirst().orElse(switch (occasion) {
             case WORK -> "office";
             case SCHOOL -> "casual";
+            case PARTY -> "trendy";
+            case TRAVEL -> "casual";
+            case SPORT -> "sporty";
+            case WEDDING -> prefs.gender() == Gender.MALE ? "smart-casual" : "elegant";
+            case INTERVIEW -> "office";
             case HANGOUT -> "streetwear";
             case DATE -> prefs.gender() == Gender.MALE ? "smart-casual" : "feminine";
         });

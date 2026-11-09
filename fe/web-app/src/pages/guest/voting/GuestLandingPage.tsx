@@ -38,7 +38,7 @@ export function GuestLandingPage() {
         <BackButton />
         <section className="guest-landing-hero">
           <div>
-            <span className="guest-kicker"><HeartOutlined /> LOOKSY / THE LOOKS</span>
+            <span className="guest-kicker"><HeartOutlined /> THE LOOKS</span>
             <h1>Bạn bè chọn giúp.<br /><em>Bạn tự tin diện đẹp.</em></h1>
             <p>Tạo bình chọn trong ứng dụng và gửi link qua Zalo. Bạn bè mở web, chọn outfit hợp nhất trong vài giây. <strong>Không cần cài app hay đăng nhập.</strong></p>
             <div className="row">
